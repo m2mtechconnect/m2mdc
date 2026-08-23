@@ -301,8 +301,7 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     const handleResize = () => {
       const newW = Math.min((canvasRef.current?.parentElement?.clientWidth || 1200) - 32, 1400);
       const newH = Math.min(Math.max(window.innerHeight - 400, 500), 700);
-      canvas.setWidth(newW);
-      canvas.setHeight(newH);
+      canvas.setDimensions({ width: newW, height: newH });
       canvas.renderAll();
     };
     window.addEventListener('resize', handleResize);

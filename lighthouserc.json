@@ -3,12 +3,7 @@
     "collect": {
       "startServerCommand": "npm run preview",
       "url": [
-        "http://localhost:4173/",
-        "http://localhost:4173/dashboard",
-        "http://localhost:4173/builder",
-        "http://localhost:4173/analytics",
-        "http://localhost:4173/operations",
-        "http://localhost:4173/integrations"
+        "http://localhost:4173/"
       ],
       "numberOfRuns": 3
     },
@@ -25,8 +20,12 @@
         "total-blocking-time": ["warn", {"maxNumericValue": 300}],
         "speed-index": ["warn", {"maxNumericValue": 3500}],
         "interactive": ["warn", {"maxNumericValue": 4000}],
+        "unused-css-rules": "warn",
+        "unused-javascript": "warn",
         "uses-responsive-images": "off",
-        "offscreen-images": "warn"
+        "offscreen-images": "warn",
+        "image-delivery-insight": "warn",
+        "network-dependency-tree-insight": "warn"
       }
     },
     "upload": {

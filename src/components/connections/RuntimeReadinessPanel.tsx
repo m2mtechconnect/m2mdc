@@ -151,7 +151,7 @@ export function RuntimeReadinessPanel({ connections = [] }: { connections?: Conn
                       <span className="font-medium text-foreground">{row.label}</span>
                       <Badge variant="outline" className="text-[11px]">{STATE_LABEL[row.state]}</Badge>
                       {row.code && (
-                        <code className="rounded bg-muted px-1 py-0.5 text-[11px] text-destructive">{row.code}</code>
+                        <code className="rounded bg-muted px-1 py-0.5 text-xs text-destructive">{row.code}</code>
                       )}
                     </div>
                     <p className="mt-0.5 break-words text-muted-foreground">{row.value}</p>
@@ -220,7 +220,7 @@ export function RuntimeReadinessPanel({ connections = [] }: { connections?: Conn
               data-testid="canary-deploy-result"
             >
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Badge variant="outline" className={result.status === 'AUTHORIZED' ? 'text-[11px]' : 'border-destructive/50 text-[11px] text-destructive'}>
+                <Badge variant="outline" className={result.status === 'AUTHORIZED' ? 'text-[11px]' : 'border-destructive/50 text-xs text-destructive'}>
                   {result.status}
                 </Badge>
                 <span className="text-muted-foreground">
@@ -240,7 +240,7 @@ export function RuntimeReadinessPanel({ connections = [] }: { connections?: Conn
                 <ul className="mt-2 space-y-2">
                   {result.blockers.map((b) => (
                     <li key={b.code} className="min-w-0 text-xs">
-                      <code className="rounded bg-muted px-1 py-0.5 text-[11px] text-destructive">{b.code}</code>
+                      <code className="rounded bg-muted px-1 py-0.5 text-xs text-destructive">{b.code}</code>
                       <p className="mt-0.5 break-words text-muted-foreground">{b.detail}</p>
                     </li>
                   ))}
@@ -259,7 +259,7 @@ export function RuntimeReadinessPanel({ connections = [] }: { connections?: Conn
           <ul className="mt-2 space-y-2">
             {BLOCKERS.map((blocker) => (
               <li key={blocker.code} className="min-w-0 text-xs">
-                <code className="rounded bg-muted px-1 py-0.5 text-[11px] text-destructive">{blocker.code}</code>
+                <code className="rounded bg-muted px-1 py-0.5 text-xs text-destructive">{blocker.code}</code>
                 <p className="mt-0.5 break-words text-muted-foreground">{blocker.detail}</p>
               </li>
             ))}

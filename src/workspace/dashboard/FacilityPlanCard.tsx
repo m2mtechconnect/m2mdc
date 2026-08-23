@@ -168,11 +168,11 @@ export function FacilityPlanCard({
     <section
       aria-labelledby="facility-visual-heading"
       data-testid="facility-canvas"
-      className="min-w-0 overflow-hidden rounded-lg border border-border bg-card"
+      className="v2-panel min-w-0 overflow-hidden p-0"
     >
-      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))]/70 px-4 py-3">
         <div className="min-w-0">
-          <h2 id="facility-visual-heading" className="text-[16px] font-semibold leading-tight text-foreground">
+          <h2 id="facility-visual-heading" className="v2-section-title">
             Facility visualisation
           </h2>
           <p className="mt-0.5 hidden text-[13px] text-muted-foreground sm:block">
@@ -240,8 +240,8 @@ export function FacilityPlanCard({
                   'hidden h-9 items-center gap-1.5 rounded-md border px-2.5 text-[13px] font-medium transition-colors duration-150 lg:inline-flex',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isActive
-                    ? 'border-[hsl(var(--info))] bg-[hsl(var(--info)/0.12)] text-[hsl(var(--info-strong))]'
-                    : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--info)/0.5)] hover:text-foreground',
+                    ? 'border-[hsl(var(--v2-tech))] bg-[hsl(var(--v2-tech)/0.12)] text-[hsl(var(--v2-tech-strong))]'
+                    : 'border-border bg-card text-muted-foreground hover:border-[hsl(var(--v2-tech)/0.5)] hover:text-foreground',
                 )}
               >
                 <layer.Icon className="h-4 w-4" strokeWidth={1.75} aria-hidden />
@@ -344,9 +344,9 @@ export function FacilityPlanCard({
       </div>
 
       <div className="flex min-w-0 items-stretch h-[clamp(300px,38vh,320px)] md:h-[clamp(360px,44vh,400px)] lg:h-[clamp(440px,52vh,500px)]">
-        <div className="min-w-0 flex-1 p-3">
+        <div className="v2-tech-zone min-w-0 flex-1 p-3">
           <div
-            className="facility-canvas relative h-full w-full min-w-0 overflow-hidden rounded-md border border-border bg-[#0a1020]"
+            className="facility-canvas v2-viewport relative h-full w-full min-w-0 overflow-hidden"
             data-testid="facility-canvas-viewport"
           >
             <FacilityFloorPlan
@@ -405,7 +405,7 @@ export function FacilityPlanCard({
       </div>
 
       <div
-        className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-border px-4 py-2 text-[12px] text-muted-foreground"
+        className="v2-mono flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))]/70 px-4 py-2 text-[12px] text-[hsl(var(--text-muted))]"
         data-testid="canvas-disclosure"
       >
         <span>Procedural design visualization</span>

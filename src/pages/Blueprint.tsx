@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Panel, SectionHeader, Instrument, InstrumentGrid } from '@/components/v2';
 import { 
   Bot, 
   Database, 
@@ -231,11 +232,11 @@ export default function Blueprint() {
 
   return (
     <BlueprintDesignerWrapper twinId={blueprintId}>
-      <div className="min-h-dvh bg-background">
+      <div className="min-h-dvh v2-canvas">
         <div className="flex min-w-0">
           {/* Main Content */}
           <div className={`flex-1 min-w-0 transition-all duration-300 ${showCoPilotPanel ? 'lg:mr-96' : ''}`}>
-            <div className="container mx-auto py-4 px-4 max-w-7xl">
+            <div className="mx-auto min-w-0 max-w-[1800px] px-4 py-4">
               {/*
                 Stage 7J: a single compact header. Identity, facility facts and
                 every Blueprint action live here so the modelling workspace
@@ -287,7 +288,7 @@ export default function Blueprint() {
               <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                 <TabsList
                   aria-label={t('blueprint.tabs.listLabel')}
-                  className="w-full justify-start border-b rounded-none bg-transparent p-0 h-auto flex-wrap gap-1"
+                  className="w-full justify-start rounded-none border-b border-[hsl(var(--v2-line))] bg-transparent p-0 h-auto flex-wrap gap-1"
                 >
                   {[
                     { value: 'model', label: t('blueprint.tabs.model') },
@@ -300,20 +301,14 @@ export default function Blueprint() {
                       key={tab.value}
                       value={tab.value}
                       data-blueprint-tab={tab.value}
-                      className="relative rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-4 py-2.5 text-muted-foreground data-[state=active]:text-foreground hover:text-foreground transition-all duration-200 data-[state=active]:font-medium"
+                      className="relative rounded-none border-b-2 border-transparent px-4 py-2.5 text-[14px] font-medium tracking-normal text-muted-foreground transition-all duration-200 hover:text-foreground data-[state=active]:border-[hsl(var(--v2-tech))] data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-foreground data-[state=active]:shadow-none"
                     >
                       {tab.label}
-                      {activeTab === tab.value && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary motion-safe:animate-pulse"
-                        />
-                      )}
                     </TabsTrigger>
                   ))}
                 </TabsList>
 
-                <div className="mt-6">
+                <div className="mt-4">
                   <TabsContent value="model" className="m-0">
                     {/* Stage 7K: operator workspace, not a full system report. */}
                     <BlueprintModelWorkspace
@@ -371,38 +366,41 @@ export default function Blueprint() {
                           dbTwin: dbTwinData,
                         })}
                       />
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-base flex items-center gap-2">
-                            <Activity className="h-4 w-4" />
-                            {t('blueprint.deploymentReadiness')}
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {t('blueprint.deploymentReadinessDesc')}
-                          </p>
-                          <div className="space-y-3">
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.agentsConfigured')}</span>
-                              <Badge variant="outline">{blueprint.agents.length}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.kpisTracked')}</span>
-                              <Badge variant="outline">{blueprint.kpis.length}</Badge>
-                            </div>
-                            <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
-                              <span className="text-sm">{t('blueprint.workflowsActive')}</span>
-                              <Badge variant="outline">{blueprint.workflows.filter(w => w.enabled).length}</Badge>
-                            </div>
-                            {/* Stage 7J: scenario readiness is owned by the
-                                Simulation workspace, not by Blueprint. */}
-                            <p className="text-xs text-muted-foreground">
-                              {t('blueprint.scenariosOwnedBySimulation')}
-                            </p>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <Panel className="min-w-0">
+                        <SectionHeader
+                          title={
+                            <span className="flex items-center gap-2">
+                              <Activity className="h-3.5 w-3.5" aria-hidden />
+                              {t('blueprint.deploymentReadiness')}
+                            </span>
+                          }
+                        />
+                        <p className="mb-3 text-[13px] text-muted-foreground">
+                          {t('blueprint.deploymentReadinessDesc')}
+                        </p>
+                        <InstrumentGrid>
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.agentsConfigured')}
+                            value={blueprint.agents.length}
+                          />
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.kpisTracked')}
+                            value={blueprint.kpis.length}
+                          />
+                          <Instrument
+                            level="compact"
+                            label={t('blueprint.workflowsActive')}
+                            value={blueprint.workflows.filter((w) => w.enabled).length}
+                          />
+                        </InstrumentGrid>
+                        {/* Stage 7J: scenario readiness is owned by the
+                            Simulation workspace, not by Blueprint. */}
+                        <p className="mt-3 text-xs text-muted-foreground">
+                          {t('blueprint.scenariosOwnedBySimulation')}
+                        </p>
+                      </Panel>
                     </div>
                   </TabsContent>
                   <TabsContent value="versions" className="m-0">

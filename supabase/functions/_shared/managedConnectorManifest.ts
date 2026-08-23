@@ -13,7 +13,8 @@
  * display strings; `managed-connector-capabilities` never echoes them
  * verbatim as a product name.
  *
- * Verified 2026-08-17 against the workspace connector inventory.
+ * Verified 2026-08-17 against the workspace connector inventory; target
+ * hybrid-stack entries added later remain explicitly unverified/not deployed.
  */
 import type { ManagedOperation } from './managedConnectorAuthz.ts';
 
@@ -143,6 +144,54 @@ export const MANAGED_CONNECTOR_MANIFEST: ManifestEntry[] = [
       'AURA_NATIVE_REQUIRED: the deployment contract for incident and change data forbids any third-party OAuth intermediary.',
     verified_at: '2026-08-17',
     evidence_note: 'No managed substitution is permitted. An AURA-owned integration must be built.',
+  },
+  {
+    connector_definition_id: 'redfish',
+    display_provider: 'Redfish',
+    connection_class: 'AURA_NATIVE',
+    eligibility: 'NATIVE_RUNTIME_REQUIRED',
+    gateway_connector_key: null,
+    linked_to_project: false,
+    supported_operations: [],
+    data_classes: ['asset', 'telemetry'],
+    disclosure_limitations: [],
+    health_probe: null,
+    native_required_reason:
+      'AURA_NATIVE_REQUIRED: hardware-management access must terminate at an AURA-controlled facility or edge adapter.',
+    verified_at: null,
+    evidence_note: 'Target hybrid-stack source. No operational Redfish endpoint or runtime adapter is verified in this environment.',
+  },
+  {
+    connector_definition_id: 'nvidia_dcgm',
+    display_provider: 'NVIDIA DCGM',
+    connection_class: 'AURA_NATIVE',
+    eligibility: 'NATIVE_RUNTIME_REQUIRED',
+    gateway_connector_key: null,
+    linked_to_project: false,
+    supported_operations: [],
+    data_classes: ['gpu_telemetry', 'metrics'],
+    disclosure_limitations: [],
+    health_probe: null,
+    native_required_reason:
+      'AURA_NATIVE_REQUIRED: GPU telemetry must be collected by an AURA-controlled runtime close to the managed cluster.',
+    verified_at: null,
+    evidence_note: 'Target hybrid-stack source. No operational NVIDIA DCGM telemetry feed is verified in this environment.',
+  },
+  {
+    connector_definition_id: 'ddn_infinia',
+    display_provider: 'DDN Infinia',
+    connection_class: 'AURA_NATIVE',
+    eligibility: 'BLOCKED_MISSING_DEPLOYMENT',
+    gateway_connector_key: null,
+    linked_to_project: false,
+    supported_operations: [],
+    data_classes: ['asset', 'evidence'],
+    disclosure_limitations: [],
+    health_probe: null,
+    native_required_reason:
+      'AURA_NATIVE_REQUIRED: the DDN storage binding must be deployed and credentialed in an AURA-owned runtime. Existing AURA managed OpenUSD storage is a different binding.',
+    verified_at: null,
+    evidence_note: 'Target hybrid-stack object-storage layer. DDN Infinia is not deployed or runtime-verified in this environment.',
   },
   ...(
     [

@@ -15,6 +15,9 @@
     "opcua",
     "snmp",
     "dcim_rest",
+    "redfish",
+    "nvidia_dcgm",
+    "ddn_infinia",
     "aws",
     "azure",
     "gcp",
@@ -31,12 +34,21 @@
   ],
   "notInOperationalCatalogue": {
     "brev": "GPU development and validation environment - represented under deployments/validation, not as an operational data source",
-    "omniverse_kit": "disabled by design"
+    "omniverse_kit": "disabled by design",
+    "supabase_platform": "internal application dependency - represented under Platform Administration, not customer Connections",
+    "kubernetes": "runtime/deployment substrate - represented under Platform Administration unless a future customer-owned cluster is explicitly bound",
+    "search_analytics": "web-presence analytics - not an AURA DC operational connector",
+    "workspace_documents": "build-time/knowledge source - not facility telemetry or operational exchange",
+    "plm_cad_import": "design import - owned by Blueprint",
+    "bim_ifc_import": "design import - owned by Blueprint",
+    "asset_manifest": "asset-pipeline capability - owned by Blueprint/asset validation"
   },
   "rules": [
     "Add connection is offered only when runtime_adapter is non-null and implementation_status is IMPLEMENTED",
     "Planned connectors expose View requirements only",
     "Generic REST is never labelled ServiceNow integration",
-    "No connector is named DSX Exchange unless it implements the official event-bus contracts"
+    "No connector is named DSX Exchange unless it implements the official event-bus contracts",
+    "Existing AURA managed OpenUSD storage is not evidence that DDN Infinia is deployed",
+    "Redfish and NVIDIA DCGM remain planned until an AURA-owned runtime adapter and operational source are verified"
   ]
 }

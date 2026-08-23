@@ -67,6 +67,8 @@ export default defineConfig({
         // the Kit client into "enabled" mode so tests can inject payloads
         // via `page.route('**/kit-api/**', …)`.
         command:
+          'VITE_SUPABASE_URL=http://127.0.0.1:54321 ' +
+          'VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key ' +
           'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
           FACADE_ENV +
           `npx vite --port ${PORT} --strictPort`,

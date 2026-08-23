@@ -298,7 +298,11 @@ async function httpBoundary() {
   const twin = {};
   for (const t of Object.values(tenants)) {
     twin[t.label] = scalar(
-      `INSERT INTO public.data_centre_twins (name, created_by_user) VALUES ('validation-${t.label}', '${t.id}') RETURNING id`,
+      `WITH inserted AS (` +
+        `INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user) ` +
+        `VALUES ('validation-${t.label}', 'Validation City', 'validation-${t.label}', '${t.id}') ` +
+        `RETURNING id` +
+      `) SELECT id FROM inserted`,
     );
   }
 
@@ -309,19 +313,25 @@ async function httpBoundary() {
   expect('expired/forged token rejected', (await call('run-lifecycle', forged, { action: 'create' })).status === 401, '401 expected');
 
   // --- input validation and privileged fields
-  const badBody = await call('run-lifecycle', tenants.tenantA.token, { action: 'nonsense' });
+  const badBody = await call('run-lifecycle', tenants.tenantA.token, { op: 'nonsense' });
   expect('invalid body rejected', badBody.status === 400, `status ${badBody.status}`);
 
   const createA = await call('run-lifecycle', tenants.tenantA.token, {
-    action: 'create',
+    op: 'create',
     twinId: twin.tenantA,
+    scenarioKey: 'phase3-external-validation',
+    scenarioName: 'Phase 3 external validation',
     requestedProvider: 'aura-local-deterministic',
-    runIntent: 'authoritative',
+    requestedExecutionClass: 'ephemeral-local-validation',
+    requestedIntent: 'authoritative',
+    inputSnapshot: { source: 'phase3-external-validation' },
+    configuration: {},
+    idempotencyKey: `phase3-${crypto.randomUUID()}`,
     tenantId: tenants.tenantB.id,
     verificationLevel: 'server-verified',
   });
   expect('tenant A run created through the boundary', createA.status < 300, `status ${createA.status}`);
-  const runId = createA.body?.data?.id ?? createA.body?.id ?? null;
+  const runId = createA.body?.data?.run?.id ?? createA.body?.run?.id ?? createA.body?.id ?? null;
   if (runId) {
     const row = JSON.parse(scalar(
       `SELECT row_to_json(r) FROM (SELECT tenant_id, user_id, run_intent, verification_level, server_created_at, lifecycle_status FROM public.simulation_runs WHERE id='${runId}') r`,
@@ -332,13 +342,13 @@ async function httpBoundary() {
     expect('server-generated timestamps present', Boolean(row.server_created_at), 'server_created_at set');
 
     // --- lifecycle transitions
-    const t1 = await call('run-lifecycle', tenants.tenantA.token, { action: 'transition', runId, to: 'running' });
+    const t1 = await call('run-lifecycle', tenants.tenantA.token, { op: 'transition', runId, to: 'running' });
     expect('legal transition queued -> running', t1.status < 300, `status ${t1.status}`);
-    const t2 = await call('run-lifecycle', tenants.tenantA.token, { action: 'transition', runId, to: 'succeeded' });
+    const t2 = await call('run-lifecycle', tenants.tenantA.token, { op: 'transition', runId, to: 'succeeded' });
     expect('legal transition running -> succeeded', t2.status < 300, `status ${t2.status}`);
-    const t3 = await call('run-lifecycle', tenants.tenantA.token, { action: 'transition', runId, to: 'running' });
+    const t3 = await call('run-lifecycle', tenants.tenantA.token, { op: 'transition', runId, to: 'running' });
     expect('succeeded cannot return to running', t3.status === 409, `status ${t3.status} code ${t3.body?.error?.code ?? t3.body?.code}`);
-    const t4 = await call('run-lifecycle', tenants.tenantB.token, { action: 'transition', runId, to: 'failed' });
+    const t4 = await call('run-lifecycle', tenants.tenantB.token, { op: 'transition', runId, to: 'failed' });
     expect('cross-tenant transition rejected', t4.status === 404 || t4.status === 403, `status ${t4.status}`);
 
     // --- decisions

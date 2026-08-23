@@ -1,7 +1,14 @@
-import { Step } from 'react-joyride';
+import type { Step } from 'react-joyride';
 
-export type TourId = 'studioIntro' | 'overview' | 'simulation' | 'blueprint'
-  | 'role_executive' | 'role_manager' | 'role_engineer' | 'role_security_admin';
+export type TourId =
+  | 'studioIntro'
+  | 'overview'
+  | 'simulation'
+  | 'blueprint'
+  | 'role_executive'
+  | 'role_manager'
+  | 'role_engineer'
+  | 'role_security_admin';
 
 export interface TourDefinition {
   id: TourId;
@@ -10,182 +17,170 @@ export interface TourDefinition {
   steps: Step[];
 }
 
-// Studio Intro Tour - Global first login experience
-// Uses multiple selectors for responsive fallbacks
+/**
+ * Tour targets intentionally use canonical shell/workspace selectors only.
+ * No tour points at retired Builder, Data Centre Twin or duplicate admin IA.
+ * Copy also follows AURA truth rules: simulated/modelled data is never called
+ * live unless a validated production source is actually connected.
+ */
 const studioIntroSteps: Step[] = [
   {
-    target: '[data-tour="dc-selector"]',
-    title: 'Active Data Centre',
-    content: 'This selector is your source of truth. Everything you see—Overview, Simulation, Blueprint—reflects the data centre chosen here.',
+    target: '[data-testid="global-header"]',
+    title: 'AURA workspace navigation',
+    content: 'Use the four persistent workspaces for facility decisions: Command Center, Blueprint, Simulation and Evidence.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="nav-dashboard"]',
-    title: 'Command Centre',
-    content: 'Your main dashboard showing real-time KPIs, alerts, and operational status for the active data centre.',
+    target: '[data-nav-item="Command Center"]',
+    title: 'Command Center',
+    content: 'Start here for facility status, priority actions, recent simulation results and model availability.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="nav-builder"]',
-    title: 'Blueprint Designer',
-    content: 'Define your twin\'s configuration—agents, KPIs, workflows, and deployment settings.',
+    target: '[data-nav-item="Blueprint"]',
+    title: 'Blueprint',
+    content: 'The Blueprint owns the canonical facility model, assets, automation definitions, validation and versions.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="nav-agents"]',
-    title: 'Subsystem Agents',
-    content: 'Monitor and configure your AI agents that manage thermal, power, cooling, and other data centre subsystems.',
+    target: '[data-nav-item="Simulation"]',
+    title: 'Simulation',
+    content: 'Review scenario inputs, run the deterministic model, compare outcomes and review recommendations.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="help-menu"]',
-    title: 'Need Help?',
-    content: 'Access guided tours anytime from the Help menu. You can restart any tour whenever you need a refresher.',
+    target: '[data-nav-item="Evidence"]',
+    title: 'Evidence',
+    content: 'Use Evidence to inspect provenance, domain results, sustainability evidence and decision records.',
+    placement: 'bottom',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-testid="assistant-entry"]',
+    title: 'AURA Assistant',
+    content: 'The Assistant is a single global utility and stays available as you move between workspaces.',
     placement: 'bottom',
     disableBeacon: true,
   },
 ];
 
-// Overview Tour - Overview/Dashboard tab
 const overviewSteps: Step[] = [
   {
-    target: '[data-tour="overview-kpi-cockpit"]',
-    title: 'KPI Cockpit',
-    content: 'Monitor critical metrics like PUE, GPU utilization, thermal stability, and carbon intensity at a glance.',
-    placement: 'bottom',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="overview-3d-preview"]',
-    title: '3D Digital Twin',
-    content: 'Visualize your data centre in 3D. Toggle overlays to see thermal zones, power distribution, and rack status.',
-    placement: 'left',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="overview-alerts"]',
-    title: 'Active Alerts',
-    content: 'Real-time alerts from your subsystem agents. Click any alert to see details and recommended actions.',
+    target: '[data-testid="command-centre"]',
+    title: 'Command Center',
+    content: 'Use this decision surface for the current modelled facility state, attention items and recent simulation outcomes.',
     placement: 'top',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="overview-tools"]',
-    title: 'Quick Actions',
-    content: 'Launch simulations, view reports, or access agent controls directly from here.',
-    placement: 'left',
+    target: '[data-nav-item="Blueprint"]',
+    title: 'Inspect the source model',
+    content: 'Move to Blueprint when you need to inspect or change the canonical facility configuration.',
+    placement: 'bottom',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-nav-item="Evidence"]',
+    title: 'Verify a claim',
+    content: 'Move to Evidence when you need the provenance and records behind a metric, constraint or decision.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
 
-// Simulation Tour - Simulation tab
 const simulationSteps: Step[] = [
   {
-    target: '[data-tour="simulation-scenario-list"]',
-    title: 'Scenario Library',
-    content: 'Choose from pre-built scenarios like GPU spike, cooling failure, or power surge to test your twin\'s response.',
+    target: '[data-testid="aura-workspace"]',
+    title: 'Simulation workspace',
+    content: 'The facility model remains in context while the tool rail changes what you inspect or do.',
+    placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-testid="workspace-tool-configure"]',
+    title: 'Scenario Inputs',
+    content: 'Set modelled overrides for the scenario. These inputs do not rewrite the canonical Blueprint.',
     placement: 'right',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="simulation-run-controls"]',
-    title: 'Simulation Controls',
-    content: 'Start, pause, or reset simulations. Adjust playback speed to analyze events in detail or fast-forward.',
-    placement: 'bottom',
+    target: '[data-testid="workspace-tool-simulate"]',
+    title: 'Run the model',
+    content: 'Execution requires reviewed assumptions. A failed run creates no successful simulation record.',
+    placement: 'right',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="simulation-kpi-grid"]',
-    title: 'KPI Impact Grid',
-    content: 'Track how each scenario affects your KPIs. Green indicates improvement, red shows degradation.',
-    placement: 'top',
+    target: '[data-testid="workspace-tool-compare"]',
+    title: 'Compare outcomes',
+    content: 'After runs exist, compare modelled outcomes and KPI deltas without treating them as measured telemetry.',
+    placement: 'right',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="simulation-3d-view"]',
-    title: '3D Digital Twin View',
-    content: 'Visualize racks, thermal zones, and power flow changes while scenarios run—without switching tools.',
-    placement: 'left',
+    target: '[data-testid="workspace-tool-decide"]',
+    title: 'Review recommendations',
+    content: 'Accept, reject or defer recommendations from a completed run and retain the decision record.',
+    placement: 'right',
     disableBeacon: true,
   },
-  {
-    target: '[data-tour="simulation-timeline"]',
-    title: 'Event Timeline',
-    content: 'Scrub through simulation events. Click any event to jump to that moment and see the impact.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  // Note: simulation-compare step removed as EnhancedComparisonMode is not yet integrated
-  // into the primary DCSimulationTab. Re-add when comparison feature is wired up.
 ];
 
-// Blueprint Tour - Blueprint/Builder tab
 const blueprintSteps: Step[] = [
   {
-    target: '[data-tour="blueprint-overview"]',
-    title: 'Blueprint Overview',
-    content: 'Your twin\'s complete configuration—agents, KPIs, workflows, and deployment settings in one place.',
+    target: '[data-blueprint-tab="model"]',
+    title: 'Model',
+    content: 'Inspect the canonical facility model and its physical configuration.',
     placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="blueprint-tier"]',
-    title: 'Infrastructure Tier',
-    content: 'Define your data centre tier, capacity, and sovereignty requirements.',
-    placement: 'right',
+    target: '[data-blueprint-tab="assets"]',
+    title: 'Assets & Systems',
+    content: 'Review the assets and systems that make up the facility model and their linked configuration.',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="blueprint-gpu"]',
-    title: 'GPU Configuration',
-    content: 'Configure GPU clusters, workload distribution, and compute optimization settings.',
-    placement: 'right',
+    target: '[data-blueprint-tab="controls"]',
+    title: 'Automation controls',
+    content: 'Agents, KPIs and workflows are nested here as automation definitions rather than separate top-level workspaces.',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="blueprint-energy"]',
-    title: 'Energy & Sustainability',
-    content: 'Set renewable energy targets, carbon intensity limits, and PUE optimization goals.',
-    placement: 'right',
+    target: '[data-blueprint-tab="validation"]',
+    title: 'Model validation',
+    content: 'Review validation state and unresolved model constraints before relying on downstream results.',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="blueprint-deploy"]',
-    title: 'Deploy Configuration',
-    content: 'When ready, deploy your twin to start collecting real telemetry and running live agents.',
-    placement: 'top',
+    target: '[data-blueprint-tab="versions"]',
+    title: 'Versions',
+    content: 'Use the version history to understand how the model changed over time.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
-
-// ═══════════════════════════════════════════════════════════════════
-// ROLE-ADAPTIVE TOURS
-// ═══════════════════════════════════════════════════════════════════
 
 const roleSharedSteps: Step[] = [
   {
-    target: '[data-tour="role-header"]',
-    title: 'Your Adaptive Dashboard',
-    content: 'This dashboard adapts to your role, showing the KPIs, sections, and navigation most relevant to you.',
-    placement: 'bottom',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="role-search"]',
-    title: 'AURA Assistant',
-    content: 'Ask natural-language questions about your data centre. The assistant understands your role context.',
-    placement: 'bottom',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="role-kpi-dc"]',
-    title: 'Facility KPIs',
-    content: 'Real-time data centre metrics—PUE, GPU saturation, thermal stability, and sovereignty compliance.',
+    target: '[data-testid="command-centre"]',
+    title: 'Role-aware decision surface',
+    content: 'Start with the same facility truth. Role context changes emphasis and permitted actions, not the underlying evidence.',
     placement: 'top',
+    disableBeacon: true,
+  },
+  {
+    target: '[data-testid="assistant-entry"]',
+    title: 'AURA Assistant',
+    content: 'Ask questions in context. Grounded answers must respect available evidence, permissions and provenance.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
@@ -193,17 +188,10 @@ const roleSharedSteps: Step[] = [
 const roleExecutiveSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-tour="role-kpi-row"]',
-    title: 'Executive KPIs',
-    content: 'Track ROI, compliance score, monthly cost savings, and carbon reduction at a glance.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="role-sections"]',
-    title: 'Strategic Sections',
-    content: 'Financial summaries, compliance posture, and team performance—tailored for executive decision-making.',
-    placement: 'top',
+    target: '[data-nav-item="Evidence"]',
+    title: 'Evidence before commitment',
+    content: 'Use Evidence to verify model assumptions, sustainability results and decision records before committing resources.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
@@ -211,17 +199,10 @@ const roleExecutiveSteps: Step[] = [
 const roleManagerSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-tour="role-kpi-row"]',
-    title: 'Operations KPIs',
-    content: 'Monitor active agents, team size, pending approvals, and average response latency.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="role-sections"]',
-    title: 'Operations Sections',
-    content: 'Agent performance, team activity, and the approval queue—everything you need to manage day-to-day operations.',
-    placement: 'top',
+    target: '[data-testid="manage-trigger"]',
+    title: 'Manage operations',
+    content: 'Facilities, Connections, Agents, Operations and Runtime are grouped under Manage for day-to-day platform work.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
@@ -229,17 +210,10 @@ const roleManagerSteps: Step[] = [
 const roleEngineerSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-tour="role-kpi-row"]',
-    title: 'Engineering KPIs',
-    content: 'Deep technical metrics—PUE, GPU saturation, thermal stability, and sovereign compute ratio.',
-    placement: 'top',
-    disableBeacon: true,
-  },
-  {
-    target: '[data-tour="role-sections"]',
-    title: 'Engineering Workbench',
-    content: 'Live twin preview, subsystem agent access, and a simulation launcher—built for hands-on engineering.',
-    placement: 'top',
+    target: '[data-nav-item="Blueprint"]',
+    title: 'Engineering model',
+    content: 'Use Blueprint for facility configuration and Simulation for scenario-specific inputs and outcomes.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
@@ -247,17 +221,17 @@ const roleEngineerSteps: Step[] = [
 const roleSecurityAdminSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-tour="role-kpi-row"]',
-    title: 'Security KPIs',
-    content: 'Security score, active alerts, policy compliance, and pending access reviews.',
-    placement: 'top',
+    target: '[data-testid="govern-trigger"]',
+    title: 'Govern',
+    content: 'People & Access, Agent Policies and Platform Administration are separated from operational management.',
+    placement: 'bottom',
     disableBeacon: true,
   },
   {
-    target: '[data-tour="role-sections"]',
-    title: 'Security Operations',
-    content: 'Security posture, audit logs, access control, and data sovereignty status—your security operations centre.',
-    placement: 'top',
+    target: '[data-nav-item="Evidence"]',
+    title: 'Governance evidence',
+    content: 'Use sovereignty and decision evidence to distinguish assessed facts from modelled, demo or not-assessed states.',
+    placement: 'bottom',
     disableBeacon: true,
   },
 ];
@@ -265,64 +239,72 @@ const roleSecurityAdminSteps: Step[] = [
 export const tourRegistry: Record<TourId, TourDefinition> = {
   studioIntro: {
     id: 'studioIntro',
-    name: 'Studio Intro Tour',
-    description: 'Get oriented with the main navigation and controls',
+    name: 'AURA orientation',
+    description: 'Learn the four core workspaces and global utilities.',
     steps: studioIntroSteps,
   },
   overview: {
     id: 'overview',
-    name: 'Overview Tour',
-    description: 'Learn about the dashboard and KPI monitoring',
+    name: 'Command Center tour',
+    description: 'Learn how to move from attention items to model and evidence.',
     steps: overviewSteps,
   },
   simulation: {
     id: 'simulation',
-    name: 'Simulation Tour',
-    description: 'Master the simulation engine and scenario testing',
+    name: 'Simulation tour',
+    description: 'Review inputs, execute the model, compare results and review recommendations.',
     steps: simulationSteps,
   },
   blueprint: {
     id: 'blueprint',
-    name: 'Blueprint Tour',
-    description: 'Configure your digital twin\'s blueprint',
+    name: 'Blueprint tour',
+    description: 'Navigate the facility model, assets, automation, validation and versions.',
     steps: blueprintSteps,
   },
   role_executive: {
     id: 'role_executive',
-    name: 'Executive Dashboard Tour',
-    description: 'Discover your executive command centre with strategic KPIs and insights',
+    name: 'Executive workflow tour',
+    description: 'Move from decision context to supporting evidence.',
     steps: roleExecutiveSteps,
   },
   role_manager: {
     id: 'role_manager',
-    name: 'Manager Dashboard Tour',
-    description: 'Learn about your operations dashboard with team and agent management',
+    name: 'Manager workflow tour',
+    description: 'Navigate the operational management surfaces.',
     steps: roleManagerSteps,
   },
   role_engineer: {
     id: 'role_engineer',
-    name: 'Engineer Dashboard Tour',
-    description: 'Explore your engineering workbench with technical deep-dive tools',
+    name: 'Engineer workflow tour',
+    description: 'Work between the canonical model and simulation workspace.',
     steps: roleEngineerSteps,
   },
   role_security_admin: {
     id: 'role_security_admin',
-    name: 'Security Admin Dashboard Tour',
-    description: 'Navigate your security operations centre with audit and compliance tools',
+    name: 'Security admin workflow tour',
+    description: 'Navigate governance, access administration and evidence.',
     steps: roleSecurityAdminSteps,
   },
 };
 
-export const tourIds: TourId[] = ['studioIntro', 'overview', 'simulation', 'blueprint', 'role_executive', 'role_manager', 'role_engineer', 'role_security_admin'];
+export const tourIds: TourId[] = [
+  'studioIntro',
+  'overview',
+  'simulation',
+  'blueprint',
+  'role_executive',
+  'role_manager',
+  'role_engineer',
+  'role_security_admin',
+];
 
-// Centralized tour routes - maps each tour to its target page
 export const tourRoutes: Record<TourId, string> = {
-  studioIntro: '/',
-  overview: '/',
-  simulation: '/data-centre-twin?view=simulation',
-  blueprint: '/builder',
-  role_executive: '/',
-  role_manager: '/',
-  role_engineer: '/',
-  role_security_admin: '/',
+  studioIntro: '/dashboard',
+  overview: '/dashboard',
+  simulation: '/simulation',
+  blueprint: '/blueprint/default',
+  role_executive: '/dashboard',
+  role_manager: '/dashboard',
+  role_engineer: '/dashboard',
+  role_security_admin: '/dashboard',
 };

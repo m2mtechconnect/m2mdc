@@ -32,7 +32,10 @@ serve(createHandler({
   name: "analytics-overview",
   authLevel: "admin",
   handler: async (input, context) => {
-    const { supabase, log } = context;
+    const { supabase, log, organizationId } = context;
+    if (!organizationId) {
+      throw { code: 'TENANT_CONTEXT_REQUIRED', message: 'Organization context is required', status: 403 };
+    }
 
     // Parse filters with defaults
     const from = input.from || new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();
@@ -43,7 +46,10 @@ serve(createHandler({
     log("Analytics overview request", { from, to, systemCount: systems.length, deptCount: departments.length });
 
     // Get filtered agents
-    let agentsQuery = supabase.from('agents').select('id, name, config');
+    let agentsQuery = supabase
+      .from('agents')
+      .select('id, name, config')
+      .eq('org_id', organizationId);
     
     if (systems.length > 0) {
       agentsQuery = agentsQuery.in('id', systems);
@@ -63,6 +69,17 @@ serve(createHandler({
         message: agentsError.message,
         status: 500,
       };
+    }
+
+    if (systems.length > 0) {
+      const visibleIds = new Set((agents || []).map((agent: any) => agent.id));
+      if (systems.some((systemId: string) => !visibleIds.has(systemId))) {
+        throw {
+          code: 'TENANT_SCOPE_VIOLATION',
+          message: 'One or more requested systems are outside the caller tenant',
+          status: 403,
+        };
+      }
     }
 
     const agentIds = agents?.map((a: any) => a.id) || [];

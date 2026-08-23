@@ -6,9 +6,9 @@
  * what URLs existed was to read two routers and a redirect list, which is how
  * the same page ended up mounted at several addresses.
  *
- * The registry is data, not routing: `src/App.tsx` and
- * `src/AuthenticatedShell.tsx` remain the mounts. The paired test
- * (`__tests__/routeRegistry.test.ts`) reads both routers and fails when a
+ * The registry is data, not routing: `src/App.tsx`, `src/ApprovedUserRouter.tsx`
+ * and `src/AuthenticatedShell.tsx` remain the mounts. The paired test
+ * (`__tests__/routeRegistry.test.ts`) reads those routers and fails when a
  * route is mounted without a declaration here, when a declaration goes stale,
  * or when a path is simultaneously a mount and a redirect source.
  *
@@ -21,7 +21,7 @@
 export type RouteShell =
   /** `src/App.tsx`, rendered when there is no session. */
   | 'public'
-  /** `src/App.tsx`, rendered for a session in any classification. */
+  /** `src/App.tsx` / `src/ApprovedUserRouter.tsx`, rendered for a session. */
   | 'session'
   /** `src/AuthenticatedShell.tsx`, internal (user_roles-backed) users only. */
   | 'internal';
@@ -47,7 +47,7 @@ export interface RouteRecord {
   note?: string;
 }
 
-/** Routes mounted by `src/App.tsx`. */
+/** Routes mounted by `src/App.tsx` and session routing in `src/ApprovedUserRouter.tsx`. */
 export const PUBLIC_ROUTES: RouteRecord[] = [
   { path: '/', shell: 'public', kind: 'canonical', note: 'Marketing landing page.' },
   { path: '/auth', shell: 'public', kind: 'canonical' },
@@ -62,6 +62,12 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
     kind: 'canonical',
     note: 'OAuth/SSO redirect target; completes the Supabase session exchange.',
   },
+  {
+    path: '/oauth/managed-user/return',
+    shell: 'public',
+    kind: 'canonical',
+    note: 'Managed-user OAuth return target; completes provider authorization before app routing.',
+  },
   { path: '/onboarding', shell: 'public', kind: 'canonical' },
   { path: '/twin-datacentre', shell: 'public', kind: 'canonical', note: 'Public landing variant.' },
   { path: '/data-centre-twin', shell: 'public', kind: 'canonical', note: 'Public demo of the twin dashboard.' },
@@ -74,13 +80,10 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
   },
   { path: '/dev-overlays', shell: 'public', kind: 'dev-only' },
   { path: '*', shell: 'public', kind: 'catch-all' },
-  // Present in every session branch (pending approval, authorization error,
-  // internal, pilot) so signing out never depends on the classification that
-  // is failing. Intentionally repeated; the test asserts it stays present.
+  // Present across session branches so signing out never depends on the
+  // classification that is failing. Intentionally repeated at runtime.
   { path: '/sign-out', shell: 'session', kind: 'canonical' },
-  // Mounted in the unauthenticated branch (as a sign-in redirect that keeps
-  // the token) and in every session branch (as the acceptance page), so an
-  // invited user lands on the same URL before and after authenticating.
+  // Mounted before and after authentication so invited users keep one URL.
   { path: '/invite/accept', shell: 'session', kind: 'canonical', note: 'Team invite acceptance.' },
   { path: '/pilot/*', shell: 'session', kind: 'canonical', note: 'Sealed pilot shell.' },
   { path: '/*', shell: 'session', kind: 'canonical', note: 'Internal users fall through to AuthenticatedShell.' },
@@ -97,23 +100,28 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/agent/:id', shell: 'internal', kind: 'canonical' },
   { path: '/agents/:id/chat', shell: 'internal', kind: 'canonical' },
   { path: '/analytics', shell: 'internal', kind: 'canonical' },
+  { path: '/compliance', shell: 'internal', kind: 'canonical' },
+  { path: '/infrastructure', shell: 'internal', kind: 'canonical' },
   { path: '/account/profile', shell: 'internal', kind: 'canonical' },
   { path: '/account/settings', shell: 'internal', kind: 'canonical' },
-  { path: '/account/access-control', shell: 'internal', kind: 'canonical' },
-  { path: '/admin/onboarding-submissions', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/user-approvals', shell: 'internal', kind: 'canonical', guard: 'admin' },
+  { path: '/teams', shell: 'internal', kind: 'canonical' },
+  { path: '/teams/access-control', shell: 'internal', kind: 'canonical' },
+  {
+    path: '/teams/onboarding',
+    shell: 'internal',
+    kind: 'canonical',
+    guard: 'admin',
+    note: 'Onboarding submissions; /admin/onboarding-submissions aliases here.',
+  },
   { path: '/admin/asset-preview', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/asset-pipeline', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/asset-validation/:assetId', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/reference-facility-validation', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/signups-dashboard', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/dsx-capabilities', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/dataset-registry', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/platform-readiness', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/manage/integrations', shell: 'internal', kind: 'canonical' },
   { path: '/manage/facilities', shell: 'internal', kind: 'canonical' },
-  { path: '/compliance', shell: 'internal', kind: 'canonical' },
-  { path: '/teams', shell: 'internal', kind: 'canonical' },
   { path: '/marketplace', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents/:slug/detail', shell: 'internal', kind: 'canonical' },
@@ -121,6 +129,8 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/app/agents/:agentId/operations', shell: 'internal', kind: 'redirect' },
   { path: '/twins/:instanceId/manage', shell: 'internal', kind: 'redirect' },
   { path: '/studio/systems/:systemId/manage', shell: 'internal', kind: 'canonical' },
+  { path: '/data-centre-twin', shell: 'internal', kind: 'canonical' },
+  { path: '/data-centre-twin/:id', shell: 'internal', kind: 'canonical' },
   { path: '/data-centre-twin/:id/blueprint', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint/preview', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint/:id', shell: 'internal', kind: 'canonical' },
@@ -130,9 +140,6 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/search', shell: 'internal', kind: 'canonical' },
   { path: '/settings/ai', shell: 'internal', kind: 'canonical' },
   { path: '/sign-out', shell: 'internal', kind: 'canonical' },
-  { path: '/playbook', shell: 'internal', kind: 'canonical' },
-  { path: '/data-centre-twin', shell: 'internal', kind: 'canonical' },
-  { path: '/data-centre-twin/:id', shell: 'internal', kind: 'canonical' },
   { path: '/twin-preview', shell: 'internal', kind: 'canonical' },
   {
     path: '/twin-debug',
@@ -142,7 +149,6 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
     note: 'Tenant diagnostics: exposes twin ids, raw query state and telemetry sources.',
   },
   { path: '/digital-twins-demo/funding-intake', shell: 'internal', kind: 'canonical', note: 'Explicit demo namespace.' },
-  { path: '/infrastructure', shell: 'internal', kind: 'canonical' },
   { path: '/dsx/evidence-beta', shell: 'internal', kind: 'canonical', note: 'Evidence shell; children below.' },
   // Pre-consolidation flat Evidence paths. These are mounted at the shell's
   // top level (outside the `/dsx/evidence-beta` parent) so deep links commit

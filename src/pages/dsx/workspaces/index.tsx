@@ -45,11 +45,11 @@ import {
 
 function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
   return (
-    <section className="space-y-3 border-t border-border/60 pt-6 first:border-t-0 first:pt-0">
+    <section className="v2-panel space-y-3 p-4">
       <div className="flex gap-3">
         <span aria-hidden className="mt-1 h-4 w-1 shrink-0 rounded-full bg-primary" />
         <div className="min-w-0 space-y-0.5">
-          <h2 className="text-[15px] font-semibold leading-tight tracking-tight">{title}</h2>
+          <h2 className="v2-label text-[13px] leading-tight">{title}</h2>
           {description && <p className="max-w-3xl text-xs leading-relaxed text-muted-foreground">{description}</p>}
         </div>
       </div>
@@ -138,9 +138,19 @@ export function OverviewWorkspace() {
         What is the operational state of the facility at this observation step, and which
         constraint binds first?
       </p>
+      {/* Prioritised instrument cluster: the binding operational metrics are
+          read first, supporting context stays quieter. No metric was removed. */}
       <MetricGrid
-        ids={['pue', 'facility_load', 'it_load', 'cooling_load', 'max_rack_inlet', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
+        ids={['pue', 'facility_load', 'max_rack_inlet']}
         metrics={rt.bundle.metrics}
+        columns="sm:grid-cols-3"
+        level="primary"
+      />
+      <MetricGrid
+        ids={['it_load', 'cooling_load', 'thermal_headroom', 'power_capacity_utilisation', 'data_quality']}
+        metrics={rt.bundle.metrics}
+        columns="grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+        level="compact"
       />
       <Section title="Trend across this run" description="Each point is recomputed from the accepted observations at that step. A step without an accepted observation is drawn as a gap.">
         <TrendStrip series={trends} />

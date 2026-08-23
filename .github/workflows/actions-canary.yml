@@ -1,0 +1,25 @@
+name: Actions Canary
+
+# Minimal GitHub Actions scheduler/runner diagnostic.
+# Manual/advisory only after the workflow-level concurrency incident was isolated.
+# No services, matrices, secrets, artifacts, dependencies or concurrency.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    name: Actions scheduler canary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Report scheduler health
+        shell: bash
+        run: |
+          echo "ACTIONS_CANARY_OK"
+          echo "event=${GITHUB_EVENT_NAME}"
+          echo "sha=${GITHUB_SHA}"
+          echo "ref=${GITHUB_REF}"

@@ -1,3 +1,4 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { updateDigitalTwinSchema } from "../_shared/digitalTwinSchemas.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
@@ -10,7 +11,7 @@ interface UpdateDigitalTwinInput {
   config?: any;
 }
 
-export default createHandler<UpdateDigitalTwinInput, any>({
+serve(createHandler<UpdateDigitalTwinInput, any>({
   name: "digital-twin-update",
   authLevel: "user",
   inputSchema: z.object({
@@ -72,4 +73,4 @@ export default createHandler<UpdateDigitalTwinInput, any>({
       },
     };
   },
-});
+}));

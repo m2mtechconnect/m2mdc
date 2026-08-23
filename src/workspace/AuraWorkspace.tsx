@@ -207,7 +207,7 @@ export default function AuraWorkspace() {
   return (
     <TwinOverlayProvider twinId={facility.id} defaultOverlay="thermal">
       <div
-        className="flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden bg-background"
+        className="v2-canvas flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden"
         data-testid="aura-workspace"
       >
         {/* One record header: identity, truth line, view selector, actions. */}
@@ -225,7 +225,7 @@ export default function AuraWorkspace() {
             role="status"
             aria-live="polite"
             data-testid="workflow-step-notice"
-            className="border-b border-border bg-muted/60 px-4 py-2 text-xs text-foreground"
+            className="v2-mono border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] px-4 py-2 text-xs text-foreground"
           >
             {stepNotice}
           </div>
@@ -257,7 +257,7 @@ export default function AuraWorkspace() {
                   if (e.key === 'ArrowLeft') setPanelWidth((w) => clampWidth(w + 16));
                   if (e.key === 'ArrowRight') setPanelWidth((w) => clampWidth(w - 16));
                 }}
-                className="w-1 shrink-0 cursor-col-resize bg-border transition-colors hover:bg-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="w-1 shrink-0 cursor-col-resize bg-[hsl(var(--v2-line))] transition-colors hover:bg-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
               <ContextPanel
                 facility={facility}
@@ -281,7 +281,7 @@ export default function AuraWorkspace() {
           >
             <SheetContent
               side="right"
-              className="flex w-full flex-col gap-0 bg-card p-0 sm:max-w-[440px]"
+              className="v2-inspector flex w-full flex-col gap-0 p-0 sm:max-w-[440px]"
               data-testid="workspace-inspector-drawer"
             >
               <SheetTitle className="sr-only">Workspace inspector</SheetTitle>

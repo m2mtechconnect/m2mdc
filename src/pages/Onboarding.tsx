@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import m2mLogo from "@/assets/m2m-logo.png";
+import { AuraLogo } from "@/components/brand/AuraLogo";
 import { StepAboutYou } from "@/components/onboarding/StepAboutYou";
 import { StepDataCentre } from "@/components/onboarding/StepDataCentre";
 import { StepGoals } from "@/components/onboarding/StepGoals";
@@ -161,7 +161,7 @@ export default function Onboarding() {
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <a href="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-4 w-4" />
-            <img src={m2mLogo} alt="M2M" className="h-6 w-auto" />
+            <AuraLogo surface="light" />
           </a>
           <span className="text-sm text-muted-foreground">
             {t('onboarding.stepOf', { current: step + 1, total: stepTitles.length })}

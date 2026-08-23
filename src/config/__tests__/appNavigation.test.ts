@@ -14,10 +14,10 @@ import { PAGE_POSITIONING, positioningFor } from '../pagePositioning';
 describe('canonical navigation', () => {
   it('exposes exactly four always-visible workspaces with DSX labels', () => {
     expect(WORKSPACE_NAV.map((i) => i.fullName)).toEqual([
-      'AI Factory Overview',
+      'Command Center',
       'Facility Blueprint',
-      'Simulation Studio',
-      'Validation & Evidence',
+      'Simulation',
+      'Evidence',
     ]);
   });
 
@@ -28,15 +28,19 @@ describe('canonical navigation', () => {
       '/simulation',
       '/dsx/evidence-beta/overview',
     ]);
+    const workspace = Object.fromEntries(WORKSPACE_NAV.map((i) => [i.fullName, i.href]));
+    expect(workspace['Facility Blueprint']).toBe('/blueprint');
+    expect(workspace['Evidence']).toBe('/dsx/evidence-beta/overview');
+
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
-    expect(manage['OpenUSD Asset Pipeline']).toBe('/builder');
-    expect(manage['Agents & Optimization']).toBe('/app/agents');
-    expect(manage['Operations & Telemetry']).toBe('/analytics');
-    expect(manage['Runtime Environments']).toBe('/deployments');
-    expect(manage['Agent Configuration']).toBe('/settings/ai');
+    expect(manage['Agents']).toBe('/app/agents');
+    expect(manage['Operations']).toBe('/analytics');
+    expect(manage['Runtime']).toBe('/deployments');
+    expect(manage['Agent Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');
   });
+
 
   it('keeps every legacy alias pointing at a live destination', () => {
     const aliases = Object.fromEntries(ROUTE_ALIASES.map((a) => [a.from, a.to]));
@@ -76,10 +80,12 @@ describe('canonical navigation', () => {
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Facilities',
       'Connections',
-      'Asset pipeline',
     ]);
-    expect(visibleManageNav(() => true)).toHaveLength(MANAGE_NAV.length);
+    const designOrOperate = MANAGE_NAV.filter((i) => i.group === 'operate' || i.group === 'design');
+    expect(visibleManageNav(() => true)).toHaveLength(designOrOperate.length);
   });
+
+
 });
 
 describe('DSX lifecycle grouping', () => {
@@ -114,11 +120,12 @@ describe('DSX lifecycle grouping', () => {
     expect(viewer.flatMap((g) => g.items.map((i) => i.href))).not.toContain('/settings/ai');
   });
 
-  it('exposes the admin capability registry only under Govern > Admin Console', () => {
-    const admin = MANAGE_NAV.find((i) => i.fullName === 'Admin Console')!;
+  it('exposes the admin capability registry only under Govern > Platform Admin', () => {
+    const admin = MANAGE_NAV.find((i) => i.fullName === 'Platform Administration')!;
     expect(admin.group).toBe('govern');
     expect(admin.children?.map((c) => c.href)).toContain('/admin/dsx-capabilities');
   });
+
 });
 
 describe('page positioning', () => {

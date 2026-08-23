@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -12,8 +12,9 @@
     <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="preload" as="image" href="/landing/hero-datacenter-bg.jpg" fetchpriority="high" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=optional">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=optional" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=optional" rel="stylesheet"></noscript>
     
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />
@@ -28,13 +29,29 @@
     <meta name="twitter:description" content="M2M AURA is an AI-powered Digital Twin platform for sovereign data centres. Model and simulate PUE, GPU utilization, thermals, carbon emissions, and compliance.">
     <link rel="icon" type="image/x-icon" href="https://storage.googleapis.com/gpt-engineer-file-uploads/odXi6HiYs6SQlU6PnfuCyfpvwF33/uploads/1762185421600-favicon.ico">
 
-    <!-- Microsoft Clarity -->
+    <!--
+      Microsoft Clarity is a progressive analytics enhancement. Loading a
+      third-party tracker during first paint adds network dependency/cookie
+      risk to the critical path, so initialize it only after genuine user
+      interaction. A future consent manager can replace this interaction gate.
+    -->
     <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "wx9a4k3uum");
+      (function () {
+        var started = false;
+        function initClarity() {
+          if (started) return;
+          started = true;
+          window.removeEventListener('pointerdown', initClarity);
+          window.removeEventListener('keydown', initClarity);
+          (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+          })(window, document, "clarity", "script", "wx9a4k3uum");
+        }
+        window.addEventListener('pointerdown', initClarity, { once: true, passive: true });
+        window.addEventListener('keydown', initClarity, { once: true });
+      })();
     </script>
     <script type="application/ld+json">
     {

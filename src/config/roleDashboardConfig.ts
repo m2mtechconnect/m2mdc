@@ -1,25 +1,44 @@
 /**
- * Role-Based Adaptive Dashboard Configuration
- * 
- * Defines per-role KPIs, dashboard sections, and navigation items.
- * Used by Dashboard, Layout, and role-aware components.
+ * Role-adaptive dashboard configuration.
+ *
+ * Role context may change emphasis and permitted actions, but it must not
+ * invent a second information architecture or fabricate KPI values. Every
+ * role therefore shares the four canonical AURA workspaces and uses explicit
+ * `Not assessed` defaults until a real data source provides a value.
  */
 
 import {
-  LayoutDashboard, Wrench, BarChart3, Shield, Users, Server,
-  Activity, Cpu, Thermometer, Globe, Zap, TrendingUp, Clock,
-  DollarSign, FileCheck, AlertTriangle, Lock, Eye, UserCheck,
-  Leaf, ShieldCheck, Gauge, Network, HardDrive, Monitor, Boxes,
+  Activity,
+  AlertTriangle,
+  BarChart3,
+  Boxes,
+  Cable,
+  Clock,
+  Cpu,
+  DollarSign,
+  FileCheck,
+  FileSearch,
+  Gauge,
+  Globe,
+  LayoutDashboard,
+  Leaf,
+  Lock,
+  Server,
+  Shield,
+  Sparkles,
+  Thermometer,
+  TrendingUp,
+  Users,
+  Zap,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AppRole } from '@/contexts/RBACContext';
 
-// ─── KPI Definition ───────────────────────────────────────────────
 export interface RoleKpi {
   key: string;
   label: string;
   icon: LucideIcon;
-  /** Mock value — replaced by live data in dashboard */
+  /** Safe empty-state value. Real/modelled values must come from their source. */
   defaultValue: string;
   change?: string;
   trend: 'up' | 'down' | 'neutral';
@@ -27,18 +46,14 @@ export interface RoleKpi {
   navigateTo?: string;
 }
 
-// ─── Section Definition ───────────────────────────────────────────
 export interface RoleDashboardSection {
   id: string;
   title: string;
   icon: LucideIcon;
-  /** Component key rendered by AdaptiveDashboard */
   component: string;
-  /** Priority order — lower = higher on page */
   priority: number;
 }
 
-// ─── Navigation Item ──────────────────────────────────────────────
 export interface RoleNavItem {
   name: string;
   fullName: string;
@@ -47,7 +62,6 @@ export interface RoleNavItem {
   group: 'primary' | 'secondary';
 }
 
-// ─── Full Role Config ─────────────────────────────────────────────
 export interface RoleDashboardConfig {
   role: AppRole;
   label: string;
@@ -58,147 +72,248 @@ export interface RoleDashboardConfig {
   navigation: RoleNavItem[];
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// EXECUTIVE CONFIG
-// ═══════════════════════════════════════════════════════════════════
+const NOT_ASSESSED = 'Not assessed';
+
+/** The four durable workspaces are identical for every internal role. */
+const CORE_NAV: RoleNavItem[] = [
+  { name: 'Command', fullName: 'Command Center', href: '/dashboard', icon: LayoutDashboard, group: 'primary' },
+  { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
+  { name: 'Simulation', fullName: 'Simulation', href: '/simulation', icon: Activity, group: 'primary' },
+  { name: 'Evidence', fullName: 'Evidence', href: '/dsx/evidence-beta/overview', icon: FileSearch, group: 'primary' },
+];
+
 const executiveConfig: RoleDashboardConfig = {
   role: 'executive',
   label: 'Executive',
-  description: 'Strategic overview with financial & compliance insights',
-  greeting: 'Executive Command Centre',
+  description: 'Decision context with financial, sustainability and governance evidence.',
+  greeting: 'Command Center',
   kpis: [
-    { key: 'total_roi', label: 'Total ROI', icon: DollarSign, defaultValue: '247%', change: '+18.3%', trend: 'up', tooltip: 'Return on investment across all data centre operations', navigateTo: '/analytics' },
-    { key: 'compliance_score', label: 'Compliance Score', icon: ShieldCheck, defaultValue: '96.4%', change: '+1.2%', trend: 'up', tooltip: 'Overall regulatory and data sovereignty compliance', navigateTo: '/compliance' },
-    { key: 'cost_savings', label: 'Monthly Savings', icon: TrendingUp, defaultValue: '$142K', change: '+$12K', trend: 'up', tooltip: 'Cost reduction from AI-driven optimization', navigateTo: '/analytics' },
-    { key: 'carbon_reduction', label: 'Carbon Reduction', icon: Leaf, defaultValue: '34%', change: '+5.1%', trend: 'up', tooltip: 'Year-over-year carbon emission reduction', navigateTo: '/analytics' },
+    {
+      key: 'financial_exposure',
+      label: 'Financial Exposure',
+      icon: DollarSign,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Financial exposure is shown only when a traceable simulation or approved source provides it.',
+      navigateTo: '/dsx/evidence-beta/sustainability/financial',
+    },
+    {
+      key: 'sovereignty_status',
+      label: 'Sovereignty Status',
+      icon: Globe,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Sovereignty remains not assessed until supporting evidence is available.',
+      navigateTo: '/dsx/evidence-beta/sustainability/sovereignty',
+    },
+    {
+      key: 'capacity_headroom',
+      label: 'Capacity Headroom',
+      icon: Gauge,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Capacity headroom depends on the active facility model and its provenance.',
+      navigateTo: '/dashboard',
+    },
+    {
+      key: 'carbon_intensity',
+      label: 'Carbon Intensity',
+      icon: Leaf,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Carbon values must identify whether they are measured, modelled, reference or unavailable.',
+      navigateTo: '/dsx/evidence-beta/sustainability',
+    },
   ],
   sections: [
-    { id: 'strategic_overview', title: 'Strategic Overview', icon: TrendingUp, component: 'StrategicOverview', priority: 1 },
-    { id: 'financial_summary', title: 'Financial Summary', icon: DollarSign, component: 'FinancialSummary', priority: 2 },
-    { id: 'compliance_posture', title: 'Compliance Posture', icon: Shield, component: 'CompliancePosture', priority: 3 },
-    { id: 'team_performance', title: 'Team Performance', icon: Users, component: 'TeamPerformance', priority: 4 },
+    { id: 'strategic_overview', title: 'Decision Overview', icon: TrendingUp, component: 'StrategicOverview', priority: 1 },
+    { id: 'financial_summary', title: 'Financial Evidence', icon: DollarSign, component: 'FinancialSummary', priority: 2 },
+    { id: 'compliance_posture', title: 'Governance Evidence', icon: Shield, component: 'CompliancePosture', priority: 3 },
+    { id: 'team_performance', title: 'People & Access', icon: Users, component: 'TeamPerformance', priority: 4 },
   ],
   navigation: [
-    { name: 'Command', fullName: 'Executive Command Centre', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
-    { name: 'Simulation', fullName: 'Simulation Workspace', href: '/simulation', icon: Activity, group: 'primary' },
-    { name: 'Analytics', fullName: 'Strategic Analytics', href: '/analytics', icon: BarChart3, group: 'primary' },
-    { name: 'Compliance', fullName: 'Sovereignty & Compliance', href: '/compliance', icon: Shield, group: 'primary' },
-    { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
-    { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
-    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
+    ...CORE_NAV,
+    { name: 'Operations', fullName: 'Operations', href: '/analytics', icon: BarChart3, group: 'secondary' },
+    { name: 'People', fullName: 'People & Access', href: '/teams', icon: Users, group: 'secondary' },
   ],
 };
 
-// ═══════════════════════════════════════════════════════════════════
-// MANAGER CONFIG
-// ═══════════════════════════════════════════════════════════════════
 const managerConfig: RoleDashboardConfig = {
   role: 'manager',
   label: 'Manager',
-  description: 'Operational oversight with team & agent performance',
-  greeting: 'Operations Dashboard',
+  description: 'Operational oversight across agents, runtime and people.',
+  greeting: 'Command Center',
   kpis: [
-    { key: 'active_agents', label: 'Active Agents', icon: Server, defaultValue: '12', change: '+3', trend: 'up', tooltip: 'Currently running subsystem agents', navigateTo: '/app/agents' },
-    { key: 'team_members', label: 'Team Members', icon: Users, defaultValue: '8', trend: 'neutral', tooltip: 'Active team members', navigateTo: '/teams' },
-    { key: 'pending_approvals', label: 'Pending Approvals', icon: Clock, defaultValue: '3', trend: 'neutral', tooltip: 'Users awaiting access approval', navigateTo: '/admin/signups-dashboard' },
-    { key: 'avg_response', label: 'Avg Response Time', icon: Gauge, defaultValue: '1.2s', change: '-0.3s', trend: 'down', tooltip: 'Average agent response latency', navigateTo: '/analytics' },
+    {
+      key: 'active_agents',
+      label: 'Active Agents',
+      icon: Server,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Active agent count comes from the authorized agent roster.',
+      navigateTo: '/app/agents',
+    },
+    {
+      key: 'team_members',
+      label: 'Team Members',
+      icon: Users,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Member count comes from the authorized People & Access roster.',
+      navigateTo: '/teams',
+    },
+    {
+      key: 'pending_approvals',
+      label: 'Pending Approvals',
+      icon: Clock,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Approval state comes from the People & Access workspace.',
+      navigateTo: '/teams',
+    },
+    {
+      key: 'operational_status',
+      label: 'Operational Status',
+      icon: Gauge,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Operational status must come from available runtime and data-source evidence.',
+      navigateTo: '/analytics',
+    },
   ],
   sections: [
     { id: 'operations_overview', title: 'Operations Overview', icon: Activity, component: 'OperationsOverview', priority: 1 },
-    { id: 'agent_performance', title: 'Agent Performance', icon: Server, component: 'AgentPerformance', priority: 2 },
-    { id: 'team_activity', title: 'Team Activity', icon: Users, component: 'TeamActivity', priority: 3 },
-    { id: 'approval_queue', title: 'Approval Queue', icon: UserCheck, component: 'ApprovalQueue', priority: 4 },
+    { id: 'agent_performance', title: 'Agent Activity', icon: Server, component: 'AgentPerformance', priority: 2 },
+    { id: 'team_activity', title: 'People & Access', icon: Users, component: 'TeamActivity', priority: 3 },
+    { id: 'approval_queue', title: 'Approval Queue', icon: Lock, component: 'ApprovalQueue', priority: 4 },
   ],
   navigation: [
-    { name: 'Command', fullName: 'Operations Dashboard', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
-    { name: 'Simulation', fullName: 'Simulation Workspace', href: '/simulation', icon: Activity, group: 'primary' },
-    { name: 'Agents', fullName: 'Subsystem Agents', href: '/app/agents', icon: Server, group: 'primary' },
-    { name: 'Analytics', fullName: 'Performance Analytics', href: '/analytics', icon: BarChart3, group: 'primary' },
-    { name: 'Teams', fullName: 'Team Management', href: '/teams', icon: Users, group: 'secondary' },
-    { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
-    { name: 'Build', fullName: 'Build Twin', href: '/builder', icon: Wrench, group: 'secondary' },
-    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
+    ...CORE_NAV,
+    { name: 'Agents', fullName: 'Agents', href: '/app/agents', icon: Server, group: 'secondary' },
+    { name: 'Operations', fullName: 'Operations', href: '/analytics', icon: BarChart3, group: 'secondary' },
+    { name: 'People', fullName: 'People & Access', href: '/teams', icon: Users, group: 'secondary' },
   ],
 };
 
-// ═══════════════════════════════════════════════════════════════════
-// ENGINEER CONFIG
-// ═══════════════════════════════════════════════════════════════════
 const engineerConfig: RoleDashboardConfig = {
   role: 'engineer',
   label: 'Engineer',
-  description: 'Technical deep-dive with agent configs, logs & debugging',
-  greeting: 'Engineering Workbench',
+  description: 'Technical model, simulation, evidence and operational diagnostics.',
+  greeting: 'Command Center',
   kpis: [
-    { key: 'global_pue', label: 'Global PUE', icon: Zap, defaultValue: '1.38', change: '-2.1%', trend: 'down', tooltip: 'Power Usage Effectiveness across all facilities', navigateTo: '/data-centre-twin' },
-    { key: 'gpu_saturation', label: 'GPU Saturation', icon: Cpu, defaultValue: '23%', change: '+4.2%', trend: 'up', tooltip: 'GPU cluster capacity utilization', navigateTo: '/data-centre-twin' },
-    { key: 'thermal_stability', label: 'Thermal Stability', icon: Thermometer, defaultValue: '94%', trend: 'neutral', tooltip: 'Temperature consistency across cooling zones', navigateTo: '/data-centre-twin' },
-    { key: 'sovereign_compute', label: 'Sovereign Compute', icon: Globe, defaultValue: '98%', trend: 'neutral', tooltip: 'Workloads within Canadian jurisdiction', navigateTo: '/data-centre-twin' },
+    {
+      key: 'global_pue',
+      label: 'PUE',
+      icon: Zap,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'PUE is displayed only with explicit provenance for its source or simulation run.',
+      navigateTo: '/dsx/evidence-beta/operations/power',
+    },
+    {
+      key: 'gpu_saturation',
+      label: 'GPU Saturation',
+      icon: Cpu,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'GPU utilization is unavailable until a bound source or simulation provides it.',
+      navigateTo: '/dsx/evidence-beta/operations/compute',
+    },
+    {
+      key: 'thermal_stability',
+      label: 'Thermal Stability',
+      icon: Thermometer,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Thermal state is sourced from model/simulation evidence unless validated telemetry is connected.',
+      navigateTo: '/dsx/evidence-beta/operations/thermal',
+    },
+    {
+      key: 'sovereign_compute',
+      label: 'Sovereignty',
+      icon: Globe,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Sovereignty is not inferred from facility location alone; inspect supporting evidence.',
+      navigateTo: '/dsx/evidence-beta/sustainability/sovereignty',
+    },
   ],
   sections: [
-    { id: 'twin_preview', title: 'Live Twin Preview', icon: Activity, component: 'TwinPreview', priority: 1 },
-    { id: 'dc_kpis', title: 'Data Centre KPIs', icon: Gauge, component: 'DCKpis', priority: 2 },
-    { id: 'agent_workspace', title: 'Quick Agent Access', icon: Server, component: 'AgentWorkspace', priority: 3 },
-    { id: 'simulation_launcher', title: 'Simulation Launcher', icon: Activity, component: 'SimulationLauncher', priority: 4 },
+    { id: 'twin_preview', title: 'Facility Model', icon: Activity, component: 'TwinPreview', priority: 1 },
+    { id: 'dc_kpis', title: 'Facility Indicators', icon: Gauge, component: 'DCKpis', priority: 2 },
+    { id: 'agent_workspace', title: 'Agent Access', icon: Server, component: 'AgentWorkspace', priority: 3 },
+    { id: 'simulation_launcher', title: 'Simulation', icon: Activity, component: 'SimulationLauncher', priority: 4 },
   ],
   navigation: [
-    { name: 'Command', fullName: 'Engineering Workbench', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
-    { name: 'Simulation', fullName: 'Simulation Workspace', href: '/simulation', icon: Activity, group: 'primary' },
-    { name: 'Build', fullName: 'Build Data Centre Twin', href: '/builder', icon: Wrench, group: 'primary' },
-    { name: 'Agents', fullName: 'Subsystem Agents', href: '/app/agents', icon: Server, group: 'primary' },
-    { name: 'Analytics', fullName: 'Telemetry & Analytics', href: '/analytics', icon: BarChart3, group: 'secondary' },
-    { name: 'Audit', fullName: 'Sovereignty & Safety Audit', href: '/compliance', icon: Shield, group: 'secondary' },
-    { name: 'Teams', fullName: 'Teams', href: '/teams', icon: Users, group: 'secondary' },
-    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
+    ...CORE_NAV,
+    { name: 'Agents', fullName: 'Agents', href: '/app/agents', icon: Server, group: 'secondary' },
+    { name: 'Operations', fullName: 'Operations', href: '/analytics', icon: BarChart3, group: 'secondary' },
+    { name: 'Connections', fullName: 'Connections', href: '/manage/integrations', icon: Cable, group: 'secondary' },
   ],
 };
 
-// ═══════════════════════════════════════════════════════════════════
-// SECURITY ADMIN CONFIG
-// ═══════════════════════════════════════════════════════════════════
 const securityAdminConfig: RoleDashboardConfig = {
   role: 'security_admin',
   label: 'Security Admin',
-  description: 'Security posture, audit logs & policy enforcement',
-  greeting: 'Security Operations Centre',
+  description: 'Access governance, policy controls and supporting evidence.',
+  greeting: 'Command Center',
   kpis: [
-    { key: 'security_score', label: 'Security Score', icon: Shield, defaultValue: '94%', change: '+2.1%', trend: 'up', tooltip: 'Overall security posture score', navigateTo: '/compliance' },
-    { key: 'active_threats', label: 'Active Alerts', icon: AlertTriangle, defaultValue: '2', trend: 'neutral', tooltip: 'Unresolved security alerts', navigateTo: '/compliance' },
-    { key: 'policy_compliance', label: 'Policy Compliance', icon: FileCheck, defaultValue: '98.7%', change: '+0.5%', trend: 'up', tooltip: 'Percentage of enforced security policies passing', navigateTo: '/compliance' },
-    { key: 'access_reviews', label: 'Access Reviews Due', icon: Eye, defaultValue: '5', trend: 'neutral', tooltip: 'Pending access review requests', navigateTo: '/teams' },
+    {
+      key: 'security_posture',
+      label: 'Security Posture',
+      icon: Shield,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'No synthetic security score is shown. Review concrete controls, alerts and evidence instead.',
+      navigateTo: '/admin/platform-readiness',
+    },
+    {
+      key: 'active_alerts',
+      label: 'Active Alerts',
+      icon: AlertTriangle,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Alert counts require a bound operational source.',
+      navigateTo: '/analytics',
+    },
+    {
+      key: 'policy_status',
+      label: 'Policy Status',
+      icon: FileCheck,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Policy status is evidence-backed rather than represented as an invented percentage.',
+      navigateTo: '/settings/ai',
+    },
+    {
+      key: 'access_reviews',
+      label: 'Access Reviews',
+      icon: Lock,
+      defaultValue: NOT_ASSESSED,
+      trend: 'neutral',
+      tooltip: 'Access review state comes from People & Access.',
+      navigateTo: '/teams',
+    },
   ],
   sections: [
-    { id: 'security_posture', title: 'Security Posture', icon: Shield, component: 'SecurityPosture', priority: 1 },
-    { id: 'audit_logs', title: 'Recent Audit Logs', icon: FileCheck, component: 'AuditLogs', priority: 2 },
-    { id: 'access_control', title: 'Access Control', icon: Lock, component: 'AccessControl', priority: 3 },
-    { id: 'sovereignty_status', title: 'Data Sovereignty', icon: Globe, component: 'SovereigntyStatus', priority: 4 },
+    { id: 'security_posture', title: 'Platform Readiness', icon: Shield, component: 'SecurityPosture', priority: 1 },
+    { id: 'audit_logs', title: 'Decision & Audit Evidence', icon: FileCheck, component: 'AuditLogs', priority: 2 },
+    { id: 'access_control', title: 'People & Access', icon: Lock, component: 'AccessControl', priority: 3 },
+    { id: 'sovereignty_status', title: 'Sovereignty Evidence', icon: Globe, component: 'SovereigntyStatus', priority: 4 },
   ],
   navigation: [
-    { name: 'Command', fullName: 'Security Operations Centre', href: '/', icon: LayoutDashboard, group: 'primary' },
-    { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
-    { name: 'Simulation', fullName: 'Simulation Workspace', href: '/simulation', icon: Activity, group: 'primary' },
-    { name: 'Audit', fullName: 'Sovereignty & Safety Audit', href: '/compliance', icon: Shield, group: 'primary' },
-    { name: 'Teams', fullName: 'Access Management', href: '/teams', icon: Users, group: 'primary' },
-    { name: 'Approvals', fullName: 'User Approvals', href: '/admin/signups-dashboard', icon: UserCheck, group: 'secondary' },
-    { name: 'Analytics', fullName: 'Security Analytics', href: '/analytics', icon: BarChart3, group: 'secondary' },
-    { name: 'Agents', fullName: 'Agent Oversight', href: '/app/agents', icon: Server, group: 'secondary' },
-    { name: 'Infra', fullName: 'Infrastructure', href: '/infrastructure', icon: HardDrive, group: 'secondary' },
+    ...CORE_NAV,
+    { name: 'People', fullName: 'People & Access', href: '/teams', icon: Users, group: 'secondary' },
+    { name: 'Policies', fullName: 'Agent Policies', href: '/settings/ai', icon: Sparkles, group: 'secondary' },
+    { name: 'Admin', fullName: 'Platform Administration', href: '/admin/platform-readiness', icon: Shield, group: 'secondary' },
   ],
 };
-
-// ═══════════════════════════════════════════════════════════════════
-// CONFIG MAP & HELPERS
-// ═══════════════════════════════════════════════════════════════════
 
 const configMap: Record<string, RoleDashboardConfig> = {
   executive: executiveConfig,
   manager: managerConfig,
   engineer: engineerConfig,
   security_admin: securityAdminConfig,
-  // Fallback aliases
   compliance: securityAdminConfig,
   data_analyst: engineerConfig,
   marketing: managerConfig,
@@ -207,23 +322,16 @@ const configMap: Record<string, RoleDashboardConfig> = {
   finance: executiveConfig,
 };
 
-/**
- * Get the dashboard configuration for a given role.
- * Falls back to engineer config if role is unknown.
- */
 export function getRoleDashboardConfig(role: AppRole | null): RoleDashboardConfig {
   if (!role) return engineerConfig;
   return configMap[role] || engineerConfig;
 }
 
-/**
- * Get navigation items for a role, split into primary and secondary.
- */
 export function getRoleNavigation(role: AppRole | null) {
   const config = getRoleDashboardConfig(role);
   return {
-    primary: config.navigation.filter(n => n.group === 'primary'),
-    secondary: config.navigation.filter(n => n.group === 'secondary'),
+    primary: config.navigation.filter((n) => n.group === 'primary'),
+    secondary: config.navigation.filter((n) => n.group === 'secondary'),
     all: config.navigation,
   };
 }

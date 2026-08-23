@@ -7,8 +7,7 @@ import { cn } from '@/lib/utils';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { BuilderModeProvider } from './BuilderModeContext';
 import { BuilderModeToggle } from './BuilderModeToggle';
-import { LastUpdatedBadge, BuilderStateIndicator } from '@/components/ui/snapshot-indicator';
-import { formatRelativeTime } from '@/lib/formatters';
+import { LastUpdatedBadge } from '@/components/ui/snapshot-indicator';
 
 enum DeployState {
   idle = "idle",
@@ -58,7 +57,6 @@ export function BuilderLayout({
   const isStepActive = (step: number) => currentStep === step;
   const isStepAccessible = (step: number) => step <= currentStep || completedSteps.includes(step - 1);
   
-  // Reset deploy state when leaving step 5
   useEffect(() => {
     if (!isDeployStep && deployState !== DeployState.idle) {
       setDeployState(DeployState.idle);
@@ -68,7 +66,6 @@ export function BuilderLayout({
   const handleDeployClick = async () => {
     if (!onDeploy || deployState !== DeployState.idle || nextDisabled) return;
     
-    // Additional validation check before deployment - get fresh state
     const state = useWizardBuilderStore.getState();
     if (!state.workflow?.actions || state.workflow.actions.length === 0) {
       console.error('[BuilderLayout] Deployment blocked: No workflow actions found');
@@ -81,13 +78,9 @@ export function BuilderLayout({
     
     console.log('[BuilderLayout] Workflow validation passed, proceeding with deployment');
 
-    // Stage 1: Morphing
     setDeployState(DeployState.morphing);
-    
-    // Wait for morph animation
     await new Promise(resolve => setTimeout(resolve, 350));
     
-    // Stage 2: Deploying - enforce minimum spinner duration
     setDeployState(DeployState.deploying);
     const deployStartTime = Date.now();
     const MIN_DEPLOY_DURATION = 1200;
@@ -132,7 +125,7 @@ export function BuilderLayout({
 
   return (
     <BuilderModeProvider>
-      <div className="min-h-screen flex w-full bg-background">
+      <div className="min-h-screen flex w-full min-w-0 max-w-full overflow-x-hidden bg-background">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex w-[260px] border-r bg-muted/30 flex-col">
           <div className="p-6 border-b">
@@ -153,7 +146,6 @@ export function BuilderLayout({
 
           {/* Mode Toggle - hidden from sidebar, available on mobile only */}
 
-          {/* Auto-save indicator */}
           {lastSaved && (
             <div className="px-4 py-2 border-b">
               <LastUpdatedBadge timestamp={lastSaved} prefix="Saved" />
@@ -200,9 +192,10 @@ export function BuilderLayout({
           </nav>
         </aside>
 
-        {/* Mobile Top Stepper */}
-        <div className="lg:hidden fixed top-0 left-0 right-0 bg-background border-b z-50">
-          <div className="flex items-center gap-2 px-4 py-2">
+        {/* Mobile Top Stepper. Every flex boundary is explicitly shrinkable so
+            a 375px phone never expands the page to the stepper's min-content width. */}
+        <div className="lg:hidden fixed inset-x-0 top-0 max-w-full overflow-x-hidden bg-background border-b z-50">
+          <div className="flex min-w-0 max-w-full items-center gap-2 px-4 py-2">
             <Button
               variant="ghost"
               size="sm"
@@ -212,9 +205,9 @@ export function BuilderLayout({
             >
               <Home className="h-4 w-4" />
             </Button>
-            <div className="flex items-center justify-between flex-1 overflow-x-auto">
+            <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto overscroll-x-contain">
               {STEPS.map((step, idx) => (
-                <div key={step.id} className="flex items-center">
+                <div key={step.id} className="flex shrink-0 items-center">
                   <button
                     onClick={() => isStepAccessible(step.id) && setCurrentStep(step.id)}
                     disabled={!isStepAccessible(step.id)}
@@ -241,24 +234,23 @@ export function BuilderLayout({
                 </div>
               ))}
             </div>
-            {/* Mobile mode toggle */}
-            <div className="flex-shrink-0 ml-2">
+            <div className="ml-2 max-w-[40px] flex-shrink-0 sm:max-w-none">
               <BuilderModeToggle />
             </div>
           </div>
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col">
-          <div className="flex-1 overflow-y-auto pt-16 lg:pt-0">
-            <div className="max-w-[880px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="flex-1 min-w-0 max-w-full flex flex-col overflow-x-hidden">
+          <div className="flex-1 min-w-0 max-w-full overflow-y-auto overflow-x-hidden pt-16 lg:pt-0">
+            <div className="w-full min-w-0 max-w-[880px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
             </div>
           </div>
 
           {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 left-0 right-0 border-t bg-background p-4">
-            <div className="max-w-[880px] mx-auto flex items-center justify-between gap-4">
+          <div className="sticky bottom-0 left-0 right-0 max-w-full overflow-x-hidden border-t bg-background p-4">
+            <div className="w-full min-w-0 max-w-[880px] mx-auto flex items-center justify-between gap-4">
               <Button
                 variant="outline"
                 onClick={onBack}
@@ -268,7 +260,7 @@ export function BuilderLayout({
                 Back
               </Button>
 
-              <div className="flex-1 text-center text-sm text-muted-foreground">
+              <div className="min-w-0 flex-1 text-center text-sm text-muted-foreground">
                 Step {currentStep} of {STEPS.length}
               </div>
 

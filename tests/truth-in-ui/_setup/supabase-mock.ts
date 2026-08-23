@@ -18,14 +18,41 @@
 
 import type { BrowserContext, Page, Route } from '@playwright/test';
 
-// Supabase project ref used by the Vite env — the storage key is
-// `sb-<ref>-auth-token`. This is a public identifier, not a secret.
+// Supabase-js derives its default storage key from the configured URL's
+// first hostname segment. Keep the test session aligned with the app when
+// CI deliberately replaces the cloud URL with a loopback placeholder.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
-export const STORAGE_KEY = `sb-${SUPABASE_REF}-auth-token`;
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
+const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
+const CONFIGURED_SUPABASE_URL =
+  process.env.VITE_SUPABASE_URL?.trim() || DEFAULT_TEST_SUPABASE_URL;
+const LOOPBACK_SUPABASE_ORIGINS = new Set([
+  new URL(DEFAULT_TEST_SUPABASE_URL).origin,
+  'http://localhost:54321',
+  'http://[::1]:54321',
+]);
 
-function isSupabaseHost(host: string): boolean {
-  return host === SUPABASE_HOST || host.endsWith('.supabase.co') || host.endsWith('.supabase.io');
+export function storageKeyForSupabaseUrl(url: string): string {
+  const hostname = new URL(url).hostname;
+  const projectRef = hostname.split('.')[0];
+  if (!projectRef) throw new Error('Supabase URL must include a hostname');
+  return `sb-${projectRef}-auth-token`;
+}
+
+export const STORAGE_KEY = storageKeyForSupabaseUrl(
+  CONFIGURED_SUPABASE_URL,
+);
+
+export function isSupabaseRequest(url: URL): boolean {
+  if (url.origin === new URL(CONFIGURED_SUPABASE_URL).origin) return true;
+  if (LOOPBACK_SUPABASE_ORIGINS.has(url.origin)) return true;
+
+  return (
+    url.protocol === 'https:' &&
+    (url.hostname === SUPABASE_HOST ||
+      url.hostname.endsWith('.supabase.co') ||
+      url.hostname.endsWith('.supabase.io'))
+  );
 }
 
 function b64url(obj: unknown): string {
@@ -131,8 +158,7 @@ export async function installSupabaseMock(
     catch { return route.fallback(); }
 
     // Parse first, match on origin+pathname second.
-    const host = parsed.hostname;
-    if (!isSupabaseHost(host)) return route.fallback();
+    if (!isSupabaseRequest(parsed)) return route.fallback();
 
     const method = req.method().toUpperCase();
     const pathname = parsed.pathname;

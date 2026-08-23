@@ -17,9 +17,19 @@ interface Props {
   className?: string;
   /** Hidden when the grid states one shared validation state for every tile. */
   hideValidation?: boolean;
+  /** Visual hierarchy only: no change to the value, provenance or semantics. */
+  level?: 'primary' | 'secondary' | 'compact';
 }
 
-export function MetricTile({ id, metric, digits = 2, label, className, hideValidation = false }: Props) {
+export function MetricTile({
+  id,
+  metric,
+  digits = 2,
+  label,
+  className,
+  hideValidation = false,
+  level = 'secondary',
+}: Props) {
   const { openProvenance } = useWorkspace();
   const unavailable = metric.value === null;
 
@@ -30,11 +40,13 @@ export function MetricTile({ id, metric, digits = 2, label, className, hideValid
       data-validation={metric.validation}
       className={cn(
         'overflow-hidden rounded-md border-y border-r border-l-4 border-border/60 border-l-primary bg-card shadow-sm transition-shadow hover:shadow-md',
+        level === 'primary' && 'border-l-primary bg-[hsl(var(--v2-panel-elevated))]',
+        level === 'compact' && 'border-l-2 border-l-border/60',
         unavailable && 'border-l-muted-foreground/30',
         className,
       )}
     >
-      <CardContent className="p-4">
+      <CardContent className={level === 'compact' ? 'p-3' : 'p-4'}>
         <button
           type="button"
           onClick={() => openProvenance(metric)}
@@ -48,7 +60,10 @@ export function MetricTile({ id, metric, digits = 2, label, className, hideValid
           </span>
 
           <span
-            className="block font-mono text-3xl font-bold leading-none tabular-nums text-foreground"
+            className={cn(
+              'v2-mono block font-bold leading-none tabular-nums text-foreground',
+              level === 'primary' ? 'text-[34px]' : level === 'compact' ? 'text-xl' : 'text-3xl',
+            )}
             data-testid={`dsx-metric-${id}-value`}
           >
             {unavailable ? (
@@ -95,10 +110,12 @@ export function MetricGrid({
   ids,
   metrics,
   columns = 'sm:grid-cols-2 lg:grid-cols-4',
+  level = 'secondary',
 }: {
   ids: string[];
   metrics: Record<string, DsxProvenancedMetric>;
   columns?: string;
+  level?: 'primary' | 'secondary' | 'compact';
 }) {
   const shown = ids.filter((id) => metrics[id]);
   /* Tiles collapse to one statement when they render the identical badge:
@@ -127,7 +144,7 @@ export function MetricGrid({
       )}
       <div className={cn('grid gap-4', columns)}>
         {shown.map((id) => (
-          <MetricTile key={id} id={id} metric={metrics[id]} hideValidation={Boolean(shared)} />
+          <MetricTile key={id} id={id} metric={metrics[id]} level={level} hideValidation={Boolean(shared)} />
         ))}
       </div>
     </div>

@@ -17,12 +17,13 @@ verify_jwt = true
 [functions.dsx-ingest]
 verify_jwt = false
 
-# Public intake (onboarding + contact). Anonymous callers must reach it, so the
-# gateway JWT check is off; the handler derives identity server-side from any
-# supplied bearer token, validates schema, rate limits per IP/user and
-# suppresses duplicates. Direct anonymous table inserts are revoked.
+# Public intake remains outside the production function allowlist. Gateway JWT
+# verification is enabled so the default-deny perimeter cannot expose an
+# unauthenticated service-role path. Re-opening anonymous intake requires a
+# separately approved boundary and disposition; rate limiting alone is not an
+# authentication mechanism.
 [functions.public-intake]
-verify_jwt = false
+verify_jwt = true
 
 # NVIDIA operational-readiness Phase 2 - service-role attack surface closed.
 # `metrics-summary`, `ops-environments`, `ops-events`, `ops-ingest-health`,
@@ -43,4 +44,28 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.zapier-action-execute]
+verify_jwt = true
+
+# Shared-handler administrative endpoints. Gateway validation remains enabled
+# as defense in depth; each handler also validates identity, canonical role and
+# profiles.org_id membership before constructing a service-role client.
+[functions.analytics-overview]
+verify_jwt = true
+
+[functions.analytics-export]
+verify_jwt = true
+
+[functions.analytics-systems]
+verify_jwt = true
+
+[functions.ai-systems]
+verify_jwt = true
+
+[functions.ops-heartbeat]
+verify_jwt = true
+
+[functions.ops-overview]
+verify_jwt = true
+
+[functions.ops-systems]
 verify_jwt = true

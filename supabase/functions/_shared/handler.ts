@@ -1,6 +1,11 @@
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { getAuthContext, AuthLevel } from "./auth.ts";
 import {
+  createCorsJsonResponse,
+  evaluateCorsOrigin,
+  handleCorsPreflightRequest,
+} from "./cors.ts";
+import {
   ApiResponse,
   createSuccessResponse,
   createErrorResponse,
@@ -24,6 +29,9 @@ export interface HandlerContext {
   correlationId: string;
   userId?: string;
   user?: any;
+  organizationId?: string;
+  tenantId?: string;
+  roles?: string[];
   supabase: any;
   log: (message: string, extra?: Record<string, unknown>) => void;
 }
@@ -54,13 +62,16 @@ export function createHandler<TInput = any, TOutput = any>(
 
       // Handle CORS preflight
       if (req.method === "OPTIONS") {
-        return new Response(null, {
-          headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-idempotency-key",
-            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-          },
-        });
+        return handleCorsPreflightRequest(req);
+      }
+
+      const cors = evaluateCorsOrigin(req.headers.get("origin"));
+      if (!cors.allowed) {
+        return createCorsJsonResponse(req, createErrorResponse(
+          "CORS_ORIGIN_DENIED",
+          "Origin is not allowed",
+          correlationId,
+        ), 403);
       }
 
       // Authenticate
@@ -74,13 +85,7 @@ export function createHandler<TInput = any, TOutput = any>(
           authError.message || "Authentication failed",
           correlationId
         );
-        return new Response(JSON.stringify(response), {
-          status: authError.status || 401,
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-          },
-        });
+        return createCorsJsonResponse(req, response, authError.status || 401);
       }
 
       // Parse and validate input
@@ -107,13 +112,7 @@ export function createHandler<TInput = any, TOutput = any>(
             correlationId,
             { issues: parseResult.error.issues }
           );
-          return new Response(JSON.stringify(response), {
-            status: 400,
-            headers: {
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-            },
-          });
+          return createCorsJsonResponse(req, response, 400);
         }
         input = parseResult.data;
       }
@@ -124,6 +123,9 @@ export function createHandler<TInput = any, TOutput = any>(
         correlationId,
         userId: authContext.userId,
         user: authContext.user,
+        organizationId: authContext.organizationId,
+        tenantId: authContext.tenantId,
+        roles: authContext.roles,
         supabase: authContext.supabase,
         log,
       };
@@ -134,13 +136,7 @@ export function createHandler<TInput = any, TOutput = any>(
       log("Success", { durationMs: duration });
 
       const response = createSuccessResponse(result, correlationId);
-      return new Response(JSON.stringify(response), {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
+      return createCorsJsonResponse(req, response, 200);
     } catch (err) {
       const duration = Date.now() - startedAt;
       
@@ -174,13 +170,7 @@ export function createHandler<TInput = any, TOutput = any>(
         { error: message }
       );
 
-      return new Response(JSON.stringify(response), {
-        status,
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-        },
-      });
+      return createCorsJsonResponse(req, response, status);
     }
   };
 }

@@ -1,3 +1,4 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createHandler } from "../_shared/handler.ts";
 import { createDigitalTwinSchema } from "../_shared/digitalTwinSchemas.ts";
 
@@ -9,7 +10,7 @@ interface CreateDigitalTwinInput {
   config: any;
 }
 
-export default createHandler<CreateDigitalTwinInput, any>({
+serve(createHandler<CreateDigitalTwinInput, any>({
   name: "digital-twin-create",
   authLevel: "user",
   inputSchema: createDigitalTwinSchema,
@@ -73,4 +74,4 @@ export default createHandler<CreateDigitalTwinInput, any>({
       },
     };
   },
-});
+}));

@@ -8,33 +8,64 @@
  * by this guard: the source tree must not reintroduce the identifiers, and the
  * template loader must not resolve them.
  *
- * The source-tree half runs offline and is the meaningful assertion. The loader
- * half needs the backend, so it is skipped rather than failed when the
- * live-backend guard blocks the request.
+ * Both halves run offline. The loader receives a deterministic not-found
+ * response from a local mock so this guard never contacts a deployed backend
+ * and never passes merely because a network request failed.
  */
-import { execFileSync } from 'node:child_process';
-import { describe, expect, it } from 'vitest';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative, sep } from 'node:path';
+import { describe, expect, it, vi } from 'vitest';
 import { loadTemplateById } from '@/lib/templates/unifiedTemplateService';
+
+const templateQuery = vi.hoisted(() => ({
+  from: vi.fn(),
+  eq: vi.fn(),
+  single: vi.fn(),
+}));
+
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    from: templateQuery.from.mockImplementation(() => ({
+      select: () => ({
+        eq: templateQuery.eq.mockImplementation(() => ({
+          single: templateQuery.single.mockResolvedValue({
+            data: null,
+            error: { code: 'PGRST116', message: 'not found' },
+          }),
+        })),
+      }),
+    })),
+  },
+}));
 
 const REMOVED_TEMPLATE_IDS = [
   'YVR_AIRPORT_DIGITAL_TWIN',
   'TRANSPORT_CANADA_TWIN',
 ] as const;
 
+function applicationSourceFiles(root: string): string[] {
+  const files: string[] = [];
+
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const path = join(root, entry.name);
+    const relativePath = relative(process.cwd(), path).split(sep).join('/');
+
+    if (entry.isDirectory()) {
+      if (relativePath === 'src/lib/mock') continue;
+      files.push(...applicationSourceFiles(path));
+    } else if (entry.isFile()) {
+      files.push(path);
+    }
+  }
+
+  return files;
+}
+
 /** Matches in src/, ignoring the retired mock modules that are not runtime-reachable. */
 function sourceMatches(pattern: string): string[] {
-  try {
-    const out = execFileSync(
-      'rg',
-      ['-l', pattern, 'src', '--glob', '!src/lib/mock/**'],
-      { encoding: 'utf8', cwd: process.cwd() },
-    );
-    return out.split('\n').filter(Boolean);
-  } catch (error) {
-    // rg exits 1 with no output when there are no matches, which is the pass case.
-    if ((error as { status?: number }).status === 1) return [];
-    throw error;
-  }
+  return applicationSourceFiles(join(process.cwd(), 'src'))
+    .filter((path) => readFileSync(path, 'utf8').includes(pattern))
+    .map((path) => relative(process.cwd(), path).split(sep).join('/'));
 }
 
 describe('non-data-centre templates remain removed', () => {
@@ -49,14 +80,9 @@ describe('non-data-centre templates remain removed', () => {
 
   for (const id of REMOVED_TEMPLATE_IDS) {
     it(`does not resolve ${id} from the template loader`, async () => {
-      let resolved: unknown;
-      try {
-        resolved = await loadTemplateById(id);
-      } catch {
-        // Backend unreachable in this environment: nothing to assert.
-        return;
-      }
-      expect(resolved).toBeNull();
+      await expect(loadTemplateById(id)).resolves.toBeNull();
+      expect(templateQuery.from).toHaveBeenLastCalledWith('agent_templates');
+      expect(templateQuery.eq).toHaveBeenLastCalledWith('id', id);
     });
   }
 });

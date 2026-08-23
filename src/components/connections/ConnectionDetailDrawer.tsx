@@ -63,8 +63,8 @@ const PANELS = [
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <dt className="text-xs uppercase tracking-wide text-muted-foreground">{label}</dt>
-      <dd className="break-words text-sm">{value}</dd>
+      <dt className="v2-label">{label}</dt>
+      <dd className="v2-mono break-words text-sm">{value}</dd>
     </div>
   );
 }
@@ -332,7 +332,7 @@ export function ConnectionDetailDrawer(props: Props) {
                   <p className="text-sm text-muted-foreground">No data contract is attached to this connection.</p>
                 ) : (
                   scoped.contracts.map((c) => (
-                    <div key={c.id} className="rounded-md border border-border p-3 text-sm">
+                    <div key={c.id} className="v2-subpanel text-sm">
                       <p className="font-medium">{c.name} {c.version ? `· ${c.version}` : ''}</p>
                       <p className="text-muted-foreground">
                         {c.direction ?? 'direction not declared'} · validation {c.validation_status ?? 'not evaluated'} · schema {c.schema_reference ?? 'none'}
@@ -363,7 +363,7 @@ export function ConnectionDetailDrawer(props: Props) {
                 <p className="text-sm text-muted-foreground">No mapping is defined for this connection.</p>
               ) : (
                 scoped.mappings.map((m) => (
-                  <div key={m.id} className="rounded-md border border-border p-3 text-sm">
+                  <div key={m.id} className="v2-subpanel text-sm">
                     <p className="font-medium break-words">{m.source_identifier}</p>
                     <p className="text-muted-foreground break-words">
                       to {m.target_prim_path ?? m.target_entity ?? 'unmapped'}{m.target_property ? `.${m.target_property}` : ''}
@@ -388,7 +388,7 @@ export function ConnectionDetailDrawer(props: Props) {
                   <p className="text-sm text-muted-foreground">No health check has been executed for this connection.</p>
                 ) : (
                   scoped.checks.slice(0, 10).map((h) => (
-                    <div key={h.id} className="rounded-md border border-border p-3 text-sm">
+                    <div key={h.id} className="v2-subpanel text-sm">
                       <p className="font-medium">{h.status} · {h.check_type}</p>
                       <p className="text-muted-foreground">
                         {formatDateTime(h.started_at)} · network {h.network_result ?? 'n/a'} · auth {h.auth_result ?? 'n/a'} · data {h.data_availability ?? 'n/a'} · {h.latency_ms ?? '-'} ms
@@ -404,7 +404,7 @@ export function ConnectionDetailDrawer(props: Props) {
                   <p className="text-sm text-muted-foreground">No ingest run has been recorded.</p>
                 ) : (
                   scoped.runs.slice(0, 10).map((r) => (
-                    <div key={r.id} className="rounded-md border border-border p-3 text-sm text-muted-foreground">
+                    <div key={r.id} className="v2-subpanel text-sm text-muted-foreground">
                       {formatDateTime(r.started_at)} · received {r.records_received} · accepted {r.records_accepted} · rejected {r.records_rejected} · {r.final_status}
                     </div>
                   ))
@@ -417,7 +417,7 @@ export function ConnectionDetailDrawer(props: Props) {
                 <p className="text-sm text-muted-foreground">No audited action has been recorded for this connection.</p>
               ) : (
                 scoped.audit.slice(0, 25).map((a) => (
-                  <div key={a.id} className="rounded-md border border-border p-3 text-sm">
+                  <div key={a.id} className="v2-subpanel text-sm">
                     <p className="font-medium">{a.action}</p>
                     <p className="text-muted-foreground">
                       {formatDateTime(a.created_at)} · {a.previous_state ?? '-'} to {a.new_state ?? '-'} · correlation {a.correlation_id ?? '-'}

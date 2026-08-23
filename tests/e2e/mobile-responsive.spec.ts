@@ -1,8 +1,8 @@
 import { test, expect, devices } from '@playwright/test';
 
-test.describe('Mobile Responsive Design', () => {
-  test.use({ ...devices['iPhone 12'] });
+test.use({ ...devices['iPhone 12'] });
 
+test.describe('Mobile Responsive Design', () => {
   test('should render dashboard on mobile', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');

@@ -16,7 +16,7 @@ import {
   connectManagedUserConnector,
   disconnectManagedUserConnector,
 } from '@/connections/managedUserBinding';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Panel, SectionHeader } from '@/components/v2';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useManagedConnectorCapabilities } from '@/connections/managedConnectorApi';
 import {
@@ -115,37 +115,36 @@ export function ManagedConnectorInventory() {
   }
   if (!data || data.entries.length === 0) {
     return (
-      <Card>
-        <CardContent className="p-6 text-sm text-muted-foreground">
+      <Panel>
+        <div className="p-2 text-sm text-muted-foreground">
           The capability inventory could not be read. No connector is treated as runtime-available until the server
           confirms its binding.
-        </CardContent>
-      </Card>
+        </div>
+      </Panel>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base">Connector capability inventory</CardTitle>
-        <CardDescription className="text-sm">
-          Implementation class and proven runtime eligibility, verified server-side. Build-time assistant connectors are
-          excluded: they are never operational AURA integrations.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <Panel>
+      <SectionHeader
+        eyebrow="Managed inventory"
+        title="Connector capability inventory"
+        description={<>Implementation class and proven runtime eligibility, verified server-side. Build-time assistant connectors are
+          excluded: they are never operational AURA integrations.</>}
+      />
+      <div className="space-y-6">
         {CLASS_ORDER.map((cls) => {
           const entries = data.entries.filter((e) => e.connection_class === cls);
           if (entries.length === 0) return null;
           return (
             <section key={cls} className="space-y-3">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold">{CONNECTION_CLASS_LABEL[cls]}</h3>
+                <h3 className="v2-label text-sm font-semibold text-foreground">{CONNECTION_CLASS_LABEL[cls]}</h3>
                 <p className="text-xs text-muted-foreground">{CONNECTION_CLASS_DESCRIPTION[cls]}</p>
               </div>
               <ul className="space-y-2">
                 {entries.map((entry) => (
-                  <li key={entry.connector_definition_id} className="rounded-md border border-border p-3">
+                  <li key={entry.connector_definition_id} className="v2-subpanel">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-medium">{entry.provider}</span>
                       <Badge variant="outline" className={`text-xs ${TONE_CLASS[ELIGIBILITY_TONE[entry.eligibility]]}`}>
@@ -189,7 +188,7 @@ export function ManagedConnectorInventory() {
             </section>
           );
         })}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

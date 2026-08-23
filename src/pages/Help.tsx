@@ -1,551 +1,302 @@
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { z } from "zod";
-import {
-  PlayCircle,
-  Calculator,
-  MessageSquare,
-  BookOpen,
-  Video,
-  FileText,
-  Mail,
-  Info,
-  DollarSign,
-  Headphones,
-  GraduationCap,
-  Activity,
-  Compass,
-  Layers,
-  RefreshCw,
-  UserCog,
-  Users,
-  Wrench,
-  Shield,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useMemo, type ElementType } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { DCCard, DCSectionHeader } from "@/components/dc-ui/DCCard";
-import { DCKPITile } from "@/components/dc-ui/DCKPITile";
-import { useTour } from "@/context/TourContext";
-import { tourRegistry, TourId, tourRoutes } from "@/tours/tourRegistry";
 
-// Tour icon mapping - matches HelpMenu styling
-const tourIcons: Record<TourId, React.ReactNode> = {
-  studioIntro: <Compass className="h-4 w-4" />,
-  overview: <BookOpen className="h-4 w-4" />,
-  simulation: <Activity className="h-4 w-4" />,
-  blueprint: <Layers className="h-4 w-4" />,
-  role_executive: <UserCog className="h-4 w-4" />,
-  role_manager: <Users className="h-4 w-4" />,
-  role_engineer: <Wrench className="h-4 w-4" />,
-  role_security_admin: <Shield className="h-4 w-4" />,
-};
+import {
+  Activity,
+  BookOpen,
+  Boxes,
+  Cable,
+  Compass,
+  FileSearch,
+  FlaskConical,
+  GraduationCap,
+  LayoutDashboard,
+  RefreshCw,
+  Rocket,
+  Server,
+  Shield,
+  Sparkles,
+  Users,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { useTour } from '@/context/TourContext';
+import { tourRegistry, type TourId } from '@/tours/tourRegistry';
+import { getBuildFingerprint } from '@/lib/buildFingerprint';
 
-// Validation Schema
-const contactSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
-  email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
-  message: z.string().trim().max(2000, "Message must be less than 2000 characters").optional(),
-});
 
-const helpSections = [
+interface GuideLink {
+  title: string;
+  description: string;
+  route: string;
+  icon: ElementType;
+}
+
+const GETTING_STARTED: GuideLink[] = [
   {
-    title: "Getting Started",
-    icon: PlayCircle,
-    items: [
-      "Build Your First AI System (5 min video)",
-      "Understanding ROI Metrics",
-      "Connecting Your Tech Stack",
-      "Setting Up Team Permissions",
-    ],
+    title: 'Command Center',
+    description: 'Read facility status, priority actions, model assumptions and recent simulation results.',
+    route: '/dashboard',
+    icon: LayoutDashboard,
   },
   {
-    title: "User Guides",
-    icon: BookOpen,
-    items: [
-      "No-Code Builder Tutorial",
-      "Analytics Dashboard Guide",
-      "Compliance & Audit Best Practices",
-      "Integration Configuration",
-    ],
+    title: 'Facility Blueprint',
+    description: 'Understand the canonical facility model, assets, automation definitions, validation and versions.',
+    route: '/blueprint/default',
+    icon: Boxes,
   },
   {
-    title: "Templates",
-    icon: FileText,
-    items: [
-      "Healthcare Compliance Template",
-      "Manufacturing Quality Control",
-      "Marketing Automation Setup",
-      "Finance Reporting Workflows",
-    ],
+    title: 'Run a Simulation',
+    description: 'Review scenario inputs, execute a deterministic run, compare outcomes and review recommendations.',
+    route: '/simulation',
+    icon: FlaskConical,
+  },
+  {
+    title: 'Review Evidence',
+    description: 'Trace operational and sustainability claims back to provenance and decision records.',
+    route: '/dsx/evidence-beta/overview',
+    icon: FileSearch,
   },
 ];
+
+const OPERATE: GuideLink[] = [
+  {
+    title: 'Connections',
+    description: 'Configure, test, map and monitor external systems and data exchange.',
+    route: '/manage/integrations',
+    icon: Cable,
+  },
+  {
+    title: 'Agents',
+    description: 'Review agent scope, recommendations, execution state, configuration and audit history.',
+    route: '/app/agents',
+    icon: Server,
+  },
+  {
+    title: 'Operations',
+    description: 'Use the aggregate operations view for alerts, trends and data availability.',
+    route: '/analytics',
+    icon: Activity,
+  },
+  {
+    title: 'Runtime',
+    description: 'Inspect deployment history, runtime state and step-level execution evidence.',
+    route: '/deployments',
+    icon: Rocket,
+  },
+];
+
+const GOVERN: GuideLink[] = [
+  {
+    title: 'People & Access',
+    description: 'Manage members, invitations, approvals and role assignments from one governance area.',
+    route: '/teams',
+    icon: Users,
+  },
+  {
+    title: 'Agent Policies',
+    description: 'Configure approved AI providers, grounding boundaries, safety settings and governance policy.',
+    route: '/settings/ai',
+    icon: Sparkles,
+  },
+  {
+    title: 'Sovereignty Evidence',
+    description: 'Review residency, sovereignty and sustainability evidence without treating modelled claims as certified facts.',
+    route: '/dsx/evidence-beta/sustainability/sovereignty',
+    icon: Shield,
+  },
+];
+
+const GUIDED_TOURS: Array<{ id: TourId; route: string; icon: ElementType }> = [
+  { id: 'studioIntro', route: '/dashboard', icon: Compass },
+  { id: 'overview', route: '/dashboard', icon: LayoutDashboard },
+  { id: 'simulation', route: '/simulation', icon: FlaskConical },
+  { id: 'blueprint', route: '/blueprint/default', icon: Boxes },
+];
+
+function GuideGrid({ items }: { items: GuideLink[] }) {
+  const navigate = useNavigate();
+  return (
+    <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      {items.map((item) => {
+        const Icon = item.icon;
+        return (
+          <button
+            key={item.title}
+            type="button"
+            onClick={() => navigate(item.route)}
+            className="rounded-lg border border-border bg-card p-4 text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <div className="mb-2 flex items-center gap-2">
+              <Icon className="h-4 w-4 text-primary" aria-hidden />
+              <span className="text-sm font-semibold">{item.title}</span>
+            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">{item.description}</p>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Help() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { startTour, resetAllTours, isTourSeen } = useTour();
-  
-  // ROI Calculator State
-  const [manualHours, setManualHours] = useState(40);
-  const [hourlyCost, setHourlyCost] = useState(75);
-  const [automationPercent, setAutomationPercent] = useState(60);
-  const [timeline, setTimeline] = useState(12);
-
-  // Contact Form State
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // ROI Calculations (live updating)
-  const timeSavedWeek = (manualHours * automationPercent) / 100;
-  const annualSavings = manualHours * hourlyCost * (automationPercent / 100) * 52;
-  const totalManualCost = manualHours * hourlyCost * 52;
-  const roi = totalManualCost > 0 ? (annualSavings / totalManualCost) * 100 : 0;
-
-  // Contact Form Submission
-  const handleContactSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Validate input
-      const validatedData = contactSchema.parse({ name, email, message });
-
-      // Server-controlled intake: identity is derived from the session on the
-      // server, never from a client-supplied user id.
-      const { data: result, error } = await supabase.functions.invoke("public-intake", {
-        body: {
-          kind: "contact",
-          name: validatedData.name,
-          email: validatedData.email,
-          message: validatedData.message || "",
-        },
-      });
-
-      if (error || !result?.ok) {
-        console.error("Backend error:", error);
-        toast.error("Failed to send message. Please try again.");
-        return;
-      }
-
-      toast.success("Thanks! Our team will reach out shortly.");
-      setName("");
-      setEmail("");
-      setMessage("");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        const firstError = error.errors?.[0];
-        toast.error(firstError?.message || 'Validation error');
-      } else {
-        console.error("Contact form error:", error);
-        toast.error("An error occurred. Please try again.");
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const fingerprint = useMemo(() => getBuildFingerprint(), []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-          {/* Header */}
-          <DCSectionHeader
-            as="h1"
-            title={t('help.title')}
-            subtitle={t('help.subtitle')}
-            icon={<GraduationCap className="h-6 w-6" />}
-          />
 
-          {/* Featured Quickstart */}
-          <DCCard
-            title="🎓 Build Your First AI System"
-            subtitle="5-minute quickstart guide to deploying your first AI workflow"
-            icon={<PlayCircle className="h-6 w-6" />}
-            status="operational"
-            className="mb-8"
-          >
-            <div className="flex flex-col sm:flex-row justify-center gap-3">
-              <Button className="glow-yellow font-semibold">
-                <PlayCircle className="h-4 w-4 mr-2" />
-                Watch Tutorial
-              </Button>
-              <Button variant="outline">
-                <FileText className="h-4 w-4 mr-2" />
-                View Documentation
-              </Button>
+    <div className="mx-auto max-w-7xl space-y-6 py-6 pb-12">
+      <DCSectionHeader
+        as="h1"
+        title={t('help.title')}
+        subtitle="Learn AURA DC by workspace: model the facility, simulate changes, operate the platform and verify evidence."
+        icon={<GraduationCap className="h-6 w-6" />}
+      />
+
+      <DCCard
+        title="Start with the operating model"
+        subtitle="AURA separates the facility model, simulations, operational status and evidence so each claim has a clear owner."
+        icon={<BookOpen className="h-5 w-5" />}
+        status="operational"
+      >
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => navigate('/dashboard')}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            Open Command Center
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/blueprint/default')}>
+            <Boxes className="mr-2 h-4 w-4" />
+            Open Blueprint
+          </Button>
+          <Button variant="outline" onClick={() => navigate('/simulation')}>
+            <FlaskConical className="mr-2 h-4 w-4" />
+            Open Simulation
+          </Button>
+        </div>
+      </DCCard>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+        <DCCard title="Getting Started" icon={<Compass className="h-5 w-5" />} status="operational">
+          <GuideGrid items={GETTING_STARTED} />
+        </DCCard>
+
+        <DCCard title="Operate" icon={<Activity className="h-5 w-5" />} status="operational">
+          <GuideGrid items={OPERATE} />
+        </DCCard>
+
+        <DCCard title="Govern" icon={<Shield className="h-5 w-5" />} status="operational">
+          <GuideGrid items={GOVERN} />
+        </DCCard>
+
+        <DCCard
+          title="How to read AURA data"
+          subtitle="Use these rules before acting on a metric or export."
+          icon={<FileSearch className="h-5 w-5" />}
+          status="operational"
+        >
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start gap-2">
+              <Badge variant="outline">LIVE</Badge>
+              <p className="text-muted-foreground">Only use LIVE when a validated production source is actually connected.</p>
             </div>
-          </DCCard>
-
-          {/* 4-Section Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Simulation Tutorial Card */}
-            <DCCard
-              title="How to Use the Data Centre Simulation"
-              subtitle="Learn how to run scenarios and interpret KPI deltas"
-              icon={<Activity className="h-5 w-5" />}
-              status="operational"
-              className="lg:col-span-2"
-            >
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between min-w-0">
-                <p className="text-sm text-muted-foreground">
-                  Master the simulation engine to test cooling failures, GPU spikes, sovereignty violations, and more. 
-                  Understand how KPI deltas help you evaluate the impact of different scenarios on your data centre operations.
-                </p>
-                <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:flex-shrink-0">
-                  <Button onClick={() => navigate('/data-centre-twin?view=simulation&mode=guided')} className="gap-2">
-                    <PlayCircle className="h-4 w-4" />
-                    Open Simulation
-                  </Button>
-                  <Button variant="outline">
-                    Read Documentation
-                  </Button>
-                </div>
-              </div>
-            </DCCard>
+            <div className="flex items-start gap-2">
+              <Badge variant="outline">SIMULATED</Badge>
+              <p className="text-muted-foreground">Scenario outputs are model results, not measured facility telemetry.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Badge variant="outline">DEMO</Badge>
+              <p className="text-muted-foreground">Demonstration fixtures explain a workflow but do not establish customer truth.</p>
+            </div>
+            <div className="flex items-start gap-2">
+              <Badge variant="outline">NOT ASSESSED</Badge>
+              <p className="text-muted-foreground">Absence of evidence is shown explicitly rather than converted into a score.</p>
+            </div>
           </div>
+        </DCCard>
+      </div>
 
-          {/* Guided Tours Section */}
-          <DCCard
-            title="Guided Tours"
-            subtitle="Interactive walkthroughs to learn the platform"
-            icon={<Compass className="h-5 w-5" />}
-            status="operational"
-            className="mb-8"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              {(Object.keys(tourRegistry) as TourId[]).map((tourId) => {
-                const tour = tourRegistry[tourId];
-                const seen = isTourSeen(tourId);
-                return (
-                  <button
-                    key={tourId}
-                    onClick={() => {
-                      navigate(tourRoutes[tourId]);
-                      setTimeout(() => startTour(tourId), 300);
-                    }}
-                    className="p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors text-left group"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-primary">{tourIcons[tourId]}</span>
-                      <span className="font-medium text-sm">{tour.name}</span>
-                      {seen && (
-                        <span className="text-xs text-muted-foreground ml-auto">✓</span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {tour.description}
-                    </p>
-                    <div className="mt-2 text-xs text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                      Start tour →
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={resetAllTours}
-              className="gap-2"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              Reset All Tours
-            </Button>
-          </DCCard>
+      <DCCard
+        title="Guided Tours"
+        subtitle="Interactive walkthroughs of the four core AURA DC workspaces."
+        icon={<Compass className="h-5 w-5" />}
+        status="operational"
+      >
+        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {GUIDED_TOURS.map(({ id, route, icon: Icon }) => {
+            const tour = tourRegistry[id];
+            const seen = isTourSeen(id);
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  navigate(route);
+                  window.setTimeout(() => startTour(id), 350);
+                }}
+                className="rounded-lg border border-border bg-card p-4 text-left transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-primary" aria-hidden />
+                  <span className="text-sm font-medium">{tour.name}</span>
+                  {seen && <span className="ml-auto text-xs text-muted-foreground">Viewed</span>}
+                </div>
+                <p className="line-clamp-3 text-xs text-muted-foreground">{tour.description}</p>
+              </button>
+            );
+          })}
+        </div>
+        <Button variant="outline" size="sm" onClick={resetAllTours}>
+          <RefreshCw className="mr-2 h-3.5 w-3.5" />
+          Reset tours
+        </Button>
+      </DCCard>
 
-          {/* Original 4-Section Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            {/* Section 1: Quickstart & Tutorials */}
-            <DCCard
-              title="Getting Started"
-              icon={<PlayCircle className="h-5 w-5" />}
-              status="operational"
-            >
-              <ul className="space-y-3 mb-4">
-                {helpSections[0].items.map((item, idx) => (
-                  <li key={idx}>
-                    <span
-                      className="text-sm text-muted-foreground flex items-start gap-2"
-                    >
-                      <span className="text-secondary mt-1">•</span>
-                      <span>{item}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <Button variant="outline" size="sm" className="w-full">
-                View All Tutorials
-              </Button>
-            </DCCard>
+      <DCCard
+        title="Need product support?"
+        subtitle="Use the Learning Hub for product guidance. For account or implementation assistance, contact the M2M team."
+        icon={<GraduationCap className="h-5 w-5" />}
+      >
+        <Button asChild variant="outline">
+          <a href="mailto:business@m2mtechconnect.com">Contact M2M Support</a>
+        </Button>
+      </DCCard>
 
-            {/* Section 2: Guides & Templates */}
-            <DCCard 
-              title="📘 User Guides" 
-              icon={<BookOpen className="h-5 w-5" />}
-              status="operational"
-            >
-              <ul className="space-y-3 mb-4">
-                {helpSections[1].items.map((item, idx) => (
-                  <li key={idx}>
-                    <span
-                      className="text-sm text-muted-foreground flex items-start gap-2"
-                    >
-                      <span className="text-secondary mt-1">•</span>
-                      <span>{item}</span>
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <div className="pt-3 border-t border-border">
-                <div className="flex items-center gap-3 mb-3">
-                  <FileText className="h-4 w-4 text-primary" />
-                  <h4 className="font-semibold text-sm">🧩 Templates</h4>
-                </div>
-                <ul className="space-y-2 mb-4">
-                  {helpSections[2].items.map((item, idx) => (
-                    <li key={idx}>
-                      <span
-                        className="text-xs text-muted-foreground flex items-start gap-2"
-                      >
-                        <span className="text-secondary mt-0.5">•</span>
-                        <span>{item}</span>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Button variant="outline" size="sm" className="w-full">
-                View All Resources
-              </Button>
-            </DCCard>
-
-            {/* Section 3: ROI Calculator */}
-            <DCCard 
-              title={t('help.roiCalculator')}
-              subtitle={t('help.roiCalculatorDesc')}
-              icon={<Calculator className="h-5 w-5" />}
-              status="operational"
-            >
-              <div className="space-y-5">
-                {/* Manual Hours */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium flex items-center gap-1">
-                      Manual Hours/Week
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="text-xs">Current weekly hours spent on manual tasks</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </label>
-                    <span className="text-sm font-bold text-primary">{manualHours}h</span>
-                  </div>
-                  <Slider
-                    value={[manualHours]}
-                    onValueChange={(val) => setManualHours(val[0])}
-                    min={1}
-                    max={168}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Hourly Cost */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium flex items-center gap-1">
-                      Hourly Cost ($)
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="text-xs">Average loaded cost per hour (salary + benefits)</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </label>
-                    <span className="text-sm font-bold text-primary">${hourlyCost}</span>
-                  </div>
-                  <Slider
-                    value={[hourlyCost]}
-                    onValueChange={(val) => setHourlyCost(val[0])}
-                    min={20}
-                    max={500}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Automation Percentage */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium flex items-center gap-1">
-                      Expected Automation (%)
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="text-xs">Percentage of tasks that can be automated</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </label>
-                    <span className="text-sm font-bold text-primary">{automationPercent}%</span>
-                  </div>
-                  <Slider
-                    value={[automationPercent]}
-                    onValueChange={(val) => setAutomationPercent(val[0])}
-                    min={10}
-                    max={100}
-                    step={5}
-                    className="w-full"
-                  />
-                </div>
-
-                {/* Timeline */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="text-sm font-medium flex items-center gap-1">
-                      Project Timeline (months)
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p className="text-xs">Expected implementation and ROI realization period</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </label>
-                    <span className="text-sm font-bold text-primary">{timeline}mo</span>
-                  </div>
-                  <Slider
-                    value={[timeline]}
-                    onValueChange={(val) => setTimeline(val[0])}
-                    min={1}
-                    max={36}
-                    step={1}
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              {/* Live Results */}
-              <div className="mt-6 p-4 rounded-xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20">
-                <p className="text-xs text-muted-foreground text-center mb-3">
-                  Annual Savings = (Manual Hours × Hourly Cost × Automation % × 52)
-                </p>
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <div>
-                    <p className="text-lg md:text-xl font-display font-bold text-primary mb-1">
-                      ${Math.round(annualSavings).toLocaleString()}
-                    </p>
-                    <p className="text-xs text-muted-foreground">Annual Savings</p>
-                  </div>
-                  <div>
-                    <p className="text-lg md:text-xl font-display font-bold text-secondary mb-1">
-                      {Math.round(roi)}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">ROI</p>
-                  </div>
-                  <div>
-                    <p className="text-lg md:text-xl font-display font-bold mb-1">
-                      {Math.round(timeSavedWeek)}h
-                    </p>
-                    <p className="text-xs text-muted-foreground">Time Saved/Week</p>
-                  </div>
-                </div>
-              </div>
-            </DCCard>
-
-            {/* Section 4: Expert Consultation */}
-            <DCCard 
-              title="🤝 Need Expert Guidance?"
-              subtitle="Book a consultation with our AI specialists"
-              icon={<Headphones className="h-5 w-5" />}
-              status="operational"
-            >
-              <form onSubmit={handleContactSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Name <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="John Doe"
-                    className="bg-input border-border"
-                    maxLength={100}
-                    required
-                    aria-label="Your name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Email <span className="text-destructive">*</span>
-                  </label>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="john@company.com"
-                    className="bg-input border-border"
-                    maxLength={255}
-                    required
-                    aria-label="Your email address"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Message <span className="text-muted-foreground text-xs">(optional)</span>
-                  </label>
-                  <Textarea
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    rows={3}
-                    placeholder="Tell us about your needs..."
-                    className="bg-input border-border resize-none"
-                    maxLength={2000}
-                    aria-label="Your message"
-                  />
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 glow-yellow font-semibold"
-                  >
-                    <Mail className="h-4 w-4 mr-2" />
-                    {isSubmitting ? "Sending..." : "Contact Expert"}
-                  </Button>
-                  <Button type="button" variant="outline" className="flex-1">
-                    <Video className="h-4 w-4 mr-2" />
-                    Schedule Demo
-                  </Button>
-                </div>
-              </form>
-            </DCCard>
+      <DCCard
+        title="Build information"
+        subtitle="Version and commit identifier for the running application bundle."
+        icon={<Server className="h-5 w-5" />}
+        status="operational"
+      >
+        <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+          <div>
+            <p className="text-xs text-muted-foreground">App version</p>
+            <p className="font-medium">{fingerprint.appVersion}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Build ID</p>
+            <p className="font-medium font-mono">{fingerprint.buildId}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Commit SHA</p>
+            <p className="font-medium font-mono" title={fingerprint.commitSha}>
+              {fingerprint.commitSha === 'unknown' ? 'unknown' : fingerprint.commitSha.slice(0, 12)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Built at</p>
+            <p className="font-medium">
+              {fingerprint.buildTimestamp === 'unknown'
+                ? 'unknown'
+                : new Date(fingerprint.buildTimestamp).toLocaleString()}
+            </p>
           </div>
         </div>
-      </div>
+      </DCCard>
+    </div>
   );
 }
+

@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, CheckCircle2, Info, RefreshCw, Stethoscope } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Panel, SectionHeader, Instrument, InstrumentGrid } from '@/components/v2';
 import { supabase } from '@/integrations/supabase/client';
 import {
   diagnoseTenant,
@@ -32,13 +32,13 @@ function SeverityIcon({ severity }: { severity: DiagnosticFinding['severity'] })
 
 function FindingRow({ finding }: { finding: DiagnosticFinding }) {
   return (
-    <li className={`rounded-md border p-3 ${SEVERITY_STYLES[finding.severity]}`}>
+    <li className={`v2-subpanel ${SEVERITY_STYLES[finding.severity]}`}>
       <div className="flex items-start gap-2">
         <SeverityIcon severity={finding.severity} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-medium">{finding.title}</p>
-            <Badge variant="outline" className="text-[11px]">{finding.code}</Badge>
+            <Badge variant="outline" className="v2-mono text-[11px]">{finding.code}</Badge>
             <Badge variant="outline" className="text-[11px] uppercase">{finding.area}</Badge>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">{finding.detail}</p>
@@ -112,18 +112,23 @@ export function RuntimeDiagnosticsPanel() {
   );
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2 pb-2">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Stethoscope className="h-4 w-4" aria-hidden="true" />
-          Runtime diagnostics
-        </CardTitle>
-        <Button variant="outline" size="sm" className="min-h-[32px]" onClick={() => void load()} disabled={loading}>
-          <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
-          Re-run
-        </Button>
-      </CardHeader>
-      <CardContent className="space-y-4 text-sm">
+    <Panel>
+      <SectionHeader
+        eyebrow="Diagnostics console"
+        title={
+          <span className="flex items-center gap-2">
+            <Stethoscope className="h-4 w-4" aria-hidden="true" />
+            Runtime diagnostics
+          </span>
+        }
+        actions={
+          <Button variant="outline" size="sm" className="min-h-[32px]" onClick={() => void load()} disabled={loading}>
+            <RefreshCw className={`mr-2 h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} aria-hidden="true" />
+            Re-run
+          </Button>
+        }
+      />
+      <div className="space-y-4 text-sm">
         <p className="text-xs text-muted-foreground">
           Why this tenant has no active mappings and no vaulted credentials. Every line below is derived from rows
           visible to your tenant; nothing is simulated.
@@ -138,23 +143,19 @@ export function RuntimeDiagnosticsPanel() {
 
         {diagnosis && (
           <>
-            <div className="grid gap-2 sm:grid-cols-3">
-              <div className="rounded-md border border-border p-3">
-                <p className="text-[11px] uppercase text-muted-foreground">Connections visible</p>
-                <p className="text-lg font-semibold">{diagnosis.connectionCount}</p>
-              </div>
-              <div className="rounded-md border border-border p-3">
-                <p className="text-[11px] uppercase text-muted-foreground">Active mappings</p>
-                <p className="text-lg font-semibold">{diagnosis.activeMappingCount}</p>
-              </div>
-              <div className="rounded-md border border-border p-3">
-                <p className="text-[11px] uppercase text-muted-foreground">Active vaulted credentials</p>
-                <p className="text-lg font-semibold">{diagnosis.activeCredentialCount}</p>
-              </div>
-            </div>
+            <InstrumentGrid className="grid-cols-1 sm:grid-cols-3">
+              <Instrument level="secondary" label="Connections visible" value={diagnosis.connectionCount} />
+              <Instrument
+                level="secondary"
+                state={diagnosis.activeMappingCount > 0 ? 'verified' : 'neutral'}
+                label="Active mappings"
+                value={diagnosis.activeMappingCount}
+              />
+              <Instrument level="secondary" label="Active vaulted credentials" value={diagnosis.activeCredentialCount} />
+            </InstrumentGrid>
 
             {blockerCount === 0 ? (
-              <p className="flex items-center gap-2 rounded-md border border-border p-3 text-xs">
+              <p className="v2-subpanel flex items-center gap-2 text-xs">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" aria-hidden="true" />
                 No blockers found: mappings and credentials are in place for every visible connection.
               </p>
@@ -171,11 +172,11 @@ export function RuntimeDiagnosticsPanel() {
             )}
 
             {diagnosis.connections.map((connection) => (
-              <div key={connection.connectionId} className="space-y-2 rounded-md border border-border p-3">
+              <div key={connection.connectionId} className="v2-subpanel space-y-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="min-w-0">
                     <p className="text-sm font-medium">{connection.displayName}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="v2-mono text-xs text-muted-foreground">
                       {connection.connectorId} · mappings {connection.activeMappingCount}/{connection.mappingCount} active
                       · credentials {connection.activeCredentialCount}/{connection.credentialCount} active
                     </p>
@@ -197,7 +198,7 @@ export function RuntimeDiagnosticsPanel() {
             ))}
           </>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </Panel>
   );
 }

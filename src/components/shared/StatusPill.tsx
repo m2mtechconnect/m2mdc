@@ -11,15 +11,18 @@ interface StatusPillProps {
 export default function StatusPill({ status, className }: StatusPillProps) {
   const normalized = status.toLowerCase();
   
+  // Semantic, AA-contrast pills. Never `text-secondary` (near-white on light canvas)
+  // and never gray-400 on a light gray fill.
   const variants: Record<string, string> = {
-    active: 'bg-secondary/10 text-secondary border-secondary/30',
-    success: 'bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/30',
-    error: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
-    warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30',
-    draft: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-    paused: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
-    inactive: 'bg-gray-500/20 text-gray-400 border-gray-500/30',
+    active: 'bg-success/10 text-success border-success/30',
+    success: 'bg-success/10 text-success border-success/30',
+    error: 'bg-destructive/10 text-destructive border-destructive/30',
+    warning: 'bg-warning/10 text-warning border-warning/30',
+    draft: 'bg-muted text-muted-foreground border-border',
+    paused: 'bg-muted text-muted-foreground border-border',
+    inactive: 'bg-muted text-muted-foreground border-border',
   };
+
 
   return (
     <Badge className={cn(variants[normalized] || variants.draft, className)}>

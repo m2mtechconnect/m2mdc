@@ -3,18 +3,19 @@
  */
 
 import { useState, useMemo, useCallback } from 'react';
+import { getSovereigntyEngine } from './SovereigntyEngine';
 import {
-  getSovereigntyEngine,
   mockDataAssets,
   mockDataFlows,
   mockSovereigntyPolicies,
   mockComplianceFrameworks,
   mockAuditEvents,
-  type SovereigntyEngineResult,
-  type SovereigntyBlueprint,
-  type SovereigntyAuditEvent,
-  type JurisdictionCode,
-} from '@/sovereignty';
+} from './mockData';
+import type {
+  SovereigntyEngineResult,
+  SovereigntyAuditEvent,
+  JurisdictionCode,
+} from './types';
 
 interface UseSovereigntyOptions {
   twinId?: string;

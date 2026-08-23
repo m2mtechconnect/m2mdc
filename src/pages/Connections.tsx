@@ -1,12 +1,11 @@
 /**
- * Connections & Data Exchange — the operational control plane for every
- * external system. Canonical route: /manage/integrations
+ * Connections — the operational control plane for customer-facing hybrid-stack
+ * systems. Canonical route: /manage/integrations
  * Alias: /manage/connections
  *
- * Static DSX environment requirements, the agent tool readiness assessment
- * and the platform capability assessment live at /admin/platform-readiness.
- * This workspace is about configured, configurable, degraded, unavailable or
- * planned connections only.
+ * Internal platform capability assessment lives at /admin/platform-readiness.
+ * This workspace is for configured systems, data flows and connectors that
+ * exchange facility, twin, storage or enterprise-workflow data with AURA.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -16,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { PagePurpose } from '@/components/capability/PagePurpose';
+import { CommandHeader } from '@/components/v2';
 import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
@@ -41,10 +41,10 @@ import {
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
-  { value: 'connections', label: 'Connections' },
+  { value: 'connections', label: 'Connected systems' },
   { value: 'data-flows', label: 'Data flows' },
-  { value: 'catalogue', label: 'Catalogue' },
-  { value: 'activity', label: 'Activity & health' },
+  { value: 'catalogue', label: 'Available connectors' },
+  { value: 'activity', label: 'Health & audit' },
 ];
 
 export default function Connections() {
@@ -73,7 +73,7 @@ export default function Connections() {
   const [testing, setTesting] = useState(false);
 
   useEffect(() => {
-    document.title = 'Connections & Data Exchange | AURA DC';
+    document.title = 'Connections | AURA DC';
   }, []);
 
   const setTab = useCallback((value: string) => {
@@ -140,46 +140,54 @@ export default function Connections() {
   const loading = connections.isLoading || definitions.isLoading;
 
   return (
-    <div className="min-w-0 space-y-6 pb-10" data-testid="connections-page">
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="min-w-0 space-y-1">
-          <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
+    <div className="min-w-0 space-y-5 pb-10" data-testid="connections-page">
+      <CommandHeader
+        eyebrow="Operations · Control plane"
+        title={
+          <span className="flex items-center gap-2">
             <Cable className="h-5 w-5 text-muted-foreground" aria-hidden />
-            Connections &amp; Data Exchange
-          </h1>
-          <p className="max-w-3xl text-sm text-muted-foreground">
-            Configure, test, map, monitor and govern every external connection. Status is derived
-            from runtime evidence. Environment requirements and the platform capability assessment
-            live on{' '}
+            Connections
+          </span>
+        }
+        subtitle={
+          <>
+            Runtime status is evidence-derived; internal platform dependencies and capability assessment live on{' '}
             <Link className="underline underline-offset-4" to="/admin/platform-readiness">
               platform readiness
             </Link>
             .
-          </p>
-          <PagePurpose route="/manage/integrations" />
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" className="h-10" onClick={refresh}>
-            <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
-            Refresh
-          </Button>
-          <Button className="h-10" disabled={!isAdmin} onClick={() => setWizardOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" aria-hidden />
-            Add connection
-          </Button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" className="h-10" onClick={refresh}>
+              <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+              Refresh
+            </Button>
+            <Button className="h-10" disabled={!isAdmin} onClick={() => setWizardOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" aria-hidden />
+              Add connection
+            </Button>
+          </>
+        }
+      />
+      <PagePurpose route="/manage/integrations" />
 
       <Tabs value={tab} onValueChange={setTab} className="min-w-0">
         <div className="-mx-1 overflow-x-auto px-1 pb-1">
-          <TabsList className="inline-flex w-max">
+          <TabsList className="inline-flex w-max bg-transparent p-0">
             {TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value} className="min-h-[40px] px-4 text-sm">
+              <TabsTrigger
+                key={t.value}
+                value={t.value}
+                className="min-h-[40px] rounded-none border-b-2 border-transparent px-4 text-[13px] uppercase tracking-[0.06em] data-[state=active]:border-[hsl(var(--v2-simulated))] data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+              >
                 {t.label}
               </TabsTrigger>
             ))}
           </TabsList>
         </div>
+
 
         <TabsContent value="overview" className="mt-4 min-w-0">
           <OverviewTab

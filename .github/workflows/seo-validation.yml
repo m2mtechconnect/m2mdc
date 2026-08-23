@@ -30,6 +30,9 @@ on:
   repository_dispatch:
     types: [lovable-published]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     name: Validate published SEO
@@ -39,8 +42,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Install tsx
-        run: npm install -g tsx
+      - name: Install pinned tsx runtime
+        run: npm install -g tsx@4.23.12
       - name: Run SEO validator
         env:
           SEO_TARGET_URL: ${{ github.event.inputs.target_url || github.event.client_payload.url || 'https://auradc.m2mtechconnect.com' }}

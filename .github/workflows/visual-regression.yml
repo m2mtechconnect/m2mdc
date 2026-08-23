@@ -7,85 +7,85 @@ on:
       - 'src/**/*.tsx'
       - 'src/**/*.css'
       - 'src/index.css'
+      - 'tests/visual/**'
+      - 'scripts/verify-visual-fingerprints.mjs'
+      - 'playwright.visual.config.ts'
       - 'tailwind.config.ts'
+      - '.github/workflows/visual-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CI: true
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  VITE_SUPABASE_URL: http://127.0.0.1:54321
+  VITE_SUPABASE_PROJECT_ID: local-placeholder
+  VITE_SUPABASE_PUBLISHABLE_KEY: safe-placeholder-anon-key
+  TEST_SUPABASE_URL: http://127.0.0.1:54321
+  TEST_SUPABASE_ANON_KEY: safe-placeholder-anon-key
+  SUPABASE_URL: http://127.0.0.1:54321
+  SUPABASE_ANON_KEY: safe-placeholder-anon-key
+  SUPABASE_SERVICE_ROLE_KEY: safe-placeholder-service-role-key
+  USE_MOCK_LLM: true
 
 jobs:
   visual-regression:
     name: Visual Regression
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetch all history for baseline comparison
-      
+          ref: ${{ env.AURA_SOURCE_SHA }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
-      
+
       - name: Install Playwright
-        run: bunx playwright install --with-deps
-      
-      - name: Setup test environment
-        run: |
-          cp .env.test .env
-          echo "USE_MOCK_LLM=true" >> .env
-      
-      - name: Run visual regression tests
-        run: bun run test:e2e tests/visual/snapshots.spec.ts
+        run: bunx playwright install --with-deps chromium
+
+      - name: Generate fresh current-head screenshots for human review
+        id: capture
+        shell: bash
         env:
-          VITE_SUPABASE_URL: ${{ secrets.TEST_SUPABASE_URL }}
-          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.TEST_SUPABASE_KEY }}
-      
-      - name: Upload visual diff artifacts
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: visual-regression-diffs
-          path: test-results/
-          retention-days: 30
-      
-      - name: Comment PR with visual diffs
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const fs = require('fs');
-            const path = require('path');
-            
-            const diffDir = 'test-results';
-            if (!fs.existsSync(diffDir)) {
-              return;
-            }
-            
-            const diffs = fs.readdirSync(diffDir)
-              .filter(f => f.endsWith('-diff.png'));
-            
-            if (diffs.length === 0) {
-              return;
-            }
-            
-            const comment = `### ⚠️ Visual Regression Detected\n\n` +
-              `${diffs.length} screenshot(s) have changed.\n\n` +
-              `Please review the visual differences in the artifacts.`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
-      
-      - name: Update baselines (if approved)
-        if: contains(github.event.pull_request.labels.*.name, 'update-snapshots')
+          AURA_CAPTURE_CURRENT_HEAD: '1'
         run: |
-          bun run test:e2e:record tests/visual/snapshots.spec.ts
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add tests/visual/**/*.png
-          git commit -m "Update visual regression baselines" || exit 0
-          git push
+          rm -rf tests/visual/snapshots.spec.ts-snapshots
+          bunx playwright test --config=playwright.visual.config.ts
+          echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Enforce visual gate
+        run: node scripts/verify-visual-fingerprints.mjs tests/visual/snapshots.spec.ts-snapshots tests/visual/approved-linux-visuals.json
+
+      - name: Upload current-head visual evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-current-head-${{ env.AURA_SOURCE_SHA }}
+          path: tests/visual/snapshots.spec.ts-snapshots/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Visual evidence summary
+        if: always()
+        run: |
+          echo "Release source SHA: $AURA_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo "Global application contract: light theme. Scoped NOC dark styling is tested separately from global mode." >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are generated fresh, then checked against the approved SHA-256/dimension manifest. CI never updates the manifest." >> "$GITHUB_STEP_SUMMARY"

@@ -13,6 +13,9 @@ import {
   AgentType
 } from '@/types/agentDefinition';
 import { toast } from 'sonner';
+import type { Database, Json } from '@/integrations/supabase/types';
+
+type AgentDefinitionUpdate = Database['public']['Tables']['agent_definitions']['Update'];
 
 // Transform DB row to AgentDefinition
 function transformAgent(row: any): AgentDefinition {
@@ -144,18 +147,18 @@ export function useUpdateAgentDefinition() {
   
   return useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<AgentDefinition> }) => {
-      const updateData: Record<string, unknown> = {};
+      const updateData: AgentDefinitionUpdate = {};
       
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.description !== undefined) updateData.description = updates.description;
       if (updates.icon !== undefined) updateData.icon = updates.icon;
       if (updates.type !== undefined) updateData.type = updates.type;
-      if (updates.inputs !== undefined) updateData.inputs = updates.inputs;
-      if (updates.outputs !== undefined) updateData.outputs = updates.outputs;
-      if (updates.tools !== undefined) updateData.tools = updates.tools;
-      if (updates.kpiBindings !== undefined) updateData.kpi_bindings = updates.kpiBindings;
-      if (updates.safetyRules !== undefined) updateData.safety_rules = updates.safetyRules;
-      if (updates.runtimeConfig !== undefined) updateData.runtime_config = updates.runtimeConfig;
+      if (updates.inputs !== undefined) updateData.inputs = updates.inputs as unknown as Json;
+      if (updates.outputs !== undefined) updateData.outputs = updates.outputs as unknown as Json;
+      if (updates.tools !== undefined) updateData.tools = updates.tools as unknown as Json;
+      if (updates.kpiBindings !== undefined) updateData.kpi_bindings = updates.kpiBindings as unknown as Json;
+      if (updates.safetyRules !== undefined) updateData.safety_rules = updates.safetyRules as Json;
+      if (updates.runtimeConfig !== undefined) updateData.runtime_config = updates.runtimeConfig as Json;
       if (updates.isActive !== undefined) updateData.is_active = updates.isActive;
       
       const { data, error } = await supabase

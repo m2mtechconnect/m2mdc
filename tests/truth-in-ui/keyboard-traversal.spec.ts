@@ -51,7 +51,7 @@ for (const surface of SURFACES) {
 
     for (let i = 0; i < MAX_TAB_STOPS; i += 1) {
       await page.keyboard.press('Tab');
-      const info = await page.evaluate(() => {
+      const info = await page.evaluate((index: number) => {
         const el = document.activeElement as HTMLElement | null;
         if (!el || el === document.body) return null;
         const style = window.getComputedStyle(el);
@@ -59,11 +59,11 @@ for (const surface of SURFACES) {
         const hasRing = style.boxShadow !== 'none' && style.boxShadow !== '';
         const hasBorderShift = style.borderColor !== 'rgba(0, 0, 0, 0)';
         return {
-          signature: `${el.tagName}:${el.getAttribute('data-testid') ?? el.textContent?.trim().slice(0, 30) ?? ''}:${i}`,
+          signature: `${el.tagName}:${el.getAttribute('data-testid') ?? el.textContent?.trim().slice(0, 30) ?? ''}:${index}`,
           key: `${el.tagName}:${el.getAttribute('data-testid') ?? el.textContent?.trim().slice(0, 30) ?? ''}`,
           visible: hasOutline || hasRing || hasBorderShift,
         };
-      });
+      }, i);
       if (!info) continue;
       signatures.push(info.key);
       if (!info.visible) invisibleFocus.push(info.key);

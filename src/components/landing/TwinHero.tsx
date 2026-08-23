@@ -175,7 +175,9 @@ export function TwinHero() {
                   height={879}
                   decoding="async"
                   className="w-full h-full object-cover object-top"
-                  loading="lazy"
+                  loading="eager"
+                  fetchPriority="high"
+
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
               </div>

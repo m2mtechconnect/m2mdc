@@ -156,9 +156,6 @@ jobs:
             echo "TEST_USER_PASSWORD=$TEST_USER_PASSWORD"
           } >> "$GITHUB_ENV"
 
-      - name: Seed isolated QA data
-        run: psql "$QA_DB_URL" -v ON_ERROR_STOP=1 -f supabase/seed/aoc_demo_data.sql
-
       - name: Serve local Edge Functions
         run: |
           nohup supabase functions serve --no-verify-jwt=false > /tmp/qa-functions.log 2>&1 &

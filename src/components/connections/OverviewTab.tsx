@@ -23,7 +23,7 @@ interface Props {
   auditEvents: AuditEventRecord[];
   eventCount: number;
   loading: boolean;
-  lastRefreshedAt: number;
+  lastRefreshedAt: number | null;
   onOpenConnection: (id: string) => void;
   onGoToTab: (tab: string) => void;
 }
@@ -86,7 +86,9 @@ export function OverviewTab({
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="overview-metrics" className="v2-label">Operational summary</h2>
           <p className="v2-mono text-xs text-muted-foreground">
-            Evidence refreshed {formatRelative(new Date(lastRefreshedAt).toISOString())}
+            {lastRefreshedAt === null
+              ? 'Evidence refresh not completed yet'
+              : `Evidence refreshed ${formatRelative(new Date(lastRefreshedAt).toISOString())}`}
           </p>
         </div>
         <InstrumentGrid className="grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">

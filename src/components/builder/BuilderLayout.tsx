@@ -218,7 +218,7 @@ export function BuilderLayout({
                           <span
                             className={cn(
                               'v2-mono flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-xs font-semibold',
-                              active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-white',
+                              active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-primary-foreground',
                               complete && !active && 'border-[hsl(var(--v2-verified))] bg-[hsl(var(--v2-verified)/0.10)] text-[hsl(var(--v2-verified))]',
                               !complete && !active && 'border-[hsl(var(--v2-line-strong))] bg-[hsl(var(--v2-panel))] text-muted-foreground',
                             )}
@@ -272,7 +272,7 @@ export function BuilderLayout({
                       <span
                         className={cn(
                           'v2-mono flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold',
-                          active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-white',
+                          active && 'border-[hsl(var(--v2-tech-strong))] bg-[hsl(var(--v2-tech-strong))] text-primary-foreground',
                           complete && !active && 'border-[hsl(var(--v2-verified))] bg-[hsl(var(--v2-verified)/0.10)] text-[hsl(var(--v2-verified))]',
                           !complete && !active && 'border-[hsl(var(--v2-line-strong))] bg-[hsl(var(--v2-panel))] text-muted-foreground',
                         )}

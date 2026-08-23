@@ -72,15 +72,45 @@ for (const name of allowlist.production_functions) {
   }
 }
 
-// 3. allowlisted functions must import _shared/authz.
+// 3. allowlisted functions must demonstrate an in-code authorization guard.
+//    Accepted shapes (strictly more than the previous single-import check):
+//      (a) _shared/handler.ts createHandler with an explicit, non-public
+//          authLevel — getAuthContext enforces identity and CORS centrally;
+//      (b) a direct caller-identity / admin-authorization guard import used
+//          together with the scoped _shared/cors.ts origin allowlist.
+const SHARED_IMPORT = (mod) =>
+  new RegExp(`from ['"](?:\\.\\.\\/)?_shared\\/${mod}(?:\\.ts)?['"]`);
 for (const name of allowlist.production_functions) {
   const idx = join(REPO, 'supabase/functions', name, 'index.ts');
   if (!existsSync(idx)) { fail(`allowlist/${name}: index.ts missing`); continue; }
   const src = readFileSync(idx, 'utf8');
-  if (!/from ['"](\.\.\/)?_shared\/authz(\.ts)?['"]/.test(src)) {
-    fail(`allowlist/${name}: missing "_shared/authz" import`);
+
+  const usesHandler = SHARED_IMPORT('handler').test(src);
+  const authLevelMatch = src.match(/authLevel\s*:\s*['"]([a-z-]+)['"]/);
+  const handlerGuarded =
+    usesHandler && !!authLevelMatch && authLevelMatch[1] !== 'public';
+
+  const usesIdentityGuard =
+    SHARED_IMPORT('callerIdentity').test(src) ||
+    SHARED_IMPORT('adminAuthorization').test(src);
+  const usesScopedCors = SHARED_IMPORT('cors').test(src);
+  const directGuarded = usesIdentityGuard && usesScopedCors;
+
+  if (!handlerGuarded && !directGuarded) {
+    if (usesHandler && authLevelMatch && authLevelMatch[1] === 'public') {
+      fail(`allowlist/${name}: authLevel "public" is not an authorization guard`);
+    } else if (usesHandler && !authLevelMatch) {
+      fail(`allowlist/${name}: createHandler without an explicit authLevel`);
+    } else {
+      fail(
+        `allowlist/${name}: no in-code authorization guard ` +
+        '(expected _shared/handler.ts with non-public authLevel, or ' +
+        '_shared/callerIdentity|adminAuthorization together with _shared/cors)',
+      );
+    }
   }
 }
+
 
 // 4. no client-side VITE_LOVABLE_API_KEY.
 function walk(dir) {

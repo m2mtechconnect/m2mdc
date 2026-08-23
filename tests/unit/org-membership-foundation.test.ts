@@ -30,6 +30,7 @@ describe('enterprise tenancy foundation migration', () => {
     expect(sql).toContain('IF NOT public.is_org_member(_org_id, auth.uid()) THEN');
     expect(sql).toContain("RAISE EXCEPTION 'organization membership required'");
     expect(sql).toContain('UPDATE public.profiles');
+    expect(sql).toContain('SET last_active_org_id = _org_id,\n      org_id = _org_id,');
   });
 
   it('uses hardened security-definer helpers', () => {

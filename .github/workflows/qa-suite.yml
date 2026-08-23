@@ -66,7 +66,8 @@ jobs:
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
-      # Preserve Chromium, Firefox and WebKit coverage while bounding wall time.
+      # Keep browser coverage while bounding wall time. Each shard retains the
+      # committed one-worker CI isolation contract from playwright.config.ts.
       max-parallel: 6
       matrix:
         browser: [chromium, firefox, webkit]
@@ -85,25 +86,107 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: 2.34.3
+
+      - name: Start isolated local Supabase stack
+        run: supabase start -x studio,imgproxy,inbucket,logflare,vector,pgbouncer
+
+      - name: Capture isolated backend credentials
+        run: |
+          supabase status -o env > /tmp/qa-supabase.env
+          set -a; . /tmp/qa-supabase.env; set +a
+
+          echo "::add-mask::$ANON_KEY"
+          echo "::add-mask::$SERVICE_ROLE_KEY"
+          {
+            echo "VITE_SUPABASE_URL=$API_URL"
+            echo "VITE_SUPABASE_PUBLISHABLE_KEY=$ANON_KEY"
+            echo "SUPABASE_URL=$API_URL"
+            echo "SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "QA_DB_URL=$DB_URL"
+          } >> "$GITHUB_ENV"
+
+      - name: Provision approved per-run test user
+        run: |
+          TEST_USER_EMAIL="qa-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.browser }}-${{ matrix.shard }}@example.invalid"
+          TEST_USER_PASSWORD="$(openssl rand -hex 24)Aa1!"
+          echo "::add-mask::$TEST_USER_PASSWORD"
+
+          USER_JSON="$(curl -fsS \
+            -X POST "$SUPABASE_URL/auth/v1/admin/users" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H 'Content-Type: application/json' \
+            -d "{\"email\":\"$TEST_USER_EMAIL\",\"password\":\"$TEST_USER_PASSWORD\",\"email_confirm\":true,\"user_metadata\":{\"full_name\":\"AURA QA Admin\"}}")"
+          TEST_USER_ID="$(printf '%s' "$USER_JSON" | jq -r '.id // empty')"
+          test -n "$TEST_USER_ID"
+
+          curl -fsS \
+            -X POST "$SUPABASE_URL/rest/v1/profiles?on_conflict=id" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H 'Content-Type: application/json' \
+            -H 'Prefer: resolution=merge-duplicates,return=minimal' \
+            -d "{\"id\":\"$TEST_USER_ID\",\"email\":\"$TEST_USER_EMAIL\",\"full_name\":\"AURA QA Admin\",\"is_approved\":true}"
+
+          curl -fsS \
+            -X POST "$SUPABASE_URL/rest/v1/user_roles" \
+            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+            -H 'Content-Type: application/json' \
+            -H 'Prefer: return=minimal' \
+            -d "{\"user_id\":\"$TEST_USER_ID\",\"role\":\"admin\",\"scope\":\"global\",\"granted_by\":\"$TEST_USER_ID\"}"
+
+          {
+            echo "TEST_USER_EMAIL=$TEST_USER_EMAIL"
+            echo "TEST_USER_PASSWORD=$TEST_USER_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - name: Seed isolated QA data
+        run: psql "$QA_DB_URL" -v ON_ERROR_STOP=1 -f supabase/seed/aoc_demo_data.sql
+
+      - name: Serve local Edge Functions
+        run: |
+          nohup supabase functions serve --no-verify-jwt=false > /tmp/qa-functions.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null "$SUPABASE_URL/functions/v1/run-lifecycle" -X OPTIONS; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Local Edge Functions did not become ready"
+          tail -n 200 /tmp/qa-functions.log || true
+          exit 1
+
       - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run E2E tests
-        # Keep the same assertions/browser coverage, but split each browser into
-        # two shards and use bounded CI parallelism. A retry still exists for
-        # transient browser/runtime noise without masking deterministic defects.
-        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=2 --retries=1
+        # Preserve committed assertions and browser coverage. Sharding bounds
+        # wall time; one worker avoids cross-test mutation races on shared state.
+        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=1 --retries=1
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          # Shard is part of the artifact name to prevent upload collisions.
           name: playwright-results-${{ matrix.browser }}-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/
           retention-days: 7
+
+      - name: Local Edge Function logs
+        if: always()
+        run: tail -n 200 /tmp/qa-functions.log || true
+
+      - name: Stop isolated local Supabase stack
+        if: always()
+        run: supabase stop --no-backup || true
 
   accessibility-audit:
     name: Accessibility Audit

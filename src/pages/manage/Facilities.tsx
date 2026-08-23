@@ -6,7 +6,7 @@
  * here is duplicated in the global header or in generic Settings.
  */
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Building2, Loader2, MapPin, Plus, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,6 +35,7 @@ const REGIONS = [
 
 export default function ManageFacilities() {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const { can } = useRBAC();
   const { twins, activeTwinId, setActiveTwin, isLoading, createLocation, createTwin } = useActiveTwin();
   const [open, setOpen] = useState(false);
@@ -46,6 +47,18 @@ export default function ManageFacilities() {
   }, []);
 
   const canEdit = can('twin.edit');
+
+  // Command Centre can deep-link directly into the creation task without
+  // inventing a second facility-creation workflow.
+  useEffect(() => {
+    if (!canEdit || params.get('create') !== 'true') return;
+    setOpen(true);
+    setParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('create');
+      return next;
+    }, { replace: true });
+  }, [canEdit, params, setParams]);
 
   const handleCreate = async () => {
     if (!form.name.trim()) {
@@ -81,15 +94,21 @@ export default function ManageFacilities() {
         metadata: { created_from: 'manage-facilities' },
       });
       if (created) {
+        setActiveTwin(created.id);
         toast.success(`${created.name} created.`);
         setOpen(false);
-        navigate(`/builder?twinId=${created.id}`);
+        navigate(`/blueprint/${created.id}`);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create facility');
     } finally {
       setCreating(false);
     }
+  };
+
+  const openFacility = (twinId: string) => {
+    setActiveTwin(twinId);
+    navigate(`/blueprint/${twinId}`);
   };
 
   return (
@@ -125,7 +144,15 @@ export default function ManageFacilities() {
             </p>
           )}
           {!isLoading && twins.length === 0 && (
-            <p className="text-sm text-muted-foreground">No facilities yet.</p>
+            <div className="rounded-md border border-dashed p-5 text-sm text-muted-foreground">
+              <p>No facilities yet.</p>
+              {canEdit && (
+                <Button className="mt-3" size="sm" onClick={() => setOpen(true)}>
+                  <Plus className="mr-2 h-4 w-4" aria-hidden />
+                  Create your first facility
+                </Button>
+              )}
+            </div>
           )}
           {twins.map((t) => (
             <div
@@ -152,8 +179,8 @@ export default function ManageFacilities() {
                   Set as current
                 </Button>
                 {canEdit && (
-                  <Button asChild size="sm" variant="outline">
-                    <Link to={`/builder?twinId=${t.id}`}>Edit</Link>
+                  <Button size="sm" variant="outline" onClick={() => openFacility(t.id)}>
+                    Open Blueprint
                   </Button>
                 )}
               </div>

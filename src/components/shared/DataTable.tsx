@@ -1,7 +1,6 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { ReactNode } from "react";
+import { TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { OperationalTable, StateView } from '@/components/v2';
+import type { ReactNode } from 'react';
 
 export interface Column<T> {
   key: string;
@@ -24,53 +23,61 @@ export default function DataTable<T extends Record<string, any>>({
   columns,
   data,
   loading = false,
-  emptyMessage = "No data available",
+  emptyMessage = 'No data available',
   onRowClick,
 }: DataTableProps<T>) {
   return (
-    <Card className="glass-panel p-6">
-      {title && (
-        <h2 className="text-2xl font-display font-bold mb-6">{title}</h2>
-      )}
-      
+    <section className="min-w-0 space-y-3">
+      {title ? <h2 className="v2-section-title">{title}</h2> : null}
+
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </div>
+        <StateView
+          kind="loading"
+          title="Loading data"
+          description="Retrieving the latest available records."
+        />
       ) : data.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">{emptyMessage}</p>
-        </div>
+        <StateView kind="empty" title={emptyMessage} />
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
+        <OperationalTable>
+          <TableHeader>
+            <TableRow>
+              {columns.map((col) => (
+                <TableHead key={col.key} className={col.className}>
+                  {col.label}
+                </TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item, idx) => (
+              <TableRow
+                key={idx}
+                onClick={() => onRowClick?.(item)}
+                onKeyDown={
+                  onRowClick
+                    ? (event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          onRowClick(item);
+                        }
+                      }
+                    : undefined
+                }
+                tabIndex={onRowClick ? 0 : undefined}
+                role={onRowClick ? 'button' : undefined}
+                className={onRowClick ? 'cursor-pointer' : undefined}
+              >
                 {columns.map((col) => (
-                  <TableHead key={col.key} className={col.className}>
-                    {col.label}
-                  </TableHead>
+                  <TableCell key={col.key} className={col.className}>
+                    {col.render ? col.render(item) : item[col.key]}
+                  </TableCell>
                 ))}
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((item, idx) => (
-                <TableRow
-                  key={idx}
-                  onClick={() => onRowClick?.(item)}
-                  className={onRowClick ? "cursor-pointer" : ""}
-                >
-                  {columns.map((col) => (
-                    <TableCell key={col.key} className={col.className}>
-                      {col.render ? col.render(item) : item[col.key]}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </OperationalTable>
       )}
-    </Card>
+    </section>
   );
 }

@@ -9,8 +9,12 @@
  *      in evidence/pr-0.1/edge-function-inventory.json.
  *   2. A function is production-allowlisted in route-allowlist.json but
  *      not marked "production-allowlisted" in the inventory.
- *   3. A function is production-allowlisted but does NOT import
- *      _shared/authz.ts.
+ *   3. A function is production-allowlisted but does NOT demonstrate an
+ *      in-code authorization guard: either it routes through
+ *      _shared/handler.ts with an explicit non-public `authLevel`, or it
+ *      imports _shared/callerIdentity.ts / _shared/adminAuthorization.ts
+ *      together with the scoped _shared/cors.ts allowlist.
+
  *   4. Any client-side source references VITE_LOVABLE_API_KEY.
  *   5. supabase/config.toml sets verify_jwt = false without an explicitly
  *      approved signed-webhook classification.

@@ -6,6 +6,7 @@ import {
 } from './helpers/testSupabaseClient';
 
 const DEFAULT_AUTH_STATE_PATH = '/tmp/aura-playwright-auth.json';
+const QA_LOGIN_ROUTE = '/login?returnTo=%2Faccount%2Fprofile';
 
 async function launchConfiguredBrowser(browserName: string) {
   switch (browserName) {
@@ -53,10 +54,11 @@ export default async function globalAuthSetup(config: FullConfig) {
     const context = await browser.newContext({ baseURL });
     try {
       const page = await context.newPage();
-      await page.goto('/auth');
-      await page.locator('input#email').fill(credentials.email);
-      await page.locator('input#password').fill(credentials.password);
-      await page.getByRole('button', { name: /sign in/i }).click();
+      await page.goto(QA_LOGIN_ROUTE);
+      await expect(page.getByLabel('Email Address')).toBeVisible({ timeout: 10_000 });
+      await page.getByLabel('Email Address').fill(credentials.email);
+      await page.getByLabel('Password').fill(credentials.password);
+      await page.getByRole('button', { name: /^sign in$/i }).click();
 
       await page.waitForFunction(() => {
         for (let i = 0; i < window.localStorage.length; i += 1) {
@@ -72,10 +74,9 @@ export default async function globalAuthSetup(config: FullConfig) {
       const session = await getBrowserTestSession(context);
       expect(session.userId).toBe(expectedUserId);
 
-      // Prove the persisted session survives application auth + approval + RBAC
-      // resolution before the full shard starts. Failure here is intentionally
-      // early and bounded instead of cascading across hundreds of tests.
-      await page.goto('/account/profile');
+      // The explicit returnTo proves the browser reached the protected route via
+      // the normal sign-in contract before storage state is persisted.
+      await expect(page).toHaveURL(/\/account\/profile(?:[/?#]|$)/, { timeout: 15_000 });
       await expect(page.locator('h1:has-text("Profile")').first()).toBeVisible({
         timeout: 15_000,
       });

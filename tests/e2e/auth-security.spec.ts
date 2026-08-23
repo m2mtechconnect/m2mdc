@@ -5,6 +5,7 @@ import {
 } from '../helpers/testSupabaseClient';
 
 const testSupabase = resolveTestSupabaseConfig();
+const LOGIN_RETURN_TO_DASHBOARD = '/login?returnTo=%2Fdashboard';
 
 const EMPTY_STORAGE_STATE = {
   cookies: [],
@@ -27,17 +28,17 @@ test.describe('Auth & Security', () => {
   test.use({ storageState: EMPTY_STORAGE_STATE });
 
   test.beforeEach(async ({ page }) => {
-    await page.goto('/auth');
-    await page.waitForLoadState('networkidle');
+    await page.goto(LOGIN_RETURN_TO_DASHBOARD);
+    await expect(page.getByLabel('Email Address')).toBeVisible({ timeout: 10_000 });
   });
 
   test('should login with valid credentials and JWT contains sub', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.locator('input#email').fill(credentials.email);
-    await page.locator('input#password').fill(credentials.password);
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByLabel('Email Address').fill(credentials.email);
+    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByRole('button', { name: /^sign in$/i }).click();
 
-    // Should redirect to dashboard after login
+    // The explicit returnTo makes the expected post-login destination deterministic.
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
     // Check localStorage for session
@@ -50,9 +51,9 @@ test.describe('Auth & Security', () => {
 
   test('should restore session on page refresh', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.locator('input#email').fill(credentials.email);
-    await page.locator('input#password').fill(credentials.password);
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByLabel('Email Address').fill(credentials.email);
+    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByRole('button', { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
     // Refresh page
@@ -65,9 +66,9 @@ test.describe('Auth & Security', () => {
 
   test('should logout and clear session', async ({ page }) => {
     const credentials = resolveTestUserCredentials();
-    await page.locator('input#email').fill(credentials.email);
-    await page.locator('input#password').fill(credentials.password);
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByLabel('Email Address').fill(credentials.email);
+    await page.getByLabel('Password').fill(credentials.password);
+    await page.getByRole('button', { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
     // Logout
@@ -80,8 +81,8 @@ test.describe('Auth & Security', () => {
       await page.getByRole('button', { name: /logout|sign out/i }).click();
     }
 
-    // Should redirect to auth page
-    await expect(page).toHaveURL(/\/auth/i, { timeout: 5000 });
+    // The committed logout contract returns to the signed-out root route.
+    await page.waitForURL((url) => url.pathname === '/', { timeout: 5000 });
 
     // Session should be cleared
     const session = await page.evaluate(storedSupabaseSession);
@@ -114,14 +115,14 @@ test.describe('Auth & Security', () => {
   });
 
   test('should handle failed login gracefully', async ({ page }) => {
-    await page.locator('input#email').fill(`invalid-${crypto.randomUUID()}@example.invalid`);
-    await page.locator('input#password').fill(crypto.randomUUID());
-    await page.getByRole('button', { name: /sign in/i }).click();
+    await page.getByLabel('Email Address').fill(`invalid-${crypto.randomUUID()}@example.invalid`);
+    await page.getByLabel('Password').fill(crypto.randomUUID());
+    await page.getByRole('button', { name: /^sign in$/i }).click();
 
     // Should show error message
     await expect(page.getByText(/invalid|incorrect|error/i)).toBeVisible({ timeout: 5000 });
     
-    // Should remain on auth page
-    await expect(page).toHaveURL(/\/auth/i);
+    // Failed authentication must remain on the canonical login route.
+    await expect(page).toHaveURL(/\/login(?:\?|$)/i);
   });
 });

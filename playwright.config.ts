@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const PLAYWRIGHT_BASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim();
+const QA_AUTH_BOOTSTRAP = process.env.QA_AUTH_BOOTSTRAP === '1';
+const QA_AUTH_STATE = process.env.QA_AUTH_STATE?.trim() || '/tmp/aura-playwright-auth.json';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -9,6 +11,7 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 1,
   workers: process.env.CI ? 1 : undefined,
   timeout: 30000,
+  globalSetup: QA_AUTH_BOOTSTRAP ? './tests/global-auth.setup.ts' : undefined,
   reporter: [
     ['html', { outputFolder: 'playwright-report' }],
     ['json', { outputFile: 'test-results/results.json' }],
@@ -16,6 +19,7 @@ export default defineConfig({
   ],
   use: {
     baseURL: PLAYWRIGHT_BASE_URL || 'http://localhost:8080',
+    storageState: QA_AUTH_BOOTSTRAP ? QA_AUTH_STATE : undefined,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

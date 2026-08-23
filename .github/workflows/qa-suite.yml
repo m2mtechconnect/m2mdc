@@ -58,14 +58,19 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     concurrency:
-      group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}
+      # Shard is part of the key so sibling shards for the same browser cannot
+      # cancel each other when pull-request concurrency cancellation is enabled.
+      group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}-${{ matrix.shard }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
-      max-parallel: 2
+      # Preserve Chromium, Firefox and WebKit coverage while bounding wall time.
+      max-parallel: 6
       matrix:
         browser: [chromium, firefox, webkit]
+        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,13 +89,17 @@ jobs:
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run E2E tests
-        run: bunx playwright test --project=${{ matrix.browser }}
+        # Keep the same assertions/browser coverage, but split each browser into
+        # two shards and use bounded CI parallelism. A retry still exists for
+        # transient browser/runtime noise without masking deterministic defects.
+        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=2 --retries=1
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-results-${{ matrix.browser }}
+          # Shard is part of the artifact name to prevent upload collisions.
+          name: playwright-results-${{ matrix.browser }}-${{ matrix.shard }}
           path: |
             playwright-report/
             test-results/

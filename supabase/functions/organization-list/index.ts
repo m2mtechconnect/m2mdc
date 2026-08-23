@@ -35,9 +35,12 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'Approved platform account required' }, 403);
     }
 
-    const { data: isPlatformOwner, error: roleError } = await authClient.rpc('check_user_has_role', {
-      _user_id: user.id,
-      _role: 'owner',
+    // Platform-owner authority must be a live global grant. A resource-scoped
+    // owner label must never unlock cross-customer inventory.
+    const { data: isPlatformOwner, error: roleError } = await authClient.rpc('user_has_role', {
+      check_user_id: user.id,
+      check_role: 'owner',
+      check_scope: 'global',
     });
     if (roleError) throw roleError;
     if (isPlatformOwner !== true) {

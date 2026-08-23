@@ -54,32 +54,42 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const [organizationsResult, membershipsResult, facilitiesResult, twinsResult, connectionsResult, invitesResult] =
-      await Promise.all([
-        serviceClient
-          .from('organizations')
-          .select('id, name, domain, industry, mfa_enabled, sso_enabled, created_at')
-          .order('created_at', { ascending: false }),
-        serviceClient
-          .from('org_memberships')
-          .select('org_id, status'),
-        serviceClient
-          .from('sovereign_dc_facilities')
-          .select('org_id')
-          .not('org_id', 'is', null),
-        serviceClient
-          .from('data_centre_twins')
-          .select('org_id')
-          .not('org_id', 'is', null),
-        serviceClient
-          .from('connection_instances')
-          .select('tenant_id')
-          .not('tenant_id', 'is', null),
-        serviceClient
-          .from('team_invites')
-          .select('org_id, email, role, status, expires_at')
-          .eq('role', 'owner'),
-      ]);
+    const [
+      organizationsResult,
+      membershipsResult,
+      facilitiesResult,
+      twinsResult,
+      connectionsResult,
+      invitesResult,
+      deploymentProfilesResult,
+    ] = await Promise.all([
+      serviceClient
+        .from('organizations')
+        .select('id, name, domain, industry, mfa_enabled, sso_enabled, created_at')
+        .order('created_at', { ascending: false }),
+      serviceClient
+        .from('org_memberships')
+        .select('org_id, status'),
+      serviceClient
+        .from('sovereign_dc_facilities')
+        .select('org_id')
+        .not('org_id', 'is', null),
+      serviceClient
+        .from('data_centre_twins')
+        .select('org_id')
+        .not('org_id', 'is', null),
+      serviceClient
+        .from('connection_instances')
+        .select('tenant_id')
+        .not('tenant_id', 'is', null),
+      serviceClient
+        .from('team_invites')
+        .select('org_id, email, role, status, expires_at')
+        .eq('role', 'owner'),
+      serviceClient
+        .from('organization_deployment_profiles')
+        .select('org_id, deployment_type, capability_status, lifecycle_status, automation_status, hosting_provider, preferred_region, control_plane_location, data_plane_location, customer_managed, edge_required, data_residency'),
+    ]);
 
     const firstError = [
       organizationsResult.error,
@@ -88,6 +98,7 @@ serve(async (req) => {
       twinsResult.error,
       connectionsResult.error,
       invitesResult.error,
+      deploymentProfilesResult.error,
     ].find(Boolean);
     if (firstError) throw firstError;
 
@@ -118,14 +129,35 @@ serve(async (req) => {
       }
     }
 
+    const deploymentByOrg = new Map<string, Record<string, unknown>>();
+    for (const deployment of (deploymentProfilesResult.data ?? []) as Array<Record<string, unknown>>) {
+      if (typeof deployment.org_id === 'string') deploymentByOrg.set(deployment.org_id, deployment);
+    }
+
     const organizations = (organizationsResult.data ?? []).map((organization) => {
       const ownerInvite = ownerInviteByOrg.get(organization.id);
+      const deployment = deploymentByOrg.get(organization.id) ?? null;
       return {
         ...organization,
         memberCount: activeMembers.get(organization.id) ?? 0,
         facilityCount: facilities.get(organization.id) ?? 0,
         twinCount: twins.get(organization.id) ?? 0,
         connectionCount: connections.get(organization.id) ?? 0,
+        deploymentProfile: deployment
+          ? {
+              type: deployment.deployment_type,
+              capabilityStatus: deployment.capability_status,
+              lifecycleStatus: deployment.lifecycle_status,
+              automationStatus: deployment.automation_status,
+              hostingProvider: deployment.hosting_provider,
+              preferredRegion: deployment.preferred_region,
+              controlPlaneLocation: deployment.control_plane_location,
+              dataPlaneLocation: deployment.data_plane_location,
+              customerManaged: deployment.customer_managed,
+              edgeRequired: deployment.edge_required,
+              dataResidency: deployment.data_residency,
+            }
+          : null,
         ownerInvite: ownerInvite
           ? {
               email: ownerInvite.email,

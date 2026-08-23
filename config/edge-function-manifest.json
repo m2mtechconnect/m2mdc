@@ -1,0 +1,326 @@
+{
+  "schema": "aura.edge-function-manifest.v1",
+  "policy": {
+    "enforcement": "changed-or-new-functions-must-be-registered",
+    "legacyUntouchedFunctions": "grandfathered-until-modified"
+  },
+  "functions": {
+    "builders-deploy": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_db_authorization",
+      "cors": "shared_handler",
+      "tenantScope": "caller_owned_system",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-runtime",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "digital-twin-create": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-twin",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "digital-twin-delete": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-twin",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "digital-twin-get": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-twin",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "digital-twin-list": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-twin",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "digital-twin-update": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-twin",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "dsx-ingest": {
+      "status": "active",
+      "authClass": "gateway_jwt",
+      "gatewayVerification": "custom_rs256_pinned",
+      "cors": "shared_request_local",
+      "tenantScope": "server_resolved_connection",
+      "serviceRole": {
+        "used": true,
+        "reason": "Resolve the verified gateway subject to one active connection and invoke the canonical ingest RPC only after custom JWT verification."
+      },
+      "owner": "platform-security",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "managed-user-oauth-complete": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_user_token_in_handler",
+      "cors": "shared_request_local",
+      "tenantScope": "server_resolved_user_tenant",
+      "serviceRole": {
+        "used": true,
+        "reason": "Persist encrypted managed-connector handles and tenant-scoped connection evidence only after authenticating the caller."
+      },
+      "owner": "platform-integrations",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "run-lifecycle": {
+      "status": "active",
+      "authClass": "user",
+      "gatewayVerification": "supabase_jwt_plus_shared_handler",
+      "cors": "shared_handler",
+      "tenantScope": "caller_rls_facility_access",
+      "serviceRole": {
+        "used": true,
+        "reason": "Persist the trusted simulation lifecycle only after the caller proves facility access through an RLS-bound client."
+      },
+      "owner": "platform-runtime",
+      "replacement": null,
+      "retirementDate": null
+    },
+    "integrations-zapier": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-action-execute": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-app-connect": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-app-disconnect": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-apps-detail": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-apps-list": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-auto-refresh": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-connect": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-disconnect": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-integration-status": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-oauth-callback": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-oauth-connect": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-oauth-start": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-refresh-token": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-status": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-test-connection": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-test": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-webhook-trigger": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    },
+    "zapier-webhook": {
+      "status": "disabled",
+      "authClass": "retired",
+      "gatewayVerification": "not_applicable",
+      "cors": "shared_fail_closed_tombstone",
+      "tenantScope": "none",
+      "serviceRole": { "used": false, "reason": "" },
+      "owner": "platform-integrations",
+      "replacement": "AURA Connections managed connector control plane",
+      "retirementDate": "2026-08-23"
+    }
+  }
+}

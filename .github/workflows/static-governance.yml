@@ -1,0 +1,77 @@
+name: Static Governance
+
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/migrations/**'
+      - 'config/edge-function-manifest.json'
+      - 'scripts/governance/**'
+      - 'vite.config.ts'
+      - '.github/workflows/static-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/functions/**'
+      - 'supabase/migrations/**'
+      - 'config/edge-function-manifest.json'
+      - 'scripts/governance/**'
+      - 'vite.config.ts'
+      - '.github/workflows/static-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: static-governance-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  policy:
+    name: Migration and Edge Function Policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GOVERNANCE_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.3'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Validate newly added migrations
+        run: node scripts/governance/check-new-migrations.mjs
+
+      - name: Validate changed Edge Function registrations
+        run: node scripts/governance/check-edge-function-manifest.mjs
+
+      - name: Verify strict release provenance rejects incomplete metadata
+        shell: bash
+        run: |
+          set +e
+          output="$(
+            AURA_RELEASE_ENVIRONMENT=production \
+            AURA_COMMIT_SHA=not-a-full-sha \
+            AURA_RELEASE_BRANCH=__orphan__ \
+            AURA_BUILD_ID='' \
+            bunx vite build 2>&1
+          )"
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then
+            echo "Strict release provenance unexpectedly accepted incomplete metadata."
+            exit 1
+          fi
+          printf '%s\n' "$output" | grep -q 'Release build requires'

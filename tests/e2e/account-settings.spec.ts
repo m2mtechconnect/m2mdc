@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures/authenticatedTest';
 
 test.describe('Account Settings Page', () => {
   test.beforeEach(async ({ page }) => {
-    // Navigate to app and wait for auth
+    // The protected fixture verifies the pre-provisioned admin session first.
     await page.goto('/');
     await page.waitForTimeout(1000);
   });
@@ -51,16 +51,16 @@ test.describe('Account Settings Page', () => {
     await expect(page.locator('label:has-text("Workspace Name")')).toBeVisible();
   });
 
-  test('should show admin badge for admin users', async ({ page }) => {
+  test('should expose admin-editable workspace controls for the QA admin', async ({ page }) => {
     await page.goto('/account/settings');
     await page.waitForLoadState('networkidle');
-    
-    // Check if admin badge or notice is visible
-    const adminNotice = page.locator('text=Admin access required, text=administrator');
-    const isAdmin = await adminNotice.count() > 0;
-    
-    // Test passes if page loads - admin status varies by user
-    expect(isAdmin).toBeDefined();
+
+    // This suite now runs with a deliberately provisioned global admin. Assert
+    // the actual capability instead of the previous boolean `toBeDefined()`
+    // assertion, which passed for both true and false.
+    const workspaceNameInput = page.locator('input[id="workspace_name"]');
+    await expect(workspaceNameInput).toBeVisible();
+    await expect(workspaceNameInput).toBeEnabled();
   });
 
   test('should update workspace settings as admin', async ({ page }) => {

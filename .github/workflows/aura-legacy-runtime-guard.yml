@@ -1,0 +1,23 @@
+name: AURA Legacy Runtime Guard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  zapier-retirement-guard:
+    name: Zapier Retirement Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify legacy Zapier runtime stays retired
+        run: node scripts/verify-zapier-retirement.mjs

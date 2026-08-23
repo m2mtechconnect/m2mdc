@@ -1,123 +1,136 @@
-/**
- * Deployment Summary Card
- * Shows full configuration summary from live twin data
- */
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
-  FileText, Brain, Plug, GitBranch, Settings, Shield, User, Clock
-} from 'lucide-react';
+import { DCCard } from '@/components/dc-ui';
+import { intelligenceProfileForModel } from '@/config/auraRuntimeCatalog';
+import { Activity, Brain, Link2, ShieldCheck, Workflow } from 'lucide-react';
+
+interface BuilderState {
+  goal?: string;
+  industry?: string;
+  department?: string;
+  type?: string | null;
+  template?: string;
+  workflow?: {
+    triggers?: string[];
+    actions?: string[];
+    integrations?: string[];
+    hitl?: string[];
+  };
+  modelConfig?: {
+    provider?: string;
+    model?: string;
+    rag?: Record<string, unknown>;
+    policies?: Record<string, unknown>;
+  };
+  kpis?: unknown[];
+  connectors?: string[];
+  webhooks?: unknown[];
+}
+
+interface GovernanceConfig {
+  auditEnabled?: boolean | null;
+  tags?: string[];
+}
 
 interface DeploymentSummaryCardProps {
-  builderState: any;
-  governanceConfig: any;
-  currentVersion: string;
+  builderState: BuilderState;
+  governanceConfig?: GovernanceConfig;
+  currentVersion?: string | null;
+}
+
+function CountRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-2 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium tabular-nums">{value}</span>
+    </div>
+  );
 }
 
 export function DeploymentSummaryCard({
   builderState,
   governanceConfig,
-  currentVersion
+  currentVersion,
 }: DeploymentSummaryCardProps) {
-  const sections = [
-    {
-      title: 'Overview',
-      icon: FileText,
-      items: [
-        { label: 'Name', value: builderState?.goal || 'Untitled Agent' },
-        { label: 'Category', value: builderState?.type || 'agent' },
-        { label: 'Industry', value: builderState?.industry || 'Not specified' },
-        { label: 'Department', value: builderState?.department || 'Not specified' },
-      ]
-    },
-    {
-      title: 'Intelligence',
-      icon: Brain,
-      items: [
-        { label: 'Model', value: builderState?.modelConfig?.model || 'Not configured' },
-        { label: 'Provider', value: builderState?.modelConfig?.provider || 'google' },
-        { label: 'Temperature', value: builderState?.modelConfig?.temperature?.toString() || '0.7' },
-        { label: 'RAG Enabled', value: builderState?.modelConfig?.rag?.enabled ? 'Yes' : 'No' },
-      ]
-    },
-    {
-      title: 'Tools & Integrations',
-      icon: Plug,
-      items: [
-        { label: 'API Tools', value: builderState?.workflow?.integrations?.length?.toString() || '0' },
-        { label: 'Connectors', value: builderState?.connectors?.length?.toString() || '0' },
-        { label: 'Webhooks', value: builderState?.webhooks?.length?.toString() || '0' },
-        { label: 'MCP Servers', value: builderState?.modelConfig?.mcp_servers?.length?.toString() || '0' },
-      ]
-    },
-    {
-      title: 'Workflows',
-      icon: GitBranch,
-      items: [
-        { label: 'Actions', value: builderState?.workflow?.actions?.length?.toString() || '0' },
-        { label: 'Triggers', value: builderState?.workflow?.triggers?.length?.toString() || '0' },
-        { label: 'HITL Gates', value: builderState?.workflow?.hitl?.length?.toString() || '0' },
-        { label: 'Automations', value: builderState?.workflow?.automations?.length?.toString() || 'None' },
-      ]
-    },
-    {
-      title: 'Runtime',
-      icon: Settings,
-      items: [
-        { label: 'Environment', value: 'Development' },
-        { label: 'Version', value: currentVersion || '1.0.0' },
-        { label: 'Owner', value: 'Current User' },
-        { label: 'Last Modified', value: new Date().toLocaleDateString() },
-      ]
-    },
-    {
-      title: 'Governance',
-      icon: Shield,
-      items: [
-        { label: 'Access Control', value: governanceConfig?.accessControl || 'Default' },
-        { label: 'Audit Enabled', value: governanceConfig?.auditEnabled ? 'Yes' : 'Yes (default)' },
-        { label: 'Data Classification', value: governanceConfig?.dataClassification || 'Internal' },
-        { label: 'Compliance Tags', value: governanceConfig?.tags?.join(', ') || 'None' },
-      ]
-    }
-  ];
+  const profile = intelligenceProfileForModel(builderState.modelConfig?.model);
+  const selectedCapabilities = builderState.connectors?.length ?? 0;
+  const actionCount = builderState.workflow?.actions?.length ?? 0;
+  const triggerCount = builderState.workflow?.triggers?.length ?? 0;
+  const approvalGateCount = builderState.workflow?.hitl?.length ?? 0;
+  const kpiCount = builderState.kpis?.length ?? 0;
+  const governanceRecorded = typeof governanceConfig?.auditEnabled === 'boolean';
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">Configuration Summary</CardTitle>
-          <Badge variant="outline">v{currentVersion || '1.0.0'}</Badge>
+    <div className="grid gap-4 lg:grid-cols-2">
+      <DCCard title="Design summary" icon={<Activity className="h-4 w-4" />}>
+        <div className="space-y-3">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">Objective</p>
+            <p className="mt-1 text-sm font-medium">{builderState.goal?.trim() || 'Not provided'}</p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-xs text-muted-foreground">Industry</p>
+              <p className="text-sm font-medium">{builderState.industry || 'Not provided'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Department</p>
+              <p className="text-sm font-medium">{builderState.department || 'Not provided'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Build type</p>
+              <p className="text-sm font-medium">{builderState.type || 'Not selected'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Configuration version</p>
+              <p className="text-sm font-medium">{currentVersion || 'No recorded snapshot'}</p>
+            </div>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-6">
-          {sections.map((section, idx) => {
-            const Icon = section.icon;
-            return (
-              <div key={section.title} className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Icon className="h-4 w-4 text-primary" />
-                  <h4 className="font-semibold text-sm">{section.title}</h4>
-                </div>
-                <div className="space-y-2 pl-6">
-                  {section.items.map((item) => (
-                    <div key={item.label} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{item.label}</span>
-                      <span className="font-medium truncate max-w-[150px]">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-                {idx < sections.length - 1 && idx % 2 === 1 && (
-                  <Separator className="col-span-2 my-4" />
-                )}
-              </div>
-            );
-          })}
+      </DCCard>
+
+      <DCCard title="Intelligence" icon={<Brain className="h-4 w-4" />}>
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">AURA {profile.name}</Badge>
+            <Badge variant="secondary">Design selection</Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">{profile.description}</p>
+          <p className="text-xs text-muted-foreground">
+            Builder selection does not prove provider connectivity or model-runtime health. Runtime readiness is verified separately by AURA control-plane evidence.
+          </p>
         </div>
-      </CardContent>
-    </Card>
+      </DCCard>
+
+      <DCCard title="Workflow & capabilities" icon={<Workflow className="h-4 w-4" />}>
+        <div className="divide-y divide-border">
+          <CountRow label="Triggers configured" value={triggerCount} />
+          <CountRow label="Actions configured" value={actionCount} />
+          <CountRow label="Approval gates configured" value={approvalGateCount} />
+          <CountRow label="Selected capabilities" value={selectedCapabilities} />
+          <CountRow label="KPIs configured" value={kpiCount} />
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Selected capabilities are design references only. Connection, authentication, health and data-flow state come from Connections.
+        </p>
+      </DCCard>
+
+      <DCCard title="Deployment control" icon={<ShieldCheck className="h-4 w-4" />}>
+        <div className="space-y-3">
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="outline">Runtime status: Not verified here</Badge>
+            <Badge variant="outline">Production activation: Server-authorized</Badge>
+          </div>
+          <div className="flex items-start gap-2 rounded-md border bg-muted/30 p-3">
+            <Link2 className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
+            <p className="text-xs text-muted-foreground">
+              Builder does not assert that this configuration is deployed, healthy, connected or live. Open the controlled deployment review to execute an authorized activation and record its result.
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Governance configuration: {governanceRecorded ? (governanceConfig?.auditEnabled ? 'recorded as enabled' : 'recorded as disabled') : 'not independently verified in Builder'}.
+          </p>
+        </div>
+      </DCCard>
+    </div>
   );
 }

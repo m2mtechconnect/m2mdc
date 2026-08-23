@@ -1,89 +1,85 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Building2, Briefcase, Bot, TrendingUp, Clock, Zap, Info, Target, FileText, Shield, Pencil, RefreshCw, Server, Thermometer, Globe, Cpu, Wind } from 'lucide-react';
+import { Building2, Briefcase, Bot, Clock, Zap, Target, FileText, Shield, Pencil, RefreshCw, Server, Globe, Cpu, Wind } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { toast } from 'sonner';
-import { DCCard, DCSectionHeader } from '@/components/dc-ui';
-import { DCKPITile } from '@/components/dc-ui';
+import { DCCard, DCSectionHeader, DCKPITile } from '@/components/dc-ui';
 import { BlueprintSnapshotCard } from '@/components/blueprint';
 
+const NOT_CONFIGURED = 'Not configured';
+
 export function Step1Summary() {
-  const navigate = useNavigate();
-  const { 
-    goal, industry, department, type, template, workflow, modelConfig,
-    setGoal, setIndustryDepartment, setType, builderId 
+  const {
+    goal, industry, department, type, template, workflow,
+    setGoal, setIndustryDepartment, setType,
   } = useWizardBuilderStore();
   const { currentBlueprint, updateBlueprint } = useBlueprintStore();
   const { openWithQuestion } = useCoPilotContext();
-  
+
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSwitchOpen, setIsSwitchOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Edit form state
+
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editIndustry, setEditIndustry] = useState('');
   const [editDepartment, setEditDepartment] = useState('');
   const [editType, setEditType] = useState<'agent' | 'process_twin' | '3d_twin'>('agent');
 
-  // DC Metadata state - defaults for Data Centre twins
-  const [dcMetadata] = useState({
-    facilityLocation: 'CA-ON (Toronto)',
-    gpuFleet: 'NVIDIA H100 x 256, A100 x 128',
-    coolingType: 'Liquid + Chilled Water',
-    powerTopology: 'N+1 Redundancy',
-    renewablePercent: '85%',
-    sovereignCompliance: 'Yes',
-  });
+  const dcMetadata = {
+    facilityLocation: NOT_CONFIGURED,
+    gpuFleet: NOT_CONFIGURED,
+    coolingType: NOT_CONFIGURED,
+    powerTopology: NOT_CONFIGURED,
+    renewablePercent: NOT_CONFIGURED,
+    sovereignCompliance: NOT_CONFIGURED,
+  };
 
-  // ALWAYS use blueprint data when available
-  const agentName = currentBlueprint?.name || 
-                    template || 
+  const agentName = currentBlueprint?.name ||
+                    template ||
                     `${type === 'agent' ? 'AI Agent' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}${department ? ` for ${department}` : ''}`;
-  
-  const goals = currentBlueprint?.goals && currentBlueprint.goals.length > 0 
-    ? currentBlueprint.goals 
-    : [];
-  
-  const expectedRoi = currentBlueprint?.expectedRoi || '35-50%';
-  const timeSaved = currentBlueprint?.timeSavedPerWeek || '20+ hrs/week';
-  const efficiencyGain = currentBlueprint?.efficiencyGain || '3-5x faster';
 
-  const toStringValue = (item: any): string => {
+  const goals = currentBlueprint?.goals && currentBlueprint.goals.length > 0
+    ? currentBlueprint.goals
+    : [];
+
+  const expectedRoi = currentBlueprint?.expectedRoi || NOT_CONFIGURED;
+  const timeSaved = currentBlueprint?.timeSavedPerWeek || NOT_CONFIGURED;
+  const efficiencyGain = currentBlueprint?.efficiencyGain || NOT_CONFIGURED;
+
+  const toStringValue = (item: unknown): string => {
     if (typeof item === 'string') return item;
     if (item && typeof item === 'object') {
-      return item.name || item.label || item.type || String(item);
+      const value = item as Record<string, unknown>;
+      return String(value.name || value.label || value.type || '');
     }
-    return String(item);
+    return String(item ?? '');
   };
 
   const capabilities = currentBlueprint?.workflow?.actions?.length > 0
     ? currentBlueprint.workflow.actions.slice(0, 5).map(toStringValue)
-    : workflow?.actions?.length > 0 
-    ? workflow.actions.slice(0, 5).map(toStringValue)
-    : ['GPU Telemetry', 'Thermal Monitoring', 'PUE Optimization', 'Workload Scheduling', 'Sovereignty Validation'];
+    : workflow?.actions?.length > 0
+      ? workflow.actions.slice(0, 5).map(toStringValue)
+      : [];
 
   const recommendedTools = currentBlueprint?.tools?.recommendedIntegrations?.length > 0
     ? currentBlueprint.tools.recommendedIntegrations.slice(0, 4).map(toStringValue)
     : workflow?.integrations?.length > 0
-    ? workflow.integrations.slice(0, 4).map(toStringValue)
-    : ['DCIM Integration', 'Prometheus', 'Kubernetes/Slurm', 'Energy Grid API'];
+      ? workflow.integrations.slice(0, 4).map(toStringValue)
+      : [];
 
   const buildWorkflowSummary = () => {
     const triggers = currentBlueprint?.workflow?.triggers || workflow?.triggers || [];
     const actions = currentBlueprint?.workflow?.actions || workflow?.actions || [];
-    
+
     if (triggers.length > 0 && actions.length > 0) {
       const triggerNames = triggers.slice(0, 2).map(toStringValue).join(' / ');
       const actionNames = actions.slice(0, 2).map(toStringValue).join(' → ');
@@ -92,13 +88,10 @@ export function Step1Summary() {
         ...(actions.length > 2 ? [`${actions.slice(2, 4).map(toStringValue).join(' → ')}`] : []),
       ];
     }
-    
-    return [
-      'Thermal Alert → Cooling Adjustment → Notification',
-      'GPU Load Spike → Workload Rebalance → PUE Update',
-    ];
+
+    return [];
   };
-  
+
   const workflowSummary = buildWorkflowSummary();
 
   const handleOpenEdit = () => {
@@ -112,12 +105,11 @@ export function Step1Summary() {
 
   const handleSaveEdit = async () => {
     setIsSaving(true);
-    
     try {
       await setGoal(editDescription);
       await setIndustryDepartment(editIndustry, editDepartment);
       await setType(editType);
-      
+
       if (currentBlueprint) {
         updateBlueprint({
           name: editName,
@@ -127,51 +119,42 @@ export function Step1Summary() {
           type: editType,
         });
       }
-      
-      toast.success('Summary updated successfully');
+
+      toast.success('Overview updated');
       setIsEditOpen(false);
-    } catch (error) {
-      console.error('[Builder:Step1] Failed to save edits:', error);
-      toast.error('Failed to save changes');
+    } catch {
+      toast.error('Could not save the overview');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleAskCoPilot = (prompt: string) => {
-    openWithQuestion(prompt);
-  };
+  const handleAskCoPilot = (prompt: string) => openWithQuestion(prompt);
 
-  // Determine if this is a DC twin
-  const isDataCentreTwin = industry?.toLowerCase().includes('data') || 
-                            department?.toLowerCase().includes('infrastructure') ||
-                            type === '3d_twin' ||
-                            template?.toLowerCase().includes('data centre');
+  const isDataCentreTwin = industry?.toLowerCase().includes('data') ||
+                           department?.toLowerCase().includes('infrastructure') ||
+                           type === '3d_twin' ||
+                           template?.toLowerCase().includes('data centre');
 
   return (
-    <div className="space-y-6 max-w-[920px] mx-auto">
-      {/* Header */}
+    <div className="mx-auto max-w-[920px] space-y-6">
       <DCSectionHeader
-        title="System Configuration"
-        subtitle="Data Centre Digital Twin specification and objectives"
+        title="Overview"
+        subtitle="Review what is known, what is selected and what is still not configured."
         icon={<Server className="h-5 w-5" />}
       />
 
-      {/* Template Source Badge */}
       {currentBlueprint?.source === 'template' && currentBlueprint?.templateName && (
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="gap-2 px-3 py-1.5 border-primary/30 bg-primary/5">
-            <FileText className="h-3.5 w-3.5 text-primary" />
+          <Badge variant="outline" className="gap-2 border-primary/30 bg-primary/5 px-3 py-1.5">
+            <FileText className="h-3.5 w-3.5 text-primary" aria-hidden />
             <span className="text-xs">Template: {currentBlueprint.templateName}</span>
-            {currentBlueprint.certified && (
-              <Shield className="h-3.5 w-3.5 text-success" />
-            )}
+            {currentBlueprint.certified && <Shield className="h-3.5 w-3.5 text-success" aria-label="Certified template" />}
           </Badge>
         </div>
       )}
 
-      {/* Main Twin Overview Card */}
-      <DCCard 
+      <DCCard
         title={agentName}
         subtitle={type === 'agent' ? 'Agentic Intelligence' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}
         icon={<Bot className="h-5 w-5" />}
@@ -179,282 +162,156 @@ export function Step1Summary() {
       >
         <div className="space-y-4">
           <div>
-            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Purpose</h4>
+            <h4 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Purpose</h4>
             <p className="text-sm">
-              {currentBlueprint?.description || 
-               goal || 
-               `Automate and optimize ${department || 'data centre'} operations with AI-powered monitoring and decision making.`}
+              {currentBlueprint?.description || goal || 'No purpose has been configured yet.'}
             </p>
           </div>
 
-          {goals.length > 0 && (
+          {goals.length > 0 ? (
             <div>
-              <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
-                <Target className="h-3 w-3" />
-                Key Objectives
+              <h4 className="mb-2 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <Target className="h-3 w-3" aria-hidden />
+                Key objectives
               </h4>
               <div className="space-y-1">
                 {goals.map((goalItem, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
                     {goalItem}
                   </div>
                 ))}
               </div>
             </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">No objectives configured yet.</p>
           )}
 
           <div className="flex flex-wrap gap-2">
-            <Badge className="bg-destructive/10 text-destructive border-destructive/30">
-              <Building2 className="h-3 w-3 mr-1" />
-              {industry || 'Data Centre'}
+            <Badge variant="outline">
+              <Building2 className="mr-1 h-3 w-3" aria-hidden />
+              {industry || NOT_CONFIGURED}
             </Badge>
-            <Badge className="bg-warning/10 text-warning border-warning/30">
-              <Briefcase className="h-3 w-3 mr-1" />
-              {department || 'Infrastructure'}
+            <Badge variant="outline">
+              <Briefcase className="mr-1 h-3 w-3" aria-hidden />
+              {department || NOT_CONFIGURED}
             </Badge>
             {isDataCentreTwin && (
-              <Badge className="bg-info/10 text-info border-info/30">
-                <Globe className="h-3 w-3 mr-1" />
-                Sovereign Compute
+              <Badge variant="outline">
+                <Globe className="mr-1 h-3 w-3" aria-hidden />
+                Data Centre Twin
               </Badge>
             )}
           </div>
         </div>
       </DCCard>
 
-      {/* DC-Specific Metadata - Only visible for DC twins */}
       {isDataCentreTwin && (
-        <DCCard 
-          title="Facility Specifications" 
-          subtitle="Data Centre infrastructure metadata"
+        <DCCard
+          title="Facility specifications"
+          subtitle="Only verified or explicitly configured facility values belong here."
           icon={<Server className="h-4 w-4" />}
         >
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Globe className="h-3.5 w-3.5 text-info" />
-                <p className="text-xs text-muted-foreground">Facility Location</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.facilityLocation}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Cpu className="h-3.5 w-3.5 text-accent" />
-                <p className="text-xs text-muted-foreground">GPU Fleet</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.gpuFleet}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Wind className="h-3.5 w-3.5 text-info" />
-                <p className="text-xs text-muted-foreground">Cooling Type</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.coolingType}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="h-3.5 w-3.5 text-warning" />
-                <p className="text-xs text-muted-foreground">Power Topology</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.powerTopology}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Zap className="h-3.5 w-3.5 text-success" />
-                <p className="text-xs text-muted-foreground">Renewable %</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.renewablePercent}</p>
-            </div>
-            <div className="p-3 rounded-lg bg-muted/50 border border-border">
-              <div className="flex items-center gap-2 mb-1">
-                <Shield className="h-3.5 w-3.5 text-info" />
-                <p className="text-xs text-muted-foreground">Sovereign Compliance</p>
-              </div>
-              <p className="text-sm font-medium">{dcMetadata.sovereignCompliance}</p>
-            </div>
+            <MetadataTile icon={<Globe className="h-3.5 w-3.5" aria-hidden />} label="Facility location" value={dcMetadata.facilityLocation} />
+            <MetadataTile icon={<Cpu className="h-3.5 w-3.5" aria-hidden />} label="GPU fleet" value={dcMetadata.gpuFleet} />
+            <MetadataTile icon={<Wind className="h-3.5 w-3.5" aria-hidden />} label="Cooling type" value={dcMetadata.coolingType} />
+            <MetadataTile icon={<Zap className="h-3.5 w-3.5" aria-hidden />} label="Power topology" value={dcMetadata.powerTopology} />
+            <MetadataTile icon={<Zap className="h-3.5 w-3.5" aria-hidden />} label="Renewable %" value={dcMetadata.renewablePercent} />
+            <MetadataTile icon={<Shield className="h-3.5 w-3.5" aria-hidden />} label="Sovereign compliance" value={dcMetadata.sovereignCompliance} />
           </div>
         </DCCard>
       )}
 
-      {/* Data Centre KPIs */}
-      <div className="grid gap-4 grid-cols-3">
-        <DCKPITile
-          label="Target PUE"
-          value="1.2-1.4"
-          sublabel="Power efficiency"
-          status="normal"
-          icon={<Zap className="h-4 w-4" />}
-          trend="up"
-        />
-        <DCKPITile
-          label="Carbon Reduction"
-          value="25-40%"
-          sublabel="Annual target"
-          status="normal"
-          icon={<TrendingUp className="h-4 w-4" />}
-          trend="up"
-        />
-        <DCKPITile
-          label="Uptime SLA"
-          value="99.99%"
-          sublabel="Availability"
-          status="normal"
-          icon={<Clock className="h-4 w-4" />}
-          trend="up"
-        />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <DCKPITile label="Expected ROI" value={expectedRoi === NOT_CONFIGURED ? '—' : expectedRoi} sublabel={expectedRoi === NOT_CONFIGURED ? NOT_CONFIGURED : 'Blueprint estimate'} status={expectedRoi === NOT_CONFIGURED ? 'info' : 'normal'} icon={<Zap className="h-4 w-4" />} />
+        <DCKPITile label="Time saved" value={timeSaved === NOT_CONFIGURED ? '—' : timeSaved} sublabel={timeSaved === NOT_CONFIGURED ? NOT_CONFIGURED : 'Blueprint estimate'} status={timeSaved === NOT_CONFIGURED ? 'info' : 'normal'} icon={<Clock className="h-4 w-4" />} />
+        <DCKPITile label="Efficiency gain" value={efficiencyGain === NOT_CONFIGURED ? '—' : efficiencyGain} sublabel={efficiencyGain === NOT_CONFIGURED ? NOT_CONFIGURED : 'Blueprint estimate'} status={efficiencyGain === NOT_CONFIGURED ? 'info' : 'normal'} icon={<Cpu className="h-4 w-4" />} />
       </div>
 
-      {/* Capabilities Summary */}
-      <DCCard title="System Capabilities" icon={<Cpu className="h-4 w-4" />}>
+      <DCCard title="System capabilities" icon={<Cpu className="h-4 w-4" />}>
         <div className="space-y-4">
+          <SummaryList title="Core functions" values={capabilities} emptyLabel="No capabilities configured yet." />
+          <SummaryList title="Connections" values={recommendedTools} emptyLabel="No connections selected yet." accent />
           <div>
-            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Core Functions</h4>
-            <div className="flex flex-wrap gap-2">
-              {capabilities.map((capability, idx) => (
-                <Badge key={idx} variant="outline" className="bg-background/50">{capability}</Badge>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Infrastructure Tools</h4>
-            <div className="flex flex-wrap gap-2">
-              {recommendedTools.map((tool, idx) => (
-                <Badge key={idx} className="bg-accent/10 text-accent border-accent/30">{tool}</Badge>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Workflow Pipeline</h4>
-            <div className="space-y-2">
-              {workflowSummary.map((workflowItem, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm text-muted-foreground font-mono">
-                  <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                  {workflowItem}
-                </div>
-              ))}
-            </div>
+            <h4 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">Workflow</h4>
+            {workflowSummary.length > 0 ? (
+              <div className="space-y-2">
+                {workflowSummary.map((workflowItem, idx) => (
+                  <div key={idx} className="flex items-center gap-2 font-mono text-sm text-muted-foreground">
+                    <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
+                    {workflowItem}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No workflow configured yet.</p>
+            )}
           </div>
         </div>
       </DCCard>
 
-      {/* Blueprint Snapshot */}
-      <BlueprintSnapshotCard 
+      <BlueprintSnapshotCard
         twinId="default"
-        onOpenFullBlueprint={() => window.open('/blueprint/default', '_blank')}
+        onOpenFullBlueprint={() => window.open('/blueprint/default', '_blank', 'noopener,noreferrer')}
       />
 
-      {/* Actions */}
       <DCCard className="bg-muted/30">
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Ready to configure this system? Click "Next" to set up intelligence, tools, and workflows.
+            Continue to configure intelligence, connections and workflow behavior. Missing values remain visibly unconfigured rather than being replaced by assumed facility data.
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <Button variant="outline" className="flex-1" onClick={handleOpenEdit}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Configuration
+              <Pencil className="mr-2 h-4 w-4" aria-hidden />
+              Edit overview
             </Button>
             <Button variant="outline" className="flex-1" onClick={() => setIsSwitchOpen(true)}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Switch Template
+              <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+              Switch template
             </Button>
           </div>
-          
-          {/* Co-Pilot Quick Actions */}
-          <div className="pt-4 border-t border-border/50">
-            <p className="text-xs text-muted-foreground mb-2">Ask AURA Assistant:</p>
+
+          <div className="border-t border-border/50 pt-4">
+            <p className="mb-2 text-xs text-muted-foreground">Ask AURA Assistant</p>
             <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs bg-muted hover:bg-muted/80"
-                onClick={() => handleAskCoPilot(`Suggest PUE optimization strategies for this data centre twin.`)}
-              >
-                PUE Optimization
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs bg-muted hover:bg-muted/80"
-                onClick={() => handleAskCoPilot(`What thermal monitoring KPIs should I track for ${agentName}?`)}
-              >
-                Thermal KPIs
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-xs bg-muted hover:bg-muted/80"
-                onClick={() => handleAskCoPilot(`What are the key sovereignty compliance requirements for this data centre?`)}
-              >
-                Sovereignty Checks
-              </Button>
+              <Button variant="ghost" size="sm" className="bg-muted text-xs hover:bg-muted/80" onClick={() => handleAskCoPilot('Suggest PUE optimization strategies for this data centre twin.')}>PUE optimization</Button>
+              <Button variant="ghost" size="sm" className="bg-muted text-xs hover:bg-muted/80" onClick={() => handleAskCoPilot(`What thermal monitoring KPIs should I track for ${agentName}?`)}>Thermal KPIs</Button>
+              <Button variant="ghost" size="sm" className="bg-muted text-xs hover:bg-muted/80" onClick={() => handleAskCoPilot('What sovereignty controls should be evaluated for this data centre?')}>Sovereignty controls</Button>
             </div>
           </div>
         </div>
       </DCCard>
 
-      {/* Edit Summary Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Edit System Configuration</DialogTitle>
-            <DialogDescription>
-              Update the name, description, and classification for this digital twin.
-            </DialogDescription>
+            <DialogTitle>Edit overview</DialogTitle>
+            <DialogDescription>Update the name, description and classification for this build.</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">System Name</Label>
-              <Input 
-                id="edit-name" 
-                value={editName} 
-                onChange={(e) => setEditName(e.target.value)}
-                placeholder="Data Centre Twin name"
-                className=""
-              />
+              <Label htmlFor="edit-name">System name</Label>
+              <Input id="edit-name" value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="System name" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-description">Description</Label>
-              <Textarea 
-                id="edit-description" 
-                value={editDescription} 
-                onChange={(e) => setEditDescription(e.target.value)}
-                placeholder="What does this system monitor and control?"
-                rows={3}
-                className=""
-              />
+              <Textarea id="edit-description" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} placeholder="What does this system do?" rows={3} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="edit-industry">Industry</Label>
-                <Input 
-                  id="edit-industry" 
-                  value={editIndustry} 
-                  onChange={(e) => setEditIndustry(e.target.value)}
-                  placeholder="e.g. Data Centre"
-                  className=""
-                />
+                <Input id="edit-industry" value={editIndustry} onChange={(e) => setEditIndustry(e.target.value)} placeholder="Industry" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-department">Department</Label>
-                <Input 
-                  id="edit-department" 
-                  value={editDepartment} 
-                  onChange={(e) => setEditDepartment(e.target.value)}
-                  placeholder="e.g. Infrastructure"
-                  className=""
-                />
+                <Input id="edit-department" value={editDepartment} onChange={(e) => setEditDepartment(e.target.value)} placeholder="Department" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label>System Type</Label>
+              <Label>System type</Label>
               <Select value={editType} onValueChange={(val: 'agent' | 'process_twin' | '3d_twin') => setEditType(val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="agent">Agentic AI</SelectItem>
                   <SelectItem value="process_twin">Process Digital Twin</SelectItem>
@@ -465,43 +322,65 @@ export function Step1Summary() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditOpen(false)}>Cancel</Button>
-            <Button onClick={handleSaveEdit} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </Button>
+            <Button onClick={() => void handleSaveEdit()} disabled={isSaving}>{isSaving ? 'Saving…' : 'Save changes'}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Switch Template Dialog */}
       <Dialog open={isSwitchOpen} onOpenChange={setIsSwitchOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Switch Template</DialogTitle>
-            <DialogDescription>
-              Choose a different data centre template to start from.
-            </DialogDescription>
+            <DialogTitle>Switch template</DialogTitle>
+            <DialogDescription>Choose a different data-centre template to start from.</DialogDescription>
           </DialogHeader>
-          <div className="py-4 space-y-3">
+          <div className="space-y-3 py-4">
             {['Sovereign Green AI Data Center Twin', 'HPC Cluster Optimization Twin', 'Energy & Cooling Efficiency Twin', 'GPU Workload Scheduler Twin'].map((tpl) => (
-              <Button 
-                key={tpl} 
-                variant="outline" 
+              <Button
+                key={tpl}
+                variant="outline"
                 className="w-full justify-start"
                 onClick={() => {
                   toast.info(`Switching to: ${tpl}`);
                   setIsSwitchOpen(false);
                 }}
               >
-                <Server className="h-4 w-4 mr-2 text-primary" />
+                <Server className="mr-2 h-4 w-4 text-primary" aria-hidden />
                 {tpl}
               </Button>
             ))}
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsSwitchOpen(false)}>Cancel</Button>
-          </DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setIsSwitchOpen(false)}>Cancel</Button></DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function MetadataTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-muted/50 p-3">
+      <div className="mb-1 flex items-center gap-2 text-muted-foreground">
+        {icon}
+        <p className="text-xs">{label}</p>
+      </div>
+      <p className="text-sm font-medium">{value}</p>
+    </div>
+  );
+}
+
+function SummaryList({ title, values, emptyLabel, accent = false }: { title: string; values: string[]; emptyLabel: string; accent?: boolean }) {
+  return (
+    <div>
+      <h4 className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</h4>
+      {values.length > 0 ? (
+        <div className="flex flex-wrap gap-2">
+          {values.map((value, idx) => (
+            <Badge key={`${value}-${idx}`} variant="outline" className={accent ? 'bg-accent/10' : 'bg-background/50'}>{value}</Badge>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+      )}
     </div>
   );
 }

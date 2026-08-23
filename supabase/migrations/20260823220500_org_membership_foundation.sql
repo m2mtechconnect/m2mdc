@@ -43,22 +43,33 @@ WHERE last_active_org_id IS NULL
   AND org_id IS NOT NULL;
 
 -- Backfill a membership for every existing profile that already belongs to an organisation.
--- Prefer an existing role when it maps cleanly; otherwise grant the least-privileged viewer role.
+-- user_roles.role is canonical public.app_role on current schema, so compare its
+-- textual form to the membership vocabulary and preserve the strongest known role.
 INSERT INTO public.org_memberships (org_id, user_id, role, status, is_default)
 SELECT
   p.org_id,
   p.user_id,
   COALESCE(
     (
-      SELECT ur.role
+      SELECT ur.role::text
       FROM public.user_roles ur
       WHERE ur.user_id = p.user_id
-        AND ur.role = ANY (ARRAY['owner','admin','operator','viewer']::text[])
-      ORDER BY CASE ur.role
+        AND ur.role::text = ANY (ARRAY[
+          'owner','admin','operator','engineer','manager','executive',
+          'security_admin','compliance','data_analyst','support','viewer'
+        ]::text[])
+      ORDER BY CASE ur.role::text
         WHEN 'owner' THEN 1
         WHEN 'admin' THEN 2
-        WHEN 'operator' THEN 3
-        ELSE 4
+        WHEN 'security_admin' THEN 3
+        WHEN 'executive' THEN 4
+        WHEN 'manager' THEN 5
+        WHEN 'engineer' THEN 6
+        WHEN 'operator' THEN 7
+        WHEN 'compliance' THEN 8
+        WHEN 'data_analyst' THEN 9
+        WHEN 'support' THEN 10
+        ELSE 11
       END
       LIMIT 1
     ),

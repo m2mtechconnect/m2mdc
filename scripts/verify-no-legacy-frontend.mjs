@@ -10,20 +10,13 @@ const forbiddenPaths = [
   'src/components/builder/MCPToolsPlayground.tsx',
   'src/components/integrations/ZapierIntegrationCard.tsx',
   'src/hooks/useTokenRefresh.ts',
+  'src/components/agent-chat/AgentMCPServers.tsx',
+  'src/components/AgentPlayground.tsx',
   'src/components/builder/steps/DCStep1Summary.tsx',
   'src/components/builder/steps/DCStep2Blueprint.tsx',
   'src/components/builder/steps/DCStep3Integrations.tsx',
   'src/components/builder/steps/DCStep4Scenarios.tsx',
   'src/components/builder/steps/DCStep5Deploy.tsx',
-];
-
-const globalForbidden = [
-  'ZapierIntegrationCard',
-  'zapier-integration-status',
-  'zapier-auto-refresh',
-  'zapier-refresh-token',
-  'BuilderIntegrationsHub',
-  'MCPToolsPlayground',
 ];
 
 const builderForbidden = [
@@ -44,6 +37,10 @@ for (const path of forbiddenPaths) {
   if (existsSync(join(root, path))) violations.push(`${path}: retired legacy file still exists`);
 }
 
+function isTestSource(rel) {
+  return rel.includes('/test/') || rel.includes('/tests/') || /\.(?:test|spec)\.[cm]?[jt]sx?$/.test(rel);
+}
+
 function walk(dir) {
   for (const name of readdirSync(dir)) {
     const path = join(dir, name);
@@ -57,8 +54,11 @@ function walk(dir) {
     const rel = relative(root, path).replaceAll('\\', '/');
     const content = readFileSync(path, 'utf8');
 
-    for (const token of globalForbidden) {
-      if (content.includes(token)) violations.push(`${rel}: forbidden legacy token ${JSON.stringify(token)}`);
+    // Zapier is not part of the supported AURA frontend stack. Application
+    // source must not carry dormant labels, types, hooks or invocation names
+    // that could later be re-wired. Tests may name it only to assert absence.
+    if (!isTestSource(rel) && /zapier/i.test(content)) {
+      violations.push(`${rel}: retired provider-specific Zapier reference`);
     }
 
     if (rel.startsWith('src/components/builder/') || rel === 'src/pages/Builder.tsx') {
@@ -77,4 +77,4 @@ if (violations.length > 0) {
   process.exit(1);
 }
 
-console.log('Legacy frontend guard passed: retired Zapier/MCP/raw-API Builder surfaces are absent.');
+console.log('Legacy frontend guard passed: Zapier and retired MCP/raw-API Builder surfaces are absent from application source.');

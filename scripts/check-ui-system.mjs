@@ -48,24 +48,31 @@ const metrics = {
   fixedWidth: count(/(?:min-)?w-\[[0-9]{3,}px\]/g),
 };
 
-// Exact UI-debt ceiling measured on stable main f6033942. These are ceilings,
-// not targets: every remediation phase should lower one or more values and
-// ratchet the corresponding ceiling down. New UI debt must never increase them.
+// Exact UI-debt ceiling after UI Audit Phase 2 shared primitive migration.
+// These are ceilings, not targets: every remediation phase should lower one
+// or more values and ratchet the corresponding ceiling down. New UI debt must
+// never increase them.
 const baselineCeilings = {
   microText9: 18,
   microText10: 253,
   microText11: 186,
-  rawCard: 594,
-  rawTable: 18,
+  rawCard: 592,
+  rawTable: 17,
   gradients: 78,
-  glow: 70,
+  glow: 34,
   backdropBlur: 47,
   pulse: 99,
   ping: 9,
   bounce: 8,
-  uppercase: 178,
-  hardcodedColor: 346,
+  uppercase: 172,
+  hardcodedColor: 324,
   fixedWidth: 99,
+};
+
+const adoptionFloors = {
+  v2Panel: 22,
+  operationalTable: 1,
+  stateView: 2,
 };
 
 const requiredV2Tokens = [
@@ -102,6 +109,12 @@ for (const [metric, ceiling] of Object.entries(baselineCeilings)) {
   }
 }
 
+for (const [metric, floor] of Object.entries(adoptionFloors)) {
+  if (metrics[metric] < floor) {
+    failures.push(`${metric} adoption regressed: ${metrics[metric]} < floor ${floor}`);
+  }
+}
+
 for (const token of requiredV2Tokens) {
   if (!indexCss.includes(token)) failures.push(`missing required AURA V2 token ${token}`);
 }
@@ -109,8 +122,6 @@ for (const token of requiredV2Tokens) {
 for (const primitive of requiredV2Exports) {
   if (!v2Index.includes(primitive)) failures.push(`missing required AURA V2 primitive export ${primitive}`);
 }
-
-if (metrics.v2Panel < 21) failures.push(`V2 Panel adoption regressed: ${metrics.v2Panel} < baseline floor 21`);
 
 const report = {
   microTextTotal: metrics.microText9 + metrics.microText10 + metrics.microText11,

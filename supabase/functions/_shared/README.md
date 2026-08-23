@@ -1,71 +1,41 @@
-# Shared AI Client Configuration
+# Shared Edge Runtime Contracts
 
-## Overview
+## AI runtime
 
-This project uses **Lovable Cloud managed Gemini 3.x** as the default AI provider. No external API keys or credentials are required for basic operation.
+AURA currently uses one supported managed AI execution path through `_shared/ai-client.ts`.
 
-## Default Configuration
+### Supported runtime
 
-- **Provider**: Lovable Cloud (via `LOVABLE_API_KEY`)
-- **Primary Model**: `google/gemini-3-pro-preview` (all Co-Pilot interactions)
-- **Fallback Model**: `google/gemini-3.0-pro` (if preview unavailable)
-- **Image Generation**: `google/gemini-3-pro-image-preview`
+- Provider contract: managed AURA AI
+- Underlying managed gateway credential: `LOVABLE_API_KEY`
+- Primary model: `google/gemini-3-pro-preview`
+- Fallback model: `google/gemini-3.0-pro`
+- Image model: `google/gemini-3-pro-image-preview`
 
-## How to Switch to External Google Cloud Credentials
+`USE_EXTERNAL_GOOGLE=true` is retained only as a legacy environment signal. It does **not** switch runtime execution because the external Google adapter is not implemented in the current shared client. Requests remain on the supported managed path until a complete provider adapter is added and qualified.
 
-If you want to use your own Google Cloud / Vertex AI setup:
+This prevents configuration from selecting a known non-functional runtime branch.
 
-1. **Set Environment Variable**:
-   ```
-   USE_EXTERNAL_GOOGLE=true
-   ```
+## Shared request boundaries
 
-2. **Configure Google Secrets** (via Update Secrets panel):
-   - `GOOGLE_APPLICATION_CREDENTIALS_JSON`
-   - `GOOGLE_PROJECT_ID`
-   - `GOOGLE_LOCATION` (optional, defaults to northamerica-northeast1)
-   - `GEMINI_MODEL` (optional, defaults to gemini-1.5-pro)
-   - `VERTEX_DATA_STORE_ID` (optional, for Vertex Search)
+Edge Functions should reuse the shared contracts in this directory instead of implementing local variants:
 
-3. **Restart Functions**: Changes take effect immediately for new function invocations
+- `auth.ts` — canonical request authentication and administrative authorization context
+- `callerIdentity.ts` — compatibility wrapper for handlers using `requireCaller` / `requireCallerRole`
+- `adminAuthorization.ts` — approved-profile, role and tenant authorization before privileged client creation
+- `cors.ts` — canonical CORS allowlist, preflight and response headers
+- `ai-client.ts` — supported AI runtime selection and health checks
 
-## Files Using AI
+## Implementation rule
 
-### Primary AI Integration Files:
-- `_shared/ai-client.ts` - Centralized AI configuration and helper functions
-- `ai-config/index.ts` - Returns current AI configuration status
-- `health-ai/index.ts` - AI health check endpoint
-- `health/index.ts` - Overall system health including AI
-- `copilot-health/index.ts` - Copilot-specific health check
+New or modified browser-facing Edge Functions should follow this sequence:
 
-### Functions Making AI Calls:
-- `query-answer/index.ts` - Uses Gemini for query answering
-- `grounded-summary/index.ts` - Uses Gemini Pro for content summarization
-- `url-capture/index.ts` - Includes Gemini health check endpoint
+1. validate CORS / preflight;
+2. validate method;
+3. authenticate through the shared auth boundary;
+4. authorize role/tenant where required;
+5. validate request input;
+6. call domain logic;
+7. return a normalized JSON response.
 
-## Optional Integrations
-
-The following integrations are **optional** and the app works without them:
-
-- **Microsoft OAuth** (`rag-oauth-microsoft/`) - Requires `MSFT_CLIENT_ID`, `MSFT_CLIENT_SECRET`
-- **AWS S3** - Requires `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`
-- **Arcade** - Requires `ARCADE_API_KEY`
-- **Vertex Search** - Requires `VERTEX_DATA_STORE_ID` and external Google credentials
-
-## Defensive Error Handling
-
-All AI functions include defensive checks:
-- ✅ Silent fallback to Lovable managed if external credentials missing
-- ✅ Clear console warnings (not errors) when optional features unavailable
-- ✅ Graceful degradation - app continues to function
-- ✅ User-friendly error messages
-
-## Architecture Notes
-
-The AI client uses a **strategy pattern**:
-
-1. Check if `USE_EXTERNAL_GOOGLE=true` and external credentials exist
-2. If yes → Use external Google Cloud APIs
-3. If no → Use Lovable Cloud managed Gemini (default)
-
-This allows seamless switching without code changes.
+Do not introduce a new provider, local wildcard CORS object, ad-hoc bearer parser, or service-role client before authorization simply to make one handler pass.

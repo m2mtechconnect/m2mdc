@@ -35,8 +35,7 @@ serve(async (req) => {
 
     // Platform provisioning is intentionally stricter than organization admin.
     // The privileged client is not constructed until the caller is both an
-    // approved account and a platform-level owner in the legacy global role
-    // plane. Customer org admins cannot call this endpoint.
+    // approved account and a platform-level owner with a live global grant.
     const { data: profile, error: profileError } = await authClient
       .from('profiles')
       .select('is_approved')
@@ -48,9 +47,10 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'Approved platform account required', stage: 'authorization' }, 403);
     }
 
-    const { data: isPlatformOwner, error: roleError } = await authClient.rpc('check_user_has_role', {
-      _user_id: user.id,
-      _role: 'owner',
+    const { data: isPlatformOwner, error: roleError } = await authClient.rpc('user_has_role', {
+      check_user_id: user.id,
+      check_role: 'owner',
+      check_scope: 'global',
     });
 
     if (roleError) throw roleError;

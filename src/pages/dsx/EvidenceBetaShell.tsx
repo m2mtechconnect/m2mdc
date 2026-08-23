@@ -25,10 +25,6 @@ import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
 /**
- * Grouped by operator intent: what is happening, what is it made of,
- * and what can be proven about it.
- */
-/**
  * Navigation is derived from the canonical five-section Evidence IA so the
  * sidebar, the routes and the page titles can never drift apart.
  */
@@ -41,10 +37,10 @@ const NAV: { group: string; items: NavEntry[] }[] = EVIDENCE_SECTIONS.map((secti
 }));
 
 const DOT: Record<string, string> = {
-  violation: 'bg-red-400',
-  attention: 'bg-amber-400',
-  normal: 'bg-emerald-400',
-  unavailable: 'bg-zinc-500',
+  violation: 'bg-[hsl(var(--v2-critical))]',
+  attention: 'bg-[hsl(var(--v2-simulated))]',
+  normal: 'bg-[hsl(var(--v2-verified))]',
+  unavailable: 'bg-[hsl(var(--v2-neutral))]',
 };
 
 /** Maps a route segment to the constraint domain used for related views. */
@@ -74,8 +70,8 @@ function RelatedWorkspaces() {
   if (views.length === 0) return null;
 
   return (
-    <section aria-label="Related workspaces" data-testid="dsx-related-workspaces" className="pt-8">
-      <h2 className="pb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+    <section aria-label="Related workspaces" data-testid="dsx-related-workspaces" className="pt-6">
+      <h2 className="v2-field-label pb-2 font-semibold text-foreground">
         Continue this investigation
       </h2>
       <div className="flex flex-wrap gap-2">
@@ -84,7 +80,7 @@ function RelatedWorkspaces() {
             key={v.id}
             to={hrefWithContext(v.path)}
             title={v.hint}
-            className="rounded-md border border-border/60 px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex min-h-9 items-center rounded-md border border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-panel))] px-3 py-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-[hsl(var(--v2-canvas-deep)/0.7)] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {v.label}
           </Link>
@@ -104,7 +100,6 @@ function containsAsset(node: HierarchyNode, id: string | null): boolean {
 function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
   const { selectAsset, selectedAssetId } = useWorkspace();
   const onPath = containsAsset(node, selectedAssetId);
-  // Collapsed by default: only the branch holding the selected asset expands.
   const [open, setOpen] = useState(onPath || depth === 0);
   const expanded = open || onPath;
   const selected = selectedAssetId === node.asset.aura_asset_id;
@@ -118,12 +113,12 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={expanded}
             aria-label={`${expanded ? 'Collapse' : 'Expand'} ${node.asset.name}`}
-            className="inline-flex h-8 w-8 items-center justify-center rounded-sm text-muted-foreground hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-[hsl(var(--v2-canvas-deep)/0.7)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronRight className={cn('h-3 w-3 transition-transform', expanded && 'rotate-90')} aria-hidden />
+            <ChevronRight className={cn('h-3.5 w-3.5 transition-transform', expanded && 'rotate-90')} aria-hidden />
           </button>
         ) : (
-          <span className="w-5 shrink-0" aria-hidden />
+          <span className="w-6 shrink-0" aria-hidden />
         )}
         <button
           type="button"
@@ -131,8 +126,10 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
           data-testid={`dsx-scope-${node.asset.source_asset_id}`}
           aria-current={selected ? 'true' : undefined}
           className={cn(
-            'min-w-0 flex-1 truncate rounded-sm px-1.5 py-1 text-left text-[13px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-            selected ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
+            'min-h-9 min-w-0 flex-1 truncate rounded-md px-2 py-1.5 text-left text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+            selected
+              ? 'bg-[hsl(var(--v2-tech)/0.10)] font-semibold text-[hsl(var(--v2-tech-strong))]'
+              : 'text-muted-foreground hover:bg-[hsl(var(--v2-canvas-deep)/0.7)] hover:text-foreground',
           )}
         >
           {node.asset.name}
@@ -145,7 +142,7 @@ function ScopeNode({ node, depth }: { node: HierarchyNode; depth: number }) {
 
 function ScopeTree({ nodes, depth = 0 }: { nodes: HierarchyNode[]; depth?: number }) {
   return (
-    <ul className={depth === 0 ? 'space-y-0.5' : 'space-y-0.5 border-l border-border/60 pl-2'}>
+    <ul className={depth === 0 ? 'space-y-0.5' : 'space-y-0.5 border-l border-[hsl(var(--v2-line))] pl-2'}>
       {nodes.map((n) => <ScopeNode key={n.asset.aura_asset_id} node={n} depth={depth} />)}
     </ul>
   );
@@ -162,46 +159,48 @@ function WorkspaceNav() {
       className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
     >
       <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
-      {NAV.map((g) => (
-        <div key={g.group} className="pb-0 lg:pb-4">
-          <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {g.group}
-          </p>
-          <ul className="flex gap-1 lg:block lg:space-y-0.5">
-            {g.items.map((i) => {
-              const s = i.domain ? status[i.domain] : undefined;
-              return (
-                <li key={i.to}>
-                  <NavLink
-                    to={hrefWithContext(i.to)}
-                    end={i.end}
-                    data-testid={`dsx-nav-${i.label.toLowerCase().replace(/\s+/g, '-')}`}
-                    className={({ isActive }) =>
-                      cn(
-                        'flex items-center gap-2 whitespace-nowrap rounded-sm px-2 py-1.5 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                        isActive ? 'bg-primary/15 font-semibold text-foreground' : 'text-muted-foreground hover:bg-muted/60',
-                      )
-                    }
-                  >
-                    {s && (
-                      <span
-                        aria-hidden
-                        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', DOT[s])}
-                        data-status={s}
-                      />
-                    )}
-                    <span className="truncate">{i.label}</span>
-                    {s && <span className="sr-only">{s}</span>}
-                  </NavLink>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+        {NAV.map((g) => (
+          <div key={g.group} className="pb-0 lg:pb-4">
+            <p className="v2-field-label px-2 pb-1.5 font-semibold text-foreground">
+              {g.group}
+            </p>
+            <ul className="flex gap-1 lg:block lg:space-y-0.5">
+              {g.items.map((i) => {
+                const s = i.domain ? status[i.domain] : undefined;
+                return (
+                  <li key={i.to}>
+                    <NavLink
+                      to={hrefWithContext(i.to)}
+                      end={i.end}
+                      data-testid={`dsx-nav-${i.label.toLowerCase().replace(/\s+/g, '-')}`}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex min-h-10 items-center gap-2 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          isActive
+                            ? 'bg-[hsl(var(--v2-tech)/0.10)] font-semibold text-[hsl(var(--v2-tech-strong))]'
+                            : 'text-muted-foreground hover:bg-[hsl(var(--v2-canvas-deep)/0.7)] hover:text-foreground',
+                        )
+                      }
+                    >
+                      {s && (
+                        <span
+                          aria-hidden
+                          className={cn('h-1.5 w-1.5 shrink-0 rounded-full', DOT[s])}
+                          data-status={s}
+                        />
+                      )}
+                      <span className="truncate">{i.label}</span>
+                      {s && <span className="sr-only">{s}</span>}
+                    </NavLink>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
       </div>
       <div className="hidden lg:block">
-        <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="v2-field-label px-2 pb-1.5 font-semibold text-foreground">
           Facility scope
         </p>
         <ScopeTree nodes={buildHierarchy()} />
@@ -218,7 +217,7 @@ function WorkspaceHeader() {
 
   return (
     <header className="v2-command-header mb-4">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">
         <Link
           to={hrefWithContext(DSX_ROOT)}
           className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -260,7 +259,7 @@ function ShellBody() {
       <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
         <WorkspaceNav />
         <div className="min-w-0 flex-1 p-4 sm:p-6">
-          <div className="mx-auto w-full min-w-0 max-w-[1400px]">
+          <div className="mx-auto w-full min-w-0 max-w-screen-2xl">
             <WorkspaceHeader />
             <Outlet />
             <RelatedWorkspaces />

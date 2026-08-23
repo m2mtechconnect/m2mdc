@@ -48,7 +48,7 @@ const metrics = {
   fixedWidth: count(/(?:min-)?w-\[[0-9]{3,}px\]/g),
 };
 
-// UI debt ceilings ratcheted after Phase 4 Builder layout cleanup. These are
+// UI debt ceilings ratcheted after Phase 5 Evidence shell cleanup. These are
 // maximums, not targets: later phases must keep moving the values downward.
 const baselineCeilings = {
   microText9: 18,
@@ -62,9 +62,9 @@ const baselineCeilings = {
   pulse: 99,
   ping: 9,
   bounce: 8,
-  uppercase: 172,
+  uppercase: 169,
   hardcodedColor: 324,
-  fixedWidth: 91,
+  fixedWidth: 90,
 };
 
 const adoptionFloors = {

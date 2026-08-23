@@ -23,15 +23,27 @@ for (const surface of SURFACES) {
 
     const running = await page.evaluate(() => {
       const offenders: string[] = [];
+      // Cross-fades are permitted under WCAG 2.3.3; vestibular-triggering
+      // motion (movement, scaling, rotation) is not.
+      const MOTION_PROPS = ['transform', 'translate', 'rotate', 'scale', 'top', 'left', 'right', 'bottom'];
       const animations = document.getAnimations?.() ?? [];
       for (const animation of animations) {
         if (animation.playState !== 'running') continue;
-        const target = (animation.effect as KeyframeEffect | null)?.target as HTMLElement | null;
-        const timing = animation.effect?.getComputedTiming();
+        const effect = animation.effect as KeyframeEffect | null;
+        const target = effect?.target as HTMLElement | null;
+        const timing = effect?.getComputedTiming();
         const duration = typeof timing?.duration === 'number' ? timing.duration : 0;
         // The global reduce rule collapses durations to 0.01ms; anything
         // still measurably animating is unsuppressed motion.
         if (duration <= 1) continue;
+
+        const animated = new Set<string>();
+        for (const frame of effect?.getKeyframes?.() ?? []) {
+          for (const key of Object.keys(frame)) animated.add(key);
+        }
+        const movesTarget = MOTION_PROPS.some((prop) => animated.has(prop));
+        if (!movesTarget) continue;
+
         offenders.push(
           `${target?.tagName ?? 'unknown'}:${target?.getAttribute('data-testid') ?? target?.className ?? ''}`.slice(0, 80),
         );
@@ -39,7 +51,7 @@ for (const surface of SURFACES) {
       return offenders;
     });
 
-    expect(running, 'animations still running under prefers-reduced-motion').toEqual([]);
+    expect(running, 'motion animations still running under prefers-reduced-motion').toEqual([]);
   });
 
   test(`reduced motion: ${surface.name} does not autoplay video`, async ({ page }) => {

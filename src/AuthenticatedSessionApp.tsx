@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { fetchProfileFields } from '@/lib/auth/profileQuery';
@@ -26,12 +26,20 @@ function ensureChangeLogMiddleware(): Promise<void> {
   return changeLogMiddlewarePromise;
 }
 
+interface AuthenticatedSessionAppProps {
+  protectedEntry: boolean;
+  returnTo: string;
+}
+
 /**
  * Session and approval resolution. This bundle is loaded only when a persisted
  * session could exist or a protected route explicitly requires authentication.
  * All security decisions still use Supabase + the existing fail-closed gates.
  */
-export default function AuthenticatedSessionApp() {
+export default function AuthenticatedSessionApp({
+  protectedEntry,
+  returnTo,
+}: AuthenticatedSessionAppProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -96,7 +104,12 @@ export default function AuthenticatedSessionApp() {
     return <BoundedLoading stage={loading ? 'session' : 'approval'} />;
   }
 
-  if (!session || !user) return <PublicAppRoutes />;
+  if (!session || !user) {
+    if (protectedEntry) {
+      return <Navigate to={`/login?returnTo=${encodeURIComponent(returnTo)}`} replace />;
+    }
+    return <PublicAppRoutes />;
+  }
 
   if (!isApproved) {
     return (

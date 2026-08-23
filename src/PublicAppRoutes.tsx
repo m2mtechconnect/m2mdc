@@ -43,8 +43,8 @@ export default function PublicAppRoutes() {
       <Route path="/sign-in" element={<Navigate to="/login" replace />} />
       <Route path="/sign-up" element={onboardingDone ? withPublicRouteFallback(<SignUp />) : <Navigate to="/onboarding" replace />} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
-      <Route path="/forgot-password" element={onboardingDone ? withPublicRouteFallback(<ForgotPassword />) : <Navigate to="/onboarding" replace />} />
-      <Route path="/mfa" element={onboardingDone ? withPublicRouteFallback(<MFA />) : <Navigate to="/onboarding" replace />} />
+      <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
+      <Route path="/mfa" element={withPublicRouteFallback(<MFA />)} />
       <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
       <Route path="/data-centre-twin" element={withPublicRouteFallback(<PublicDataCentreTwin />)} />
       <Route path="/twin-preview" element={withPublicRouteFallback(<TwinPreview />)} />

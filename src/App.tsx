@@ -53,7 +53,7 @@ const PUBLIC_PATHS = new Set([
 ]);
 
 function RouteEntry() {
-  const { pathname } = useLocation();
+  const { pathname, search, hash } = useLocation();
   const persistedSession = hasPersistedSessionCandidate();
   const bareMarketingLanding =
     !persistedSession && (pathname === '/' || pathname === '/twin-datacentre');
@@ -63,12 +63,18 @@ function RouteEntry() {
   // initial dependency graph.
   if (bareMarketingLanding) return <PublicAppRoutes />;
 
-  const needsSessionResolution = persistedSession || !PUBLIC_PATHS.has(pathname);
+  const protectedEntry = !PUBLIC_PATHS.has(pathname);
+  const needsSessionResolution = persistedSession || protectedEntry;
+  const returnTo = `${pathname}${search}${hash}`;
 
   return (
     <Suspense fallback={publicRouteFallback}>
       <RuntimeAppProviders>
-        {needsSessionResolution ? <AuthenticatedSessionApp /> : <PublicAppRoutes />}
+        {needsSessionResolution ? (
+          <AuthenticatedSessionApp protectedEntry={protectedEntry} returnTo={returnTo} />
+        ) : (
+          <PublicAppRoutes />
+        )}
       </RuntimeAppProviders>
     </Suspense>
   );

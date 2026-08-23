@@ -17,6 +17,9 @@
  */
 
 import type { BrowserContext, Page, Route } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve as resolvePath } from 'node:path';
+
 
 // Supabase-js derives its default storage key from the configured URL's
 // first hostname segment. Keep the test session aligned with the app when

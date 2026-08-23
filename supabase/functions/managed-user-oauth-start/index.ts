@@ -1,6 +1,7 @@
 /**
  * Starts an AURA Managed User Connection authorization for the signed-in user.
- * Returns only an authorization URL - never a token, credential name or handle.
+ * Returns only a white-label-safe provider authorization URL - never a token,
+ * credential name, handle, or implementation-vendor gateway URL.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeAppUserOAuth } from '../_shared/appUserConnector.ts';
@@ -8,11 +9,12 @@ import { getConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
 import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import {
+  authorizationUrlIsWhiteLabelSafe,
+  managedConnectorGatewayPolicy,
+  whiteLabelBlockedResponse,
+} from '../_shared/whiteLabelGateway.ts';
 
-const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev';
-
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -55,12 +57,19 @@ Deno.serve(async (req) => {
       correlation_id: correlationId,
     });
   }
+
+  const gateway = managedConnectorGatewayPolicy();
+  if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
+    const blocked = whiteLabelBlockedResponse(gateway.reason);
+    return json(503, { ...blocked, correlation_id: correlationId });
+  }
+
   const clientAPIKey = Deno.env.get(binding.client_api_key_env);
   if (!clientAPIKey) {
     return json(503, {
       error_code: 'managed_client_not_configured',
       safe_message:
-        'No managed connector client is configured for this connector, so no user can authorize it yet. An administrator must configure it first.',
+        'No AURA managed connector client is configured for this connector, so no user can authorize it yet. An administrator must configure it first.',
       correlation_id: correlationId,
     });
   }
@@ -76,7 +85,7 @@ Deno.serve(async (req) => {
   let authorizationUrl: string;
   try {
     const started = await authorizeAppUserOAuth({
-      gatewayBaseUrl: GATEWAY_BASE_URL,
+      gatewayBaseUrl: gateway.gatewayBaseUrl,
       connectorId: binding.gateway_connector_key,
       appUserId: user.id,
       clientAPIKey,
@@ -89,6 +98,22 @@ Deno.serve(async (req) => {
     return json(502, {
       error_code: 'managed_authorization_unavailable',
       safe_message: 'The authorization service could not start this connection.',
+      correlation_id: correlationId,
+    });
+  }
+
+  if (!authorizationUrlIsWhiteLabelSafe(authorizationUrl)) {
+    await admin.from('connection_audit_events').insert({
+      actor_id: user.id,
+      tenant_id: tenantId,
+      action: 'managed_user_connection.authorization_blocked',
+      new_state: 'BLOCKED_WHITE_LABEL_POLICY',
+      evidence: { connector_definition_id: definitionId, reason_code: 'authorization_url_not_white_label_safe' },
+      correlation_id: correlationId,
+    });
+    return json(503, {
+      error_code: 'authorization_url_not_white_label_safe',
+      safe_message: 'This authorization path is not approved for the AURA white-label runtime.',
       correlation_id: correlationId,
     });
   }

@@ -5,7 +5,8 @@
  * Fail-closed rules:
  *   - Session JWT required; roles and tenant resolved server-side.
  *   - The caller never supplies a URL, host, credential or gateway key.
- *   - authorizeManagedOperation() is the only gate; default is deny.
+ *   - authorizeManagedOperation() is the application authorization gate.
+ *   - Strict white-label policy must resolve an approved AURA-owned gateway.
  *   - Writes require an APPROVED, unexpired approval record.
  *   - Every attempt writes a managed_connector_invocations row with the
  *     decision, reason code and correlation ID. No credential is ever logged.
@@ -15,19 +16,27 @@ import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
 import { manifestEntry, operationFor } from '../_shared/managedConnectorManifest.ts';
 import { authorizeManagedOperation } from '../_shared/managedConnectorAuthz.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
+import {
+  managedConnectorGatewayPolicy,
+  strictWhiteLabelEnabled,
+  whiteLabelBlockedResponse,
+} from '../_shared/whiteLabelGateway.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
-const GATEWAY_BASE = 'https://connector-gateway.lovable.dev';
-
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
+}
+
+function gatewayToken(): string | null {
+  const auraToken = Deno.env.get('AURA_MANAGED_GATEWAY_TOKEN')?.trim();
+  if (auraToken) return auraToken;
+  if (!strictWhiteLabelEnabled()) return Deno.env.get('LOVABLE_API_KEY')?.trim() || null;
+  return null;
 }
 
 Deno.serve(async (req) => {
@@ -139,16 +148,23 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Managed credentials are resolved by the secure connector gateway. AURA
-  // never reads, stores or forwards a provider token.
-  const platformKey = Deno.env.get('LOVABLE_API_KEY');
+  const gateway = managedConnectorGatewayPolicy();
+  if (!gateway.runtimeAllowed || !gateway.gatewayBaseUrl) {
+    await record('BLOCKED', gateway.reason.toLowerCase(), tenantId);
+    return json(503, {
+      ...whiteLabelBlockedResponse(gateway.reason),
+      correlation_id: correlationId,
+    });
+  }
+
+  const platformKey = gatewayToken();
   const connectionKeyName = `${(entry!.gateway_connector_key ?? '').toUpperCase()}_API_KEY`;
   const connectionKey = connectionKeyName === '_API_KEY' ? undefined : Deno.env.get(connectionKeyName);
   if (!platformKey || !connectionKey) {
     await record('BLOCKED', 'managed_credential_unavailable', tenantId);
     return json(503, {
       error_code: 'managed_credential_unavailable',
-      safe_message: 'The platform-managed credential for this connector is not available to this environment.',
+      safe_message: 'The AURA-managed credential for this connector is not available to this environment.',
       correlation_id: correlationId,
     });
   }
@@ -162,7 +178,7 @@ Deno.serve(async (req) => {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), operation!.timeout_ms);
   try {
-    const upstream = await fetch(`${GATEWAY_BASE}/${entry!.gateway_connector_key}${path}`, {
+    const upstream = await fetch(`${gateway.gatewayBaseUrl}/${entry!.gateway_connector_key}${path}`, {
       method: operation!.classification === 'WRITE' ? 'POST' : 'GET',
       headers: {
         Authorization: `Bearer ${platformKey}`,

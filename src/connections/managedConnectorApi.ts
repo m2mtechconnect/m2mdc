@@ -1,15 +1,22 @@
 /**
  * Read access to the server-owned managed connector capability inventory.
- * The browser never receives a gateway key, credential name or token.
+ * The browser never receives a gateway URL, gateway key, credential name or token.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ManagedCapabilityEntry } from './managedConnectors';
 
+export interface ManagedWhiteLabelPolicy {
+  strict: boolean;
+  managed_gateway_ready: boolean;
+  reason: string;
+}
+
 export interface ManagedCapabilityResponse {
   correlation_id: string;
   tenant_id: string | null;
   caller_roles: string[];
+  white_label_policy?: ManagedWhiteLabelPolicy;
   entries: ManagedCapabilityEntry[];
 }
 
@@ -23,10 +30,18 @@ export function useManagedConnectorCapabilities() {
       // Defensive normalisation: a partial or mocked response must never
       // reach the UI with a missing `entries` array.
       const payload = data as Partial<ManagedCapabilityResponse>;
+      const policy = payload.white_label_policy;
       return {
         correlation_id: payload.correlation_id ?? '',
         tenant_id: payload.tenant_id ?? null,
         caller_roles: Array.isArray(payload.caller_roles) ? payload.caller_roles : [],
+        white_label_policy: policy && typeof policy === 'object'
+          ? {
+              strict: Boolean(policy.strict),
+              managed_gateway_ready: Boolean(policy.managed_gateway_ready),
+              reason: typeof policy.reason === 'string' ? policy.reason : '',
+            }
+          : undefined,
         entries: Array.isArray(payload.entries) ? payload.entries : [],
       };
     },
@@ -34,6 +49,7 @@ export function useManagedConnectorCapabilities() {
     retry: false,
   });
 }
+
 export interface ManagedInvocationRecord {
   id: string;
   connection_id: string | null;

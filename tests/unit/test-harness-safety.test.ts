@@ -15,7 +15,7 @@ function workflowJobBlocks(workflow: string): string[] {
   const jobsStart = workflow.indexOf('\njobs:\n');
   if (jobsStart < 0) return [];
   const jobs = workflow.slice(jobsStart + '\njobs:\n'.length);
-  const starts = [...jobs.matchAll(/^  [a-zA-Z0-9_-]+:\s*$/gm)].map((m) => m.index ?? 0);
+  const starts = [...jobs.matchAll(/^ {2}[a-zA-Z0-9_-]+:\s*$/gm)].map((m) => m.index ?? 0);
   return starts.map((start, index) => jobs.slice(start, starts[index + 1] ?? jobs.length));
 }
 

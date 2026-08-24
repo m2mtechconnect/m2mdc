@@ -17,6 +17,7 @@ import { DCArchitectureDiagram } from '@/components/dc-ui/DCArchitectureDiagram'
 import { SimulationPreviewModal } from '@/components/simulation/SimulationPreviewModal';
 import { BlueprintViewProvider } from '@/context/BlueprintViewContext';
 import { DesignViewHeader } from '@/components/blueprint/DesignViewHeader';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface AOCDesignTabProps {
   instance: DeployedSystem;

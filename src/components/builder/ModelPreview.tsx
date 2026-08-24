@@ -2,7 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Brain, ArrowRight, CheckCircle2, Zap, TrendingUp } from "lucide-react";
-import { models, ModelConfig } from "./ModelMarketplace";
+import { models } from "@/lib/llm/modelCatalog";
+import {
+  modelCapabilityDescription,
+  modelDisplayLabel,
+  providerDisplayLabel,
+} from "@/lib/llm/modelLabels";
 
 interface ModelPreviewProps {
   selectedModelId: string | null;
@@ -85,10 +90,12 @@ export function ModelPreview({
       <CardContent className="space-y-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <div className="font-semibold text-lg mb-1">{selectedModel.name}</div>
-            <div className="text-sm text-muted-foreground mb-2">{selectedModel.provider}</div>
+            <div className="font-semibold text-lg mb-1">{modelDisplayLabel(selectedModel.id)}</div>
+            <div className="text-sm text-muted-foreground mb-2">
+              {providerDisplayLabel(selectedModel.provider)}
+            </div>
             <p className="text-sm text-muted-foreground line-clamp-2">
-              {selectedModel.description}
+              {modelCapabilityDescription(selectedModel)}
             </p>
           </div>
           {getSpeedIcon(selectedModel.speed)}

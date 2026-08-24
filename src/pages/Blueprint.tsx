@@ -61,6 +61,7 @@ import { formatPower } from '@/workspace/facilityModel';
 import { normalizeLocation } from '@/lib/location/normalizeLocation';
 import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';
 import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
+import { stackDescription } from '@/config/auraStackManifest';
 
 /**
  * Static Tailwind class map. Interpolated classes (`bg-${color}/10`) are not
@@ -377,6 +378,13 @@ export default function Blueprint() {
                         />
                         <p className="mb-3 text-[13px] text-muted-foreground">
                           {t('blueprint.deploymentReadinessDesc')}
+                        </p>
+                        {/* Stack wording comes from the canonical manifest so
+                            Blueprint, Simulation and Evidence describe the
+                            same capabilities in the same words. */}
+                        <p className="mb-3 text-[13px] text-muted-foreground">
+                          {stackDescription('twin.openusd')} {stackDescription('simulation.engine')}{' '}
+                          {stackDescription('evidence.workspace')}
                         </p>
                         <InstrumentGrid>
                           <Instrument

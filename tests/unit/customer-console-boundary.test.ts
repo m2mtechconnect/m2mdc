@@ -4,25 +4,35 @@ import { describe, expect, it } from 'vitest';
 
 const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
 
-const listFunction = read('supabase/functions/organization-list/index.ts');
+const remediation = read('supabase/migrations/20260824003000_enterprise_audit_remediation.sql');
+const inviteFunction = read('supabase/functions/teams-invite/index.ts');
+const customers = read('src/pages/admin/Customers.tsx');
 const config = read('supabase/config.toml');
 const shell = read('src/AuthenticatedShell.tsx');
 const router = read('src/ApprovedUserRouter.tsx');
 const rbac = read('src/contexts/RBACContext.tsx');
 
 describe('platform customer console boundary', () => {
-  it('authorizes approved platform owner before constructing a service client', () => {
-    const approvalCheck = listFunction.indexOf("if (!profile?.is_approved)");
-    const ownerCheck = listFunction.indexOf("if (isPlatformOwner !== true)");
-    const serviceClient = listFunction.indexOf("const serviceClient = createClient");
-
-    expect(approvalCheck).toBeGreaterThanOrEqual(0);
-    expect(ownerCheck).toBeGreaterThan(approvalCheck);
-    expect(serviceClient).toBeGreaterThan(ownerCheck);
+  it('guards cross-tenant inventory inside the SECURITY DEFINER RPC', () => {
+    expect(remediation).toContain('CREATE OR REPLACE FUNCTION public.platform_list_organizations');
+    expect(remediation).toContain('SECURITY DEFINER');
+    expect(remediation).toContain('p.is_approved = true');
+    expect(remediation).toContain("public.user_has_role(v_user_id, 'owner', 'global')");
+    expect(remediation).toContain('v_page_size := LEAST');
   });
 
-  it('keeps the customer inventory behind JWT verification and a dedicated permission', () => {
-    expect(config).toContain('[functions.organization-list]\nverify_jwt = true');
+  it('uses the existing guarded teams-invite boundary for platform provisioning', () => {
+    expect(config).toContain('[functions.teams-invite]\nverify_jwt = true');
+    expect(config).not.toContain('[functions.organization-list]');
+    expect(config).not.toContain('[functions.organization-provision]');
+    expect(inviteFunction).toContain("mode === 'platform_provision'");
+    expect(inviteFunction).toContain("mode === 'platform_resend_owner'");
+    expect(inviteFunction).toContain("check_scope: 'global'");
+    expect(customers).toContain("mode: 'platform_provision'");
+    expect(customers).toContain("mode: 'platform_resend_owner'");
+  });
+
+  it('keeps the customer route behind its dedicated platform permission', () => {
     expect(shell).toContain('permission="platform.manage_customers"');
   });
 

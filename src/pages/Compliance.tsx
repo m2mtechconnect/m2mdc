@@ -41,8 +41,24 @@ import { MetricValue } from "@/components/provenance/MetricValue";
 import { notAssessedMetric } from "@/lib/provenance/kitMetrics";
 import { describeExportBlock } from "@/lib/provenance/exporters";
 import { staticMetric, demoMetric } from "@/lib/provenance";
+import { ProvenanceBadge } from "@/components/provenance/ProvenanceBadge";
+import type { ProvenanceMeta } from "@/lib/provenance/types";
 
-// DC-specific audit timeline
+/**
+ * DEMO FIXTURE — not a production audit record.
+ *
+ * These rows are a hardcoded illustration of the audit timeline layout. No
+ * audit-log table is queried for them, so every entry MUST render with the
+ * `demo` provenance qualifier below. Nothing here may be read as a factual
+ * production audit event.
+ */
+const AUDIT_TIMELINE_PROVENANCE: ProvenanceMeta = {
+  provenance: 'demo',
+  source: 'audit-timeline-demo-fixture',
+  connection: 'demo',
+  note: 'Illustrative layout fixture. No production audit-log record is queried for these entries.',
+};
+
 const auditTimeline = [
   {
     time: "09:41 AM",
@@ -396,9 +412,14 @@ export default function Compliance() {
                     <CardTitle className="flex items-center gap-2">
                       <Clock className="h-5 w-5" />
                       Audit Timeline
+                      <ProvenanceBadge meta={AUDIT_TIMELINE_PROVENANCE} compact />
                     </CardTitle>
                     <p className="text-sm text-muted-foreground">
                       Subsystem events, safety checks, and compliance actions
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Demo fixture. These entries illustrate the timeline layout only and are not
+                      production audit records.
                     </p>
                   </div>
                   <Button variant="outline" size="sm">
@@ -437,6 +458,7 @@ export default function Compliance() {
                               </div>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                  <ProvenanceBadge meta={AUDIT_TIMELINE_PROVENANCE} compact />
                                   <Badge variant="outline" className="text-xs">
                                     {event.eventType}
                                   </Badge>

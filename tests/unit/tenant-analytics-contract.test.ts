@@ -1,15 +1,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { sanitizeAnalyticsProperties } from '../../src/analytics/auraAnalytics';
+import { captureAuraEvent, sanitizeAnalyticsProperties } from '../../src/analytics/auraAnalytics';
 
 const source = fs.readFileSync(path.resolve(process.cwd(), 'src/analytics/auraAnalytics.ts'), 'utf8');
 
 describe('AURA tenant analytics contract', () => {
-  it('defaults analytics to disabled and supports only PostHog as an optional adapter', () => {
-    expect(source).toContain("VITE_AURA_ANALYTICS_PROVIDER ?? 'disabled'");
-    expect(source).toContain("raw === 'posthog' ? 'posthog' : 'disabled'");
-    expect(source).toContain("provider === 'disabled'");
+  it('defaults analytics to disabled and supports only an explicit PostHog adapter', async () => {
+    const result = await captureAuraEvent('tenant.organization_switched', { organizationId: 'org-1' });
+    expect(result).toEqual({ provider: 'disabled', status: 'disabled' });
+    expect(source).toContain("config.provider === 'posthog'");
+    expect(source).not.toContain('import.meta.env');
     expect(source).not.toContain('lovable.app');
     expect(source).not.toContain('lovable.dev');
   });
@@ -54,18 +55,20 @@ describe('AURA tenant analytics contract', () => {
     expect(sanitized).toEqual({ source: 'customer_console', count: 2, enabled: true });
   });
 
-  it('uses only public PostHog browser configuration and a pseudonymous session id', () => {
-    expect(source).toContain('VITE_POSTHOG_KEY');
-    expect(source).toContain('VITE_POSTHOG_HOST');
+  it('uses only caller-supplied public browser configuration and a pseudonymous session id', () => {
+    expect(source).toContain('posthogKey?: string');
+    expect(source).toContain('posthogHost?: string');
     expect(source).toContain('window.sessionStorage');
     expect(source).toContain('crypto.randomUUID()');
     expect(source).not.toContain('POSTHOG_PERSONAL_API_KEY');
     expect(source).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
   });
 
-  it('fails closed on insecure analytics hosts', () => {
-    expect(source).toContain("url.protocol !== 'https:'");
-    expect(source).toContain("url.hostname !== 'localhost'");
-    expect(source).toContain("url.hostname !== '127.0.0.1'");
+  it('accepts HTTPS and local HTTP only, and bounds browser delivery', () => {
+    expect(source).toContain("url.protocol === 'https:'");
+    expect(source).toContain("url.protocol === 'http:'");
+    expect(source).toContain("url.hostname === 'localhost'");
+    expect(source).toContain("url.hostname === '127.0.0.1'");
+    expect(source).toContain('AbortSignal.timeout(ANALYTICS_TIMEOUT_MS)');
   });
 });

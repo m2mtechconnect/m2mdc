@@ -25,6 +25,11 @@ verify_jwt = false
 [functions.public-intake]
 verify_jwt = true
 
+# Customer-visible AI configuration is authenticated both at the gateway and
+# inside the handler. The response is provider-neutral capability state only.
+[functions.ai-config]
+verify_jwt = true
+
 # NVIDIA operational-readiness Phase 2 - service-role attack surface closed.
 # `metrics-summary`, `ops-environments`, `ops-events`, `ops-ingest-health`,
 # `templates-seed` and `zapier-apps-sync` were orphaned service-role endpoints

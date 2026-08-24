@@ -7311,6 +7311,7 @@ export type Database = {
         }[]
       }
       set_active_org: { Args: { _org_id: string }; Returns: string }
+      storage_object_org_id: { Args: { _name: string }; Returns: string }
       store_secret_in_vault: {
         Args: { secret_name: string; secret_value: string }
         Returns: string

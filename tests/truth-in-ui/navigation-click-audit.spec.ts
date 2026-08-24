@@ -110,11 +110,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
-    const drawer = page.getByRole('dialog').first();
+    const drawer = page.locator('#mobile-nav-sheet');
     await expect(drawer).toBeVisible();
     await drawer.getByRole('link', { name: 'Simulation' }).first().click();
     await expectPath(page, '/simulation');
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(drawer).toBeHidden();
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });

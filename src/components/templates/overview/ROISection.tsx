@@ -46,31 +46,31 @@ export function ROISection({ headline, benefits, estimates }: ROISectionProps) {
   }
   
   return (
-    <Card className="p-6 bg-white border-[#E5E7EB]">
+    <Card className="p-6 bg-white border-border">
       <div className="flex items-center gap-2 mb-6">
         <TrendingUp className="h-6 w-6 text-[#F59E0B]" />
-        <h3 className="text-[20px] font-semibold text-[#111827]">Business Impact & ROI</h3>
+        <h3 className="text-[20px] font-semibold text-foreground">Business Impact & ROI</h3>
       </div>
       
       <div className="space-y-6">
         {/* ROI Headline */}
         {headline && (
-          <div className="p-4 bg-[#FFF7E6] border border-[#E5E7EB] rounded-lg">
-            <p className="text-[18px] font-medium text-[#111827]">{headline}</p>
+          <div className="p-4 bg-[#FFF7E6] border border-border rounded-lg">
+            <p className="text-[18px] font-medium text-foreground">{headline}</p>
           </div>
         )}
         
         {/* ROI Benefits */}
         {benefits && benefits.length > 0 && (
           <div className="space-y-3">
-            <h4 className="font-semibold text-[12px] uppercase tracking-wide text-[#6B7280]">
+            <h4 className="font-semibold text-[12px] uppercase tracking-wide text-muted-foreground">
               Key Benefits
             </h4>
             <div className="space-y-2">
               {benefits.map((benefit: string, idx: number) => (
-                <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-[#F9FAFB]">
+                <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-muted">
                   <Check className="h-5 w-5 text-[#16A34A] shrink-0 mt-0.5" />
-                  <p className="text-[14px] text-[#4B5563] leading-relaxed">{benefit}</p>
+                  <p className="text-[14px] text-muted-foreground leading-relaxed">{benefit}</p>
                 </div>
               ))}
             </div>
@@ -80,28 +80,28 @@ export function ROISection({ headline, benefits, estimates }: ROISectionProps) {
         {/* ROI Estimate Cards - Always show with industry defaults */}
         {displayEstimates.length > 0 && (
           <div className="space-y-3">
-            <h4 className="font-semibold text-[12px] uppercase tracking-wide text-[#6B7280]">
+            <h4 className="font-semibold text-[12px] uppercase tracking-wide text-muted-foreground">
               Industry-Benchmarked Impact Estimates
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {displayEstimates.map((estimate: ROIEstimate, idx: number) => (
-                <Card key={idx} className="p-4 bg-white border-[#E5E7EB] border-l-4 border-l-[#FDE68A] hover:border-[#F59E0B] transition-colors">
+                <Card key={idx} className="p-4 bg-white border-border border-l-4 border-l-[#FDE68A] hover:border-[#F59E0B] transition-colors">
                   <div className="space-y-2">
-                    <p className="text-[12px] text-[#6B7280]">{estimate.scenario}</p>
+                    <p className="text-[12px] text-muted-foreground">{estimate.scenario}</p>
                     <div className="flex items-baseline gap-2">
-                      <p className="text-[32px] font-bold text-[#111827]">
+                      <p className="text-[32px] font-bold text-foreground">
                         {estimate.estimated_annual_roi_pct}%
                       </p>
                       <ArrowUpRight className="h-4 w-4 text-[#F59E0B]" />
                     </div>
-                    <p className="text-[12px] font-medium text-[#111827]">Annual ROI</p>
+                    <p className="text-[12px] font-medium text-foreground">Annual ROI</p>
                     {estimate.estimated_savings && (
-                      <p className="text-[12px] text-[#6B7280] pt-2 border-t border-[#E5E7EB]">
+                      <p className="text-[12px] text-muted-foreground pt-2 border-t border-border">
                         Est. Savings: {estimate.estimated_savings}
                       </p>
                     )}
                     {estimate.time_frame && (
-                      <p className="text-xs text-[#9CA3AF]">
+                      <p className="text-xs text-muted-foreground">
                         Timeframe: {estimate.time_frame}
                       </p>
                     )}

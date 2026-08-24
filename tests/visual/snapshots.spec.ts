@@ -87,13 +87,40 @@ async function installBuilderVisualMock(context: BrowserContext) {
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
-  const dimensions = await page.evaluate(() => ({
-    innerWidth: window.innerWidth,
-    documentScrollWidth: document.documentElement.scrollWidth,
-    bodyScrollWidth: document.body.scrollWidth,
-  }));
-  expect(dimensions.documentScrollWidth, `document overflow: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.innerWidth);
-  expect(dimensions.bodyScrollWidth, `body overflow: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.innerWidth);
+  const dimensions = await page.evaluate(() => {
+    const innerWidth = window.innerWidth;
+    const offenders = Array.from(document.querySelectorAll<HTMLElement>('body *'))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          testId: element.dataset.testid ?? null,
+          className: typeof element.className === 'string' ? element.className.slice(0, 180) : '',
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          scrollWidth: element.scrollWidth,
+        };
+      })
+      .filter((item) => item.right > innerWidth + 1 || item.left < -1 || item.scrollWidth > innerWidth + 1)
+      .sort((a, b) => Math.max(b.right, b.scrollWidth) - Math.max(a.right, a.scrollWidth))
+      .slice(0, 12);
+
+    return {
+      innerWidth,
+      documentScrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+      offenders,
+    };
+  });
+  expect(
+    dimensions.documentScrollWidth,
+    `document overflow: ${JSON.stringify(dimensions)}`,
+  ).toBeLessThanOrEqual(dimensions.innerWidth);
+  expect(
+    dimensions.bodyScrollWidth,
+    `body overflow: ${JSON.stringify(dimensions)}`,
+  ).toBeLessThanOrEqual(dimensions.innerWidth);
 }
 
 async function expectPinnedMobileViewport(page: Page) {

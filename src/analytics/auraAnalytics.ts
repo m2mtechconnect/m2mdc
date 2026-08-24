@@ -11,6 +11,12 @@ export interface AuraAnalyticsEvent {
   properties?: Record<string, AuraAnalyticsPrimitive>;
 }
 
+export interface AuraAnalyticsConfig {
+  provider?: AuraAnalyticsProvider;
+  posthogKey?: string;
+  posthogHost?: string;
+}
+
 export interface AuraAnalyticsResult {
   provider: AuraAnalyticsProvider;
   status: 'disabled' | 'not_configured' | 'queued' | 'failed';
@@ -19,17 +25,19 @@ export interface AuraAnalyticsResult {
 const SENSITIVE_KEY_PATTERN = /(token|secret|password|authorization|credential|cookie|content|document|body|email|phone|address|api[_-]?key)/i;
 const RESERVED_PROPERTY_KEYS = new Set(['organization_id', 'distinct_id']);
 const SESSION_KEY = 'aura_analytics_distinct_id';
+const ANALYTICS_TIMEOUT_MS = 5_000;
 
-function configuredProvider(): AuraAnalyticsProvider {
-  const raw = (import.meta.env.VITE_AURA_ANALYTICS_PROVIDER ?? 'disabled').trim().toLowerCase();
-  return raw === 'posthog' ? 'posthog' : 'disabled';
+function configuredProvider(config: AuraAnalyticsConfig): AuraAnalyticsProvider {
+  return config.provider === 'posthog' ? 'posthog' : 'disabled';
 }
 
-function posthogHost(): string | null {
-  const raw = (import.meta.env.VITE_POSTHOG_HOST ?? 'https://us.i.posthog.com').trim();
+function posthogHost(config: AuraAnalyticsConfig): string | null {
+  const raw = (config.posthogHost ?? 'https://us.i.posthog.com').trim();
   try {
     const url = new URL(raw);
-    if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') return null;
+    const allowed = url.protocol === 'https:'
+      || (url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1'));
+    if (!allowed) return null;
     return url.toString().replace(/\/$/, '');
   } catch {
     return null;
@@ -62,15 +70,21 @@ function analyticsDistinctId(): string {
   }
 }
 
+/**
+ * Analytics is disabled unless the caller supplies an explicit public runtime
+ * configuration. This avoids hidden build-time browser environment dependencies
+ * and keeps private/white-label packaging provider-neutral.
+ */
 export async function captureAuraEvent(
   event: AuraAnalyticsEventName,
   context: AuraAnalyticsEvent,
+  config: AuraAnalyticsConfig = {},
 ): Promise<AuraAnalyticsResult> {
-  const provider = configuredProvider();
+  const provider = configuredProvider(config);
   if (provider === 'disabled') return { provider, status: 'disabled' };
 
-  const apiKey = (import.meta.env.VITE_POSTHOG_KEY ?? '').trim();
-  const host = posthogHost();
+  const apiKey = (config.posthogKey ?? '').trim();
+  const host = posthogHost(config);
   if (!apiKey || !host || !context.organizationId.trim()) {
     return { provider, status: 'not_configured' };
   }
@@ -91,6 +105,7 @@ export async function captureAuraEvent(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
       keepalive: true,
+      signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
     });
     return { provider, status: response.ok ? 'queued' : 'failed' };
   } catch {

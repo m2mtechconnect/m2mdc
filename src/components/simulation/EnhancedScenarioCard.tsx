@@ -89,13 +89,13 @@ export const EnhancedScenarioCard = memo(function EnhancedScenarioCard({
               <div className="min-w-0 flex-1">
                 <h4 className="font-semibold text-sm leading-tight truncate">{scenario.name}</h4>
                 {scenario.isCustom && (
-                  <Badge variant="outline" className="text-[10px] h-4 mt-1 shrink-0">
+                  <Badge variant="outline" className="text-xs h-4 mt-1 shrink-0">
                     <Sparkles className="h-2 w-2 mr-1" />Custom
                   </Badge>
                 )}
               </div>
             </div>
-            <Badge className={cn('text-[10px]', severity.badge)}>{scenario.severity}</Badge>
+            <Badge className={cn('text-xs', severity.badge)}>{scenario.severity}</Badge>
           </div>
           
           <p className="text-xs text-muted-foreground line-clamp-2">{scenario.description}</p>
@@ -104,7 +104,7 @@ export const EnhancedScenarioCard = memo(function EnhancedScenarioCard({
             {scenario.domainsInvolved.slice(0, 3).map((domain) => {
               const Icon = domainIcons[domain] || AlertTriangle;
               return (
-                <Badge key={domain} variant="outline" className={cn('text-[10px] gap-1', domainColors[domain])}>
+                <Badge key={domain} variant="outline" className={cn('text-xs gap-1', domainColors[domain])}>
                   <Icon className="h-2.5 w-2.5" />{domain}
                 </Badge>
               );

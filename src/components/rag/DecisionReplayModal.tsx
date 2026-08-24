@@ -44,7 +44,7 @@ export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalP
     {
       stage: "Reranking",
       icon: Brain,
-      content: "Gemini 1.5 Pro reranked to top 6 most relevant snippets",
+      content: "Managed AI reranked to top 6 most relevant snippets",
       metadata: { model: "gemini-1.5-pro", snippets: 6 },
       tooltip: "AI model scores and prioritizes the most relevant content",
     },

@@ -55,7 +55,7 @@ export function ScenarioControls() {
                 title={s.state === 'operational' ? s.question : s.reason}
               >
                 {s.label}
-                {s.state !== 'operational' && <span className="ml-2 text-[10px] uppercase">Planned</span>}
+                {s.state !== 'operational' && <span className="ml-2 text-xs uppercase">Planned</span>}
               </Button>
             );
           })}

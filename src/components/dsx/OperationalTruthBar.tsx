@@ -13,7 +13,7 @@ import { EVIDENCE_BETA_SITE } from '@/dsx/fixtures/evidenceBetaFacility';
 function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5 leading-tight">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
       <span className={cn('truncate text-xs font-medium text-foreground', mono && 'font-mono')}>{value}</span>
     </div>
   );
@@ -30,7 +30,7 @@ function Cluster({ label, children }: { label: string; children: React.ReactNode
 function Chip({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex min-w-0 flex-col items-start gap-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
       {children}
     </div>
   );
@@ -109,7 +109,7 @@ export function OperationalTruthBar() {
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-panel))] px-3 py-2 sm:px-4">
         {unassessable.length > 0 && (
           <span className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Coverage</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Coverage</span>
             <button
               type="button"
               data-testid="dsx-unassessable-domains"

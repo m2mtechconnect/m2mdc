@@ -166,7 +166,7 @@ export function EnhancedKPITile({
               <h4 className="text-sm font-semibold truncate">{label}</h4>
             </div>
             {scenario && (
-              <Badge variant="secondary" className="mt-1 text-[10px]">
+              <Badge variant="secondary" className="mt-1 text-xs">
                 {scenario}
               </Badge>
             )}

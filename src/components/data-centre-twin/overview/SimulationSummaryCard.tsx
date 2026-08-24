@@ -62,7 +62,7 @@ export function SimulationSummaryCard({
                 <Badge 
                   variant={isActive ? 'default' : 'outline'}
                   className={cn(
-                    'text-[10px] h-5',
+                    'text-xs h-5',
                     isActive && 'bg-success text-success-foreground animate-pulse',
                     isCompleted && 'bg-primary'
                   )}

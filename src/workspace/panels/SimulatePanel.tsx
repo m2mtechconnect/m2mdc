@@ -197,7 +197,7 @@ export function SimulatePanel({ facility }: Props) {
       <div className="rounded-md border border-border bg-muted/30 p-3" data-testid="simulation-draft-state">
         <div className="mb-1 flex items-center justify-between gap-2">
           <span className="text-xs font-medium text-foreground">Draft configuration</span>
-          <Badge variant="outline" className="text-[10px]">
+          <Badge variant="outline" className="text-xs">
             {run ? 'Last run available' : 'Run state: Not started'}
           </Badge>
         </div>
@@ -271,7 +271,7 @@ export function SimulatePanel({ facility }: Props) {
                   <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-1.5">
                       <span className="text-sm font-semibold text-foreground">{d.summary}</span>
-                      <Badge variant="outline" className="text-[10px]">SIMULATED</Badge>
+                      <Badge variant="outline" className="text-xs">SIMULATED</Badge>
                       {selected && <Check className="h-3.5 w-3.5 text-accent" aria-label="Selected" />}
                     </span>
                     <span className="mt-1 block text-xs text-muted-foreground [overflow-wrap:anywhere]">{d.id}</span>

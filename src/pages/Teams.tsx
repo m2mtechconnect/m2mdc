@@ -42,7 +42,7 @@ import RoleBreakdownSection from "@/components/teams/RoleBreakdownSection";
 import ActivityFeed from "@/components/teams/ActivityFeed";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast as sonnerToast } from "sonner";
-import { useUserPermissions } from "@/hooks/useUserPermissions";
+import { useRBAC } from "@/contexts/RBACContext";
 
 const roleIcons: Record<string, any> = {
   executive: Crown,
@@ -79,8 +79,8 @@ export default function Teams() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("members");
   const [approvalFilter, setApprovalFilter] = useState<'pending' | 'approved' | 'all'>('pending');
-  const { hasRole } = useUserPermissions();
-  const isAdmin = hasRole('admin');
+  const { authorization } = useRBAC();
+  const isAdmin = authorization.roles.includes('admin');
   
   // Filters
   const [searchQuery, setSearchQuery] = useState("");

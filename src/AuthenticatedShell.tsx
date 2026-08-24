@@ -142,7 +142,11 @@ function ApprovedUserRoutes() {
       <Route path="/sign-out" element={<SignOut />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
       <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
+      {/* Demo-only intake surface. Not a supported production feature, so it is
+          reachable in development builds only. */}
+      {import.meta.env.DEV && (
+        <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
+      )}
 
       {ROUTE_ALIASES.map((alias) => (
         <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />

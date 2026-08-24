@@ -64,7 +64,7 @@ function KPITile({
             {value}{unit}
           </span>
           {delta !== undefined && (
-            <Badge variant="outline" className={`text-[10px] ${delta >= 0 ? 'text-success' : 'text-destructive'}`}>
+            <Badge variant="outline" className={`text-xs ${delta >= 0 ? 'text-success' : 'text-destructive'}`}>
               {delta >= 0 ? '+' : ''}{delta}%
             </Badge>
           )}

@@ -20,6 +20,7 @@ import {
 import { formatDate, formatRelativeTime } from '@/lib/formatters';
 import { useNavigate } from 'react-router-dom';
 import type { DeployedSystem } from '@/types/system';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface SystemConfigTabsProps {
   system: DeployedSystem;
@@ -118,7 +119,7 @@ export function SystemConfigTabs({ system, onEdit }: SystemConfigTabsProps) {
               <div className="flex justify-between items-center p-3 rounded-md bg-muted/50">
                 <span className="text-sm text-muted-foreground">Model</span>
                 <Badge variant="outline" className="font-mono">
-                  {system.intelligence?.modelId || 'Gemini 2.5 Flash'}
+                  {modelDisplayLabel(system.intelligence?.modelId)}
                 </Badge>
               </div>
               <div className="flex justify-between items-center p-3 rounded-md bg-muted/50">

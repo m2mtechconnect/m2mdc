@@ -93,19 +93,19 @@ const EventItem = memo(function EventItem({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <Badge variant="outline" className={cn('text-[10px]', severity.text, severity.border)}>
+          <Badge variant="outline" className={cn('text-xs', severity.text, severity.border)}>
             {event.domain}
           </Badge>
           <Badge 
             variant="outline" 
             className={cn(
-              'text-[10px]',
+              'text-xs',
               event.severity === 'critical' && 'text-destructive border-destructive/30'
             )}
           >
             {event.severity}
           </Badge>
-          <span className="text-[10px] text-muted-foreground font-mono ml-auto">
+          <span className="text-xs text-muted-foreground font-mono ml-auto">
             {formatTimestamp(event.timestamp)}
           </span>
         </div>
@@ -170,7 +170,7 @@ export const ClickableEventTimeline = memo(function ClickableEventTimeline({
           </CardTitle>
           <div className="flex items-center gap-2">
             {isRunning && (
-              <Badge variant="outline" className="text-[10px] text-success border-success/30 animate-pulse">
+              <Badge variant="outline" className="text-xs text-success border-success/30 animate-pulse">
                 <span className="relative flex h-2 w-2 mr-1">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
@@ -178,7 +178,7 @@ export const ClickableEventTimeline = memo(function ClickableEventTimeline({
                 LIVE
               </Badge>
             )}
-            <Badge variant="secondary" className="text-[10px]">
+            <Badge variant="secondary" className="text-xs">
               {events.length} events
             </Badge>
           </div>
@@ -213,7 +213,7 @@ export const ClickableEventTimeline = memo(function ClickableEventTimeline({
         {/* Timeline scrubber hint */}
         {events.length > 0 && !isRunning && (
           <div className="mt-3 pt-3 border-t border-border text-center">
-            <p className="text-[10px] text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               Click any event to view details • Use "Jump to moment" to seek
             </p>
           </div>

@@ -50,13 +50,13 @@ export function CompactAlertsPanel({
       {/* Quick Summary */}
       <div className="flex items-center gap-2 mb-3">
         {criticalAlerts.length > 0 && (
-          <Badge variant="destructive" className="gap-1 text-[10px]">
+          <Badge variant="destructive" className="gap-1 text-xs">
             <XCircle className="h-2.5 w-2.5" />
             {criticalAlerts.length} Critical
           </Badge>
         )}
         {warningAlerts.length > 0 && (
-          <Badge className="bg-warning/10 text-warning border-warning/30 gap-1 text-[10px]">
+          <Badge className="bg-warning/10 text-warning border-warning/30 gap-1 text-xs">
             <AlertTriangle className="h-2.5 w-2.5" />
             {warningAlerts.length} Warning
           </Badge>
@@ -76,7 +76,7 @@ export function CompactAlertsPanel({
             <CheckCircle className="h-5 w-5 text-success" />
           </div>
           <p className="text-xs font-medium">No active alerts</p>
-          <p className="text-[10px]">All systems operating normally</p>
+          <p className="text-xs">All systems operating normally</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -96,7 +96,7 @@ export function CompactAlertsPanel({
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-medium truncate">{alert.title}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 font-mono">
+                  <span className="text-xs text-muted-foreground flex items-center gap-0.5 font-mono">
                     <Clock className="h-2.5 w-2.5" />
                     {formatTimeAgo(alert.triggeredAt)}
                   </span>
@@ -105,7 +105,7 @@ export function CompactAlertsPanel({
               <Button
                 variant="ghost"
                 size="sm"
-                className="shrink-0 h-6 px-2 text-[10px]"
+                className="shrink-0 h-6 px-2 text-xs"
                 onClick={(e) => { e.stopPropagation(); onAcknowledge?.(alert.id); }}
               >
                 Ack

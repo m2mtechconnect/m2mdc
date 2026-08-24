@@ -164,7 +164,7 @@ const UPSSparkline = memo(function UPSSparkline({
         )}
       </svg>
       {hasSpike && (
-        <Badge variant="outline" className="absolute -top-2 -right-2 text-[9px] bg-warning/10 text-warning border-warning/30">
+        <Badge variant="outline" className="absolute -top-2 -right-2 text-xs bg-warning/10 text-warning border-warning/30">
           Spike
         </Badge>
       )}
@@ -327,7 +327,7 @@ export const LiveSimulationDashboard = memo(function LiveSimulationDashboard({
                 </CardHeader>
                 <CardContent className="pt-0">
                   <ThermalHeatmapPreview rackMetrics={rackMetrics} />
-                  <div className="flex items-center justify-between mt-2 text-[10px]">
+                  <div className="flex items-center justify-between mt-2 text-xs">
                     <div className="flex items-center gap-1">
                       <div className="w-2 h-2 rounded bg-success" />
                       <span className="text-muted-foreground">&lt;24°C</span>

@@ -123,7 +123,7 @@ export function EnhancedEventLogPanel({
       critical: 'bg-red-500/20 text-red-600 animate-pulse'
     };
     return (
-      <Badge variant="outline" className={cn('text-[10px] ml-2', colors[severity as keyof typeof colors])}>
+      <Badge variant="outline" className={cn('text-xs ml-2', colors[severity as keyof typeof colors])}>
         {severity.toUpperCase()}
       </Badge>
     );
@@ -191,7 +191,7 @@ export function EnhancedEventLogPanel({
                           <span className="text-xs font-mono text-muted-foreground">
                             [{event.timestamp}]
                           </span>
-                          <Badge variant="outline" className="text-[10px] uppercase">
+                          <Badge variant="outline" className="text-xs uppercase">
                             {config.label}
                           </Badge>
                           {getSeverityBadge(event.severity)}
@@ -211,7 +211,7 @@ export function EnhancedEventLogPanel({
                                 key={i} 
                                 variant="secondary" 
                                 className={cn(
-                                  "text-[10px]",
+                                  "text-xs",
                                   impact.delta > 0 ? "bg-green-500/20 text-green-600" : "bg-red-500/20 text-red-600"
                                 )}
                               >
@@ -223,7 +223,7 @@ export function EnhancedEventLogPanel({
                         
                         {/* Metadata */}
                         {event.metadata && Object.keys(event.metadata).length > 0 && (
-                          <div className="mt-2 text-[10px] text-muted-foreground font-mono bg-muted/50 p-2 rounded">
+                          <div className="mt-2 text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded">
                             {Object.entries(event.metadata).map(([key, value]) => (
                               <div key={key}>
                                 <span className="text-muted-foreground">{key}:</span>{' '}

@@ -59,21 +59,21 @@ export function BlueprintSnapshotCard({ twinId = 'default', onOpenFullBlueprint 
               <Bot className="h-3 w-3 text-muted-foreground" />
             </div>
             <p className="text-lg font-bold">{summary.totalAgents}</p>
-            <p className="text-[10px] text-muted-foreground">Agents</p>
+            <p className="text-xs text-muted-foreground">Agents</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Activity className="h-3 w-3 text-muted-foreground" />
             </div>
             <p className="text-lg font-bold">{summary.totalKpis}</p>
-            <p className="text-[10px] text-muted-foreground">KPIs</p>
+            <p className="text-xs text-muted-foreground">KPIs</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/50">
             <div className="flex items-center justify-center gap-1 mb-1">
               <GitBranch className="h-3 w-3 text-muted-foreground" />
             </div>
             <p className="text-lg font-bold">{summary.totalWorkflows}</p>
-            <p className="text-[10px] text-muted-foreground">Workflows</p>
+            <p className="text-xs text-muted-foreground">Workflows</p>
           </div>
         </div>
 

@@ -54,7 +54,7 @@ export const HealthBadges = () => {
           <TooltipTrigger>
             <Badge variant="outline" className={`gap-1 ${getStatusColor(health.gemini.status)}`}>
               {getStatusIcon(health.gemini.status)}
-              Gemini
+              Managed AI
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
@@ -66,7 +66,7 @@ export const HealthBadges = () => {
           <TooltipTrigger>
             <Badge variant="outline" className={`gap-1 ${getStatusColor(health.vertex.status)}`}>
               {getStatusIcon(health.vertex.status)}
-              Vertex
+              Grounding Search
             </Badge>
           </TooltipTrigger>
           <TooltipContent>

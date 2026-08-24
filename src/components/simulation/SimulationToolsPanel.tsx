@@ -150,7 +150,7 @@ export const SimulationToolsPanel = memo(function SimulationToolsPanel({
                     </div>
                     <Badge 
                       variant="outline" 
-                      className={cn('text-[10px] gap-0.5', status.className)}
+                      className={cn('text-xs gap-0.5', status.className)}
                     >
                       {status.icon}
                       {status.label}
@@ -170,7 +170,7 @@ export const SimulationToolsPanel = memo(function SimulationToolsPanel({
                       <Badge 
                         key={tag} 
                         variant="outline" 
-                        className="text-[9px] h-4 px-1.5 bg-muted/50"
+                        className="text-xs h-4 px-1.5 bg-muted/50"
                       >
                         {tag}
                       </Badge>
@@ -178,7 +178,7 @@ export const SimulationToolsPanel = memo(function SimulationToolsPanel({
                   </div>
                   
                   <div className="flex items-center justify-between pt-2 border-t border-border">
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {tool.subtitle}
                     </span>
                     <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />

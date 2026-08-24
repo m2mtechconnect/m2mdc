@@ -97,7 +97,7 @@ export function ChangeLogPanel({ className }: { className?: string }) {
             <History className="h-4 w-4" />
             Change Log
             {changeLog.length > 0 && (
-              <Badge variant="secondary" className="text-[10px]">
+              <Badge variant="secondary" className="text-xs">
                 {changeLog.length} changes
               </Badge>
             )}
@@ -154,7 +154,7 @@ export function ChangeLogPanel({ className }: { className?: string }) {
                             <p className="text-sm font-medium">{entry.title}</p>
                             <p className="text-xs text-muted-foreground">{entry.description}</p>
                             {entry.domain && (
-                              <Badge variant="outline" className="text-[9px] mt-1">
+                              <Badge variant="outline" className="text-xs mt-1">
                                 {entry.domain}
                               </Badge>
                             )}
@@ -193,7 +193,7 @@ export function ChangeLogPanel({ className }: { className?: string }) {
                         )}
 
                         {/* Timestamp */}
-                        <p className="text-[10px] text-muted-foreground mt-1">
+                        <p className="text-xs text-muted-foreground mt-1">
                           {formatDistanceToNow(new Date(entry.timestamp), { addSuffix: true })}
                           {entry.user && entry.user !== 'system' && ` by ${entry.user}`}
                         </p>

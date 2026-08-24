@@ -437,7 +437,7 @@ export function StandardCard({
                       <Button 
                         variant="default" 
                         size="sm" 
-                        className="flex-1 bg-[#FFD700] hover:bg-[#FFC700] text-black font-semibold"
+                        className="flex-1 bg-primary hover:bg-primary text-black font-semibold"
                         onClick={onUseTemplate}
                       >
                         Use Template

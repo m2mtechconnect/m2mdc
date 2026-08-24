@@ -95,19 +95,17 @@ export default function Settings() {
       const isExec = roleData?.role === 'executive';
       setIsAdmin(isExec);
 
-      // Load user's profile to get org_id
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('org_id')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Resolve the tenant through the canonical server authority
+      // (active_org_id() over org_memberships). No active org means fail closed.
+      const { data: activeOrgId } = await supabase.rpc('active_org_id');
+      const resolvedOrgId = typeof activeOrgId === 'string' && activeOrgId.length > 0 ? activeOrgId : null;
 
-      if (profileData?.org_id) {
+      if (resolvedOrgId) {
         // Load organization data
         const { data: orgData, error } = await supabase
           .from('organizations')
           .select('*')
-          .eq('id', profileData.org_id)
+          .eq('id', resolvedOrgId)
           .maybeSingle();
 
         if (error && error.code !== 'PGRST116') {

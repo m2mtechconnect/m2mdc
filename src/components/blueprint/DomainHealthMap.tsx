@@ -240,7 +240,7 @@ export function DomainHealthMap({ className }: { className?: string }) {
                         </div>
                         <div className="min-w-0 w-full">
                           <p className="text-xs font-medium leading-tight break-words group-hover:text-foreground transition-colors">{domain.name}</p>
-                          <p className={cn('text-[10px] font-medium', styles.text)}>{styles.label}</p>
+                          <p className={cn('text-xs font-medium', styles.text)}>{styles.label}</p>
                         </div>
                       </div>
                       
@@ -260,8 +260,8 @@ export function DomainHealthMap({ className }: { className?: string }) {
                         {domain.metric}: <span className="font-medium text-foreground">{domain.value}</span>
                       </p>
                       <div className="flex gap-2 text-xs">
-                        <Badge variant="outline" className="text-[10px]">{domain.agentCount} agents</Badge>
-                        <Badge variant="outline" className="text-[10px]">{domain.kpiCount} KPIs</Badge>
+                        <Badge variant="outline" className="text-xs">{domain.agentCount} agents</Badge>
+                        <Badge variant="outline" className="text-xs">{domain.kpiCount} KPIs</Badge>
                       </div>
                     </div>
                   </TooltipContent>
@@ -275,19 +275,19 @@ export function DomainHealthMap({ className }: { className?: string }) {
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mt-4 pt-3 border-t">
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-success" />
-            <span className="text-[10px] text-muted-foreground">Healthy</span>
+            <span className="text-xs text-muted-foreground">Healthy</span>
           </div>
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-warning" />
-            <span className="text-[10px] text-muted-foreground">Degraded</span>
+            <span className="text-xs text-muted-foreground">Degraded</span>
           </div>
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-destructive" />
-            <span className="text-[10px] text-muted-foreground">Critical</span>
+            <span className="text-xs text-muted-foreground">Critical</span>
           </div>
           <div className="flex items-center gap-1.5 whitespace-nowrap">
             <div className="w-2 h-2 rounded-full bg-muted-foreground" />
-            <span className="text-[10px] text-muted-foreground">No Data</span>
+            <span className="text-xs text-muted-foreground">No Data</span>
           </div>
         </div>
       </CardContent>

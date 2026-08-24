@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilderSelectionStore } from '@/stores/builderSelectionStore';
 import { normalizeIndustryAgent } from '@/lib/marketplaceNormalizer';
 import { UnifiedAgentPreview } from '@/components/agent-preview/UnifiedAgentPreview';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface IndustryAgentPreviewModalProps {
   agent: any;
@@ -52,7 +53,7 @@ export function IndustryAgentPreviewModal({ agent, open, onOpenChange, onConnect
             onDeploy={handleUseInBuilder}
             mode="preview"
             description={agent.short_description || agent.description}
-            llmModel={agent.model_stack?.primary_model || "Gemini 2.5 Flash"}
+            llmModel={modelDisplayLabel(agent.model_stack?.primary_model)}
             llmProvider={agent.model_stack?.provider || "Google"}
             temperature={agent.model_stack?.temperature || 0.7}
             mcpServers={agent.dependencies?.map((dep: string) => ({
@@ -79,7 +80,7 @@ export function IndustryAgentPreviewModal({ agent, open, onOpenChange, onConnect
             ]}
             compatibility={{
               mcpEnabled: true,
-              llmCompatible: ['Gemini', 'OpenAI'],
+              llmCompatible: ['Managed AI'],
               cloudReady: true,
               enterpriseSecure: true,
             }}

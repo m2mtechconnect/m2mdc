@@ -115,7 +115,7 @@ export function ScenarioContextSidebar({
                   <Badge 
                     key={domain} 
                     variant="outline" 
-                    className="text-[10px] gap-1 capitalize"
+                    className="text-xs gap-1 capitalize"
                   >
                     <Icon className="h-2.5 w-2.5" />
                     {domain.replace(/_/g, ' ')}
@@ -167,7 +167,7 @@ export function ScenarioContextSidebar({
                     <div
                       key={item.metric}
                       className={cn(
-                        'flex items-center justify-between text-[10px] py-1 px-2 rounded',
+                        'flex items-center justify-between text-xs py-1 px-2 rounded',
                         item.withinRange ? 'bg-success/10' : 'bg-warning/10'
                       )}
                     >

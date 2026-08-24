@@ -140,7 +140,7 @@ function RackGrid({
           className={`p-2 rounded-lg border transition-all hover:scale-105 ${statusColors[rack.status] || statusColors.normal}`}
         >
           <div className="text-xs font-medium text-card-foreground">{rack.name}</div>
-          <div className="text-[10px] text-muted-foreground">{rack.powerKw.toFixed(1)} kW</div>
+          <div className="text-xs text-muted-foreground">{rack.powerKw.toFixed(1)} kW</div>
         </button>
       ))}
     </div>
@@ -363,7 +363,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
             <FileText className="h-4 w-4" />
             Blueprint
             {summary && (
-              <Badge variant="secondary" className="text-[10px] h-4 px-1">
+              <Badge variant="secondary" className="text-xs h-4 px-1">
                 {summary.totalAgents} agents
               </Badge>
             )}
@@ -391,7 +391,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="relative">
           {isSimulating && (
-            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-xs bg-primary animate-pulse">
               SIM
             </Badge>
           )}
@@ -406,7 +406,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
         </div>
         <div className="relative">
           {isSimulating && (
-            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-xs bg-primary animate-pulse">
               SIM
             </Badge>
           )}
@@ -421,7 +421,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
         </div>
         <div className="relative">
           {isSimulating && (
-            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-xs bg-primary animate-pulse">
               SIM
             </Badge>
           )}
@@ -436,7 +436,7 @@ export function DataCentreDashboard({ facility, twinId = 'default', initialTab, 
         </div>
         <div className="relative">
           {isSimulating && (
-            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-[10px] bg-primary animate-pulse">
+            <Badge variant="default" className="absolute -top-2 -right-2 z-10 text-xs bg-primary animate-pulse">
               SIM
             </Badge>
           )}

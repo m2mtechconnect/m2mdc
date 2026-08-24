@@ -135,10 +135,10 @@ const EventItem = memo(function EventItem({
             <span className="text-sm font-medium truncate text-card-foreground">{event.title}</span>
           </div>
           <div className="flex items-center gap-1.5 flex-shrink-0">
-            <Badge variant="outline" className={cn('text-[10px] h-5', eventType.color)}>
+            <Badge variant="outline" className={cn('text-xs h-5', eventType.color)}>
               {eventType.label}
             </Badge>
-            <Badge variant="outline" className="text-[10px] h-5 font-mono">
+            <Badge variant="outline" className="text-xs h-5 font-mono">
               <Clock className="h-2.5 w-2.5 mr-1" />
               {formatTimestamp(event.timestamp)}
             </Badge>
@@ -154,17 +154,17 @@ const EventItem = memo(function EventItem({
         {(event.affectedRacks || event.affectedZones || event.affectedClusters) && (
           <div className="flex flex-wrap gap-1 pt-1">
             {event.affectedRacks?.slice(0, 3).map((rack) => (
-              <Badge key={rack} variant="outline" className="text-[10px] h-4">
+              <Badge key={rack} variant="outline" className="text-xs h-4">
                 {rack}
               </Badge>
             ))}
             {event.affectedZones?.slice(0, 2).map((zone) => (
-              <Badge key={zone} variant="outline" className="text-[10px] h-4">
+              <Badge key={zone} variant="outline" className="text-xs h-4">
                 {zone}
               </Badge>
             ))}
             {event.affectedClusters?.slice(0, 2).map((cluster) => (
-              <Badge key={cluster} variant="outline" className="text-[10px] h-4">
+              <Badge key={cluster} variant="outline" className="text-xs h-4">
                 {cluster}
               </Badge>
             ))}
@@ -216,7 +216,7 @@ export const DCEventTimeline = memo(function DCEventTimeline({
             <Clock className="h-4 w-4 text-primary" />
             Event Timeline
           </CardTitle>
-          <Badge variant="outline" className="text-[10px]">
+          <Badge variant="outline" className="text-xs">
             {events.length} events
           </Badge>
         </div>

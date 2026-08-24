@@ -19,12 +19,18 @@ import { toast } from "sonner";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
 
-const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
+const DEFAULT_SYSTEM_PROMPT = `You are AURA Assistant inside an enterprise control center.
 Be concise and business-ready.
 Always cite sources when grounding is enabled.
 If you are unsure, say so and suggest a next step.
 Respect user role (Executive | Manager | Engineer).
 Never expose secrets or internal IDs.`;
+
+const RESIDENCY_LABELS: Record<string, string> = {
+  'northamerica-northeast1': 'Canada',
+  'us-central1': 'United States',
+  'europe-west1': 'Europe',
+};
 
 interface HealthStatus {
   gemini: { status: 'ok' | 'error'; latency?: number; error?: string };
@@ -215,7 +221,7 @@ function AISettingsPage() {
         >
           <div className="grid gap-6">
             <div className="space-y-2">
-              <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
+              <Label htmlFor="ai-project-id">Managed AI Workspace ID</Label>
               <Input 
                 id="ai-project-id"
                 value={projectId}
@@ -223,7 +229,7 @@ function AISettingsPage() {
                   setProjectId(e.target.value);
                   if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
                 }}
-                placeholder="your-project-id"
+                placeholder="your-workspace-id"
                 aria-invalid={!!fieldErrors.projectId}
                 aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
               />
@@ -235,28 +241,28 @@ function AISettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Region</Label>
+              <Label>Data residency</Label>
               <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger aria-label="Region">
+                <SelectTrigger aria-label="Data residency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="northamerica-northeast1">🇨🇦 northamerica-northeast1 (Montreal)</SelectItem>
-                  <SelectItem value="us-central1">🇺🇸 us-central1 (Iowa)</SelectItem>
-                  <SelectItem value="europe-west1">🇪🇺 europe-west1 (Belgium)</SelectItem>
+                  <SelectItem value="northamerica-northeast1">Canada</SelectItem>
+                  <SelectItem value="us-central1">United States</SelectItem>
+                  <SelectItem value="europe-west1">Europe</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Model</Label>
+              <Label>Response profile</Label>
               <Select value={model} onValueChange={setModel}>
-                <SelectTrigger aria-label="Model">
+                <SelectTrigger aria-label="Response profile">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="gemini-1.5-pro">gemini-1.5-pro (Recommended)</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">gemini-1.5-flash (Faster)</SelectItem>
+                  <SelectItem value="gemini-1.5-pro">Balanced (recommended)</SelectItem>
+                  <SelectItem value="gemini-1.5-flash">Fast</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -264,19 +270,19 @@ function AISettingsPage() {
         </DCCard>
 
         <DCCard
-          title="Vertex AI search and grounding"
+          title="Grounding search"
           icon={<Database className="h-5 w-5 text-primary" />}
           status="info"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="space-y-0.5">
               <Label>Enable Grounding</Label>
-              <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
+              <p className="text-xs text-muted-foreground">Connect to your approved grounding search index</p>
             </div>
             <Switch
               checked={groundingEnabled}
               onCheckedChange={setGroundingEnabled}
-              aria-label="Enable grounding against Vertex AI Search"
+              aria-label="Enable grounding search"
             />
           </div>
 
@@ -407,7 +413,7 @@ function AISettingsPage() {
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
                   <div>
-                    <p className="font-medium">Gemini API</p>
+                    <p className="font-medium">Managed AI</p>
                     {healthStatus.gemini.error && (
                       <p className="text-xs text-red-500">{healthStatus.gemini.error}</p>
                     )}
@@ -427,7 +433,7 @@ function AISettingsPage() {
                       <XCircle className="h-5 w-5 text-red-500" />
                     )}
                     <div>
-                      <p className="font-medium">Vertex AI Search</p>
+                      <p className="font-medium">Grounding Search</p>
                       {healthStatus.vertexSearch.error && (
                         <p className="text-xs text-red-500">{healthStatus.vertexSearch.error}</p>
                       )}
@@ -440,8 +446,8 @@ function AISettingsPage() {
               )}
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <p className="font-medium">Region</p>
-                <Badge variant="secondary">{healthStatus.region}</Badge>
+                <p className="font-medium">Data residency</p>
+                <Badge variant="secondary">{RESIDENCY_LABELS[healthStatus.region] ?? healthStatus.region}</Badge>
               </div>
             </div>
           </DCCard>

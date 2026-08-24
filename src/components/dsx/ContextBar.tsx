@@ -19,7 +19,7 @@ export function ContextBar() {
       aria-label="Investigation context"
       className="v2-mono flex flex-wrap items-center gap-2 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas))] px-3 py-1.5 sm:px-4"
     >
-      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+      <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
         Context
       </span>
 

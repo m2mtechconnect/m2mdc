@@ -344,8 +344,8 @@ export function DCStep3Integrations() {
                   <SelectValue placeholder="Select provider" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="google">Google (Gemini)</SelectItem>
-                  <SelectItem value="openai">OpenAI (GPT)</SelectItem>
+                  <SelectItem value="google">Managed AI (primary)</SelectItem>
+                  <SelectItem value="openai">Managed AI (alternate)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -359,10 +359,10 @@ export function DCStep3Integrations() {
                   <SelectValue placeholder="Select model" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash</SelectItem>
-                  <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                  <SelectItem value="google/gemini-3-pro-preview">Gemini 3 Pro Preview</SelectItem>
-                  <SelectItem value="openai/gpt-5-mini">GPT-5 Mini</SelectItem>
+                  <SelectItem value="google/gemini-2.5-flash">Fast</SelectItem>
+                  <SelectItem value="google/gemini-2.5-pro">Balanced</SelectItem>
+                  <SelectItem value="google/gemini-3-pro-preview">Advanced (preview)</SelectItem>
+                  <SelectItem value="openai/gpt-5-mini">Fast (alternate)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

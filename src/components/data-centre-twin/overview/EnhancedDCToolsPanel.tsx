@@ -119,7 +119,7 @@ export function EnhancedDCToolsPanel({ twinId, onOpenTool }: EnhancedDCToolsPane
                   <div className={cn('p-2 rounded-lg bg-muted/50', tool.color)}>
                     {tool.icon}
                   </div>
-                  <Badge variant="outline" className={cn('text-[10px] gap-0.5', status.className)}>
+                  <Badge variant="outline" className={cn('text-xs gap-0.5', status.className)}>
                     {status.icon}
                   </Badge>
                 </div>
@@ -132,7 +132,7 @@ export function EnhancedDCToolsPanel({ twinId, onOpenTool }: EnhancedDCToolsPane
                 </div>
                 
                 <div className="flex items-center justify-between">
-                  <div className="text-[10px]">
+                  <div className="text-xs">
                     <span className={cn('font-medium', status.className.split(' ').find(c => c.startsWith('text-')))}>
                       {tool.statusLabel}
                     </span>

@@ -228,7 +228,7 @@ export function ScenarioEnhancementsPanel({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-medium text-sm">{scenario.name}</span>
-                      <Badge className={cn("text-[10px] h-4", COMPLEXITY_CONFIG[scenario.complexity].color)}>
+                      <Badge className={cn("text-xs h-4", COMPLEXITY_CONFIG[scenario.complexity].color)}>
                         {COMPLEXITY_CONFIG[scenario.complexity].label}
                       </Badge>
                     </div>
@@ -248,7 +248,7 @@ export function ScenarioEnhancementsPanel({
                           key={i}
                           variant="outline"
                           className={cn(
-                            "text-[10px] h-4",
+                            "text-xs h-4",
                             delta.delta > 0 ? "text-destructive" : "text-success"
                           )}
                         >

@@ -33,7 +33,7 @@ export function AgentToolsTab() {
       <Card>
         <CardHeader className="pb-2">
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle className="text-base">Agent tools — not implemented</CardTitle>
+            <CardTitle className="text-base">Agent tools: not available</CardTitle>
             <Badge variant="outline" className="text-xs">Not implemented</Badge>
           </div>
           <CardDescription className="text-sm">

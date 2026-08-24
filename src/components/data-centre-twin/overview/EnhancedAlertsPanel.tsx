@@ -166,7 +166,7 @@ export function EnhancedAlertsPanel({ alerts, onAcknowledge, onViewRCA }: Enhanc
                             {alert.description}
                           </p>
                           <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 font-mono">
+                            <span className="text-xs text-muted-foreground flex items-center gap-1 font-mono">
                               <Clock className="h-2.5 w-2.5" />
                               {formatTimeAgo(alert.triggeredAt)}
                             </span>

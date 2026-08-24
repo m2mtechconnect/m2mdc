@@ -79,7 +79,7 @@ export function toPrintHtml(payload: ExportPayload): string {
    <dt>Calculation timestamp</dt><dd data-field="calculation-timestamp">${esc(os.calculationTimestamp ?? 'Unavailable')}</dd>
    <dt>Source / generator</dt><dd data-field="source-generator">${esc(os.sourceGenerator)}</dd>
    <dt>Human review status</dt><dd data-field="human-review">${esc(os.humanReviewStatus)}</dd>
-   <dt>NVIDIA runtime used</dt><dd data-field="nvidia-runtime-used">${esc(os.nvidiaRuntimeUsed)}</dd>
+   <dt>Accelerated runtime used</dt><dd data-field="nvidia-runtime-used">${esc(os.nvidiaRuntimeUsed)}</dd>
    <dt>Live facility data used</dt><dd data-field="live-facility-data-used">${esc(os.liveFacilityDataUsed)}</dd>
    <dt>Known limitations</dt><dd data-field="known-limitations">${esc(os.knownLimitations)}</dd>
   </dl>`;

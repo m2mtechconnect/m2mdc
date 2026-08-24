@@ -43,17 +43,17 @@ async function selectAll<T>(table: string, order: string, ascending = false): Pr
   return (data ?? []) as T[];
 }
 
-/** The caller's tenant, resolved from their profile. Null means no tenant. */
+/**
+ * The caller's tenant, resolved by the server via the canonical `active_org_id()`
+ * function (org_memberships authority). Null means no active org: callers must
+ * fail closed rather than falling back to a client-side guess.
+ */
 export async function fetchCurrentTenantId(): Promise<string | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth?.user) return null;
-  const { data, error } = await db
-    .from('profiles')
-    .select('org_id')
-    .eq('user_id', auth.user.id)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('active_org_id');
   if (error) return null;
-  return (data?.org_id as string | null) ?? null;
+  return typeof data === 'string' && data.length > 0 ? data : null;
 }
 
 export function useCurrentTenantId() {

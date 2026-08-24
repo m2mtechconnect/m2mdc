@@ -218,7 +218,7 @@ export function WorkflowEnhancementsPanel({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-sm">{step.action}</span>
-                          <Badge variant="outline" className="text-[10px] h-4">
+                          <Badge variant="outline" className="text-xs h-4">
                             {step.duration}
                           </Badge>
                         </div>
@@ -249,7 +249,7 @@ export function WorkflowEnhancementsPanel({
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">v{version.version}</span>
                         {version.isCurrent && (
-                          <Badge className="text-[10px] h-4">Current</Badge>
+                          <Badge className="text-xs h-4">Current</Badge>
                         )}
                       </div>
                       {!version.isCurrent && (
@@ -295,7 +295,7 @@ export function WorkflowEnhancementsPanel({
                     )}>
                       {impact.expectedChange > 0 ? '+' : ''}{impact.expectedChange}%
                     </span>
-                    <Badge variant="outline" className="text-[10px] h-4">
+                    <Badge variant="outline" className="text-xs h-4">
                       {signalStrength(impact.confidence)} signal
                     </Badge>
                   </div>

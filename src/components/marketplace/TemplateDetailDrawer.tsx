@@ -267,7 +267,7 @@ export function TemplateDetailDrawer({ template, open, onOpenChange }: TemplateD
             </Card>
           </TabsContent>
 
-          {/* Section 3: Interactive Preview (Gemini-powered) */}
+          {/* Section 3: Interactive Preview (Managed AI) */}
           <TabsContent value="preview" className="space-y-6 mt-6">
             <Card className="p-6 space-y-4">
               <h3 className="font-semibold flex items-center gap-2">
@@ -275,7 +275,7 @@ export function TemplateDetailDrawer({ template, open, onOpenChange }: TemplateD
                 Chat With This Digital Twin
               </h3>
               <p className="text-sm text-muted-foreground">
-                Powered by Gemini 2.5 Flash - Ask questions about capabilities, workflows, and limitations
+                Powered by AURA Managed AI. Ask questions about capabilities, workflows, and limitations
               </p>
               <GeminiChatInterface templateContext={template} />
             </Card>
@@ -299,7 +299,7 @@ export function TemplateDetailDrawer({ template, open, onOpenChange }: TemplateD
             <Card className="p-6 space-y-4">
               <h3 className="font-semibold">AI-Recommended Scenarios</h3>
               <p className="text-sm text-muted-foreground">
-                Gemini-generated test scenarios based on industry best practices
+                AI-generated test scenarios based on industry best practices
               </p>
               <div className="space-y-2">
                 <div className="p-4 border border-border rounded-lg">

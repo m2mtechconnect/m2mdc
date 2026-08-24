@@ -113,7 +113,7 @@ export interface DigitalTwinBlueprint {
     expected_outputs: Record<string, any>;
   }>;
   
-  // Gemini Co-Pilot
+  // AURA Assistant
   copilot_prompts?: {
     intro: string;
     capabilities: string[];

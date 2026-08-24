@@ -263,7 +263,7 @@ export function ModernFileUploadWizard({
           <div className="flex items-center justify-between mt-6 px-8">
             {[
               { id: 1, label: 'Upload Document' },
-              { id: 2, label: 'Gemini Analysis' },
+              { id: 2, label: 'AI Analysis' },
               { id: 3, label: 'Convert to Twin / Agent' },
             ].map((stepDef, index) => {
               const isActive = 
@@ -411,7 +411,7 @@ export function ModernFileUploadWizard({
         {stage === 'analyzing' && (
           <div className="py-16 px-8 space-y-8">
             <div className="flex flex-col items-center gap-6">
-              {/* Animated Gemini-style loader */}
+              {/* Animated analysis loader */}
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-purple-500/30 to-blue-500/30 rounded-full blur-3xl animate-pulse" />
                 <div className="relative h-32 w-32 rounded-full bg-gradient-to-br from-primary via-purple-500 to-blue-500 flex items-center justify-center animate-spin-slow">
@@ -426,7 +426,7 @@ export function ModernFileUploadWizard({
               </div>
 
               <div className="text-center space-y-3 max-w-md">
-                <h3 className="text-h4 font-semibold">Analyzing with Gemini AI</h3>
+                <h3 className="text-h4 font-semibold">Analyzing with AURA AI</h3>
                 <p className="text-body text-muted-foreground animate-pulse">
                   {phase || 'Processing your document...'}
                 </p>
@@ -477,7 +477,7 @@ export function ModernFileUploadWizard({
                   )}>
                     {progress >= 80 ? <CheckCircle2 className="h-5 w-5 text-white" /> : <Brain className="h-5 w-5 text-white" />}
                   </div>
-                  <span className="text-body">Gemini analyzing content</span>
+                  <span className="text-body">Analyzing content</span>
                 </div>
 
                 <div className={cn(
@@ -726,7 +726,7 @@ export function ModernFileUploadWizard({
           <div className="flex items-center justify-center gap-2">
             <Brain className="h-4 w-4 text-muted-foreground" />
             <p className="text-xs text-muted-foreground text-center">
-              Powered by {result?.powered_by || "Gemini Flash"}
+              Powered by AURA Managed AI
             </p>
           </div>
         </div>

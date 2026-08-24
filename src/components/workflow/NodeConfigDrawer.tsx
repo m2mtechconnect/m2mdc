@@ -49,9 +49,9 @@ export function NodeConfigDrawer({ node, onClose, onUpdate }: NodeConfigDrawerPr
                   <SelectValue placeholder="Select model" />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                  <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash</SelectItem>
-                  <SelectItem value="openai/gpt-5">GPT-5</SelectItem>
+                  <SelectItem value="google/gemini-2.5-pro">Balanced</SelectItem>
+                  <SelectItem value="google/gemini-2.5-flash">Fast</SelectItem>
+                  <SelectItem value="openai/gpt-5">Advanced</SelectItem>
                 </SelectContent>
               </Select>
             </div>

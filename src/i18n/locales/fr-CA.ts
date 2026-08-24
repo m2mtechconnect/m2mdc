@@ -1068,8 +1068,8 @@ const frCA = {
   aiSettings: {
     title: 'Paramètres IA',
     subtitle: 'Configurer le fournisseur de modèle de langage géré pour l\'assistant AURA',
-    gcpConfig: 'Configuration Google Cloud',
-    projectId: 'ID du projet Google Cloud',
+    gcpConfig: 'Configuration de l’IA gérée',
+    projectId: 'ID d’espace de travail IA géré',
     region: 'Région',
     model: 'Modèle',
     vertexSearch: 'Vertex AI Search et ancrage',

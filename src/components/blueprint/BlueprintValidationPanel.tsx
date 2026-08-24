@@ -344,7 +344,7 @@ export function BlueprintValidationPanel({ blueprint, className }: BlueprintVali
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-medium">{issue.message}</span>
-                        <Badge variant="outline" className="text-[10px] gap-1">
+                        <Badge variant="outline" className="text-xs gap-1">
                           {getCategoryIcon(issue.category)}
                           {issue.category}
                         </Badge>

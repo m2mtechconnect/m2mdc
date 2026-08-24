@@ -166,7 +166,7 @@ export function GeminiChatInterface({ templateContext }: GeminiChatInterfaceProp
           <Bot className="h-4 w-4" />
           Chat with {templateContext?.name}
         </p>
-        <p className="text-xs text-muted-foreground">Powered by Gemini 2.5 Flash</p>
+        <p className="text-xs text-muted-foreground">Powered by AURA Managed AI</p>
       </div>
 
       <ScrollArea className="flex-1 p-4" ref={scrollRef}>

@@ -216,7 +216,7 @@ export function EnhancedRackOverview({
                   
                   <div className="pt-1">
                     <div className="text-xs font-medium text-card-foreground">{rack.name}</div>
-                    <div className="text-[10px] text-muted-foreground font-mono">
+                    <div className="text-xs text-muted-foreground font-mono">
                       {rack.inletTemp}°C
                     </div>
                     

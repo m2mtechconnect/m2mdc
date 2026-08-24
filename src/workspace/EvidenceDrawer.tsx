@@ -33,7 +33,7 @@ export function EvidenceDrawer({ facility, overrides }: Props) {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-base">
             {descriptor.label}
-            <Badge variant="outline" className="text-[10px] uppercase">
+            <Badge variant="outline" className="text-xs uppercase">
               Simulated
             </Badge>
           </SheetTitle>

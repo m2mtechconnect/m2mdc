@@ -53,7 +53,7 @@ export function ComparePanel() {
                 )}
               >
                 <span className="font-medium text-foreground">{run.scenarioLabel}</span>
-                <span className="ml-2 text-[10px] text-muted-foreground">{run.id}</span>
+                <span className="ml-2 text-xs text-muted-foreground">{run.id}</span>
                 <span className="mt-1 block">
                   <RunProvenanceBadge run={run} />
                 </span>
@@ -102,7 +102,7 @@ export function ComparePanel() {
                       <span className="font-medium text-foreground">{formatKpi(key, run!.result[key])}</span>
                       <span
                         className={cn(
-                          'ml-1.5 text-[10px]',
+                          'ml-1.5 text-xs',
                           dir === 'better' && 'text-success',
                           dir === 'worse' && 'text-destructive',
                           dir === 'flat' && 'text-muted-foreground',
@@ -121,7 +121,7 @@ export function ComparePanel() {
       </div>
 
       <div className="flex items-center justify-between">
-        <Badge variant="outline" className="text-[10px]">
+        <Badge variant="outline" className="text-xs">
           Simulated results only
         </Badge>
         <Button size="sm" onClick={() => setTool('decide')}>

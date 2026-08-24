@@ -23,7 +23,7 @@ export function EvidenceQualityBar({
   if (compact) {
     return (
       <span className={cn('flex min-w-[7rem] shrink-0 flex-col gap-0.5', className)} data-testid="dsx-evidence-quality">
-        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Evidence quality</span>
+        <span className="text-xs uppercase tracking-wider text-muted-foreground">Evidence quality</span>
         <span
           role="img"
           aria-label={

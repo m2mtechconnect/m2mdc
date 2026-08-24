@@ -418,7 +418,7 @@ export function KPIDetailModal({
                           <div className="text-lg font-bold">
                             {forecast?.predicted.toFixed(1) ?? '—'}
                           </div>
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-xs text-muted-foreground">
                             ±{((forecast?.upperBound ?? 0) - (forecast?.predicted ?? 0)).toFixed(1)}
                           </div>
                         </div>

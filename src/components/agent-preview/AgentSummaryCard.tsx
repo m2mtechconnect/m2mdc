@@ -56,8 +56,8 @@ interface AgentSummaryCardProps {
 
 export function AgentSummaryCard({
   description,
-  llmModel = "Gemini 2.5 Flash",
-  llmProvider = "Google",
+  llmModel = "Fast",
+  llmProvider = "Managed AI",
   temperature = 0.7,
   mcpServers = [],
   toolsCount = 0,
@@ -67,7 +67,7 @@ export function AgentSummaryCard({
   setupInstructions = [],
   compatibility = {
     mcpEnabled: true,
-    llmCompatible: ['Gemini', 'OpenAI'],
+    llmCompatible: ['Managed AI'],
     cloudReady: true,
     enterpriseSecure: true,
   },

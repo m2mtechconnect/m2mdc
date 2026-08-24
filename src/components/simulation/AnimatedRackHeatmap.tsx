@@ -99,7 +99,7 @@ const RackTile = memo(function RackTile({
             )}
           >
             {/* Rack ID */}
-            <span className="text-[10px] font-mono font-bold text-foreground/90">
+            <span className="text-xs font-mono font-bold text-foreground/90">
               {rack.rackId.replace('Rack-', '')}
             </span>
             
@@ -231,7 +231,7 @@ export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
       </CardHeader>
       <CardContent>
         {/* Legend */}
-        <div className="flex items-center gap-2 mb-3 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
           <span>Cool</span>
           <div className="flex gap-0.5">
             <div className="w-4 h-2 rounded-sm bg-success/60" />
@@ -263,15 +263,15 @@ export const AnimatedRackHeatmap = memo(function AnimatedRackHeatmap({
         <div className="grid grid-cols-3 gap-2 mt-4 pt-3 border-t border-border">
           <div className="text-center">
             <p className="text-lg font-bold font-mono text-success">{optimalCount}</p>
-            <p className="text-[10px] text-muted-foreground">Optimal</p>
+            <p className="text-xs text-muted-foreground">Optimal</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-bold font-mono text-warning">{elevatedCount}</p>
-            <p className="text-[10px] text-muted-foreground">Elevated</p>
+            <p className="text-xs text-muted-foreground">Elevated</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-bold font-mono text-destructive">{hotRacks}</p>
-            <p className="text-[10px] text-muted-foreground">Critical</p>
+            <p className="text-xs text-muted-foreground">Critical</p>
           </div>
         </div>
       </CardContent>

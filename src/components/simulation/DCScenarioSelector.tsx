@@ -95,14 +95,14 @@ function ScenarioCard({
             <div>
               <h4 className="font-medium text-sm leading-tight text-card-foreground">{scenario.name}</h4>
               {scenario.isCustom && (
-                <Badge variant="outline" className="text-[10px] h-4 mt-1">
+                <Badge variant="outline" className="text-xs h-4 mt-1">
                   <Sparkles className="h-2 w-2 mr-1" />
                   Custom
                 </Badge>
               )}
             </div>
           </div>
-          <Badge className={cn('text-[10px]', severityColors[scenario.severity])}>
+          <Badge className={cn('text-xs', severityColors[scenario.severity])}>
             {scenario.severity}
           </Badge>
         </div>
@@ -120,7 +120,7 @@ function ScenarioCard({
               <Badge 
                 key={domain} 
                 variant="outline" 
-                className={cn('text-[10px] gap-1', domainColors[domain])}
+                className={cn('text-xs gap-1', domainColors[domain])}
               >
                 <Icon className="h-2.5 w-2.5" />
                 {domain}
@@ -128,7 +128,7 @@ function ScenarioCard({
             );
           })}
           {scenario.domainsInvolved.length > 3 && (
-            <Badge variant="outline" className="text-[10px]">
+            <Badge variant="outline" className="text-xs">
               +{scenario.domainsInvolved.length - 3}
             </Badge>
           )}

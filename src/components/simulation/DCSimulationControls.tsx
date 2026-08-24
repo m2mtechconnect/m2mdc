@@ -143,7 +143,7 @@ export function DCSimulationControls({
           value={progress} 
           className="h-2"
         />
-        <div className="flex justify-between text-[10px] text-muted-foreground">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>0%</span>
           <span>{Math.round(progress)}% complete</span>
           <span>100%</span>

@@ -142,7 +142,7 @@ export function EnhancedKPICard({
             <div className="mt-3 p-2 rounded bg-muted/50 border border-border overflow-hidden">
               <div className="flex items-start gap-2 min-w-0">
                 <Info className="h-3 w-3 text-accent mt-0.5 shrink-0" />
-                <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">{insight}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{insight}</p>
               </div>
             </div>
           )}

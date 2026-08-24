@@ -151,7 +151,7 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
                 <Badge 
                   variant="outline" 
                   className={cn(
-                    'text-[10px] gap-0.5',
+                    'text-xs gap-0.5',
                     isGood ? 'text-success border-success/30' : 'text-destructive border-destructive/30'
                   )}
                 >
@@ -175,7 +175,7 @@ const AnimatedKPICard = memo(function AnimatedKPICard({
               {config.format ? config.format(value) : value}
               <span className="text-xs text-muted-foreground ml-0.5">{config.unit}</span>
             </span>
-            <p className="text-[10px] text-muted-foreground">{config.label}</p>
+            <p className="text-xs text-muted-foreground">{config.label}</p>
           </motion.div>
         </CardContent>
       </Card>

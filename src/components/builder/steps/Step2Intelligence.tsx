@@ -429,11 +429,11 @@ export function Step2Intelligence() {
                       <SelectValue placeholder="Select a model" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="google/gemini-3-pro-preview">Gemini 3.0 Pro Preview (Latest)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-flash">Gemini 2.5 Flash (Default)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-pro">Gemini 2.5 Pro</SelectItem>
-                      <SelectItem value="openai/gpt-5">GPT-5</SelectItem>
-                      <SelectItem value="openai/gpt-5-mini">GPT-5 Mini</SelectItem>
+                      <SelectItem value="google/gemini-3-pro-preview">Advanced (preview)</SelectItem>
+                      <SelectItem value="google/gemini-2.5-flash">Fast (default)</SelectItem>
+                      <SelectItem value="google/gemini-2.5-pro">Balanced</SelectItem>
+                      <SelectItem value="openai/gpt-5">Advanced</SelectItem>
+                      <SelectItem value="openai/gpt-5-mini">Fast (alternate)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

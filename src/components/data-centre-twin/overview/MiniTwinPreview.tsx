@@ -52,13 +52,13 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
           <Eye className="h-4 w-4 text-muted-foreground" />
           Twin Preview
           {/* Read-only overlay badge - non-interactive */}
-          <Badge variant="outline" className="text-[10px] h-5 font-normal">
+          <Badge variant="outline" className="text-xs h-5 font-normal">
             {overlayConfig.label}
           </Badge>
         </CardTitle>
         <div className="flex items-center gap-2">
           {simulation.isSimulating && (
-            <Badge variant="default" className="bg-success/80 text-success-foreground text-[10px] h-5 animate-pulse">
+            <Badge variant="default" className="bg-success/80 text-success-foreground text-xs h-5 animate-pulse">
               <Activity className="h-3 w-3 mr-1" />
               Live
             </Badge>
@@ -111,7 +111,7 @@ export function MiniTwinPreview({ onExpand, className }: MiniTwinPreviewProps) {
             </span>
           </div>
           {criticalRacks > 0 && (
-            <Badge variant="destructive" className="text-[10px] h-5">
+            <Badge variant="destructive" className="text-xs h-5">
               {criticalRacks} Critical
             </Badge>
           )}

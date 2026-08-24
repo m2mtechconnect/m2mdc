@@ -190,7 +190,7 @@ export function EnhancedSimulationControls({
             )}
           </AnimatePresence>
         </div>
-        <div className="flex justify-between text-[10px] text-muted-foreground">
+        <div className="flex justify-between text-xs text-muted-foreground">
           <span>0%</span>
           <motion.span
             key={Math.round(progress)}

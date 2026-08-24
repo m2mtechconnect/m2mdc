@@ -230,10 +230,10 @@ export function WorkflowVersionControl({
                   <User className="h-3 w-3" />
                   {version.author}
                   {version.triggersChanged && (
-                    <Badge variant="outline" className="text-[10px] h-4">Triggers</Badge>
+                    <Badge variant="outline" className="text-xs h-4">Triggers</Badge>
                   )}
                   {version.actionsChanged && (
-                    <Badge variant="outline" className="text-[10px] h-4">Actions</Badge>
+                    <Badge variant="outline" className="text-xs h-4">Actions</Badge>
                   )}
                 </div>
 
@@ -245,7 +245,7 @@ export function WorkflowVersionControl({
                     </li>
                   ))}
                   {version.changes.length > 2 && (
-                    <li className="text-primary text-[10px]">
+                    <li className="text-primary text-xs">
                       +{version.changes.length - 2} more changes
                     </li>
                   )}

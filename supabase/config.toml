@@ -79,3 +79,36 @@ verify_jwt = true
 
 [functions.teams-accept-invite]
 verify_jwt = true
+
+# End-to-end audit remediation (Phase A). A live probe showed `ai-config`
+# answering HTTP 200 to a deliberately invalid bearer token and disclosing
+# provider configuration. These handlers have no caller anywhere in the
+# product surface (`ai-config`, `grounded-summary`, `query-answer`,
+# `template-validate`, `health-ai`, `generate-ctas`, `funding-query` and
+# `generate-ai-recommendations` are referenced only from documentation or
+# unreferenced components), so gateway JWT verification is enabled with no
+# product impact. None of them is a signed webhook or an OAuth redirect
+# target. `ai-config` additionally verifies the caller in code.
+[functions.ai-config]
+verify_jwt = true
+
+[functions.grounded-summary]
+verify_jwt = true
+
+[functions.query-answer]
+verify_jwt = true
+
+[functions.template-validate]
+verify_jwt = true
+
+[functions.health-ai]
+verify_jwt = true
+
+[functions.generate-ctas]
+verify_jwt = true
+
+[functions.funding-query]
+verify_jwt = true
+
+[functions.generate-ai-recommendations]
+verify_jwt = true

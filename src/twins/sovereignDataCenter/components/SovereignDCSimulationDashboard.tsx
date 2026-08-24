@@ -226,7 +226,7 @@ export function SovereignDCSimulationDashboard({
           <CardContent className="py-3">
             <div className="flex items-center gap-2 flex-wrap">
               <Brain className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground mr-2">Ask CoPilot:</span>
+              <span className="text-sm text-muted-foreground mr-2">Ask AURA Assistant:</span>
               {SOVEREIGN_DC_COPILOT_CHIPS.slice(0, 4).map((chip) => (
                 <Button
                   key={chip.label}

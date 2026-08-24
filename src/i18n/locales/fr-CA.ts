@@ -1067,7 +1067,7 @@ const frCA = {
   // Paramètres IA
   aiSettings: {
     title: 'Paramètres IA',
-    subtitle: 'Configurer Google Gemini (Vertex AI) pour l\'assistant AURA',
+    subtitle: 'Configurer le fournisseur de modèle de langage géré pour l\'assistant AURA',
     gcpConfig: 'Configuration Google Cloud',
     projectId: 'ID du projet Google Cloud',
     region: 'Région',
@@ -1088,7 +1088,7 @@ const frCA = {
     saveConfig: 'Sauvegarder la configuration',
     runHealthCheck: 'Vérification de santé',
     healthResults: 'Résultats de la vérification de santé',
-    geminiApi: 'API Gemini',
+    geminiApi: 'API du modele',
     configError: "Veuillez configurer l'ID du projet et sélectionner un modèle IA",
     saveSuccess: 'Paramètres IA sauvegardés avec succès',
     saveFailed: 'Échec de la sauvegarde des paramètres',

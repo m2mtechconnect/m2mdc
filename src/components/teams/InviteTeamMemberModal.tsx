@@ -14,6 +14,7 @@ import {
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ROLE_PERMISSIONS, type AnyRole, type Permission } from "@/auth/permissions";
 
 interface InviteTeamMemberModalProps {
   open: boolean;
@@ -21,8 +22,22 @@ interface InviteTeamMemberModalProps {
   onInviteSent?: () => void;
 }
 
+/** Capability badges derived from the canonical permission model. */
+function roleCapabilityBadges(role: string): string[] {
+  const granted = ROLE_PERMISSIONS[role as AnyRole] ?? [];
+  const has = (p: Permission) => granted.includes(p);
+  const badges: string[] = [];
+  if (has('twin.view')) badges.push('View Access');
+  if (has('twin.edit')) badges.push('Edit Access');
+  if (has('deployment.execute')) badges.push('Deploy Access');
+  if (has('analytics.export')) badges.push('Analytics Export');
+  if (has('authz.view_assignments')) badges.push('Audit Access');
+  if (has('tenant.view_members')) badges.push('Member Visibility');
+  return badges;
+}
+
 const roles = [
-  { value: "executive", label: "Executive", icon: Crown, description: "Full platform access" },
+  { value: "executive", label: "Executive", icon: Crown, description: "Read-only oversight across twins, agents, deployments and analytics, plus analytics export and member visibility" },
   { value: "manager", label: "Manager", icon: Users, description: "Team oversight & deployment" },
   { value: "engineer", label: "Engineer / DevOps", icon: Wrench, description: "Build & maintain systems" },
   { value: "compliance", label: "Compliance Officer", icon: Shield, description: "Audit & governance access" },
@@ -164,17 +179,17 @@ export default function InviteTeamMemberModal({
                 <p className="text-sm text-muted-foreground mb-3">
                   {selectedRole.description}
                 </p>
+                {/*
+                  Capability badges are derived from the canonical permission
+                  model rather than hardcoded per role. The previous hardcoded
+                  list claimed Edit and Deploy access for `executive`, which
+                  only holds viewer-tier permissions plus analytics export and
+                  member visibility.
+                */}
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">View Access</Badge>
-                  {(role === "executive" || role === "manager" || role === "engineer") && (
-                    <Badge variant="secondary">Edit Access</Badge>
-                  )}
-                  {(role === "executive" || role === "manager") && (
-                    <Badge variant="secondary">Deploy Access</Badge>
-                  )}
-                  {role === "compliance" && (
-                    <Badge variant="secondary">Audit Access</Badge>
-                  )}
+                  {roleCapabilityBadges(role).map((badge) => (
+                    <Badge key={badge} variant="secondary">{badge}</Badge>
+                  ))}
                 </div>
               </div>
             )}

@@ -23,6 +23,7 @@ import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import {
   WORKSPACE_NAV,
+  visibleNavChildren,
   isNavItemActive,
   visibleGovernNav,
   visibleManageNav,
@@ -345,7 +346,7 @@ export function Layout({ children }: LayoutProps) {
                       </Button>
                       {isActive && item.children?.length ? (
                         <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
-                          {item.children.map((child) => {
+                          {visibleNavChildren(item, can).map((child) => {
                             const childActive = isNavItemActive(child, location.pathname);
                             return (
                               <Button

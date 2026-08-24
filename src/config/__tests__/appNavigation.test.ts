@@ -34,7 +34,7 @@ describe('canonical navigation', () => {
 
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
     expect(manage['Agents']).toBe('/app/agents');
-    expect(manage['Operations']).toBe('/analytics');
+    expect(manage['Operations & Telemetry']).toBe('/analytics');
     expect(manage['Runtime']).toBe('/deployments');
     expect(manage['Agent Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');

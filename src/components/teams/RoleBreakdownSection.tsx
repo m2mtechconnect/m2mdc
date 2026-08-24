@@ -16,7 +16,7 @@ const roleConfig = {
     icon: Crown, 
     label: "Executive", 
     color: "text-primary border-primary",
-    description: "Full platform access and strategic oversight"
+    description: "Read-only strategic oversight with analytics export and member visibility"
   },
   manager: { 
     icon: Users, 

@@ -1,93 +1,71 @@
-# AURA DC frontend remediation — prioritized from the route audit
+# Diagnosis: "Loading workspace..." on /dashboard (read-only)
 
-Audit-only findings are already reported. This plan is the remediation backlog, ordered by
-customer-visible risk. Nothing here has been applied.
+No code, deployment or database changes were made. This is a findings report only.
 
-## P0 — Customer-visible contradictions with the current product
+## 1. Exact UI that renders the string
 
-### 1. Remove the Zapier surface from Builder
-`/builder` Step 3 renders a Zapier OAuth flow that is not part of the Connections control plane.
-- `src/components/builder/ConnectStep.tsx` -> `BuilderIntegrationsHub.tsx` -> `ZapierIntegrationCard.tsx`
-- Delete `ZapierIntegrationCard`, the `zapier-integration-status` / `zapier-oauth-connect` /
-  `zapier-test-connection` client calls and `hooks/useTokenRefresh.ts` Zapier branch.
-- Replace Step 3 with a read-only summary of connections already established at
-  `/manage/integrations`, plus a link out. Builder must not mint credentials.
-- Drop `zapier` from `src/types/integrations.ts` and the `en.ts` / `fr.ts` strings.
-- Delete orphans `components/HealthCheck.tsx`, `components/HealthBadges.tsx`.
+`src/AuthenticatedShell.tsx`, `export default function AuthenticatedShell()` (lines ~183-207).
 
-### 2. Collapse the duplicate Builder wizards
-`src/pages/Builder.tsx:187` picks between two complete 5-step wizards at runtime.
-- Keep the DC wizard (`components/builder/dc-steps/*`, `useDCTwinBuilderStore`), which matches the
-  Data Centre master template.
-- Delete `components/builder/steps/Step1Summary..Step5Deploy` and `useWizardBuilderStore`, and make
-  `/builder` render the DC wizard unconditionally regardless of the `fromScanner` flag.
-- Delete the third, entirely unreferenced copy `components/builder/steps/DCStep1..5*.tsx` — this is
-  where the raw `Endpoint URL` / `Bearer Token` / `API Key` form lives, so removing it also removes
-  the re-wiring landmine.
-- Fold `components/builder/step5/` into the surviving step directory so there is one naming scheme.
+The string exists exactly once in the source tree. It is the `fallback` of a single `<Suspense>`:
 
-### 3. Un-ship the demo page
-`/digital-twins-demo/funding-intake` (`AuthenticatedShell.tsx:142`) has no DEV gate and no role
-guard. Delete the route and `pages/FundingIntakeDemo.tsx`.
-Gate `/twin-debug` behind `import.meta.env.DEV` in addition to `AdminRouteGuard`.
+```text
+TourProvider
+ └─ CoPilotProvider
+     └─ CoPilotCommandProvider
+         └─ DatasetProvider
+             └─ Layout
+                 └─ ReferenceRouteGate
+                     └─ RouteLoadRecovery (error boundary, resetKey = pathname)
+                         └─ Suspense fallback="Loading workspace..."
+                             └─ ApprovedUserRoutes  →  <Route path="/dashboard" element={<Dashboard/>} />
+```
 
-### 4. Status labels must be evidence-backed
-- `CompactEventTimeline.tsx:64`: replace the literal `badge="Live"` with the run/provenance mode
-  already available on the event stream, or drop the badge.
-- `AdminSignupsDashboard.tsx:139-140`: either subscribe to realtime and keep "Live", or relabel to
-  the last-refreshed timestamp.
-- Add a lint/test rule extending `src/test/whiteLabelSurfaces.test.ts` that fails on literal
-  `Live` / `Connected` / `Healthy` / `Deployed` badge props.
+`Dashboard` is `lazy(() => import("./pages/Dashboard"))` (line 20), and `src/pages/Dashboard.tsx` re-exports `src/workspace/CommandCentre.tsx`.
 
-## P1 — Duplicate information architecture
+## 2. What must resolve before the text disappears
 
-### 5. Retire `/marketplace`
-`pages/Marketplace.tsx` and `components/marketplace/*` are a second "connect things" surface with no
-import overlap with `src/connections/*`. Move template browsing into the Connections catalogue tab
-and redirect `/marketplace` -> `/manage/integrations?tab=catalogue` via `routeAliases.ts`.
-Delete the unreachable `McpGrid.tsx`, `McpServerPreviewModal.tsx`, `MCPToolsPlayground.tsx` and the
-Zapier branch of `lib/marketplaceNormalizer.ts`.
+Two layers, and only the second one owns this text.
 
-### 6. Decide the end-user MCP surface
-`SystemDetailsDrawer` mounts `AgentPlayground` + `AgentMCPServers` on `/app/agents`. Either scope it
-to internal roles, or restate it as an agent tool inspector without raw server registration.
+Ancestors that must already have succeeded for this text to be on screen at all (if any of these were unresolved the user would see a *different* surface):
 
-### 7. Resolve the twin route overlap
-`/data-centre-twin(/:id)` and `/blueprint/:id` render different components for the same concept, and
-`/data-centre-twin` also names a distinct public page. Make the authenticated paths redirect to
-`/blueprint/:id`, and rename the public one to `/twin-preview`-style naming.
-Remove the redundant `/dsx/evidence-beta/overview` duplicate of the index route.
+- `src/App.tsx` → `src/AuthenticatedSessionApp.tsx`: `supabase.auth.getSession()` and `fetchProfileFields(user.id, 'is_approved')` (`src/lib/auth/profileQuery.ts`). Unresolved ⇒ `BoundedLoading stage="session"|"approval"`; not approved ⇒ `PendingApproval`.
+- `src/ApprovedUserRouter.tsx` + `src/contexts/RBACContext.tsx` (`RBACProvider.fetchAuthorization`): `auth.getUser()`, `select user_roles`, `select org_memberships (status=active)`, conditional `select organizations`, `rpc('active_org_id')`. Unresolved ⇒ `BoundedLoading stage="authorization"`; any error ⇒ `src/pages/AuthorizationError.tsx` ("Authorization unavailable").
+- `DatasetProvider` (`src/data/dataset/DatasetProvider.tsx`) and `ReferenceRouteGate` (`src/components/dataset/ReferenceRouteGate.tsx`) are synchronous; they read RBAC context only.
 
-## P2 — Provider neutrality and design-system consistency
+The Suspense boundary itself resolves on exactly one condition:
 
-### 8. Provider-neutral intelligence profiles
-`ModelMarketplace.tsx` and `Step2Intelligence.tsx` expose `openai/gpt-5`,
-`anthropic/claude-sonnet-4-5`, Gemini IDs and vendor logos; `/settings/ai` exposes `gemini-1.5-pro`.
-Introduce named profiles (for example Fast / Balanced / Deep Reasoning) resolved to concrete models
-server-side, and remove vendor logos and raw model IDs from customer-facing pages. Keep raw model
-selection only under `/admin/*`.
+- the dynamic `import("./pages/Dashboard")` module request (and its statically imported graph: `workspace/CommandCentre`, `facilityModel`, `workspaceStore`, `runFixtures`, `scenarioEngine`, `dashboard/*`) settles.
 
-### 9. Brand cleanup
-- `AuraLogo.tsx`: replace the `NVIDIA_GREEN` constant with an AURA technical-accent design token of
-  the same value, so the logo does not carry a vendor-named constant.
-- `DCArchitectureDiagram.tsx` and `InfrastructurePage.tsx`: drive hardware names from the blueprint
-  inventory instead of hardcoded "NVIDIA H100 Fleet" / "B3100" copy.
-- `validation/cloudGpu/baselineSnapshot.ts`: move the `m2mdc.lovable.app` value behind the release
-  metadata already used by `/help`.
+Verified: no data dependency can hold this boundary. `CommandCentre` performs no suspending reads - it uses `useFacilityModel` (pure, derives from `useActiveTwin` state), Zustand stores, `useSearchParams` and `sessionStorage`. There is no `useSuspenseQuery`, no React `use()`, no `suspense: true` React Query config, and no top-level `await` anywhere in `src/` (only in a test file). `ActiveTwinProvider` renders children unconditionally and never gates on `isLoading`.
 
-### 10. Page header and token compliance
-Only 3 of 37 pages use `CommandHeader` + `PagePurpose`. Roll the Connections pattern out across
-authenticated pages, starting with the highest-traffic offenders, and replace hardcoded utilities:
-`TwinPreview.tsx:182,204,447,459`, `account/Profile.tsx:282-284`,
-`AdminSignupsDashboard.tsx:234`, `admin/AssetPreview.tsx:87`.
-Convert `InfrastructurePage.tsx` from raw `Card` to the shared `Panel` / `Instrument` primitives.
+## 3. Behaviour under the stated production data shape
 
-## Technical notes
-- All 30 entries in `config/routeAliases.ts` already resolve through `PreserveNavigate`; no alias
-  renders a legacy screen, so no alias work is required beyond adding the `/marketplace` entry.
-- `PARAM_ALIASES` is never mounted as a route. Either mount it or move it into the test fixtures it
-  actually serves.
-- Duplicate `/sign-out`, `/invite/accept` and `*` declarations are intentional: each resolves in a
-  distinct auth state (public / pending-approval / approved-internal / pilot). Leave them.
-- Verification per phase: `bunx tsgo --noEmit`, the existing route-stress and deep-link Playwright
-  configs, and `src/test/whiteLabelSurfaces.test.ts`.
+324 profiles, 20 user_roles, 0 organizations, 0 org_memberships, all `profiles.org_id` null.
+
+Verified against the live schema (read-only): `public.active_org_id()`, `public.is_org_member(uuid,uuid)` and `public.has_role(uuid,app_role)` all exist; `user_roles_read_own` (`auth.uid() = user_id`) and `org_memberships_read` (`user_id = auth.uid() OR org_has_role(...)`) are non-recursive and return an empty set rather than an error; `organizations` is only queried when `orgIds.length > 0`, so it is never queried at all in this state; `active_org_id()` returns null.
+
+Consequence in `RBACContext`:
+
+- `memberships = []`, `activeMembership = null`, `activeOrgId = null`, `organizationRole = null`.
+- If the user has any mapped platform grant, `resolution = { status: 'internal' }`.
+- If not, `resolution = { status: 'pilot' }` ⇒ `ApprovedUserRouter` redirects to `/pilot/overview`; `/dashboard` is never reached, so this text is not what those users see.
+
+So none of the org-shaped dependencies can hold "Loading workspace..." on screen. Their failure modes are the pilot shell, `AuthorizationError`, or `BoundedLoading` - all visually distinct.
+
+## 4. Most likely root cause
+
+The persistent "Loading workspace..." is a **module-loading stall of the `/dashboard` lazy chunk**, not an authorization or tenancy condition. The boundary has exactly one dependency (the dynamic import), and the observed state means RBAC already resolved to `internal` or `tenant`.
+
+Ranked causes consistent with the code:
+
+1. Stale `index.html` referencing hashed chunks removed by a newer deploy, where the chunk request hangs (or is served a non-JS body) rather than rejecting. A clean rejection would be caught by `RouteLoadRecovery` and render "This workspace could not be loaded", so an *indefinite* fallback implies a request that never settles.
+2. A never-settling network fetch for the chunk (proxy/CDN hold, offline tab resumed).
+3. Any ancestor re-mount loop restarting the boundary. `RouteLoadRecovery` resets on `resetKey = location.pathname`; `DatasetProvider`'s effect issues `navigate(..., { replace: true })` only when an admin reference-canary intent exists and the param is missing, which would re-run on pathname change - worth confirming in a live console before excluding.
+
+Files to inspect for confirmation: `src/AuthenticatedShell.tsx` (boundary), `src/routing/RouteLoadRecovery.tsx` (would have caught a rejection), `src/data/dataset/DatasetProvider.tsx` (navigate effect). Evidence needed from production: the Network panel state of the `Dashboard-*.js` request (pending vs 404 vs 200 text/html) and whether `[RouteLoadRecovery]` appears in the console.
+
+## 5. Can an approved global admin enter the normal shell without an organization?
+
+Yes, under current code. `AuthenticatedSessionApp` gates only on `profiles.is_approved`. `RBACContext` sets `status: 'internal'` from `platformAuthorization.primaryRole` (derived from `user_roles`) **before** it considers membership, and `ApprovedUserRouter` routes both `internal` and `tenant` to `AuthenticatedShell`. `activeOrgId` stays null and org-scoped RLS simply returns no rows; nothing blocks shell entry. Users with no platform grant and no membership are the ones sealed into `/pilot/overview`.
+
+No remediation proposed.

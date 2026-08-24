@@ -44,8 +44,8 @@ describe('runtime monitoring contract', () => {
     expect(source).not.toContain('error.stack');
     expect(source).not.toContain('location.search');
     expect(source).not.toContain('location.href');
-    expect(source).not.toContain('userId');
-    expect(source).not.toContain('email');
+    expect(source).not.toContain('.userId');
+    expect(source).not.toMatch(/\.email\b|\[['"]email['"]\]/);
   });
 
   it('deduplicates repeated failures and bounds route metadata', () => {

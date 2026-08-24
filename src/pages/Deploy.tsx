@@ -825,7 +825,7 @@ export default function Deploy() {
             <div className="text-sm space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-warning" />
-                <span>Vertex AI for model serving</span>
+                <span>Managed AI model serving</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-warning" />

@@ -92,6 +92,13 @@ verify_jwt = true
 [functions.ai-config]
 verify_jwt = true
 
+# `copilot-health` probes managed AI capability reachability. It is only
+# invoked from the authenticated AI settings workspace, so gateway JWT
+# verification is explicit here and the handler also verifies the caller in
+# code before running any upstream probe.
+[functions.copilot-health]
+verify_jwt = true
+
 [functions.grounded-summary]
 verify_jwt = true
 

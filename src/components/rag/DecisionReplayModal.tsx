@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useReturnFocus } from "@/hooks/useReturnFocus";
+import { modelDisplayLabel } from "@/lib/llm/modelLabels";
 import { 
   ArrowRight, 
   Search, 
@@ -45,7 +46,7 @@ export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalP
       stage: "Reranking",
       icon: Brain,
       content: "Managed AI reranked to top 6 most relevant snippets",
-      metadata: { model: "gemini-1.5-pro", snippets: 6 },
+      metadata: { model: modelDisplayLabel("gemini-1.5-pro"), snippets: 6 },
       tooltip: "AI model scores and prioritizes the most relevant content",
     },
     {
@@ -58,9 +59,9 @@ export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalP
     {
       stage: "Grounded Generation",
       icon: Brain,
-      content: "Generated answer with Vertex AI Grounding verification",
+      content: "Generated answer with managed grounding verification",
       metadata: { 
-        model: "gemini-1.5-pro", 
+        model: modelDisplayLabel("gemini-1.5-pro"), 
         temperature: 0.3, 
         outputTokens: 247,
         faithfulness: "88%",
@@ -109,7 +110,7 @@ export function DecisionReplayModal({ open, onOpenChange }: DecisionReplayModalP
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Model</p>
-                <p className="text-sm font-mono text-foreground">gemini-1.5-pro</p>
+                <p className="text-sm font-mono text-foreground">{modelDisplayLabel("gemini-1.5-pro")}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Region</p>

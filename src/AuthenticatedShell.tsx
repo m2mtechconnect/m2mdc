@@ -24,7 +24,12 @@ const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
 const Compliance = lazy(() => import("./pages/Compliance"));
-const InfrastructurePage = lazy(() => import("./pages/InfrastructurePage"));
+// Legacy static reference page. Its operational figures are illustrative mock
+// data with no navigation entry point, so it is compiled and routed in
+// development builds only; production direct URLs fall through to NotFound.
+const InfrastructurePage = import.meta.env.DEV
+  ? lazy(() => import("./pages/InfrastructurePage"))
+  : null;
 const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
@@ -36,7 +41,10 @@ const ManageFacilities = lazy(() => import("./pages/manage/Facilities"));
 const SignOut = lazy(() => import("./pages/auth/index").then((m) => ({ default: m.SignOut })));
 const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
 const AgentChat = lazy(() => import("./pages/AgentChat"));
-const FundingIntakeDemo = lazy(() => import("./pages/FundingIntakeDemo"));
+// Demo-only intake surface. Development builds only, so production emits no chunk.
+const FundingIntakeDemo = import.meta.env.DEV
+  ? lazy(() => import("./pages/FundingIntakeDemo"))
+  : null;
 const ManageAgents = lazy(() => import("./pages/ManageAgents"));
 const SystemManage = lazy(() => import("./pages/SystemManage"));
 const TwinManage = lazy(() => import("./pages/TwinManage"));
@@ -93,14 +101,16 @@ function ApprovedUserRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
-      <Route path="/builder" element={<Builder />} />
-      <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.view"><Deploy /></PermissionRouteGuard>} />
+      <Route path="/builder" element={<PermissionRouteGuard permission="twin.edit"><Builder /></PermissionRouteGuard>} />
+      <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.execute"><Deploy /></PermissionRouteGuard>} />
       <Route path="/deployments" element={<PermissionRouteGuard permission="deployment.view"><DeploymentHistory /></PermissionRouteGuard>} />
       <Route path="/agent/:id" element={<AgentWorkspace />} />
       <Route path="/agents/:id/chat" element={<AgentChat />} />
       <Route path="/analytics" element={<PermissionRouteGuard permission="analytics.view"><IntelligenceDashboard /></PermissionRouteGuard>} />
       <Route path="/compliance" element={<Compliance />} />
-      <Route path="/infrastructure" element={<InfrastructurePage />} />
+      {import.meta.env.DEV && InfrastructurePage && (
+        <Route path="/infrastructure" element={<InfrastructurePage />} />
+      )}
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
 
@@ -128,7 +138,7 @@ function ApprovedUserRoutes() {
       <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.view"><TwinManage /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
-      <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
+      <Route path="/studio/systems/:systemId/manage" element={<PermissionRouteGuard permission="twin.edit"><SystemManage /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
@@ -144,7 +154,7 @@ function ApprovedUserRoutes() {
       <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
       {/* Demo-only intake surface. Not a supported production feature, so it is
           reachable in development builds only. */}
-      {import.meta.env.DEV && (
+      {import.meta.env.DEV && FundingIntakeDemo && (
         <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
       )}
 

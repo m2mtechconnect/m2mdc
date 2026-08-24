@@ -2,7 +2,13 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
 
-
+/**
+ * Provider-neutral managed AI capability probe.
+ *
+ * The response describes capability availability only. Provider names, model
+ * identifiers, cloud project identifiers, regions and upstream URLs are never
+ * echoed to the caller; they stay server side.
+ */
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
@@ -10,8 +16,8 @@ serve(async (req) => {
   }
 
   // Defense in depth. Gateway JWT verification is enabled for this function in
-  // supabase/config.toml; the in-code check means the provider configuration is
-  // never disclosed even if the gateway setting is later relaxed.
+  // supabase/config.toml; the in-code check means the capability configuration
+  // is never disclosed even if the gateway setting is later relaxed.
   try {
     await requireCaller(req);
   } catch (error) {
@@ -24,51 +30,35 @@ serve(async (req) => {
   }
 
   try {
-    // Return AI configuration status
-    // PRIMARY: Lovable Cloud managed Gemini (always available)
-    // OPTIONAL: External Google Cloud credentials (for advanced users)
-    
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    const useExternalGoogle = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true';
-    const externalGoogleConfigured = !!(
-      Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON') && 
+    const managedAiAvailable = !!Deno.env.get('LOVABLE_API_KEY');
+    const externalConfigured = !!(
+      Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON') &&
       Deno.env.get('GOOGLE_PROJECT_ID')
     );
+    const externalEnabled = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true' && externalConfigured;
 
     const config = {
-      // Primary AI provider (Lovable Cloud managed)
-      primary: {
-        provider: 'lovable_managed',
-        available: !!lovableApiKey,
-        models: {
-          primary: 'google/gemini-3-pro-preview',
-          fallback: 'google/gemini-3.0-pro',
-        }
+      managedAi: {
+        available: managedAiAvailable || externalEnabled,
       },
-      
-      // Optional external Google Cloud
-      external_google: {
-        enabled: useExternalGoogle && externalGoogleConfigured,
-        configured: externalGoogleConfigured,
-        projectId: Deno.env.get('GOOGLE_PROJECT_ID') || null,
-        location: Deno.env.get('GOOGLE_LOCATION') || 'northamerica-northeast1',
-        model: Deno.env.get('GEMINI_MODEL') || 'gemini-1.5-pro',
-        vertexDataStoreId: Deno.env.get('VERTEX_DATA_STORE_ID') || null,
+      groundingSearch: {
+        available: externalEnabled && !!Deno.env.get('VERTEX_DATA_STORE_ID'),
       },
-      
-      // Overall status
-      active_provider: useExternalGoogle && externalGoogleConfigured ? 'external_google' : 'lovable_managed',
-      ready: !!lovableApiKey, // Always ready if Lovable key exists
+      residency: {
+        configured: externalEnabled,
+      },
+      ready: managedAiAvailable || externalEnabled,
     };
 
     return new Response(JSON.stringify(config), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   } catch (error) {
-    console.error('Config error:', error);
-    return new Response(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Failed to load config',
-      requestId: crypto.randomUUID()
+    const requestId = crypto.randomUUID();
+    console.error('[ai-config] configuration probe failed', requestId, error);
+    return new Response(JSON.stringify({
+      error: 'Unable to load AI capability configuration',
+      requestId,
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -40,6 +40,10 @@ describe('authenticated shell core', () => {
   it('keeps mounted route pages behind React.lazy', () => {
     expect(shell).toMatch(/const Dashboard = lazy\(/);
     expect(shell).toMatch(/const Compliance = lazy\(/);
-    expect(shell).toMatch(/const InfrastructurePage = lazy\(/);
+    expect(shell).toMatch(/const DataCentreTwin = lazy\(/);
+    // Development-only surfaces are lazy behind an env gate so production
+    // never emits their chunks.
+    expect(shell).toMatch(/const InfrastructurePage = import\.meta\.env\.DEV\s*\n\s*\? lazy\(/);
   });
+
 });

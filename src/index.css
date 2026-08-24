@@ -1781,13 +1781,21 @@ html:not(.dark) .aura-workspace-theme {
   .aura-ws-title { font-size: 30px; }
 }
 
+.aura-ws-description {
+  margin-top: 8px;
+  max-width: 78ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: hsl(var(--muted-foreground));
+}
+
 /* ---- compact density: canvas workspaces that cannot spend vertical space ---- */
 .aura-ws-header[data-density='compact'] {
   margin-bottom: 0;
   border-radius: 0;
-  border-left: 0;
-  border-right: 0;
-  border-top: 0;
+  border-left-width: 0;
+  border-right-width: 0;
+  border-top-width: 0;
   box-shadow: none;
   padding: 10px 16px;
   gap: 10px;
@@ -1799,12 +1807,9 @@ html:not(.dark) .aura-workspace-theme {
   border-radius: 8px;
 }
 
-.aura-ws-header[data-density='compact'] .aura-ws-title,
-@media (min-width: 900px) {
-  .aura-ws-header[data-density='compact'] .aura-ws-title { font-size: 16px; }
+.aura-ws-header[data-density='compact'] .aura-ws-title {
+  font-size: 16px;
 }
-
-.aura-ws-header[data-density='compact'] .aura-ws-title { font-size: 16px; }
 
 .aura-ws-header[data-density='compact'] .aura-ws-description {
   margin-top: 2px;
@@ -1815,14 +1820,6 @@ html:not(.dark) .aura-workspace-theme {
   padding-top: 8px;
 }
 
-
-.aura-ws-description {
-  margin-top: 8px;
-  max-width: 78ch;
-  font-size: 14px;
-  line-height: 1.55;
-  color: hsl(var(--muted-foreground));
-}
 
 .aura-ws-header-actions {
   display: flex;

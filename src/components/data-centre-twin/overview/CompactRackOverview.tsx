@@ -86,7 +86,7 @@ export function CompactRackOverview({
         </div>
         
         {/* Compact Legend */}
-        <div className="flex items-center gap-2 text-[10px]">
+        <div className="flex items-center gap-2 text-xs">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-sm bg-success" />
             <span className="text-muted-foreground">&lt;22°C</span>
@@ -127,7 +127,7 @@ export function CompactRackOverview({
                     getTempColor(rack.inletTemp)
                   )} />
                   
-                  <div className="text-[9px] font-medium text-card-foreground truncate">
+                  <div className="text-xs font-medium text-card-foreground truncate">
                     {rack.name}
                   </div>
                   <div className="text-[8px] text-muted-foreground font-mono">

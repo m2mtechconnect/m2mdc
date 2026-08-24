@@ -285,7 +285,7 @@ export function LiveInsightsKPIPanel({
                         <Badge 
                           variant="outline" 
                           className={cn(
-                            "text-[9px] shrink-0",
+                            "text-xs shrink-0",
                             insight.severity === 'critical' 
                               ? "text-destructive border-destructive/30" 
                               : "text-muted-foreground"

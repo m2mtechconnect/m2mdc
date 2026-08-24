@@ -444,7 +444,7 @@ export function EnhancedComparisonMode({ availableRuns, className, useHistorical
                               <Badge 
                                 variant="outline" 
                                 className={cn(
-                                  "text-[9px]",
+                                  "text-xs",
                                   isNeutral && "border-muted-foreground/30 text-muted-foreground",
                                   !isNeutral && isImprovement && "border-success/30 text-success bg-success/5",
                                   !isNeutral && !isImprovement && "border-destructive/30 text-destructive bg-destructive/5"

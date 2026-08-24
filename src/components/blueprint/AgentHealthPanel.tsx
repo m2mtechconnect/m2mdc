@@ -135,7 +135,7 @@ export function AgentHealthPanel({ className }: { className?: string }) {
                       </div>
                       <div>
                         <p className="text-sm font-medium">{agent.name}</p>
-                        <p className="text-[10px] text-muted-foreground capitalize">{agent.domain}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{agent.domain}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -151,22 +151,22 @@ export function AgentHealthPanel({ className }: { className?: string }) {
                     <div className="p-2 rounded bg-muted/50 text-center">
                       <Zap className={cn('h-3 w-3 mx-auto mb-1', getLatencyColor(agent.latencyMs))} />
                       <p className="font-mono font-medium">{agent.latencyMs}ms</p>
-                      <p className="text-[10px] text-muted-foreground">Latency</p>
+                      <p className="text-xs text-muted-foreground">Latency</p>
                     </div>
                     <div className="p-2 rounded bg-muted/50 text-center">
                       <RefreshCw className="h-3 w-3 mx-auto mb-1 text-info" />
                       <p className="font-mono font-medium">{agent.refreshRateHz}Hz</p>
-                      <p className="text-[10px] text-muted-foreground">Refresh</p>
+                      <p className="text-xs text-muted-foreground">Refresh</p>
                     </div>
                     <div className="p-2 rounded bg-muted/50 text-center">
                       <Clock className="h-3 w-3 mx-auto mb-1 text-muted-foreground" />
                       <p className="font-mono font-medium">{agent.dataFreshnessMs}ms</p>
-                      <p className="text-[10px] text-muted-foreground">Freshness</p>
+                      <p className="text-xs text-muted-foreground">Freshness</p>
                     </div>
                     <div className="p-2 rounded bg-muted/50 text-center">
                       <CheckCircle2 className="h-3 w-3 mx-auto mb-1 text-success" />
                       <p className="font-mono font-medium">{agent.successRate}%</p>
-                      <p className="text-[10px] text-muted-foreground">Success</p>
+                      <p className="text-xs text-muted-foreground">Success</p>
                     </div>
                   </div>
 
@@ -176,16 +176,16 @@ export function AgentHealthPanel({ className }: { className?: string }) {
                       <div className="flex items-center gap-2">
                         <Brain className="h-3.5 w-3.5 text-primary" />
                         <span className="text-xs font-medium">Last Decision</span>
-                        <Badge variant="outline" className="text-[10px] ml-auto">
+                        <Badge variant="outline" className="text-xs ml-auto">
                           {signalStrength(agent.lastDecision.confidence * 100)} signal
                         </Badge>
                       </div>
                       <p className="text-xs font-medium">{agent.lastDecision.action}</p>
-                      <p className="text-[10px] text-muted-foreground">{SIGNAL_BASIS}</p>
-                      <p className="text-[10px] text-muted-foreground">{agent.lastDecision.reasoning}</p>
+                      <p className="text-xs text-muted-foreground">{SIGNAL_BASIS}</p>
+                      <p className="text-xs text-muted-foreground">{agent.lastDecision.reasoning}</p>
                       <div className="flex flex-wrap gap-1">
                         {agent.lastDecision.factors.map((factor, i) => (
-                          <Badge key={i} variant="secondary" className="text-[9px]">
+                          <Badge key={i} variant="secondary" className="text-xs">
                             {factor}
                           </Badge>
                         ))}

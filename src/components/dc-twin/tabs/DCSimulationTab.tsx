@@ -389,7 +389,7 @@ export function DCSimulationTab() {
                       </div>
                       <Badge 
                         variant="outline" 
-                        className={`text-[10px] shrink-0 ${
+                        className={`text-xs shrink-0 ${
                           scenario.severity === 'critical' ? 'text-destructive' :
                           scenario.severity === 'warning' ? 'text-warning' : 'text-info'
                         }`}
@@ -415,10 +415,10 @@ export function DCSimulationTab() {
                     {scenario.kpisImpacted.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {scenario.kpisImpacted.slice(0, 2).map((kpi, i) => (
-                          <Badge key={i} variant="secondary" className="text-[9px]">{kpi}</Badge>
+                          <Badge key={i} variant="secondary" className="text-xs">{kpi}</Badge>
                         ))}
                         {scenario.kpisImpacted.length > 2 && (
-                          <Badge variant="secondary" className="text-[9px]">+{scenario.kpisImpacted.length - 2}</Badge>
+                          <Badge variant="secondary" className="text-xs">+{scenario.kpisImpacted.length - 2}</Badge>
                         )}
                       </div>
                     )}

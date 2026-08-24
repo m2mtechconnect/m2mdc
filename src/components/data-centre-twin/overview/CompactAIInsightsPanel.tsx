@@ -72,7 +72,7 @@ export function CompactAIInsightsPanel({
             <CheckCircle className="h-5 w-5 text-success" />
           </div>
           <p className="text-xs font-medium">All systems optimized</p>
-          <p className="text-[10px]">No actionable insights</p>
+          <p className="text-xs">No actionable insights</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -85,13 +85,13 @@ export function CompactAIInsightsPanel({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 mb-1 flex-wrap">
-                      <Badge variant="outline" className={cn('text-[10px]', domainColors[insight.domain])}>
+                      <Badge variant="outline" className={cn('text-xs', domainColors[insight.domain])}>
                         {insight.domain}
                       </Badge>
                       {insight.severity !== 'info' && (
                         <Badge 
                           variant={insight.severity === 'critical' ? 'destructive' : 'outline'}
-                          className={cn('text-[10px]', insight.severity === 'warning' && 'bg-warning/10 text-warning border-warning/30')}
+                          className={cn('text-xs', insight.severity === 'warning' && 'bg-warning/10 text-warning border-warning/30')}
                         >
                           {insight.severity}
                         </Badge>
@@ -101,7 +101,7 @@ export function CompactAIInsightsPanel({
                     <p className="text-xs font-medium truncate">{insight.title}</p>
                     
                     {insight.impact && (
-                      <div className="flex items-center gap-1 mt-1 text-[10px] text-muted-foreground">
+                      <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                         <Lightbulb className="h-2.5 w-2.5 text-warning shrink-0" />
                         <span className="truncate">{insight.impact}</span>
                       </div>
@@ -111,7 +111,7 @@ export function CompactAIInsightsPanel({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-6 text-[10px] gap-1"
+                        className="h-6 text-xs gap-1"
                         onClick={() => onSimulateFix?.(insight.id)}
                       >
                         <PlayCircle className="h-2.5 w-2.5" />
@@ -120,7 +120,7 @@ export function CompactAIInsightsPanel({
                       <Button
                         variant="default"
                         size="sm"
-                        className="h-6 text-[10px] gap-1"
+                        className="h-6 text-xs gap-1"
                         onClick={() => onApplyFix?.(insight.id)}
                       >
                         <CheckCircle className="h-2.5 w-2.5" />
@@ -129,7 +129,7 @@ export function CompactAIInsightsPanel({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 text-[10px] text-muted-foreground"
+                        className="h-6 text-xs text-muted-foreground"
                         onClick={() => handleDismiss(insight.id)}
                       >
                         Dismiss

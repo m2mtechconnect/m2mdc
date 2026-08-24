@@ -104,10 +104,10 @@ export function DCDeployTab() {
                   <p className="text-xs font-medium text-muted-foreground">Recommended Services</p>
                   <div className="flex flex-wrap gap-1">
                     {region.recommendedServices.slice(0, 3).map((svc, i) => (
-                      <Badge key={i} variant="secondary" className="text-[9px]">{svc}</Badge>
+                      <Badge key={i} variant="secondary" className="text-xs">{svc}</Badge>
                     ))}
                     {region.recommendedServices.length > 3 && (
-                      <Badge variant="secondary" className="text-[9px]">+{region.recommendedServices.length - 3}</Badge>
+                      <Badge variant="secondary" className="text-xs">+{region.recommendedServices.length - 3}</Badge>
                     )}
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export function DCDeployTab() {
                     <p className="text-xs text-muted-foreground mt-1">{check.message}</p>
                   )}
                   {check.requiresConfigAction && check.status !== 'pass' && (
-                    <Badge variant="outline" className="mt-2 text-[10px]">Action Required</Badge>
+                    <Badge variant="outline" className="mt-2 text-xs">Action Required</Badge>
                   )}
                 </div>
               </div>

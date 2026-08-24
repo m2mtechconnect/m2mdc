@@ -146,10 +146,10 @@ export function DCBlueprintTab() {
                     <p className="text-xs font-medium text-muted-foreground mb-1">Input Signals</p>
                     <div className="flex flex-wrap gap-1">
                       {agent.inputSignals.slice(0, 3).map((signal, i) => (
-                        <Badge key={i} variant="outline" className="text-[10px]">{signal}</Badge>
+                        <Badge key={i} variant="outline" className="text-xs">{signal}</Badge>
                       ))}
                       {agent.inputSignals.length > 3 && (
-                        <Badge variant="outline" className="text-[10px]">+{agent.inputSignals.length - 3}</Badge>
+                        <Badge variant="outline" className="text-xs">+{agent.inputSignals.length - 3}</Badge>
                       )}
                     </div>
                   </div>
@@ -158,10 +158,10 @@ export function DCBlueprintTab() {
                     <p className="text-xs font-medium text-muted-foreground mb-1">KPIs Impacted</p>
                     <div className="flex flex-wrap gap-1">
                       {agent.kpisImpacted.slice(0, 2).map((kpi, i) => (
-                        <Badge key={i} variant="secondary" className="text-[10px]">{kpi}</Badge>
+                        <Badge key={i} variant="secondary" className="text-xs">{kpi}</Badge>
                       ))}
                       {agent.kpisImpacted.length > 2 && (
-                        <Badge variant="secondary" className="text-[10px]">+{agent.kpisImpacted.length - 2}</Badge>
+                        <Badge variant="secondary" className="text-xs">+{agent.kpisImpacted.length - 2}</Badge>
                       )}
                     </div>
                   </div>
@@ -193,7 +193,7 @@ export function DCBlueprintTab() {
                     <span>Protocol: <span className="font-medium">{ds.protocol}</span></span>
                     <span>Refresh: <span className="font-medium">{ds.updateFrequency}</span></span>
                   </div>
-                  <Badge variant="outline" className="text-[10px]">{ds.domain}</Badge>
+                  <Badge variant="outline" className="text-xs">{ds.domain}</Badge>
                 </CardContent>
               </Card>
             ))}
@@ -233,15 +233,15 @@ export function DCBlueprintTab() {
                         </div>
                         <div className="flex items-center justify-between text-sm">
                           <span className="text-muted-foreground">Direction</span>
-                          <Badge variant="outline" className="text-[10px]">
+                          <Badge variant="outline" className="text-xs">
                             {kpi.direction.replace('_', ' ')}
                           </Badge>
                         </div>
                         <div className="flex gap-2 mt-2">
-                          <Badge variant="outline" className="text-[10px] text-warning">
+                          <Badge variant="outline" className="text-xs text-warning">
                             Warn: {kpi.warningThreshold}
                           </Badge>
-                          <Badge variant="outline" className="text-[10px] text-destructive">
+                          <Badge variant="outline" className="text-xs text-destructive">
                             Crit: {kpi.criticalThreshold}
                           </Badge>
                         </div>
@@ -304,7 +304,7 @@ export function DCBlueprintTab() {
                         <p className="text-xs font-medium text-muted-foreground mb-1">Auto Actions</p>
                         <div className="flex flex-wrap gap-1">
                           {wf.autoActions.map((action, i) => (
-                            <Badge key={i} variant="secondary" className="text-[10px]">{action}</Badge>
+                            <Badge key={i} variant="secondary" className="text-xs">{action}</Badge>
                           ))}
                         </div>
                       </div>

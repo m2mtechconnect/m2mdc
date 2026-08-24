@@ -45,7 +45,7 @@ export function DecidePanel() {
             <li key={rec.id} className="rounded-md border border-border p-3">
               <div className="mb-1 flex items-start justify-between gap-2">
                 <h4 className="text-xs font-semibold text-foreground">{rec.title}</h4>
-                <Badge variant="outline" className="shrink-0 text-[10px]">
+                <Badge variant="outline" className="shrink-0 text-xs">
                   {rec.signal}
                 </Badge>
               </div>
@@ -65,7 +65,7 @@ export function DecidePanel() {
                 ))}
                 <span
                   className={cn(
-                    'ml-auto text-[10px] uppercase tracking-wide',
+                    'ml-auto text-xs uppercase tracking-wide',
                     decision === 'pending' ? 'text-muted-foreground' : 'text-foreground',
                   )}
                 >

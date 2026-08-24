@@ -128,7 +128,7 @@ export function EnhancedEventTimeline({
             <Badge 
               key={domain} 
               variant="outline" 
-              className={cn('text-[10px] gap-0.5', colors.bg, colors.border, colors.text)}
+              className={cn('text-xs gap-0.5', colors.bg, colors.border, colors.text)}
             >
               {domainIcons[domain]}
             </Badge>
@@ -149,7 +149,7 @@ export function EnhancedEventTimeline({
         className="relative h-16 bg-muted/30 rounded-lg border border-border mb-4 overflow-hidden"
       >
         {/* Time labels */}
-        <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 py-1 text-[10px] text-muted-foreground font-mono">
+        <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 py-1 text-xs text-muted-foreground font-mono">
           <span>{formatTime(timeRange.start)}</span>
           <span>Now</span>
         </div>
@@ -222,11 +222,11 @@ export function EnhancedEventTimeline({
               <div className="flex items-center gap-2">
                 <Badge variant="outline" className={cn('gap-0.5', colors.bg, colors.border, colors.text)}>
                   {domainIcons[event.domain.toLowerCase()]}
-                  <span className="text-[10px]">{event.domain}</span>
+                  <span className="text-xs">{event.domain}</span>
                 </Badge>
                 <span className="text-sm truncate max-w-[200px]">{event.title}</span>
                 {event.isSimulated && (
-                  <Badge variant="outline" className="text-[10px] bg-info/10 text-info">
+                  <Badge variant="outline" className="text-xs bg-info/10 text-info">
                     SIM
                   </Badge>
                 )}

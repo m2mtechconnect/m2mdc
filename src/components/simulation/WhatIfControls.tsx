@@ -215,7 +215,7 @@ export function WhatIfControls({
                       </div>
                       <div>
                         <span className="text-sm font-medium">{param.name}</span>
-                        <p className="text-[10px] text-muted-foreground">{param.description}</p>
+                        <p className="text-xs text-muted-foreground">{param.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -244,7 +244,7 @@ export function WhatIfControls({
                     className={cn(!isDefault && "[&_[role=slider]]:bg-primary")}
                   />
 
-                  <div className="flex justify-between text-[10px] text-muted-foreground">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{param.min}{param.unit}</span>
                     <span>Default: {param.currentValue}{param.unit}</span>
                     <span>{param.max}{param.unit}</span>
@@ -277,7 +277,7 @@ export function WhatIfControls({
                   key={kpiId}
                   className="p-2 rounded bg-muted/50 border border-border"
                 >
-                  <span className="text-[10px] text-muted-foreground block truncate">
+                  <span className="text-xs text-muted-foreground block truncate">
                     {config?.name}
                   </span>
                   <div className="flex items-center justify-between mt-1">
@@ -285,7 +285,7 @@ export function WhatIfControls({
                       {value.toFixed(1)}{config?.unit}
                     </span>
                     {!isNeutral && (
-                      <Badge variant="outline" className={cn("text-[10px] h-4 gap-0.5", trendColor)}>
+                      <Badge variant="outline" className={cn("text-xs h-4 gap-0.5", trendColor)}>
                         <TrendIcon className="h-2.5 w-2.5" />
                         {Math.abs(delta).toFixed(1)}
                       </Badge>

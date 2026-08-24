@@ -94,13 +94,13 @@ export function AIInsightsPanel({ facility, onApplyFix, onSimulateFix }: AIInsig
                           {insight.domain}
                         </Badge>
                         {insight.severity === 'critical' && (
-                          <Badge variant="destructive" className="text-[10px]">
+                          <Badge variant="destructive" className="text-xs">
                             <AlertTriangle className="h-2.5 w-2.5 mr-1" />
                             Critical
                           </Badge>
                         )}
                         {insight.severity === 'warning' && (
-                          <Badge className="text-[10px] bg-warning/10 text-warning border-warning/30">
+                          <Badge className="text-xs bg-warning/10 text-warning border-warning/30">
                             Warning
                           </Badge>
                         )}

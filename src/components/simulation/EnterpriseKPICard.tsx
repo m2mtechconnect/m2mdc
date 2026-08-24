@@ -277,7 +277,7 @@ export function EnterpriseKPICard({
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Badge variant="outline" className={cn("text-[10px] h-4 gap-0.5", trendColor)}>
+            <Badge variant="outline" className={cn("text-xs h-4 gap-0.5", trendColor)}>
               <TrendIcon className="h-2.5 w-2.5" />
               {Math.abs(deltaPercent).toFixed(1)}%
             </Badge>
@@ -290,7 +290,7 @@ export function EnterpriseKPICard({
             >
               <Badge 
                 variant="outline" 
-                className="text-[10px] h-4"
+                className="text-xs h-4"
                 style={{ borderColor: zone.color, color: zone.color }}
               >
                 {zone.label}
@@ -426,7 +426,7 @@ export function EnterpriseKPICard({
                 >
                   <Badge 
                     variant="outline" 
-                    className="text-[10px]"
+                    className="text-xs"
                     style={{ borderColor: zone.color, color: zone.color }}
                   >
                     {zone.severity === 'critical' && <AlertTriangle className="h-3 w-3 mr-1" />}

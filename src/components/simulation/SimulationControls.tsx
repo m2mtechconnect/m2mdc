@@ -166,7 +166,7 @@ export function SimulationControls({
               >
                 <span>{scenario.name}</span>
                 {scenario.active && (
-                  <Badge variant="default" className="h-4 px-1 text-[10px]">Active</Badge>
+                  <Badge variant="default" className="h-4 px-1 text-xs">Active</Badge>
                 )}
               </DropdownMenuItem>
             ))}
@@ -220,7 +220,7 @@ export function SimulationControls({
             onValueChange={([value]) => onSeek((value / 100) * totalDuration)}
             className="cursor-pointer"
           />
-          <div className="flex justify-between text-[10px] text-muted-foreground">
+          <div className="flex justify-between text-xs text-muted-foreground">
             <span>Start</span>
             <span className="flex items-center gap-1">
               {isRunning && <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />}

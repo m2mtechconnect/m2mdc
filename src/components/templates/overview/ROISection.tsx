@@ -101,7 +101,7 @@ export function ROISection({ headline, benefits, estimates }: ROISectionProps) {
                       </p>
                     )}
                     {estimate.time_frame && (
-                      <p className="text-[10px] text-[#9CA3AF]">
+                      <p className="text-xs text-[#9CA3AF]">
                         Timeframe: {estimate.time_frame}
                       </p>
                     )}

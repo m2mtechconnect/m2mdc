@@ -245,7 +245,7 @@ export function ExecutiveSummaryBlock({ className, twinId }: ExecutiveSummaryBlo
                   <p className="text-sm font-medium group-hover:text-foreground transition-colors">{risk.name}</p>
                   <p className="text-xs text-muted-foreground">{risk.description}</p>
                 </div>
-                <Badge variant="outline" className="text-[10px] shrink-0 capitalize">
+                <Badge variant="outline" className="text-xs shrink-0 capitalize">
                   {risk.severity}
                 </Badge>
               </div>

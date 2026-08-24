@@ -319,7 +319,7 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
                 <span className="truncate flex-1">{flow.name}</span>
                 <Badge 
                   variant={flow.status === 'active' ? 'default' : 'secondary'}
-                  className="text-[10px] ml-2"
+                  className="text-xs ml-2"
                 >
                   {flow.isCrossBorder ? 'X-Border' : 'Local'}
                 </Badge>

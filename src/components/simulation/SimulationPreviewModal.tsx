@@ -107,7 +107,7 @@ export function SimulationPreviewModal({
                 {PRESET_SCENARIOS.map((scenario) => (
                   <SelectItem key={scenario.id} value={scenario.id}>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-xs">
                         {scenario.category}
                       </Badge>
                       <span>{scenario.name}</span>

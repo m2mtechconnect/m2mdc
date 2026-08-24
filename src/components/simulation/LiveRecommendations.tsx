@@ -189,7 +189,7 @@ export function LiveRecommendations({
                         )}
                         
                         <span className="flex items-center gap-1">
-                          <Badge variant="outline" className="h-4 px-1 text-[10px]">
+                          <Badge variant="outline" className="h-4 px-1 text-xs">
                             {signalStrength(rec.confidence)} signal
                           </Badge>
                         </span>

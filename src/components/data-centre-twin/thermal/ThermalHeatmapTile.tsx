@@ -46,7 +46,7 @@ export function ThermalHeatmapTile({ rack, showAirflow = true, onClick }: Therma
               <span className="text-xs font-mono font-bold drop-shadow-lg">
                 {rack.inletTempC.toFixed(0)}°
               </span>
-              <span className="text-[9px] font-mono opacity-80 drop-shadow">
+              <span className="text-xs font-mono opacity-80 drop-shadow">
                 {rack.name.replace('Rack ', '')}
               </span>
             </div>

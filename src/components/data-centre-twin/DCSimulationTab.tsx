@@ -295,7 +295,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                   </Badge>
                 )}
                 {isRunning && (
-                  <Badge variant="outline" className="ml-auto text-[10px] bg-primary/10 text-primary animate-pulse">
+                  <Badge variant="outline" className="ml-auto text-xs bg-primary/10 text-primary animate-pulse">
                     <Activity className="h-3 w-3 mr-1" />
                     LIVE
                   </Badge>
@@ -328,7 +328,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         animationDelay: `${idx * 50}ms`
                       }}
                     >
-                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium">{kpi.label}</p>
+                      <p className="text-xs uppercase tracking-wide text-muted-foreground font-medium">{kpi.label}</p>
                       <p className={cn(
                         'text-xl font-bold tabular-nums transition-all duration-500',
                         isRunning && 'scale-110',
@@ -480,7 +480,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                       <Clock className="h-3 w-3" />
                       {Math.floor(activeScenario.durationSeconds / 60)}m
                     </span>
-                    <Badge variant="outline" className="text-[10px] h-5">
+                    <Badge variant="outline" className="text-xs h-5">
                       {activeScenario.severity}
                     </Badge>
                   </div>
@@ -494,7 +494,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-sm font-medium flex items-center justify-between">
                 <span>Select Scenario</span>
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge variant="secondary" className="text-xs">
                   {allScenarios.length} available
                 </Badge>
               </CardTitle>
@@ -521,7 +521,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         <Badge 
                           variant="outline" 
                           className={cn(
-                            'text-[10px] h-5',
+                            'text-xs h-5',
                             categoryColors[scenario.category] || 'border-muted-foreground/30'
                           )}
                         >
@@ -530,7 +530,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         <span className="text-xs text-muted-foreground">
                           {Math.floor(scenario.durationSeconds / 60)}m
                         </span>
-                        <Badge variant="outline" className="text-[10px] h-5">
+                        <Badge variant="outline" className="text-xs h-5">
                           {scenario.severity}
                         </Badge>
                       </div>
@@ -548,7 +548,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                 <AlertTriangle className="h-4 w-4 text-warning" />
                 Simulation Events
                 {events.length > 0 && (
-                  <Badge variant="secondary" className="text-[10px] h-5">
+                  <Badge variant="secondary" className="text-xs h-5">
                     {events.length}
                   </Badge>
                 )}
@@ -595,7 +595,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                         </div>
                         <div className="flex items-center gap-1.5 mt-1">
                           {event.domain && DOMAIN_AGENT_SHORT[event.domain] && (
-                            <Badge variant="outline" className="text-[9px] h-4 px-1 gap-0.5 font-normal border-primary/30 text-primary shrink-0">
+                            <Badge variant="outline" className="text-xs h-4 px-1 gap-0.5 font-normal border-primary/30 text-primary shrink-0">
                               <Bot className="h-2.5 w-2.5" />
                               {DOMAIN_AGENT_SHORT[event.domain]}
                             </Badge>

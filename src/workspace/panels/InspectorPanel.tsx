@@ -59,7 +59,7 @@ export function InspectorPanel({ facility, assets }: Props) {
                 )}
               >
                 <span className="truncate">{asset.name}</span>
-                <span className="ml-2 shrink-0 text-[10px] text-muted-foreground">{asset.subsystem}</span>
+                <span className="ml-2 shrink-0 text-xs text-muted-foreground">{asset.subsystem}</span>
               </button>
             </li>
           ))}
@@ -112,7 +112,7 @@ export function InspectorPanel({ facility, assets }: Props) {
               </p>
               <div className="flex flex-wrap gap-1">
                 {dependents.slice(0, 8).map((dep) => (
-                  <Badge key={dep.id} variant="secondary" className="text-[10px]">
+                  <Badge key={dep.id} variant="secondary" className="text-xs">
                     {dep.name}
                   </Badge>
                 ))}

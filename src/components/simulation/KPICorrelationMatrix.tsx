@@ -150,7 +150,7 @@ export function KPICorrelationMatrix({
                         className="w-12 h-20 flex items-end justify-center pb-1"
                       >
                         <span 
-                          className="text-[9px] text-muted-foreground font-medium whitespace-nowrap transform -rotate-45 origin-left"
+                          className="text-xs text-muted-foreground font-medium whitespace-nowrap transform -rotate-45 origin-left"
                         >
                           {DEFAULT_KPI_CONFIGS[kpi]?.name.slice(0, 12)}
                         </span>
@@ -162,7 +162,7 @@ export function KPICorrelationMatrix({
                   {matrix.map((row, i) => (
                     <div key={kpiIds[i]} className="flex items-center">
                       <div className="w-24 shrink-0 pr-2 py-1">
-                        <span className="text-[10px] text-muted-foreground truncate block">
+                        <span className="text-xs text-muted-foreground truncate block">
                           {DEFAULT_KPI_CONFIGS[kpiIds[i]]?.name.slice(0, 15)}
                         </span>
                       </div>
@@ -178,7 +178,7 @@ export function KPICorrelationMatrix({
                           )}
                           title={`${kpiIds[i]} ↔ ${kpiIds[j]}: ${value.toFixed(2)}`}
                         >
-                          <span className="text-[10px] font-mono">
+                          <span className="text-xs font-mono">
                             {i === j ? '1.0' : value.toFixed(1)}
                           </span>
                         </motion.div>

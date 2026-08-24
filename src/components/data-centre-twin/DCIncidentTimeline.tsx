@@ -87,7 +87,7 @@ export function DCIncidentTimeline({
               {domainIcons[incident.domain]}
               <span className="text-xs truncate max-w-[200px]">{incident.title}</span>
             </div>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {formatTimeAgo(incident.timestamp)}
             </span>
           </div>
@@ -138,7 +138,7 @@ export function DCIncidentTimeline({
                     ) : (
                       <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                     )}
-                    <span className="text-[10px] text-muted-foreground">
+                    <span className="text-xs text-muted-foreground">
                       {formatTimeAgo(incident.timestamp)}
                     </span>
                   </div>
@@ -152,19 +152,19 @@ export function DCIncidentTimeline({
                 {incident.metadata && (
                   <div className="flex gap-1.5 flex-wrap">
                     {incident.metadata.emissionsImpact && (
-                      <Badge variant="outline" className="text-[10px] bg-success/10 text-success">
+                      <Badge variant="outline" className="text-xs bg-success/10 text-success">
                         <Leaf className="h-2.5 w-2.5 mr-1" />
                         {incident.metadata.emissionsImpact}
                       </Badge>
                     )}
                     {incident.metadata.costImpact && (
-                      <Badge variant="outline" className="text-[10px] bg-warning/10 text-warning">
+                      <Badge variant="outline" className="text-xs bg-warning/10 text-warning">
                         <DollarSign className="h-2.5 w-2.5 mr-1" />
                         {incident.metadata.costImpact}
                       </Badge>
                     )}
                     {incident.metadata.region && (
-                      <Badge variant="outline" className="text-[10px]">
+                      <Badge variant="outline" className="text-xs">
                         {incident.metadata.region}
                       </Badge>
                     )}

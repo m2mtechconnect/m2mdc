@@ -123,7 +123,7 @@ const KPICard = memo(function KPICard({
           </span>
           {!isNeutral && (
             <Badge variant="outline" className={cn(
-              'text-[10px] h-4 gap-0.5 transition-all duration-300',
+              'text-xs h-4 gap-0.5 transition-all duration-300',
               trendColor,
               isRunning && 'animate-pulse'
             )}>
@@ -183,7 +183,7 @@ const KPICard = memo(function KPICard({
             </Badge>
           )}
           {isNeutral && isRunning && (
-            <Badge variant="outline" className="text-[10px] h-5 animate-pulse bg-primary/10 text-primary border-primary/30">
+            <Badge variant="outline" className="text-xs h-5 animate-pulse bg-primary/10 text-primary border-primary/30">
               <Activity className="h-3 w-3 mr-1" />
               LIVE
             </Badge>
@@ -264,7 +264,7 @@ export const DCKPIDeltas = memo(function DCKPIDeltas({
             KPI Impact
           </CardTitle>
           {isRunning && (
-            <Badge variant="outline" className="text-[10px] animate-pulse bg-success/10 text-success">
+            <Badge variant="outline" className="text-xs animate-pulse bg-success/10 text-success">
               LIVE
             </Badge>
           )}

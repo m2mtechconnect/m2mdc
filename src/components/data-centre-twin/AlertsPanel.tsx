@@ -121,7 +121,7 @@ function AlertItem({ alert, muted }: AlertItemProps) {
             {alert.description}
           </p>
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className={`text-[10px] ${domainColors[alert.domain.toLowerCase()] || 'bg-muted'}`}>
+            <Badge variant="outline" className={`text-xs ${domainColors[alert.domain.toLowerCase()] || 'bg-muted'}`}>
               {alert.domain}
             </Badge>
             <span className="text-xs text-muted-foreground flex items-center gap-1 font-mono">

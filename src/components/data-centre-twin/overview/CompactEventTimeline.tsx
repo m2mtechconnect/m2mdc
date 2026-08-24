@@ -85,7 +85,7 @@ export function CompactEventTimeline({
       {/* Mini Timeline Bar */}
       <div className="relative h-8 bg-muted/30 rounded-lg border border-border mb-3 overflow-hidden">
         {/* Time markers */}
-        <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 py-0.5 text-[9px] text-muted-foreground font-mono">
+        <div className="absolute inset-x-0 bottom-0 flex justify-between px-2 py-0.5 text-xs text-muted-foreground font-mono">
           <span>24h ago</span>
           <span>Now</span>
         </div>
@@ -131,13 +131,13 @@ export function CompactEventTimeline({
             <div className="flex items-center gap-2 min-w-0">
               <Badge 
                 variant="outline" 
-                className={cn('shrink-0 text-[10px] gap-0.5', domainColors[latestEvent.domain.toLowerCase()])}
+                className={cn('shrink-0 text-xs gap-0.5', domainColors[latestEvent.domain.toLowerCase()])}
               >
                 {domainIcons[latestEvent.domain.toLowerCase()]}
               </Badge>
               <span className="text-xs truncate">{latestEvent.title}</span>
             </div>
-            <span className="text-[10px] text-muted-foreground font-mono shrink-0">
+            <span className="text-xs text-muted-foreground font-mono shrink-0">
               {formatTimeAgo(latestEvent.timestamp)}
             </span>
           </div>

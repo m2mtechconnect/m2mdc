@@ -256,7 +256,7 @@ function InspectorBody() {
               </Button>
             ))}
           </div>
-          <Badge variant="outline" className="text-[10px] font-normal">
+          <Badge variant="outline" className="text-xs font-normal">
             Every related view keeps this asset in context.
           </Badge>
         </section>

@@ -152,7 +152,7 @@ export function EnterpriseKPIChart({
           {zone && (
             <Badge 
               variant="outline" 
-              className="text-[10px]"
+              className="text-xs"
               style={{ borderColor: zone.color, color: zone.color }}
             >
               {zone.label}
@@ -248,7 +248,7 @@ export function EnterpriseKPIChart({
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-6 px-2 text-[10px]",
+                      "h-6 px-2 text-xs",
                       visibleLayers[key as keyof typeof visibleLayers] 
                         ? "bg-primary/10 text-primary" 
                         : "text-muted-foreground"
@@ -261,7 +261,7 @@ export function EnterpriseKPIChart({
               </div>
 
               {isRunning && (
-                <Badge variant="outline" className="text-[10px] animate-pulse bg-success/10 text-success">
+                <Badge variant="outline" className="text-xs animate-pulse bg-success/10 text-success">
                   LIVE
                 </Badge>
               )}
@@ -289,14 +289,14 @@ export function EnterpriseKPIChart({
           {(anomalies.length > 0 || forecast?.trend !== 'stable') && (
             <div className="flex gap-2 mt-2">
               {anomalies.length > 0 && (
-                <Badge variant="outline" className="text-[10px] text-destructive border-destructive/30 bg-destructive/5">
+                <Badge variant="outline" className="text-xs text-destructive border-destructive/30 bg-destructive/5">
                   <AlertTriangle className="h-3 w-3 mr-1" />
                   {anomalies.length} anomalies detected
                 </Badge>
               )}
               {forecast && forecast.trend !== 'stable' && (
                 <Badge variant="outline" className={cn(
-                  "text-[10px]",
+                  "text-xs",
                   forecast.trend === 'improving' ? "text-success border-success/30" : "text-warning border-warning/30"
                 )}>
                   {forecast.trend === 'improving' ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}

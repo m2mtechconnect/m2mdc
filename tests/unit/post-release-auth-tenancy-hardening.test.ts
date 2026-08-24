@@ -53,9 +53,13 @@ describe('post-release authorization and tenancy hardening', () => {
   });
 
   it('binds builder drafts to the server-resolved active organization', () => {
+    const inputSchemaBlock = builderCreate.slice(
+      builderCreate.indexOf('const InputSchema'),
+      builderCreate.indexOf('serve(createHandler'),
+    );
+    expect(inputSchemaBlock).not.toContain('org_id');
     expect(builderCreate).toContain("supabase.rpc('active_org_id')");
     expect(builderCreate).toContain('org_id: activeOrgId');
-    expect(builderCreate).not.toMatch(/InputSchema[\s\S]*org_id/);
   });
 
   it('uses RLS for current builder reads and keeps legacy drafts owner-only', () => {

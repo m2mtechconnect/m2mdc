@@ -129,7 +129,7 @@ export function AOCDesignTab({ instance }: AOCDesignTabProps) {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 rounded-lg bg-muted/50 border border-border">
                 <p className="text-xs text-muted-foreground mb-1">AI Model</p>
-                <p className="text-sm font-medium">{intelligence.model_id || 'Gemini 2.5 Flash'}</p>
+                <p className="text-sm font-medium">{modelDisplayLabel(intelligence.model_id)}</p>
               </div>
               <div className="p-3 rounded-lg bg-muted/50 border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Version</p>

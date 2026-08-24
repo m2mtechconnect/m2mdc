@@ -7,6 +7,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { stashReturnPath } from '@/auth/returnPathHandoff';
 
 export type SSOProviderId = 'google' | 'microsoft' | 'enterprise';
 
@@ -43,7 +44,13 @@ export function ssoRedirectUrl(): string {
   return `${window.location.origin}/auth/callback`;
 }
 
-export async function signInWithGoogle(): Promise<{ error: string | null }> {
+/**
+ * Start Google SSO. `returnTo` is sanitized and stashed same-origin so a
+ * protected deep link (including its query and hash) survives the provider
+ * round trip and is restored by `/auth/callback`.
+ */
+export async function signInWithGoogle(returnTo?: string | null): Promise<{ error: string | null }> {
+  stashReturnPath(returnTo ?? null);
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -53,3 +60,4 @@ export async function signInWithGoogle(): Promise<{ error: string | null }> {
   });
   return { error: error ? error.message : null };
 }
+

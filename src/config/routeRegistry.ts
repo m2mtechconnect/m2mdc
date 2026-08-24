@@ -101,7 +101,12 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/agents/:id/chat', shell: 'internal', kind: 'canonical' },
   { path: '/analytics', shell: 'internal', kind: 'canonical' },
   { path: '/compliance', shell: 'internal', kind: 'canonical' },
-  { path: '/infrastructure', shell: 'internal', kind: 'canonical' },
+  {
+    path: '/infrastructure',
+    shell: 'internal',
+    kind: 'dev-only',
+    note: 'Legacy static reference page with illustrative figures only. Mounted under import.meta.env.DEV; production direct URLs fall through to NotFound.',
+  },
   { path: '/account/profile', shell: 'internal', kind: 'canonical' },
   { path: '/account/settings', shell: 'internal', kind: 'canonical' },
   { path: '/teams', shell: 'internal', kind: 'canonical' },
@@ -155,7 +160,12 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
     guard: 'admin',
     note: 'Tenant diagnostics: exposes twin ids, raw query state and telemetry sources.',
   },
-  { path: '/digital-twins-demo/funding-intake', shell: 'internal', kind: 'canonical', note: 'Explicit demo namespace.' },
+  {
+    path: '/digital-twins-demo/funding-intake',
+    shell: 'internal',
+    kind: 'dev-only',
+    note: 'Explicit demo namespace. Mounted under import.meta.env.DEV only; not a production route.',
+  },
   { path: '/dsx/evidence-beta', shell: 'internal', kind: 'canonical', note: 'Evidence shell; children below.' },
   // Pre-consolidation flat Evidence paths. These are mounted at the shell's
   // top level (outside the `/dsx/evidence-beta` parent) so deep links commit
@@ -204,3 +214,59 @@ export const ALL_ROUTES: RouteRecord[] = [
 
 /** Every route that renders a real page (excludes redirects and plumbing). */
 export const CANONICAL_ROUTES = ALL_ROUTES.filter((r) => r.kind === 'canonical');
+
+/** Routes compiled and mounted only in development builds. */
+export const DEV_ONLY_ROUTES = ALL_ROUTES.filter((r) => r.kind === 'dev-only');
+
+/** Paths that exist in production builds (dev-only mounts excluded). */
+export const PRODUCTION_ROUTES = ALL_ROUTES.filter((r) => r.kind !== 'dev-only');
+
+export function isProductionRoute(path: string): boolean {
+  return PRODUCTION_ROUTES.some((r) => r.path === path);
+}
+
+/**
+ * Canonical share/deep-link targets.
+ *
+ * A handful of legacy public paths resolve to a different surface once the
+ * visitor is authenticated (`/twin-datacentre` is the public landing page but
+ * redirects an authenticated user into the Blueprint workspace). Those paths
+ * stay mounted for existing external links, but nothing in the product may
+ * *emit* them: share buttons, copied links and navigation must use the
+ * canonical path below so a shared URL always means one surface.
+ */
+export interface ShareLinkRule {
+  /** Legacy or ambiguous path that may still be received. */
+  legacy: string;
+  /** Path the product emits for an anonymous audience. */
+  publicCanonical: string;
+  /** Path the product emits for an authenticated audience. */
+  internalCanonical: string;
+  reason: string;
+}
+
+export const SHARE_LINK_RULES: ShareLinkRule[] = [
+  {
+    legacy: '/twin-datacentre',
+    publicCanonical: '/data-centre-twin',
+    internalCanonical: '/blueprint/default',
+    reason:
+      'Public marketing variant; authenticated visitors are redirected into the Blueprint workspace, so the two audiences need distinct canonical paths.',
+  },
+  {
+    legacy: '/omniverse-scene',
+    publicCanonical: '/twin-preview',
+    internalCanonical: '/twin-preview',
+    reason: 'Retired vendor-named path kept for compatibility only; never emitted as a canonical link.',
+  },
+];
+
+/** Vendor-named or legacy paths that must never be emitted as canonical links. */
+export const NON_EMITTABLE_PATHS: string[] = SHARE_LINK_RULES.map((r) => r.legacy);
+
+/** Canonical path a share/copy-link affordance should emit for `path`. */
+export function canonicalSharePath(path: string, audience: 'public' | 'internal'): string {
+  const rule = SHARE_LINK_RULES.find((r) => r.legacy === path);
+  if (!rule) return path;
+  return audience === 'public' ? rule.publicCanonical : rule.internalCanonical;
+}

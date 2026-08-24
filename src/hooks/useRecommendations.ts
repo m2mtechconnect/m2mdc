@@ -96,7 +96,7 @@ export function useRecommendations() {
       if (forceIngest) {
         const functionUrl = import.meta.env.VITE_SUPABASE_URL;
         if (!functionUrl) {
-          throw new Error('Configuration error: Supabase URL not found. Please refresh the page or contact support.');
+          throw new Error('Configuration error: the AURA service endpoint is unavailable. Please refresh the page or contact support.');
         }
         
         console.log('[Turbo] Base URL:', functionUrl);

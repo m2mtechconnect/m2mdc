@@ -326,16 +326,16 @@ Always provide specific, actionable recommendations backed by simulation data. R
       gcp: {
         enabled: true,
         region: 'northamerica-northeast1',
-        services: ['GKE', 'Cloud Monitoring', 'BigQuery', 'Pub/Sub', 'Vertex AI', 'Looker Studio'],
+        services: ['GKE', 'Cloud Monitoring', 'BigQuery', 'Pub/Sub', 'Managed AI', 'Looker Studio'],
         recommended_services: [
           'A3 VMs for H100 AI workloads',
-          'Vertex AI for optimization models',
+          'Managed AI for optimization models',
           'Pub/Sub for telemetry streaming',
           'BigQuery for emissions analytics'
         ],
         twin_services: [
           'Pub/Sub for GPU & energy telemetry ingestion',
-          'Vertex AI for carbon intensity forecasting',
+          'Managed AI for carbon intensity forecasting',
           'Cloud Storage (northamerica-northeast1) for sovereign data',
           'Looker Studio for KPI visualization'
         ],

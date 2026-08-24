@@ -89,7 +89,7 @@ export const AURA_CLOUD_DATA_CONNECTORS: readonly AuraCloudDataConnectorCapabili
     privateRuntimeStatus: 'ADAPTER_REQUIRED',
     requiresCustomerCredentials: true,
     connected: false,
-    truthNote: 'Connector capability is available in the AURA development workspace; no customer Google Cloud project or BigQuery dataset is connected.',
+    truthNote: 'Connector capability is available in the AURA development workspace; no customer cloud project or warehouse dataset is connected.',
   },
   {
     id: 'fabric',

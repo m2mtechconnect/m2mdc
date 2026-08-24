@@ -574,7 +574,7 @@ export const CANADIAN_CLOUD_REGIONS: DCCloudRegion[] = [
     regionCode: 'northamerica-northeast1',
     city: 'Montreal',
     sovereigntyNotes: 'GCP Montreal region, Canadian data sovereignty',
-    recommendedServices: ['Pub/Sub', 'Vertex AI', 'Cloud Functions', 'Cloud Storage', 'Looker'],
+    recommendedServices: ['Pub/Sub', 'Managed AI', 'Cloud Functions', 'Cloud Storage', 'Looker'],
   },
 ];
 

@@ -9,7 +9,7 @@ const source = fs.readFileSync(
 const mainSource = fs.readFileSync(path.resolve(process.cwd(), 'src/main.tsx'), 'utf8');
 
 describe('runtime monitoring contract', () => {
-  it('captures uncaught browser failures and unhandled rejections', () => {
+  it('supports uncaught browser failures and unhandled rejections when explicitly configured', () => {
     expect(source).toContain("window.addEventListener('error', onError)");
     expect(source).toContain("window.addEventListener('unhandledrejection', onUnhandledRejection)");
     expect(source).toContain("'runtime.client_error'");
@@ -17,11 +17,13 @@ describe('runtime monitoring contract', () => {
     expect(mainSource).toContain('startRuntimeMonitoring()');
   });
 
-  it('is disabled unless an explicit public PostHog configuration is selected', () => {
-    expect(source).toContain("VITE_AURA_ANALYTICS_PROVIDER === 'posthog'");
-    expect(source).toContain('VITE_POSTHOG_KEY');
-    expect(source).toContain('VITE_POSTHOG_HOST');
-    expect(source).toContain("if (config.provider === 'disabled') return () => {}");
+  it('is fail-closed and does not read ambient browser environment configuration', () => {
+    expect(source).toContain('startRuntimeMonitoring(config: AuraAnalyticsConfig = {})');
+    expect(source).toContain("if (config.provider !== 'posthog') return () => {}");
+    expect(source).not.toContain('import.meta.env');
+    expect(source).not.toContain('VITE_AURA_ANALYTICS_PROVIDER');
+    expect(source).not.toContain('VITE_POSTHOG_KEY');
+    expect(source).not.toContain('VITE_POSTHOG_HOST');
     expect(source).not.toContain('POSTHOG_PERSONAL_API_KEY');
     expect(source).not.toContain('SUPABASE_SERVICE_ROLE_KEY');
   });

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AURAStackSummary } from '@/components/stack/AURAStackSummary';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
@@ -253,6 +254,14 @@ export default function Help() {
           <RefreshCw className="mr-2 h-3.5 w-3.5" />
           Reset tours
         </Button>
+      </DCCard>
+
+      <DCCard
+        title="Platform architecture"
+        subtitle="What AURA is made of, in the same vocabulary the product uses. Each capability carries its evidence status."
+        icon={<Server className="h-5 w-5" />}
+      >
+        <AURAStackSummary surface="help" />
       </DCCard>
 
       <DCCard

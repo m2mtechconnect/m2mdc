@@ -144,6 +144,16 @@ export default function PlatformReadiness() {
         <Instrument level="secondary" label="Last assessment" value={<span className="v2-mono text-lg">{LAST_ASSESSED}</span>} detail="Applies to every capability row." />
       </InstrumentGrid>
 
+      <section aria-labelledby="stack-summary-heading" className="space-y-3">
+        <div className="space-y-1">
+          <h2 id="stack-summary-heading" className="text-base font-semibold">Platform stack</h2>
+          <p className="text-sm text-muted-foreground">
+            The customer-facing capability vocabulary, with the evidence qualifier that applies to each one.
+          </p>
+        </div>
+        <AURAStackSummary surface="readiness" />
+      </section>
+
       <section aria-labelledby="capabilities-heading" className="space-y-3">
         <h2 id="capabilities-heading" className="text-base font-semibold">Capability assessment</h2>
         {clusters.map((group) => (

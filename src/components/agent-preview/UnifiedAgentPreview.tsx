@@ -1,25 +1,10 @@
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { formatRelativeTime } from '@/lib/formatters';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
-import {
-  Bot,
-  Play,
-  Pause,
-  RotateCcw,
-  Rocket,
-  TrendingUp,
-  Activity,
-  CheckCircle2,
-  Plug2,
-} from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Bot, Play, Pause, RotateCcw, Rocket, TrendingUp, Activity, CheckCircle2, Plug2 } from 'lucide-react';
 import { AgentSummaryCard } from './AgentSummaryCard';
 
 interface MCPServer {
@@ -40,18 +25,13 @@ interface UnifiedAgentPreviewProps {
   totalRuns?: number;
   roi?: number;
   connectedAppsCount?: number;
-  recentActivity?: Array<{
-    id: string;
-    timestamp: string;
-    description: string;
-  }>;
+  recentActivity?: Array<{ id: string; timestamp: string; description: string }>;
   onResume?: () => void;
   onPause?: () => void;
   onRollback?: () => void;
   onDeploy?: () => void;
   isLoading?: boolean;
-  mode?: 'full' | 'preview' | 'overview'; // full = all controls, preview = template/marketplace, overview = chat + metrics only
-  // Agent Summary fields
+  mode?: 'full' | 'preview' | 'overview';
   description?: string;
   llmModel?: string;
   llmProvider?: string;
@@ -72,23 +52,26 @@ interface UnifiedAgentPreviewProps {
   onConnectServer?: (server: MCPServer) => void;
 }
 
+function metricText(value: number | undefined, suffix = ''): string {
+  return typeof value === 'number' ? `${value}${suffix}` : 'Unavailable';
+}
+
 export function UnifiedAgentPreview({
   agentId,
   agentName,
   status = 'draft',
   version = 'v0',
-  successRate = 0,
-  totalRuns = 0,
-  roi = 0,
-  connectedAppsCount = 0,
-  recentActivity = [],
+  successRate,
+  totalRuns,
+  roi,
+  connectedAppsCount,
+  recentActivity,
   onResume,
   onPause,
   onRollback,
   onDeploy,
   isLoading = false,
   mode = 'full',
-  // Agent Summary props
   description,
   llmModel,
   llmProvider,
@@ -105,32 +88,23 @@ export function UnifiedAgentPreview({
 }: UnifiedAgentPreviewProps) {
   const navigate = useNavigate();
 
-  const statusColor =
-    status === 'active' || status === 'deployed'
-      ? 'bg-secondary/10 text-secondary border-secondary/30'
-      : status === 'paused'
+  const statusColor = status === 'active' || status === 'deployed'
+    ? 'bg-secondary/10 text-secondary border-secondary/30'
+    : status === 'paused'
       ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30'
       : 'bg-muted text-muted-foreground border-border';
 
-  const handleChat = () => {
-    if (agentId) {
-      navigate(`/agents/${agentId}/chat`);
-    }
-  };
+  const hasLifecycleAction = Boolean(onPause || onResume || onRollback || onDeploy);
 
   return (
     <div className="space-y-4">
-      {/* Title */}
       <h2 className="text-h3 font-semibold">{agentName}</h2>
 
-      {/* Status & Version Header + Actions */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <p className="text-caption text-muted-foreground mb-1">Status</p>
-            <Badge className={statusColor}>
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
+            <Badge className={statusColor}>{status.charAt(0).toUpperCase() + status.slice(1)}</Badge>
           </div>
           <div className="text-right">
             <p className="text-caption text-muted-foreground mb-1">Version</p>
@@ -138,7 +112,7 @@ export function UnifiedAgentPreview({
           </div>
         </div>
 
-        {connectedAppsCount > 0 && (
+        {typeof connectedAppsCount === 'number' && connectedAppsCount > 0 && (
           <div className="flex items-center gap-2 pt-2 border-t">
             <Plug2 className="h-4 w-4 text-primary" />
             <span className="text-sm text-muted-foreground">
@@ -147,110 +121,46 @@ export function UnifiedAgentPreview({
           </div>
         )}
 
-        {/* Action Buttons */}
-        <TooltipProvider delayDuration={150}>
-          <div className="flex gap-2 flex-wrap mt-4 pt-4 border-t">
-            {/* Chat button - only show in full mode (not in overview or preview) */}
-            {mode === 'full' && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={handleChat}
-                    className="gap-2"
-                    disabled={!agentId || isLoading}
-                  >
-                    <Bot className="h-4 w-4" />
-                    Chat
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Start a live conversation with this agent to test its responses.
-                </TooltipContent>
-              </Tooltip>
-            )}
-
-            {/* Control buttons - only show in full mode */}
-            {mode === 'full' && (
-              <>
-                {status === 'active' || status === 'deployed' ? (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onPause}
-                        disabled={isLoading || !onPause}
-                      >
-                        <Pause className="h-4 w-4 mr-2" />
-                        Pause
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      Temporarily pause this agent's operations.
-                    </TooltipContent>
-                  </Tooltip>
-                ) : (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onResume}
-                        disabled={isLoading || !onResume}
-                      >
-                        <Play className="h-4 w-4 mr-2" />
-                        Resume
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      Continue from where you last left off in this agent's workflow.
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-
+        {mode === 'full' && (agentId || hasLifecycleAction) && (
+          <TooltipProvider delayDuration={150}>
+            <div className="flex gap-2 flex-wrap mt-4 pt-4 border-t">
+              {agentId && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onRollback}
-                      disabled={isLoading || !onRollback}
-                    >
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Rollback
+                    <Button variant="default" size="sm" onClick={() => navigate(`/agents/${agentId}/chat`)} className="gap-2" disabled={isLoading}>
+                      <Bot className="h-4 w-4" />
+                      Chat
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="top">
-                    Revert this agent to a previous version or checkpoint.
-                  </TooltipContent>
+                  <TooltipContent side="top">Open the configured agent conversation surface.</TooltipContent>
                 </Tooltip>
+              )}
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={onDeploy}
-                      disabled={isLoading}
-                      className="glow-yellow"
-                    >
-                      <Rocket className="h-4 w-4 mr-2" />
-                      Deploy New Version
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    Push your latest changes to production and create a new version.
-                  </TooltipContent>
-                </Tooltip>
-              </>
-            )}
-          </div>
-        </TooltipProvider>
+              {(status === 'active' || status === 'deployed') && onPause && (
+                <Button variant="outline" size="sm" onClick={onPause} disabled={isLoading}>
+                  <Pause className="h-4 w-4 mr-2" />Pause
+                </Button>
+              )}
+              {status !== 'active' && status !== 'deployed' && onResume && (
+                <Button variant="outline" size="sm" onClick={onResume} disabled={isLoading}>
+                  <Play className="h-4 w-4 mr-2" />Resume
+                </Button>
+              )}
+              {onRollback && (
+                <Button variant="outline" size="sm" onClick={onRollback} disabled={isLoading}>
+                  <RotateCcw className="h-4 w-4 mr-2" />Rollback
+                </Button>
+              )}
+              {onDeploy && (
+                <Button variant="outline" size="sm" onClick={onDeploy} disabled={isLoading} className="glow-yellow">
+                  <Rocket className="h-4 w-4 mr-2" />Deploy New Version
+                </Button>
+              )}
+            </div>
+          </TooltipProvider>
+        )}
       </Card>
 
-      {/* Agent Summary Card */}
       {mode === 'preview' && (
         <AgentSummaryCard
           description={description}
@@ -269,57 +179,35 @@ export function UnifiedAgentPreview({
         />
       )}
 
-      {/* KPI Cards Row */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <p className="text-caption text-muted-foreground">Success Rate</p>
-          </div>
-          <p className="text-2xl font-bold">
-            {typeof successRate === 'number' ? `${Math.round(successRate)}%` : '0%'}
-          </p>
+          <div className="flex items-center gap-2 mb-2"><TrendingUp className="h-4 w-4 text-primary" /><p className="text-caption text-muted-foreground">Success Rate</p></div>
+          <p className="text-2xl font-bold">{typeof successRate === 'number' ? `${Math.round(successRate)}%` : 'Unavailable'}</p>
         </Card>
-
         <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <p className="text-caption text-muted-foreground">Total Runs</p>
-          </div>
-          <p className="text-2xl font-bold">{totalRuns}</p>
+          <div className="flex items-center gap-2 mb-2"><Activity className="h-4 w-4 text-primary" /><p className="text-caption text-muted-foreground">Total Runs</p></div>
+          <p className="text-2xl font-bold">{metricText(totalRuns)}</p>
         </Card>
-
         <Card className="p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <p className="text-caption text-muted-foreground">ROI</p>
-          </div>
-          <p className="text-2xl font-bold">
-            {typeof roi === 'number' ? `${roi}%` : '0%'}
-          </p>
+          <div className="flex items-center gap-2 mb-2"><TrendingUp className="h-4 w-4 text-primary" /><p className="text-caption text-muted-foreground">ROI</p></div>
+          <p className="text-2xl font-bold">{metricText(roi, '%')}</p>
         </Card>
       </div>
 
-      {/* Recent Activity */}
       <Card className="p-6">
         <h3 className="text-h4 font-semibold mb-4">Recent Activity</h3>
-        {recentActivity.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">No recent activity</p>
-          </div>
+        {recentActivity === undefined ? (
+          <p className="text-muted-foreground text-center py-8">Activity evidence unavailable on this view</p>
+        ) : recentActivity.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">No recent activity recorded</p>
         ) : (
           <div className="space-y-3">
             {recentActivity.map((activity) => (
-              <div
-                key={activity.id}
-                className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
-              >
+              <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
                 <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm">{activity.description}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formatRelativeTime(activity.timestamp)}
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{formatRelativeTime(activity.timestamp)}</p>
                 </div>
               </div>
             ))}

@@ -21,6 +21,7 @@ export interface AuraWorkflowResult {
 
 const SENSITIVE_KEY_PATTERN = /(token|secret|password|authorization|credential|cookie|content|document|body|email|phone|address|api[_-]?key)/i;
 const RESERVED_KEYS = new Set(['organization_id']);
+const WORKFLOW_TIMEOUT_MS = 10_000;
 
 function provider(): AuraWorkflowProvider {
   const raw = (Deno.env.get('AURA_WORKFLOW_PROVIDER') ?? 'disabled').trim().toLowerCase();
@@ -31,7 +32,9 @@ function inngestEndpoint(): string | null {
   const raw = (Deno.env.get('AURA_INNGEST_ENDPOINT') ?? 'https://inn.gs/e').trim();
   try {
     const url = new URL(raw);
-    if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') return null;
+    const allowed = url.protocol === 'https:'
+      || (url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1'));
+    if (!allowed) return null;
     return url.toString().replace(/\/$/, '');
   } catch {
     return null;
@@ -80,6 +83,7 @@ export async function enqueueAuraWorkflow(event: AuraWorkflowEvent): Promise<Aur
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(WORKFLOW_TIMEOUT_MS),
     });
     if (!response.ok) {
       return {

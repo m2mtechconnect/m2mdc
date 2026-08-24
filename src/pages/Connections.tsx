@@ -21,6 +21,8 @@ import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
 import { DataFlowsTab } from '@/components/connections/DataFlowsTab';
+import { DataStorageTab } from '@/components/connections/DataStorageTab';
+
 import { ActivityTab } from '@/components/connections/ActivityTab';
 import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetailDrawer';
 import { ConnectionSetupWizard } from '@/components/connections/ConnectionSetupWizard';
@@ -45,9 +47,11 @@ const TABS = [
   { value: 'overview', label: 'Overview' },
   { value: 'connections', label: 'Connected systems' },
   { value: 'data-flows', label: 'Data flows' },
+  { value: 'data-storage', label: 'Data & Storage' },
   { value: 'catalogue', label: 'Available connectors' },
   { value: 'activity', label: 'Health & audit' },
 ];
+
 
 function errorMessage(error: unknown): string | null {
   return error instanceof Error && error.message ? error.message : null;
@@ -202,18 +206,24 @@ export default function Connections() {
   const tabs = (
     <Tabs value={tab} onValueChange={setTab} className="min-w-0">
       <div className="-mx-1 overflow-x-auto px-1 pb-1">
-        <TabsList className="inline-flex w-max bg-transparent p-0">
+        <TabsList className="inline-flex w-max items-center bg-transparent p-0">
           {TABS.map((t) => (
-            <TabsTrigger
-              key={t.value}
-              value={t.value}
-              className="min-h-[40px] rounded-none border-b-2 border-transparent px-4 text-[13px] uppercase tracking-[0.06em] data-[state=active]:border-[hsl(var(--v2-simulated))] data-[state=active]:bg-transparent data-[state=active]:shadow-none"
-            >
-              {t.label}
-            </TabsTrigger>
+            <span key={t.value} className="contents">
+              {t.value === 'data-storage' ? (
+                <span aria-hidden className="mx-2 h-5 w-px shrink-0 bg-border" />
+              ) : null}
+              <TabsTrigger
+                value={t.value}
+                data-group={t.value === 'data-storage' ? 'data-storage' : 'connections'}
+                className="min-h-[40px] rounded-none border-b-2 border-transparent px-4 text-[13px] uppercase tracking-[0.06em] data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[group=connections]:data-[state=active]:border-[hsl(var(--v2-simulated))] data-[group=data-storage]:data-[state=active]:border-primary"
+              >
+                {t.label}
+              </TabsTrigger>
+            </span>
           ))}
         </TabsList>
       </div>
+
 
       <TabsContent value="overview" className="mt-4 min-w-0">
         <OverviewTab
@@ -252,6 +262,18 @@ export default function Connections() {
           onRequestHandled={() => setMapRequestFor(null)}
         />
       </TabsContent>
+
+      <TabsContent value="data-storage" className="mt-4 min-w-0">
+        <DataStorageTab
+          rows={rows}
+          ingestRuns={ingestRuns.data ?? []}
+          contracts={contracts.data ?? []}
+          retainedEventCount={eventCount.data ?? 0}
+          loading={loading}
+          onOpenConnection={setDetailId}
+        />
+      </TabsContent>
+
 
       <TabsContent value="catalogue" className="mt-4 min-w-0">
         <CatalogueTab

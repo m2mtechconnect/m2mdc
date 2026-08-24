@@ -40,6 +40,8 @@ import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { stackLabel } from '@/config/auraStackManifest';
 import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
+import { DeploymentEvidenceCard } from '@/components/deploy/DeploymentEvidenceCard';
+
 
 interface SystemSummary {
   name: string;
@@ -642,7 +644,15 @@ export default function Deploy() {
         </Alert>
       )}
 
+      {/* Execution: configuration review and the controls that run a deployment. */}
+      <SectionCard
+        title="Execution"
+        description="Review the saved configuration and run the deployment."
+        icon={Rocket}
+        className="mb-6"
+      >
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
         {/* Left: Summary */}
         <DCCard status="info" className="p-6">
           <h2 className="text-xl font-semibold mb-4">System Configuration</h2>
@@ -747,6 +757,13 @@ export default function Deploy() {
           />
         </div>
       </div>
+      </SectionCard>
+
+      {/* Evidence: recorded outcome of the latest execution. Canonical detail
+          lives on Runtime History; this is a deep-linked summary only. */}
+      <DeploymentEvidenceCard systemId={systemId!} />
+
+
 
       {/* DC-Specific Deployment Recommendations */}
       <div className="mt-8 grid gap-6 lg:grid-cols-3">

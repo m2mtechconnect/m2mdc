@@ -2,31 +2,31 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "96c474be47012020b18dd9570a06b4fcce24a07b",
-    "workflowRunId": 32702287346,
-    "artifactId": 9510981142,
-    "artifactZipSha256": "c3a0810df5ba096a6e0fe787b67c21c18cb4234f9282a8575fe41ae4aa9645a1"
+    "sha": "7dbcbc831ab03edad6089417e3610e36d4242683",
+    "workflowRunId": 32787794231,
+    "artifactId": 9542088089,
+    "artifactZipSha256": "c261286d6210aab1250318072a93e87d8b12925b49e0dd18fde3b3e09ff26216"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
-    "Fingerprints were derived from the exact-head visual artifact after route, build, responsive-containment and UI hierarchy review.",
-    "For source 96c474be47012020b18dd9570a06b4fcce24a07b, 10 of 11 surfaces remained byte-identical to the prior approved enterprise baseline.",
-    "The sole promoted drift is teams-light: /teams intentionally resolves to the Platform Access control workspace after the enterprise routing remediation; the exact-head artifact was human-reviewed before this fingerprint update.",
-    "Builder mobile remains contained at 375px with no horizontal viewport overflow; its height increase reflects intentional content/layout growth.",
-    "Dashboard mobile remains complete through the footer at 375px; its reduced height reflects intentional hierarchy changes rather than clipping."
+    "Fingerprints were derived from the exact-head P1 release-candidate artifact after route, build, responsive-containment and UI hierarchy review.",
+    "All 11 screenshots were generated successfully at source 7dbcbc831ab03edad6089417e3610e36d4242683 and reviewed before approval.",
+    "Mobile acceptance is pinned to a 375 by 667 CSS viewport with devicePixelRatio 1. Dashboard, Builder and Operations and Telemetry passed the document-overflow invariant at 375px.",
+    "The Operations and Telemetry mobile overflow was traced to idle Recharts tooltip geometry. Recharts wrapper containment prevents hidden tooltip nodes from widening the document while preserving visible chart content.",
+    "The approved visual set contains no observed broken layout, clipped controls, overlapping text or catastrophic responsive defects."
   ],
   "screenshots": [
-    {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"5f72862c73ac3c8c4a280615b72fcad6a2109addbb673f391a0b142e9d21e066","width":375,"height":5406},
-    {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"3a748806c5eb7809edfd40777aa6c26a946c8ff4d81d544f70573b95dfdc7b4d","width":1280,"height":720},
-    {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"127cbb660e965c7408c1ee5de0ccbfd922305ec35897199c779474057d93ca4d","width":375,"height":2476},
-    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"a2d9ebd6bb5713d6016304745634310adffe6d4a91b63637ea737431f6052923","width":1280,"height":720},
-    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"76d2c00e8fdd6dd0545423d38eb7a1435e6019505ef39f929ca2d1c7f3c09b32","width":1280,"height":720},
-    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"d9a59be65402867e0dc1a7239cc449764d7ac518c24471a9996212b66028ce6d","width":1280,"height":720},
-    {"file":"compliance-light-chromium-linux.png","mode":"sha256","sha256":"edc013ff7f7c28684b7b739e07ce711b320b72769c12fc77b0622ca8079f8d33","width":1280,"height":720},
-    {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"cacd56e140905844977a8276ce372d2ebc9a6fca29b0d25051dfe17b791d8a15","width":1280,"height":720},
-    {"file":"dashboard-mobile-chromium-linux.png","mode":"sha256","sha256":"13459b2ff95839fcfef76d27b689f6a3bb0ae7076224a6bbc7e5b1dc8c65e3dc","width":375,"height":1911},
-    {"file":"integrations-light-chromium-linux.png","mode":"sha256","sha256":"72ec423b758be560a7f90824ead24b0029f69eb37dd0260725c2c6c0c03bec33","width":1280,"height":720},
-    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"14774a76b75ca75946bc11fb4acb315d244c21c8f9d464d40d15d9ddbcbd9a0e","width":1280,"height":720}
+    {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"18f9dd5427eb80de2e48871e338d986d467fa02531116e49cfbf0eb88dcfbdbb","width":375,"height":5424},
+    {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"2fa34669b7df712f54f3193c494b8a4d94214772ca32fd917ae4de153c48b2cc","width":1280,"height":720},
+    {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"ff61811b3c98307fd2d6d43096f4f80a72b8acf47bee071c8c16f4ce1c626008","width":375,"height":2476},
+    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"961fa826e2003fcd59df82f2d3d831ab2d020b3ae84d516263ca8720f9bcf4e1","width":1280,"height":720},
+    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"bb06682ca5ce6b2d4669ad98f0114c0b06dd9d5f75fffee70995f81d166425f4","width":1280,"height":720},
+    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"362d4a77fef4614bd34a3b120742bdb67af82975cf4e3d745feead184f426174","width":1280,"height":720},
+    {"file":"compliance-light-chromium-linux.png","mode":"sha256","sha256":"eaf540494cf2fb34010d220a5673d7239bfb0278467fbeb5dee95d68bdf26453","width":1280,"height":720},
+    {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"cbe35bfc224c66dacb5dd4ea018143a07ac1cdd7be2059095b731410ea8fcdcb","width":1280,"height":720},
+    {"file":"dashboard-mobile-chromium-linux.png","mode":"sha256","sha256":"c13adfc579a4203cb6b9f85fd58b8294c4fce2f80e6cd8a02701505424a00f72","width":375,"height":2321},
+    {"file":"integrations-light-chromium-linux.png","mode":"sha256","sha256":"49b3991122845769e82439df1ec67092acb6aae09006ed5e1fda25d96a09ff46","width":1280,"height":720},
+    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"8b781a5e8baa23877ffd04213042eb7df59fc798ab312a9a1184df32ac7076ac","width":1280,"height":720}
   ]
 }

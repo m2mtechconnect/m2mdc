@@ -46,8 +46,8 @@ test.describe('Functional acceptance — persisted behavior, not presence-only s
     await expect(dialog.getByRole('list', { name: 'Setup steps' })).toBeVisible();
   });
 
-  test('platform admin Teams entry resolves to the live Access Control roster', async ({ page }) => {
-    await page.goto('/teams');
+  test('platform admin Access Control route resolves to the live platform roster', async ({ page }) => {
+    await page.goto('/teams/access-control');
     await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
     await expect(page.getByRole('heading', { name: /Access control/i })).toBeVisible();
     await expect(page.getByText(/role assignments across the platform/i)).toBeVisible({ timeout: 15_000 });

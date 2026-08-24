@@ -1,0 +1,5 @@
+{
+  "schema": "aura.lovable-release-sync.v1",
+  "purpose": "Force Lovable to ingest and rebuild the current authoritative GitHub source after provider-generated schema type synchronization.",
+  "runtimeImpact": "none"
+}

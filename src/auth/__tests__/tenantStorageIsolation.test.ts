@@ -36,7 +36,7 @@ describe('tenant client-state isolation', () => {
       'aura.assistant.open',
       'twin-overlay-preference',
     ];
-    const allTenantKeys = new Set([
+    const allTenantKeys = new Set<string>([
       ...TENANT_SCOPED_LOCAL_STORAGE_KEYS,
       ...TENANT_SCOPED_SESSION_STORAGE_KEYS,
     ]);

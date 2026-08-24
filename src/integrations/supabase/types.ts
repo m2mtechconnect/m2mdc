@@ -6020,7 +6020,7 @@ export type Database = {
           id: string
           invited_by: string
           org_id: string | null
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           status: string
           token: string
         }
@@ -6031,7 +6031,7 @@ export type Database = {
           id?: string
           invited_by: string
           org_id?: string | null
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           status?: string
           token: string
         }
@@ -6042,7 +6042,7 @@ export type Database = {
           id?: string
           invited_by?: string
           org_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string
           status?: string
           token?: string
         }
@@ -7094,6 +7094,10 @@ export type Database = {
       }
     }
     Functions: {
+      accept_org_invite: {
+        Args: { _invite_id: string; _user_id: string }
+        Returns: string
+      }
       active_org_id: { Args: never; Returns: string }
       admin_assign_role: {
         Args: {
@@ -7229,6 +7233,21 @@ export type Database = {
       org_has_role: {
         Args: { _org_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
+      }
+      platform_provision_organization: {
+        Args: {
+          _domain: string
+          _industry: string
+          _invited_by: string
+          _name: string
+          _owner_email: string
+        }
+        Returns: {
+          invite_expires_at: string
+          invite_id: string
+          invite_token: string
+          org_id: string
+        }[]
       }
       provision_default_twin: { Args: { _user_id: string }; Returns: string }
       rpc_kpi_agents_deployed: {

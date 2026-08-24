@@ -233,7 +233,7 @@ const frCA = {
     integrationsNote: '{{count}}+ intégrations disponibles • Connecteurs personnalisés pris en charge • API REST et GraphQL',
     intAws: 'AWS', intAwsDesc: 'Télémétrie infonuagique',
     intAzure: 'Azure', intAzureDesc: 'Surveillance infonuagique',
-    intGcp: 'Google Cloud', intGcpDesc: 'Métriques GCP',
+    intGcp: 'Données infonuagiques', intGcpDesc: 'Métriques infonuagiques',
     intNvidia: 'NVIDIA', intNvidiaDesc: 'Gestion de parc GPU',
     intNlyte: 'Nlyte / Sunbird', intNlyteDesc: 'Flux de données DCIM',
     intSchneider: 'Schneider', intSchneiderDesc: 'EcoStruxure',

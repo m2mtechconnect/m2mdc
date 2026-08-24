@@ -232,7 +232,7 @@ const en = {
     integrationsNote: '{{count}}+ integrations available • Custom connectors supported • REST & GraphQL APIs',
     intAws: 'AWS', intAwsDesc: 'Cloud telemetry',
     intAzure: 'Azure', intAzureDesc: 'Cloud monitoring',
-    intGcp: 'Google Cloud', intGcpDesc: 'GCP metrics',
+    intGcp: 'Cloud data', intGcpDesc: 'Cloud metrics',
     intNvidia: 'NVIDIA', intNvidiaDesc: 'GPU fleet management',
     intNlyte: 'Nlyte / Sunbird', intNlyteDesc: 'DCIM data feed',
     intSchneider: 'Schneider', intSchneiderDesc: 'EcoStruxure',

@@ -46,7 +46,7 @@ export function SovereignDCDeploymentChecklist({
     {
       id: 'intelligence-model',
       label: 'AI model configured for optimization + emissions + risk',
-      description: 'Gemini/GPT model set for multi-objective optimization across efficiency, emissions, and risk domains',
+      description: 'Managed AI model set for multi-objective optimization across efficiency, emissions, and risk domains',
       check: !!config.model && (typeof config.model === 'string' ? config.model.includes('gemini') : true),
       category: 'intelligence',
       fixStep: 2,

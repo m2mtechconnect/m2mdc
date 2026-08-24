@@ -32,10 +32,17 @@ const RESIDENCY_LABELS: Record<string, string> = {
   'europe-west1': 'Europe',
 };
 
+interface HealthProbe {
+  status: 'ok' | 'error' | 'disabled' | 'not_applicable';
+  latency?: number;
+  error?: string;
+}
+
+/** Provider-neutral contract returned by the managed AI health probe. */
 interface HealthStatus {
-  gemini: { status: 'ok' | 'error'; latency?: number; error?: string };
-  vertexSearch: { status: 'ok' | 'error'; latency?: number; error?: string };
-  region: string;
+  managedAi: HealthProbe;
+  groundingSearch: HealthProbe;
+  residency: string;
 }
 
 
@@ -172,7 +179,7 @@ function AISettingsPage() {
 
       setHealthStatus(data as HealthStatus);
       
-      if (data?.gemini?.status === 'ok' && (!groundingEnabled || data?.vertexSearch?.status === 'ok')) {
+      if (data?.managedAi?.status === 'ok' && (!groundingEnabled || data?.groundingSearch?.status === 'ok')) {
         toast.success("Health check passed!");
       } else {
         toast.error("Health check failed. Check the results below.");
@@ -402,52 +409,52 @@ function AISettingsPage() {
         {healthStatus && (
           <DCCard
             title="Health Check Results"
-            status={healthStatus.gemini.status === 'ok' ? 'operational' : 'critical'}
+            status={healthStatus.managedAi.status === 'ok' ? 'operational' : 'critical'}
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <div className="flex items-center gap-3">
-                  {healthStatus.gemini.status === 'ok' ? (
+                  {healthStatus.managedAi.status === 'ok' ? (
                     <CheckCircle className="h-5 w-5 text-green-500" />
                   ) : (
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
                   <div>
                     <p className="font-medium">Managed AI</p>
-                    {healthStatus.gemini.error && (
-                      <p className="text-xs text-red-500">{healthStatus.gemini.error}</p>
+                    {healthStatus.managedAi.error && (
+                      <p className="text-xs text-red-500">{healthStatus.managedAi.error}</p>
                     )}
                   </div>
                 </div>
-                {healthStatus.gemini.latency && (
-                  <Badge variant="outline">{healthStatus.gemini.latency}ms</Badge>
+                {healthStatus.managedAi.latency && (
+                  <Badge variant="outline">{healthStatus.managedAi.latency}ms</Badge>
                 )}
               </div>
 
               {groundingEnabled && (
                 <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                   <div className="flex items-center gap-3">
-                    {healthStatus.vertexSearch.status === 'ok' ? (
+                    {healthStatus.groundingSearch.status === 'ok' ? (
                       <CheckCircle className="h-5 w-5 text-green-500" />
                     ) : (
                       <XCircle className="h-5 w-5 text-red-500" />
                     )}
                     <div>
                       <p className="font-medium">Grounding Search</p>
-                      {healthStatus.vertexSearch.error && (
-                        <p className="text-xs text-red-500">{healthStatus.vertexSearch.error}</p>
+                      {healthStatus.groundingSearch.error && (
+                        <p className="text-xs text-red-500">{healthStatus.groundingSearch.error}</p>
                       )}
                     </div>
                   </div>
-                  {healthStatus.vertexSearch.latency && (
-                    <Badge variant="outline">{healthStatus.vertexSearch.latency}ms</Badge>
+                  {healthStatus.groundingSearch.latency && (
+                    <Badge variant="outline">{healthStatus.groundingSearch.latency}ms</Badge>
                   )}
                 </div>
               )}
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <p className="font-medium">Data residency</p>
-                <Badge variant="secondary">{RESIDENCY_LABELS[healthStatus.region] ?? healthStatus.region}</Badge>
+                <Badge variant="secondary">{RESIDENCY_LABELS[healthStatus.residency] ?? healthStatus.residency}</Badge>
               </div>
             </div>
           </DCCard>

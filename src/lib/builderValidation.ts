@@ -102,7 +102,7 @@ export function validateStep3(state: any): ValidationResult {
     if (!state.geminiEnabled && !state.vertexEnabled) {
       errors.push({
         field: "aiEngines",
-        message: "Enable at least one AI engine (Gemini or Vertex)",
+        message: "Enable at least one approved AI engine",
         fixStep: 3,
         fixAction: "Enable an AI engine",
       });

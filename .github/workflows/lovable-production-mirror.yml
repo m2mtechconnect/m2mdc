@@ -2,8 +2,8 @@ name: Lovable Production Mirror
 
 # GitHub `main` is the authoritative production source. The existing Lovable
 # project is still bound to remediation/hybrid-stack-p0. This workflow keeps
-# both refs on one common commit without force-pushing, even when Lovable adds
-# provider-generated commits to its compatibility branch.
+# the compatibility ref on the exact `main` tree without ever advancing `main`
+# from provider-generated history.
 on:
   push:
     branches: [main]
@@ -54,7 +54,7 @@ jobs:
           fi
 
           echo "Mirror contains provider-side history not present on main."
-          echo "Creating a normal two-parent reconciliation commit with the exact main tree."
+          echo "Creating a two-parent mirror-only reconciliation commit with the exact main tree."
 
           reconcile_sha="$({
             printf 'tree %s\n' "$main_tree"
@@ -67,15 +67,14 @@ jobs:
 
           test "$(git rev-parse "$reconcile_sha^{tree}")" = "$main_tree"
 
-          # The reconciliation commit has both current refs as parents, so each
-          # update is a normal fast-forward. Push the provider ref first, then
-          # advance main to the identical common SHA.
+          # The reconciliation commit contains both current refs as parents, so
+          # advancing only the compatibility ref is a normal fast-forward. Main
+          # is deliberately never pushed or rewritten by this workflow.
           git push origin "$reconcile_sha:refs/heads/$MIRROR_REF"
-          git push origin "$reconcile_sha:refs/heads/main"
 
           echo "reconciled_sha=$reconcile_sha"
 
-      - name: Verify common release ref
+      - name: Verify authoritative main and mirror tree parity
         shell: bash
         env:
           MIRROR_REF: remediation/hybrid-stack-p0
@@ -84,11 +83,17 @@ jobs:
           git fetch origin main "$MIRROR_REF"
           main_sha="$(git rev-parse origin/main)"
           mirror_sha="$(git rev-parse FETCH_HEAD)"
-          test "$main_sha" = "$mirror_sha"
+          main_tree="$(git rev-parse "$main_sha^{tree}")"
+          mirror_tree="$(git rev-parse "$mirror_sha^{tree}")"
+
+          test "$main_tree" = "$mirror_tree"
+          git merge-base --is-ancestor "$main_sha" "$mirror_sha"
+
           {
             echo "### Lovable production compatibility mirror"
             echo ""
             echo "- Authoritative source: main @ $main_sha"
             echo "- Mirrored ref: $MIRROR_REF @ $mirror_sha"
-            echo "- Update mode: fast-forward only, history-preserving reconciliation"
+            echo "- Source-tree parity: $main_tree"
+            echo "- Main mutation by mirror workflow: prohibited"
           } >> "$GITHUB_STEP_SUMMARY"

@@ -27,15 +27,15 @@ const literalPaths = (source: string) =>
   Array.from(source.matchAll(/path="([^"]+)"/g)).map((m) => m[1]);
 
 const evidenceBlock = (() => {
-  const start = shellSource.indexOf('<Route path="/dsx/evidence-beta"');
+  const start = shellSource.indexOf('<Route path="/evidence"');
   const end = shellSource.indexOf('</Route>', start);
   return shellSource.slice(start, end);
 })();
 
 const shellTopLevel = literalPaths(shellSource).filter(
-  (p) => !literalPaths(evidenceBlock).includes(p) || p === '/dsx/evidence-beta',
+  (p) => !literalPaths(evidenceBlock).includes(p) || p === '/evidence',
 );
-const evidenceChildren = literalPaths(evidenceBlock).filter((p) => p !== '/dsx/evidence-beta');
+const evidenceChildren = literalPaths(evidenceBlock).filter((p) => p !== '/evidence');
 
 describe('route registry mirrors the mounted routers', () => {
   it('declares every path mounted in the public route module', () => {

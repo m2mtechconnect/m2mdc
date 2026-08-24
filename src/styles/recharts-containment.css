@@ -1,0 +1,12 @@
+/*
+ * Recharts keeps tooltip wrappers mounted while idle using
+ * `visibility: hidden` + absolute positioning. Long category labels can then
+ * extend the document scroll width even though the tooltip is not visible.
+ *
+ * The chart view box already constrains active tooltips by default, so clipping
+ * the Recharts wrapper prevents hidden tooltip geometry from widening mobile
+ * pages without changing the visible chart or its interactive tooltip contract.
+ */
+.recharts-wrapper {
+  overflow: clip;
+}

@@ -29,18 +29,21 @@ serve(createHandler({
 
     log("Fetching builder draft", { builderId });
 
-    // First, try to load from the new agents-based builder store
+    // The authenticated, RLS-bound client decides whether this caller may read
+    // the agent. Do not narrow this to owner_id: org-bound drafts are deliberately
+    // visible to authorized members according to the canonical agents policies.
     const { data: fetchedBuilder, error: dbError } = await supabase
       .from('agents')
       .select('*')
       .eq('id', builderId)
-      .eq('owner_id', userId)
       .single();
     let builder = fetchedBuilder;
 
     if (dbError) {
       log("Builder not found in agents, trying legacy drafts", { error: dbError.message });
 
+      // Legacy agent_drafts has no org_id and remains owner-only. RLS plus this
+      // explicit owner predicate prevents broadening the old draft contract.
       const { data: legacyDraft, error: legacyError } = await supabase
         .from('agent_drafts')
         .select('*')
@@ -60,7 +63,21 @@ serve(createHandler({
         };
       }
 
-      // Migrate legacy draft (agent_drafts) to new builder record in agents
+      // Migrate legacy draft (agent_drafts) to new builder record in agents and
+      // bind it to the server-resolved active organization when one exists.
+      const { data: resolvedOrgId, error: activeOrgError } = await supabase.rpc('active_org_id');
+      if (activeOrgError) {
+        log("Failed to resolve active organization for legacy builder migration", {
+          error: activeOrgError.message,
+        });
+        throw {
+          code: 'DATABASE_ERROR',
+          message: 'Failed to resolve active organization',
+          status: 500,
+        };
+      }
+      const activeOrgId = typeof resolvedOrgId === 'string' ? resolvedOrgId : null;
+
       const legacyGoal: any = legacyDraft.goal || {};
       const legacyMeta: any = legacyDraft.meta || {};
       const recommendationData: any = legacyMeta.recommendationData || {};
@@ -77,6 +94,7 @@ serve(createHandler({
           name: goal || 'Untitled Agent',
           description: legacyGoal.problem || 'Draft agent created from recommendation',
           owner_id: userId,
+          org_id: activeOrgId,
           status: 'draft',
           version: 'v0',
           template_id,
@@ -117,7 +135,11 @@ serve(createHandler({
         };
       }
 
-      log("Migrated legacy draft to builder", { legacyDraftId: builderId, newBuilderId: createdBuilder.id });
+      log("Migrated legacy draft to builder", {
+        legacyDraftId: builderId,
+        newBuilderId: createdBuilder.id,
+        organizationBound: activeOrgId !== null,
+      });
       builder = createdBuilder;
     }
 

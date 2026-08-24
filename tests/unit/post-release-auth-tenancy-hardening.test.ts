@@ -10,6 +10,10 @@ const builderCreate = fs.readFileSync(
   path.resolve(process.cwd(), 'supabase/functions/builders-create/index.ts'),
   'utf8',
 );
+const builderGet = fs.readFileSync(
+  path.resolve(process.cwd(), 'supabase/functions/builders-get/index.ts'),
+  'utf8',
+);
 const rbac = fs.readFileSync(path.resolve(process.cwd(), 'src/contexts/RBACContext.tsx'), 'utf8');
 
 describe('post-release authorization and tenancy hardening', () => {
@@ -31,7 +35,7 @@ describe('post-release authorization and tenancy hardening', () => {
     );
   });
 
-  it('adds organization write policies for evidence child tables', () => {
+  it('adds organization write policies using only canonical tenant writer roles', () => {
     for (const table of [
       'twin_sovereignty_events',
       'twin_carbon_emissions',
@@ -40,13 +44,35 @@ describe('post-release authorization and tenancy hardening', () => {
       expect(migration).toContain(`${table}_org_write`);
       expect(migration).toContain(`ON public.${table} FOR ALL TO authenticated`);
     }
-    expect(migration).toContain('public.org_has_role(');
+    expect(migration).toContain(
+      "ARRAY['owner','admin','operator','engineer','manager']::text[]",
+    );
+    expect(migration).not.toContain(
+      "ARRAY['owner','admin','operator','engineer','manager','executive']::text[]",
+    );
   });
 
   it('binds builder drafts to the server-resolved active organization', () => {
     expect(builderCreate).toContain("supabase.rpc('active_org_id')");
     expect(builderCreate).toContain('org_id: activeOrgId');
     expect(builderCreate).not.toMatch(/InputSchema[\s\S]*org_id/);
+  });
+
+  it('uses RLS for current builder reads and keeps legacy drafts owner-only', () => {
+    const agentsLookup = builderGet.slice(
+      builderGet.indexOf(".from('agents')"),
+      builderGet.indexOf('let builder = fetchedBuilder'),
+    );
+    expect(agentsLookup).toContain(".eq('id', builderId)");
+    expect(agentsLookup).not.toContain(".eq('owner_id', userId)");
+
+    const legacyLookup = builderGet.slice(
+      builderGet.indexOf(".from('agent_drafts')"),
+      builderGet.indexOf('if (legacyError || !legacyDraft)'),
+    );
+    expect(legacyLookup).toContain(".eq('owner_id', userId)");
+    expect(builderGet).toContain("supabase.rpc('active_org_id')");
+    expect(builderGet).toContain('org_id: activeOrgId');
   });
 
   it('purges legacy tenant state after the server approves an organization switch', () => {

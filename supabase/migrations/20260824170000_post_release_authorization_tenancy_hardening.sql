@@ -112,8 +112,9 @@ GRANT EXECUTE ON FUNCTION public.check_user_has_role(uuid, text) TO authenticate
 GRANT EXECUTE ON FUNCTION public.dsx_current_user_is_operator_in_org(uuid) TO authenticated, service_role;
 
 -- Organization-owned data-centre twin child records previously had org read
--- policies but no org write path. Mirror the existing twin_simulation_runs
--- collaboration contract without weakening legacy user-owned twin policies.
+-- policies but no org write path. Mirror the canonical tenant-writer contract
+-- used by twin_simulation_runs. Executive and other read-oriented roles are
+-- intentionally excluded from this write set.
 DROP POLICY IF EXISTS twin_sovereignty_events_org_write ON public.twin_sovereignty_events;
 CREATE POLICY twin_sovereignty_events_org_write
   ON public.twin_sovereignty_events FOR ALL TO authenticated
@@ -124,7 +125,7 @@ CREATE POLICY twin_sovereignty_events_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ))
   WITH CHECK (EXISTS (
@@ -134,7 +135,7 @@ CREATE POLICY twin_sovereignty_events_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ));
 
@@ -148,7 +149,7 @@ CREATE POLICY twin_carbon_emissions_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ))
   WITH CHECK (EXISTS (
@@ -158,7 +159,7 @@ CREATE POLICY twin_carbon_emissions_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ));
 
@@ -172,7 +173,7 @@ CREATE POLICY twin_financial_records_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ))
   WITH CHECK (EXISTS (
@@ -182,7 +183,7 @@ CREATE POLICY twin_financial_records_org_write
       AND public.org_has_role(
         t.org_id,
         auth.uid(),
-        ARRAY['owner','admin','operator','engineer','manager','executive']::text[]
+        ARRAY['owner','admin','operator','engineer','manager']::text[]
       )
   ));
 

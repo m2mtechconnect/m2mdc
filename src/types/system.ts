@@ -22,8 +22,8 @@ export interface DeployedSystem {
 
   /** Null when success rate is not available from persisted evidence. */
   successRate: number | null;
-  /** Persisted run counter. */
-  totalRuns: number;
+  /** Null when the persisted run counter is unavailable. */
+  totalRuns: number | null;
   /** Null when ROI has not been computed from measured metrics. */
   roi: number | null;
   avgDuration?: number | null;

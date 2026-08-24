@@ -4608,6 +4608,50 @@ export type Database = {
         }
         Relationships: []
       }
+      org_memberships: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          is_default: boolean
+          org_id: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          is_default?: boolean
+          org_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          is_default?: boolean
+          org_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null
@@ -4882,6 +4926,7 @@ export type Database = {
           id: string
           is_approved: boolean
           job_title: string | null
+          last_active_org_id: string | null
           locale: string | null
           org_id: string | null
           phone: string | null
@@ -4902,6 +4947,7 @@ export type Database = {
           id?: string
           is_approved?: boolean
           job_title?: string | null
+          last_active_org_id?: string | null
           locale?: string | null
           org_id?: string | null
           phone?: string | null
@@ -4922,6 +4968,7 @@ export type Database = {
           id?: string
           is_approved?: boolean
           job_title?: string | null
+          last_active_org_id?: string | null
           locale?: string | null
           org_id?: string | null
           phone?: string | null
@@ -4935,6 +4982,13 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_last_active_org_id_fkey"
+            columns: ["last_active_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -7040,6 +7094,7 @@ export type Database = {
       }
     }
     Functions: {
+      active_org_id: { Args: never; Returns: string }
       admin_assign_role: {
         Args: {
           _reason?: string
@@ -7145,6 +7200,10 @@ export type Database = {
         Returns: boolean
       }
       is_approved_user: { Args: { _user_id: string }; Returns: boolean }
+      is_org_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       link_system_integration: {
         Args: {
           p_integration_id: string
@@ -7166,6 +7225,10 @@ export type Database = {
           metadata: Json
           similarity: number
         }[]
+      }
+      org_has_role: {
+        Args: { _org_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
       }
       provision_default_twin: { Args: { _user_id: string }; Returns: string }
       rpc_kpi_agents_deployed: {
@@ -7196,6 +7259,7 @@ export type Database = {
           hours: number
         }[]
       }
+      set_active_org: { Args: { _org_id: string }; Returns: string }
       store_secret_in_vault: {
         Args: { secret_name: string; secret_value: string }
         Returns: string

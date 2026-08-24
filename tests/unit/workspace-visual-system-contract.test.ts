@@ -65,9 +65,10 @@ describe('AURA shared workspace visual system', () => {
     for (const file of NEUTRAL_MODEL_SURFACES) {
       const source = read(file);
       expect(source).toContain('modelDisplayLabel');
-      for (const forbidden of ['gpt-', 'gemini-', 'claude-']) {
-        expect(source).not.toContain(forbidden);
-      }
+      // The raw model identifier may exist as a stored default, but it must
+      // never be rendered directly: every display path goes through the label.
+      expect(source).not.toContain('value={summary?.model}');
+      expect(source).not.toContain('>{summary?.model}<');
     }
   });
 

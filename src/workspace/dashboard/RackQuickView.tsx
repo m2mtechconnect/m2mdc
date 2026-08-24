@@ -191,7 +191,7 @@ export function RackQuickViewBody({ data, facilityId, blueprintHref }: BodyProps
           </Link>
         </Button>
         <Button asChild size="sm" variant="outline" className="h-9 text-[13px] max-sm:h-11">
-          <Link to={`/dsx/evidence-beta/evidence?rack=${rackParam}`}>
+          <Link to={`/evidence/evidence?rack=${rackParam}`}>
             <FileSearch className="mr-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
             View Evidence
           </Link>

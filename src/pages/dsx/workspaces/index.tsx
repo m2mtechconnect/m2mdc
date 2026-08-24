@@ -724,7 +724,7 @@ export function EvidenceWorkspace() {
 
       <p className="text-xs text-muted-foreground">
         Full traceability for any displayed value is available from its metric tile. See also the{' '}
-        <Link className="underline underline-offset-4" to="/dsx/evidence-beta">facility overview</Link>.
+        <Link className="underline underline-offset-4" to="/evidence">facility overview</Link>.
       </p>
     </div>
   );

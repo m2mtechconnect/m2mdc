@@ -79,7 +79,7 @@ const CORE_NAV: RoleNavItem[] = [
   { name: 'Command', fullName: 'Command Center', href: '/dashboard', icon: LayoutDashboard, group: 'primary' },
   { name: 'Blueprint', fullName: 'Facility Blueprint', href: '/blueprint', icon: Boxes, group: 'primary' },
   { name: 'Simulation', fullName: 'Simulation', href: '/simulation', icon: Activity, group: 'primary' },
-  { name: 'Evidence', fullName: 'Evidence', href: '/dsx/evidence-beta/overview', icon: FileSearch, group: 'primary' },
+  { name: 'Evidence', fullName: 'Evidence', href: '/evidence/overview', icon: FileSearch, group: 'primary' },
 ];
 
 const executiveConfig: RoleDashboardConfig = {
@@ -95,7 +95,7 @@ const executiveConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'Financial exposure is shown only when a traceable simulation or approved source provides it.',
-      navigateTo: '/dsx/evidence-beta/sustainability/financial',
+      navigateTo: '/evidence/sustainability/financial',
     },
     {
       key: 'sovereignty_status',
@@ -104,7 +104,7 @@ const executiveConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'Sovereignty remains not assessed until supporting evidence is available.',
-      navigateTo: '/dsx/evidence-beta/sustainability/sovereignty',
+      navigateTo: '/evidence/sustainability/sovereignty',
     },
     {
       key: 'capacity_headroom',
@@ -122,7 +122,7 @@ const executiveConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'Carbon values must identify whether they are measured, modelled, reference or unavailable.',
-      navigateTo: '/dsx/evidence-beta/sustainability',
+      navigateTo: '/evidence/sustainability',
     },
   ],
   sections: [
@@ -208,7 +208,7 @@ const engineerConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'PUE is displayed only with explicit provenance for its source or simulation run.',
-      navigateTo: '/dsx/evidence-beta/operations/power',
+      navigateTo: '/evidence/operations/power',
     },
     {
       key: 'gpu_saturation',
@@ -217,7 +217,7 @@ const engineerConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'GPU utilization is unavailable until a bound source or simulation provides it.',
-      navigateTo: '/dsx/evidence-beta/operations/compute',
+      navigateTo: '/evidence/operations/compute',
     },
     {
       key: 'thermal_stability',
@@ -226,7 +226,7 @@ const engineerConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'Thermal state is sourced from model/simulation evidence unless validated telemetry is connected.',
-      navigateTo: '/dsx/evidence-beta/operations/thermal',
+      navigateTo: '/evidence/operations/thermal',
     },
     {
       key: 'sovereign_compute',
@@ -235,7 +235,7 @@ const engineerConfig: RoleDashboardConfig = {
       defaultValue: NOT_ASSESSED,
       trend: 'neutral',
       tooltip: 'Sovereignty is not inferred from facility location alone; inspect supporting evidence.',
-      navigateTo: '/dsx/evidence-beta/sustainability/sovereignty',
+      navigateTo: '/evidence/sustainability/sovereignty',
     },
   ],
   sections: [

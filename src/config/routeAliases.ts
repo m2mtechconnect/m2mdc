@@ -9,11 +9,11 @@ export interface RouteAlias {
 export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/', to: '/dashboard' },
   { from: '/command', to: '/dashboard' },
-  { from: '/evidence', to: '/dsx/evidence-beta/decisions/log' },
   { from: '/build', to: '/builder' },
   { from: '/omniverse-scene', to: '/twin-preview' },
 
   { from: '/admin', to: '/admin/platform-readiness' },
+  { from: '/admin/dsx-capabilities', to: '/admin/accelerated-ai-capabilities' },
   { from: '/admin/signups-dashboard', to: '/teams/access-control' },
   { from: '/admin/user-approvals', to: '/teams/access-control' },
   { from: '/admin/onboarding-submissions', to: '/teams/onboarding' },

@@ -34,7 +34,7 @@ export interface DomainConstraint {
   blocking_capability: Capability | null;
 }
 
-const ROUTE = '/dsx/evidence-beta';
+const ROUTE = '/evidence';
 
 function unavailableDomain(
   domain: DomainId,

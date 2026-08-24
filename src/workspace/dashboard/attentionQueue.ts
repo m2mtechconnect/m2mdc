@@ -149,7 +149,7 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       observedBasis: 'derivation',
       actions: [
         { label: 'Inspect in Blueprint', to: `${blueprintHref}?tab=model&layer=${encodeURIComponent(kpi.key)}` },
-        { label: 'Open calculation', to: `/dsx/evidence-beta/evidence?kpi=${encodeURIComponent(kpi.key)}` },
+        { label: 'Open calculation', to: `/evidence/evidence?kpi=${encodeURIComponent(kpi.key)}` },
       ],
     });
   }

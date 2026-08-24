@@ -23,6 +23,7 @@ import {
   CheckCircle2, Info
 } from 'lucide-react';
 import { useState } from 'react';
+import { stackDescription, stackLabel } from '@/config/auraStackManifest';
 
 // All 8 required integration templates per QA spec
 const INTEGRATION_TEMPLATES = [
@@ -234,10 +235,10 @@ export function DCStep3Integrations() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Link className="h-5 w-5 text-primary" />
-            External Integrations
+            {stackLabel('connections.enterprise')}
           </CardTitle>
           <CardDescription>
-            Connect data sources, APIs, and monitoring systems ({integrations.length} active)
+            {stackDescription('connections.enterprise')} ({integrations.length} active)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -325,23 +326,25 @@ export function DCStep3Integrations() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Brain className="h-5 w-5 text-primary" />
-            AI Intelligence Settings
+            {stackLabel('ai.managed')} settings
             <Badge variant="outline" className="text-xs">Architect Mode</Badge>
           </CardTitle>
           <CardDescription>
-            Configure the AI model and behavior for this digital twin
+            {stackDescription('ai.managed')} Tune assistance behaviour for this digital twin.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label>Model Provider</Label>
+              {/* Customer-facing capacity tiers. The stored value stays an
+                  internal provider identifier and is never rendered. */}
+              <Label>{stackLabel('ai.managed')} capacity</Label>
               <Select 
                 value={intelligence.llmProvider} 
                 onValueChange={(value) => updateIntelligence({ llmProvider: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select provider" />
+                  <SelectValue placeholder="Select capacity" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="google">Managed AI (primary)</SelectItem>
@@ -350,13 +353,13 @@ export function DCStep3Integrations() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Model</Label>
+              <Label>Response profile</Label>
               <Select 
                 value={intelligence.llmModel} 
                 onValueChange={(value) => updateIntelligence({ llmModel: value })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select model" />
+                  <SelectValue placeholder="Select response profile" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="google/gemini-2.5-flash">Fast</SelectItem>

@@ -23,6 +23,14 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { Permission } from '@/auth/permissions';
+import { stackDescription } from '@/config/auraStackManifest';
+import {
+  ACCELERATED_AI_CAPABILITIES_LABEL,
+  ACCELERATED_AI_CAPABILITIES_ROUTE,
+  EVIDENCE_ROOT,
+  LEGACY_CAPABILITIES_ROUTE,
+  LEGACY_EVIDENCE_ROOT,
+} from '@/config/evidenceRoutes';
 
 export interface AppNavItem {
   name: string;
@@ -65,7 +73,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     icon: LayoutDashboard,
     matches: ['/dashboard', '/'],
     group: 'overview',
-    description: 'Facility status, priority actions, recent simulations and model availability.',
+    description: `Facility status, priority actions and recent runs. ${stackDescription('platform.command')}`,
   },
   {
     name: 'Blueprint',
@@ -74,7 +82,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     icon: Boxes,
     matches: ['/blueprint'],
     group: 'design',
-    description: 'Facility topology, OpenUSD assets, automation definitions and model versions.',
+    description: stackDescription('twin.openusd'),
   },
   {
     name: 'Simulation',
@@ -83,16 +91,19 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     icon: FlaskConical,
     matches: ['/simulation'],
     group: 'simulate',
-    description: 'Configure scenarios, run simulations, compare outcomes and review recommendations.',
+    description: stackDescription('simulation.engine'),
   },
   {
     name: 'Evidence',
     fullName: 'Evidence',
-    href: '/dsx/evidence-beta/overview',
+    // Neutral canonical Evidence URL. The retired implementation-named family
+    // is still matched for active-state highlighting on inbound deep links,
+    // but is never emitted as an href.
+    href: `${EVIDENCE_ROOT}/overview`,
     icon: FileSearch,
-    matches: ['/dsx/evidence-beta', '/compliance'],
+    matches: [EVIDENCE_ROOT, LEGACY_EVIDENCE_ROOT, '/compliance'],
     group: 'govern',
-    description: 'Provenance, domain evidence, sustainability evidence and decision records.',
+    description: stackDescription('evidence.workspace'),
   },
 ];
 
@@ -115,7 +126,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/connect'],
     permission: 'twin.edit',
     group: 'operate',
-    description: 'Facility systems, edge gateways, twin exchange, storage and enterprise workflows.',
+    description: `${stackDescription('connections.enterprise')} ${stackDescription('data.storage')}`,
   },
   {
     name: 'Agents',
@@ -148,7 +159,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/deployments', '/deploy'],
     permission: 'deployment.view',
     group: 'operate',
-    description: 'Deployment history, runtime state and execution evidence.',
+    description: `Deployment history, runtime state and execution evidence. ${stackDescription('governance.controls')}`,
   },
   {
     name: 'People & Access',
@@ -174,7 +185,9 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/settings/ai'],
     permission: 'agent.administer',
     group: 'govern',
-    description: 'Approved providers, grounding boundaries, safety settings and agent governance.',
+    // Model providers are AURA-managed, not customer configuration, so this
+    // reads as managed-AI and grounding governance rather than provider choice.
+    description: `${stackDescription('ai.managed')} Grounding boundaries, safety settings and agent governance.`,
   },
   {
     name: 'Platform Admin',
@@ -183,7 +196,8 @@ export const MANAGE_NAV: AppNavItem[] = [
     icon: Shield,
     matches: [
       '/admin/platform-readiness',
-      '/admin/dsx-capabilities',
+      ACCELERATED_AI_CAPABILITIES_ROUTE,
+      LEGACY_CAPABILITIES_ROUTE,
       '/admin/dataset-registry',
       '/admin/asset-preview',
       '/admin/asset-pipeline',
@@ -205,12 +219,12 @@ export const MANAGE_NAV: AppNavItem[] = [
         description: 'Environment readiness, capability state and release blockers.',
       },
       {
-        name: 'DSX capabilities',
-        fullName: 'DSX capability registry',
-        href: '/admin/dsx-capabilities',
+        name: ACCELERATED_AI_CAPABILITIES_LABEL,
+        fullName: `${ACCELERATED_AI_CAPABILITIES_LABEL} registry`,
+        href: ACCELERATED_AI_CAPABILITIES_ROUTE,
         icon: Shield,
-        matches: ['/admin/dsx-capabilities'],
-        description: 'Capability status, evidence, owners, blockers and permitted claims.',
+        matches: [ACCELERATED_AI_CAPABILITIES_ROUTE, LEGACY_CAPABILITIES_ROUTE],
+        description: `${stackDescription('ai.accelerated')} Capability status, evidence, owners, blockers and permitted claims.`,
       },
       {
         name: 'Datasets',

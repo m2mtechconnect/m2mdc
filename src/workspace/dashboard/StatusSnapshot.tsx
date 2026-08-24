@@ -27,7 +27,7 @@ export function buildSnapshotRows(evidenceNeedingReview: number): SnapshotRow[] 
       label: 'Evidence requiring review',
       value: String(evidenceNeedingReview),
       tone: evidenceNeedingReview > 0 ? 'critical' : 'neutral',
-      to: '/dsx/evidence-beta',
+      to: '/evidence',
     },
     { label: 'Production readiness', value: 'No-Go', tone: 'critical', to: '/manage/integrations#nvidia-dsx' },
   ];

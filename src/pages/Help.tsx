@@ -56,7 +56,7 @@ const GETTING_STARTED: GuideLink[] = [
   {
     title: 'Review Evidence',
     description: 'Trace operational and sustainability claims back to provenance and decision records.',
-    route: '/dsx/evidence-beta/overview',
+    route: '/evidence/overview',
     icon: FileSearch,
   },
 ];
@@ -104,7 +104,7 @@ const GOVERN: GuideLink[] = [
   {
     title: 'Sovereignty Evidence',
     description: 'Review residency, sovereignty and sustainability evidence without treating modelled claims as certified facts.',
-    route: '/dsx/evidence-beta/sustainability/sovereignty',
+    route: '/evidence/sustainability/sovereignty',
     icon: Shield,
   },
 ];

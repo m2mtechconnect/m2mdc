@@ -25,8 +25,8 @@ import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetai
 import { ConnectionSetupWizard } from '@/components/connections/ConnectionSetupWizard';
 import { CredentialVaultDialog } from '@/components/connections/CredentialVaultDialog';
 import { buildConnectionRows } from '@/connections/presentation';
-import {
 import { stackDescription } from '@/config/auraStackManifest';
+import {
   runHealthCheck,
   useAuditEvents,
   useConnectionCredentials,

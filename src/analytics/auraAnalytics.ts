@@ -17,6 +17,7 @@ export interface AuraAnalyticsResult {
 }
 
 const SENSITIVE_KEY_PATTERN = /(token|secret|password|authorization|credential|cookie|content|document|body|email|phone|address|api[_-]?key)/i;
+const RESERVED_PROPERTY_KEYS = new Set(['organization_id', 'distinct_id']);
 const SESSION_KEY = 'aura_analytics_distinct_id';
 
 function configuredProvider(): AuraAnalyticsProvider {
@@ -41,6 +42,7 @@ export function sanitizeAnalyticsProperties(
   if (!properties) return {};
   return Object.fromEntries(
     Object.entries(properties).filter(([key, value]) => {
+      if (RESERVED_PROPERTY_KEYS.has(key)) return false;
       if (SENSITIVE_KEY_PATTERN.test(key)) return false;
       return value === null || ['string', 'number', 'boolean'].includes(typeof value);
     }),
@@ -77,9 +79,9 @@ export async function captureAuraEvent(
     api_key: apiKey,
     event,
     properties: {
+      ...sanitizeAnalyticsProperties(context.properties),
       distinct_id: analyticsDistinctId(),
       organization_id: context.organizationId,
-      ...sanitizeAnalyticsProperties(context.properties),
     },
   };
 

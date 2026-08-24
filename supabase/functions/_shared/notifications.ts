@@ -206,6 +206,7 @@ export async function sendOrganizationInviteNotification(
   const role = safeHeaderText(input.role.trim() || 'member');
   const expiration = new Date(input.expiresAt);
   const expirationText = Number.isNaN(expiration.getTime()) ? input.expiresAt : expiration.toUTCString();
+  const deliveryAttempt = Number.isNaN(expiration.getTime()) ? input.expiresAt : String(expiration.getTime());
 
   const safeOrganization = escapeHtml(organizationName);
   const safeRole = escapeHtml(role);
@@ -221,6 +222,8 @@ export async function sendOrganizationInviteNotification(
       `This invitation expires ${expirationText}.`,
     ].join('\n\n'),
     html: `<!doctype html><html><body><p>You've been invited to <strong>${safeOrganization}</strong> in AURA with the <strong>${safeRole}</strong> role.</p><p><a href="${safeUrl}">Accept invitation</a></p><p>This invitation expires ${safeExpiration}.</p></body></html>`,
-    idempotencyKey: `aura-invite-${input.inviteId}`,
+    // The row id makes one persisted invitation idempotent, while expiry changes
+    // on a legitimate reissue so providers do not suppress delivery of a new token.
+    idempotencyKey: `aura-invite-${input.inviteId}-${deliveryAttempt}`,
   });
 }

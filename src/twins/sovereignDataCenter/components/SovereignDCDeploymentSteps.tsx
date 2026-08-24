@@ -80,10 +80,10 @@ export function SovereignDCDeploymentSteps({
       emoji: '🟢',
       enabled: cloudMetadata.gcp?.enabled,
       region: 'Montreal',
-      sovereignNote: 'Google Cloud Canada, data never leaves Canadian jurisdiction',
+      sovereignNote: 'Canadian region, data never leaves Canadian jurisdiction',
       services: cloudMetadata.gcp?.twin_services || [
         'Pub/Sub for GPU & energy telemetry',
-        'Vertex AI for carbon intensity forecasting',
+        'Managed AI for carbon intensity forecasting',
         'Cloud Storage (northamerica-northeast1) for sovereign data',
         'Looker Studio for KPI dashboards'
       ]

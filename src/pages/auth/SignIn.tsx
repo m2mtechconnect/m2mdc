@@ -99,7 +99,7 @@ export default function SignIn() {
 
   const handleGoogleSSO = async () => {
     setLoading(true);
-    const { error: ssoError } = await signInWithGoogle();
+    const { error: ssoError } = await signInWithGoogle(postSignInPath);
     if (ssoError) {
       setLoading(false);
       toast.error(ssoError);

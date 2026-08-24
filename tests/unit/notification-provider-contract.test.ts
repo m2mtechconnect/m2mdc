@@ -47,14 +47,16 @@ describe('AURA notification provider contract', () => {
   });
 
   it('does not expose an owner invite token in the platform-provision response', () => {
-    expect(teamsInvite).toContain("mode === 'platform_provision'");
+    const modeStart = teamsInvite.indexOf("mode === 'platform_provision'");
+    expect(modeStart).toBeGreaterThan(-1);
     expect(teamsInvite).toContain('token: result.invite_token');
     expect(teamsInvite).toContain('sendOrganizationInviteNotification');
 
-    const modeStart = teamsInvite.indexOf("mode === 'platform_provision'");
-    const responseStart = teamsInvite.indexOf('ownerInvite: {', modeStart);
-    const responseEnd = teamsInvite.indexOf('workflow,', responseStart);
+    const workflowStart = teamsInvite.indexOf("name: 'aura/onboarding.organization.provisioned'", modeStart);
+    const responseStart = teamsInvite.indexOf('return json(corsHeaders, {', workflowStart);
+    const responseEnd = teamsInvite.indexOf('}, 201);', responseStart);
     const response = teamsInvite.slice(responseStart, responseEnd);
+    expect(responseStart).toBeGreaterThan(workflowStart);
     expect(response).not.toContain('token:');
     expect(response).toContain('delivery: notification');
   });
@@ -65,8 +67,11 @@ describe('AURA notification provider contract', () => {
     expect(insertIndex).toBeGreaterThan(-1);
     expect(notifyIndex).toBeGreaterThan(insertIndex);
 
-    const responseStart = teamsInvite.lastIndexOf('return json(corsHeaders, {');
-    const response = teamsInvite.slice(responseStart);
+    const workflowStart = teamsInvite.lastIndexOf("name: 'aura/onboarding.invite.created'");
+    const responseStart = teamsInvite.indexOf('return json(corsHeaders, {', workflowStart);
+    const responseEnd = teamsInvite.indexOf('}, 201);', responseStart);
+    const response = teamsInvite.slice(responseStart, responseEnd);
+    expect(responseStart).toBeGreaterThan(workflowStart);
     expect(response).not.toContain('token,');
     expect(response).toContain('delivery: notification');
   });

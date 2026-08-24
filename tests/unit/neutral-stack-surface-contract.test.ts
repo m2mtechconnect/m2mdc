@@ -218,7 +218,7 @@ describe('navigation and share links never emit retired paths', () => {
       .join('\n');
     expect(code).not.toContain("'/omniverse-scene'");
     expect(code).not.toContain('"/omniverse-scene"');
-    expect(code).toContain("'/twin-preview'");
+    expect(code).toContain('"/twin-preview"');
   });
 
   it('emits only neutral hrefs', () => {

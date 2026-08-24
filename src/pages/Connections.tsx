@@ -15,7 +15,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
 import { PagePurpose } from '@/components/capability/PagePurpose';
-import { CommandHeader } from '@/components/v2';
+import { CapabilityChips, WorkspaceHeader } from '@/components/workspace-system';
+
 import { OverviewTab } from '@/components/connections/OverviewTab';
 import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
@@ -273,15 +274,12 @@ export default function Connections() {
 
   return (
     <div className="min-w-0 space-y-5 pb-10" data-testid="connections-page">
-      <CommandHeader
+      <WorkspaceHeader
         eyebrow="Operations · Control plane"
-        title={
-          <span className="flex items-center gap-2">
-            <Cable className="h-5 w-5 text-muted-foreground" aria-hidden />
-            Connections
-          </span>
-        }
-        subtitle={
+        title="Connections"
+        icon={Cable}
+        capabilityId="connections.enterprise"
+        description={
           <>
             {stackDescription('connections.enterprise')} {stackDescription('data.storage')} Runtime status is
             evidence-derived; internal platform dependencies and capability assessment live on{' '}
@@ -291,6 +289,8 @@ export default function Connections() {
             .
           </>
         }
+        meta={<CapabilityChips surface="connections" limit={4} />}
+
         actions={
           <>
             <Button variant="outline" className="h-10" onClick={() => { void refresh(); }} disabled={refreshing} aria-busy={refreshing}>

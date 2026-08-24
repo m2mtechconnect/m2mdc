@@ -1,77 +1,31 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import { execFileSync } from "node:child_process";
 import { componentTagger } from "lovable-tagger";
 import { seoBuildGate } from "./scripts/seoBuildGate";
-import { normalizeReleaseBranch, resolveReleaseEnvironment } from "./scripts/releaseMetadata";
+import {
+  assertProductionFingerprint,
+  buildReleaseFingerprint,
+  resolveReleaseSource,
+} from "./scripts/releaseMetadata";
 
-function resolveGitValue(args: string[], fallback = 'unknown') {
-  try {
-    return execFileSync('git', args, {
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim() || fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function resolveReleaseSha() {
-  return (
-    process.env.AURA_COMMIT_SHA ||
-    process.env.GITHUB_SHA ||
-    process.env.VERCEL_GIT_COMMIT_SHA ||
-    process.env.CI_COMMIT_SHA ||
-    resolveGitValue(['rev-parse', 'HEAD'])
-  ).trim();
-}
-
-function resolveRawReleaseBranch() {
-  return (
-    process.env.AURA_RELEASE_BRANCH ||
-    process.env.GITHUB_HEAD_REF ||
-    process.env.GITHUB_REF_NAME ||
-    process.env.VERCEL_GIT_COMMIT_REF ||
-    process.env.CI_COMMIT_REF_NAME ||
-    resolveGitValue(['rev-parse', '--abbrev-ref', 'HEAD'])
-  ).trim();
-}
-
-function resolveReleaseBranch() {
-  return normalizeReleaseBranch(resolveRawReleaseBranch());
-}
+const PROJECT_ROOT = __dirname;
 
 function releaseFingerprint(): Plugin {
-  const sha = resolveReleaseSha();
-  const rawBranch = resolveRawReleaseBranch();
-  const branch = normalizeReleaseBranch(rawBranch);
-  const builtAt = new Date().toISOString();
-  const buildId = process.env.AURA_BUILD_ID || `b${Date.now().toString(36)}`;
-  const environment = resolveReleaseEnvironment({
-    rawBranch,
-    explicitEnvironment: process.env.AURA_RELEASE_ENVIRONMENT,
-    providerEnvironment: process.env.VERCEL_ENV,
-  });
-  const version = process.env.npm_package_version || '1.0.0';
+  const fingerprint = buildReleaseFingerprint({ rootDir: PROJECT_ROOT, isReleaseBuild: true });
 
   return {
     name: 'aura-release-fingerprint',
     apply: 'build',
+    buildStart() {
+      // Fail-closed: a release bundle may never ship unknown provenance.
+      assertProductionFingerprint(fingerprint);
+    },
     generateBundle() {
-      const payload = {
-        schema: 'aura.release-fingerprint.v1',
-        sha,
-        branch,
-        builtAt,
-        buildId,
-        environment,
-        version,
-      };
       this.emitFile({
         type: 'asset',
         fileName: 'release.json',
-        source: `${JSON.stringify(payload, null, 2)}\n`,
+        source: `${JSON.stringify(fingerprint, null, 2)}\n`,
       });
     },
   };
@@ -100,7 +54,7 @@ function kitProxy() {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const releaseSha = resolveReleaseSha();
+  const releaseSha = resolveReleaseSource({ rootDir: PROJECT_ROOT }).sha;
   const buildTimestamp = new Date().toISOString();
   const buildId = process.env.AURA_BUILD_ID || `b${Date.now().toString(36)}`;
 

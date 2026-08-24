@@ -1,31 +1,68 @@
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import path from 'node:path';
+
 export const LOVABLE_ORPHAN_BRANCH = '__orphan__';
+export const RELEASE_FINGERPRINT_SCHEMA = 'aura.release-fingerprint.v1';
+export const RELEASE_SOURCE_STAMP_FILE = 'release-source.json';
+export const CANONICAL_RELEASE_BRANCH = 'main';
+
+const SHA_PATTERN = /^[0-9a-f]{40}$/;
+
+/** Branch markers that carry no authoritative source information. */
+const AMBIGUOUS_BRANCHES = new Set(['', 'unknown', 'HEAD', LOVABLE_ORPHAN_BRANCH]);
+
+/** Internal Lovable working checkouts are never the published source branch. */
+const INTERNAL_CHECKOUT_BRANCH = /^(edit|preview|lovable)\//;
+
+export type ShaProvenance = 'provider' | 'git-cli' | 'git-dir' | 'stamped' | 'unknown';
 
 export interface ReleaseEnvironmentInputs {
   rawBranch: string;
   explicitEnvironment?: string;
   providerEnvironment?: string;
+  /** True when the build is a release (non-development) bundle. */
+  isReleaseBuild?: boolean;
+}
+
+export interface ReleaseFingerprint {
+  schema: typeof RELEASE_FINGERPRINT_SCHEMA;
+  sha: string;
+  branch: string;
+  builtAt: string;
+  buildId: string;
+  environment: string;
+  version: string;
+  shaSource: ShaProvenance;
+}
+
+export function isSourceSha(value: unknown): value is string {
+  return typeof value === 'string' && SHA_PATTERN.test(value.trim());
 }
 
 /**
  * Lovable production publishes check out the synchronized source onto an
- * internal `__orphan__` branch. That is a provider checkout detail, not the
- * authoritative source branch. Production source is GitHub `main`; the
- * compatibility mirror is required to remain a fast-forward copy of `main`.
+ * internal `__orphan__` branch, and some provider builds expose no Git
+ * metadata at all. Neither is an authoritative source branch: production
+ * source is GitHub `main`.
  */
 export function normalizeReleaseBranch(rawBranch: string): string {
-  const branch = rawBranch.trim() || 'unknown';
-  return branch === LOVABLE_ORPHAN_BRANCH ? 'main' : branch;
+  const branch = (rawBranch ?? '').trim();
+  if (AMBIGUOUS_BRANCHES.has(branch) || INTERNAL_CHECKOUT_BRANCH.test(branch)) {
+    return CANONICAL_RELEASE_BRANCH;
+  }
+  return branch;
 }
 
 /**
- * Prefer explicit provider metadata. When Lovable exposes only its internal
- * orphan checkout marker, classify the release as production rather than
- * emitting an ambiguous `unknown` environment in the live fingerprint.
+ * Prefer explicit provider metadata. A release build with no provider
+ * environment signal is a production publish - never an ambiguous `unknown`.
  */
 export function resolveReleaseEnvironment({
   rawBranch,
   explicitEnvironment,
   providerEnvironment,
+  isReleaseBuild = false,
 }: ReleaseEnvironmentInputs): string {
   const explicit = explicitEnvironment?.trim();
   if (explicit) return explicit;
@@ -33,5 +70,238 @@ export function resolveReleaseEnvironment({
   const provider = providerEnvironment?.trim();
   if (provider) return provider;
 
-  return rawBranch.trim() === LOVABLE_ORPHAN_BRANCH ? 'production' : 'unknown';
+  if ((rawBranch ?? '').trim() === LOVABLE_ORPHAN_BRANCH) return 'production';
+
+  return isReleaseBuild ? 'production' : 'unknown';
+}
+
+function runGit(args: string[], cwd: string): string {
+  try {
+    return execFileSync('git', args, {
+      cwd,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return '';
+  }
+}
+
+function resolveGitDir(rootDir: string): string | undefined {
+  const candidate = path.join(rootDir, '.git');
+  if (!existsSync(candidate)) return undefined;
+  try {
+    if (statSync(candidate).isDirectory()) return candidate;
+    const pointer = readFileSync(candidate, 'utf8').trim();
+    const match = /^gitdir:\s*(.+)$/.exec(pointer);
+    if (!match) return undefined;
+    const resolved = path.isAbsolute(match[1])
+      ? match[1]
+      : path.resolve(rootDir, match[1]);
+    return existsSync(resolved) ? resolved : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Resolve HEAD by reading the Git object store directly. This keeps release
+ * provenance available when the `git` binary is missing from the build image
+ * but the checkout metadata is still on disk.
+ */
+export function readGitMetadataFromDisk(rootDir: string): { sha: string; branch: string } {
+  const gitDir = resolveGitDir(rootDir);
+  if (!gitDir) return { sha: '', branch: '' };
+
+  const read = (relative: string): string => {
+    try {
+      const file = path.join(gitDir, relative);
+      return existsSync(file) ? readFileSync(file, 'utf8').trim() : '';
+    } catch {
+      return '';
+    }
+  };
+
+  const head = read('HEAD');
+  if (!head) return { sha: '', branch: '' };
+
+  if (isSourceSha(head)) return { sha: head, branch: '' };
+
+  const refMatch = /^ref:\s*(.+)$/.exec(head);
+  if (!refMatch) return { sha: '', branch: '' };
+  const ref = refMatch[1].trim();
+  const branch = ref.replace(/^refs\/heads\//, '');
+
+  const direct = read(ref);
+  if (isSourceSha(direct)) return { sha: direct, branch };
+
+  // packed-refs fallback
+  const packed = read('packed-refs');
+  for (const line of packed.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('^')) continue;
+    const [sha, name] = trimmed.split(/\s+/);
+    if (name === ref && isSourceSha(sha)) return { sha, branch };
+  }
+
+  return { sha: '', branch };
+}
+
+export interface StampedSourceFingerprint {
+  sha: string;
+  branch: string;
+  stampedAt: string;
+}
+
+/**
+ * Read the committed source stamp. This is the deterministic last-resort
+ * provenance record for provider builds with no Git metadata at all. It is
+ * regenerated by `bun run stamp:release`, never hand-edited.
+ */
+export function readStampedSourceFingerprint(
+  rootDir: string,
+): StampedSourceFingerprint | undefined {
+  try {
+    const file = path.join(rootDir, RELEASE_SOURCE_STAMP_FILE);
+    if (!existsSync(file)) return undefined;
+    const parsed = JSON.parse(readFileSync(file, 'utf8')) as Partial<StampedSourceFingerprint>;
+    if (!isSourceSha(parsed.sha)) return undefined;
+    return {
+      sha: parsed.sha.trim(),
+      branch: (parsed.branch || CANONICAL_RELEASE_BRANCH).trim(),
+      stampedAt: (parsed.stampedAt || '').trim(),
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+export interface ResolveSourceOptions {
+  rootDir: string;
+  env?: NodeJS.ProcessEnv;
+}
+
+export interface ResolvedSource {
+  sha: string;
+  rawBranch: string;
+  shaSource: ShaProvenance;
+}
+
+/**
+ * Layered resolution: provider/CI env -> git CLI -> on-disk git metadata ->
+ * committed source stamp.
+ */
+export function resolveReleaseSource({
+  rootDir,
+  env = process.env,
+}: ResolveSourceOptions): ResolvedSource {
+  const providerSha = (
+    env.AURA_COMMIT_SHA ||
+    env.GITHUB_SHA ||
+    env.VERCEL_GIT_COMMIT_SHA ||
+    env.CI_COMMIT_SHA ||
+    ''
+  ).trim();
+  const providerBranch = (
+    env.AURA_RELEASE_BRANCH ||
+    env.GITHUB_HEAD_REF ||
+    env.GITHUB_REF_NAME ||
+    env.VERCEL_GIT_COMMIT_REF ||
+    env.CI_COMMIT_REF_NAME ||
+    ''
+  ).trim();
+
+  if (isSourceSha(providerSha)) {
+    return { sha: providerSha, rawBranch: providerBranch, shaSource: 'provider' };
+  }
+
+  const cliSha = runGit(['rev-parse', 'HEAD'], rootDir);
+  if (isSourceSha(cliSha)) {
+    const cliBranch = providerBranch || runGit(['rev-parse', '--abbrev-ref', 'HEAD'], rootDir);
+    return { sha: cliSha, rawBranch: cliBranch, shaSource: 'git-cli' };
+  }
+
+  const disk = readGitMetadataFromDisk(rootDir);
+  if (isSourceSha(disk.sha)) {
+    return { sha: disk.sha, rawBranch: providerBranch || disk.branch, shaSource: 'git-dir' };
+  }
+
+  const stamped = readStampedSourceFingerprint(rootDir);
+  if (stamped) {
+    return {
+      sha: stamped.sha,
+      rawBranch: providerBranch || stamped.branch,
+      shaSource: 'stamped',
+    };
+  }
+
+  return { sha: '', rawBranch: providerBranch, shaSource: 'unknown' };
+}
+
+export interface BuildFingerprintOptions {
+  rootDir: string;
+  env?: NodeJS.ProcessEnv;
+  now?: Date;
+  isReleaseBuild?: boolean;
+}
+
+export function buildReleaseFingerprint({
+  rootDir,
+  env = process.env,
+  now = new Date(),
+  isReleaseBuild = true,
+}: BuildFingerprintOptions): ReleaseFingerprint {
+  const source = resolveReleaseSource({ rootDir, env });
+  return {
+    schema: RELEASE_FINGERPRINT_SCHEMA,
+    sha: source.sha,
+    branch: normalizeReleaseBranch(source.rawBranch),
+    builtAt: now.toISOString(),
+    buildId: (env.AURA_BUILD_ID || `b${now.getTime().toString(36)}`).trim(),
+    environment: resolveReleaseEnvironment({
+      rawBranch: source.rawBranch,
+      explicitEnvironment: env.AURA_RELEASE_ENVIRONMENT,
+      providerEnvironment: env.VERCEL_ENV,
+      isReleaseBuild,
+    }),
+    version: (env.npm_package_version || '1.0.0').trim(),
+    shaSource: source.shaSource,
+  };
+}
+
+/**
+ * Fail-closed gate. A production release.json may never claim unknown
+ * provenance: an unresolved SHA, branch or environment aborts the build.
+ */
+export function assertProductionFingerprint(fingerprint: ReleaseFingerprint): void {
+  const problems: string[] = [];
+
+  if (!isSourceSha(fingerprint.sha)) {
+    problems.push(`sha is not a 40-hex source SHA (got "${fingerprint.sha || 'unknown'}")`);
+  }
+  if (fingerprint.shaSource === 'unknown') {
+    problems.push('no source provenance could be resolved');
+  }
+  if (!fingerprint.branch || fingerprint.branch === 'unknown') {
+    problems.push(`branch is unresolved (got "${fingerprint.branch || ''}")`);
+  }
+  if (!fingerprint.environment || fingerprint.environment === 'unknown') {
+    problems.push('environment is unresolved');
+  }
+  if (!fingerprint.buildId) {
+    problems.push('buildId is empty');
+  }
+  if (fingerprint.schema !== RELEASE_FINGERPRINT_SCHEMA) {
+    problems.push(`schema must be ${RELEASE_FINGERPRINT_SCHEMA}`);
+  }
+
+  if (problems.length > 0) {
+    throw new Error(
+      [
+        'AURA release fingerprint is not publishable (fail-closed):',
+        ...problems.map((p) => `  - ${p}`),
+        `Run \`bun run stamp:release\` on the bound main source, or set AURA_COMMIT_SHA / AURA_RELEASE_BRANCH / AURA_RELEASE_ENVIRONMENT for this build.`,
+      ].join('\n'),
+    );
+  }
 }

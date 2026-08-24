@@ -210,6 +210,17 @@ describe('navigation and share links never emit retired paths', () => {
     ...(item.children ?? []),
   ]);
 
+  it('TwinFooter never emits /omniverse-scene', () => {
+    const source = read('src/components/landing/TwinFooter.tsx');
+    const code = source
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('//'))
+      .join('\n');
+    expect(code).not.toContain("'/omniverse-scene'");
+    expect(code).not.toContain('"/omniverse-scene"');
+    expect(code).toContain("'/twin-preview'");
+  });
+
   it('emits only neutral hrefs', () => {
     for (const item of navItems) {
       expect(isLegacyNamedPath(item.href), `${item.name} -> ${item.href}`).toBe(false);

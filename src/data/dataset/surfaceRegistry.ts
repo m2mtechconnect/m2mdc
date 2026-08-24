@@ -130,33 +130,38 @@ function unavailable(path: string, title: string, blockingSource: string): Surfa
   };
 }
 
-/** Evidence workspace routes, all served by the synthetic evidence-beta fixture. */
+/**
+ * Evidence workspace routes, all served by the same synthetic evidence fixture.
+ *
+ * Neutral canonical paths only. The retired `/dsx/evidence-beta` family
+ * redirects onto these, so it needs no separate surface entry.
+ */
 const EVIDENCE_BETA_ROUTES: readonly [string, string][] = [
-  ['/dsx/evidence-beta', 'Evidence workspaces'],
-  ['/dsx/evidence-beta/overview', 'Evidence overview'],
-  ['/dsx/evidence-beta/operations', 'Operations'],
-  ['/dsx/evidence-beta/operations/thermal', 'Thermal'],
-  ['/dsx/evidence-beta/operations/power', 'Power'],
-  ['/dsx/evidence-beta/operations/cooling', 'Cooling'],
-  ['/dsx/evidence-beta/operations/compute', 'Compute and network'],
-  ['/dsx/evidence-beta/operations/workload', 'Workload'],
-  ['/dsx/evidence-beta/sustainability', 'Sustainability'],
-  ['/dsx/evidence-beta/sustainability/financial', 'Financial'],
-  ['/dsx/evidence-beta/sustainability/sovereignty', 'Sovereignty'],
-  ['/dsx/evidence-beta/decisions', 'Decisions'],
-  ['/dsx/evidence-beta/decisions/log', 'Decision log'],
-  ['/dsx/evidence-beta/assets', 'Facility assets'],
-  ['/dsx/evidence-beta/thermal', 'Thermal'],
-  ['/dsx/evidence-beta/power', 'Power'],
-  ['/dsx/evidence-beta/cooling', 'Cooling'],
-  ['/dsx/evidence-beta/network', 'Network'],
-  ['/dsx/evidence-beta/facility', 'Facility'],
-  ['/dsx/evidence-beta/workload', 'Workload'],
-  ['/dsx/evidence-beta/simulations', 'Simulations'],
-  ['/dsx/evidence-beta/sovereignty', 'Sovereignty'],
-  ['/dsx/evidence-beta/carbon', 'Carbon'],
-  ['/dsx/evidence-beta/financials', 'Financials'],
-  ['/dsx/evidence-beta/evidence', 'Evidence log'],
+  ['/evidence', 'Evidence workspaces'],
+  ['/evidence/overview', 'Evidence overview'],
+  ['/evidence/operations', 'Operations'],
+  ['/evidence/operations/thermal', 'Thermal'],
+  ['/evidence/operations/power', 'Power'],
+  ['/evidence/operations/cooling', 'Cooling'],
+  ['/evidence/operations/compute', 'Compute and network'],
+  ['/evidence/operations/workload', 'Workload'],
+  ['/evidence/sustainability', 'Sustainability'],
+  ['/evidence/sustainability/financial', 'Financial'],
+  ['/evidence/sustainability/sovereignty', 'Sovereignty'],
+  ['/evidence/decisions', 'Decisions'],
+  ['/evidence/decisions/log', 'Decision log'],
+  ['/evidence/assets', 'Facility assets'],
+  ['/evidence/thermal', 'Thermal'],
+  ['/evidence/power', 'Power'],
+  ['/evidence/cooling', 'Cooling'],
+  ['/evidence/network', 'Network'],
+  ['/evidence/facility', 'Facility'],
+  ['/evidence/workload', 'Workload'],
+  ['/evidence/simulations', 'Simulations'],
+  ['/evidence/sovereignty', 'Sovereignty'],
+  ['/evidence/carbon', 'Carbon'],
+  ['/evidence/financials', 'Financials'],
+  ['/evidence/evidence', 'Evidence log'],
 ];
 
 export const SURFACE_MATRIX: readonly SurfaceEntry[] = [

@@ -6,8 +6,14 @@
  * context so the operator never has to re-find the same object.
  */
 import type { AssetClass } from '../contracts/assetMapping';
+import { EVIDENCE_ROOT } from '@/config/evidenceRoutes';
 
-export const DSX_ROOT = '/dsx/evidence-beta';
+/**
+ * Root every related-view destination is built from. Neutral canonical
+ * Evidence family: the retired implementation-named root is accepted on
+ * inbound links only and is never emitted here.
+ */
+export const DSX_ROOT = EVIDENCE_ROOT;
 
 export interface RelatedView {
   id: string;

@@ -64,8 +64,8 @@ describe('stack manifest drives the frontend', () => {
   it.each(MANIFEST_CONSUMERS)('%s consumes the stack manifest', (file) => {
     const source = read(file);
     const usesManifest =
-      source.includes("from '@/config/auraStackManifest'") ||
-      source.includes("from '@/components/stack/AURAStackSummary'");
+      /from ['"]@\/config\/auraStackManifest['"]/.test(source) ||
+      /from ['"]@\/components\/stack\/AURAStackSummary['"]/.test(source);
     expect(usesManifest).toBe(true);
   });
 

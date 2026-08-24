@@ -427,6 +427,7 @@ export default function AccessControl() {
                       {userRole.expires_at ? new Date(userRole.expires_at).toLocaleDateString() : 'Never'}
                     </TableCell>
                     <TableCell className="text-right">
+                      {canManageAssignments && (
                       <Dialog open={isRevokeDialogOpen && selectedRole?.id === userRole.id} onOpenChange={(open) => {
                         setIsRevokeDialogOpen(open);
                         if (!open) setSelectedRole(null);

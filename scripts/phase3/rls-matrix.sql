@@ -30,12 +30,14 @@ DO $outer$
 DECLARE
   ua uuid := gen_random_uuid();
   ub uuid := gen_random_uuid();
+  org_a uuid := gen_random_uuid();
+  org_b uuid := gen_random_uuid();
   twin_a uuid;
   run_a uuid;
   n int;
   ok boolean;
 BEGIN
-  -- Two tenants, each with their own twin.
+  -- Two tenants, each with their own durable organization membership.
   INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password,
                           email_confirmed_at, created_at, updated_at)
   VALUES (ua, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
@@ -43,8 +45,18 @@ BEGIN
          (ub, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
           'tenant-b@validation.invalid', '', now(), now(), now());
 
-  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
-  VALUES ('validation-twin-a', 'Validation City', 'validation-region-a', ua)
+  INSERT INTO public.organizations (id, name) VALUES
+    (org_a, 'Validation Tenant A'),
+    (org_b, 'Validation Tenant B');
+
+  INSERT INTO public.org_memberships (org_id, user_id, role, status, is_default) VALUES
+    (org_a, ua, 'owner', 'active', true),
+    (org_b, ub, 'owner', 'active', true);
+
+  -- Privileged fixture setup must state the tenant explicitly; production
+  -- stamp_active_org_id() intentionally rejects an orphan privileged insert.
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user, org_id)
+  VALUES ('validation-twin-a', 'Validation City', 'validation-region-a', ua, org_a)
   RETURNING id INTO twin_a;
 
   INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
@@ -170,6 +182,8 @@ DECLARE
   admin_a uuid := gen_random_uuid();
   member_b uuid := gen_random_uuid();
   approver_b uuid := gen_random_uuid();
+  org_a uuid := gen_random_uuid();
+  org_b uuid := gen_random_uuid();
   twin_a uuid;
   run_a uuid;
   n int;
@@ -184,8 +198,19 @@ BEGIN
   INSERT INTO public.user_roles (user_id, role) VALUES
     (approver_a, 'operator'), (admin_a, 'admin'), (approver_b, 'operator');
 
-  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user)
-  VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a)
+  INSERT INTO public.organizations (id, name) VALUES
+    (org_a, 'Validation Extended Tenant A'),
+    (org_b, 'Validation Extended Tenant B');
+
+  INSERT INTO public.org_memberships (org_id, user_id, role, status, is_default) VALUES
+    (org_a, member_a, 'owner', 'active', true),
+    (org_a, approver_a, 'operator', 'active', true),
+    (org_a, admin_a, 'admin', 'active', true),
+    (org_b, member_b, 'owner', 'active', true),
+    (org_b, approver_b, 'operator', 'active', true);
+
+  INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user, org_id)
+  VALUES ('validation-twin-ext-a', 'Validation City', 'validation-region-a', member_a, org_a)
   RETURNING id INTO twin_a;
 
   -- The prior anonymous assertion intentionally clears request.jwt.claims.

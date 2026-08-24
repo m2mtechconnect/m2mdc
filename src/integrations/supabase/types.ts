@@ -4673,6 +4673,74 @@ export type Database = {
           },
         ]
       }
+      organization_deployment_profiles: {
+        Row: {
+          automation_status: string
+          capability_evidence: Json
+          capability_status: string
+          control_plane_location: string
+          created_at: string
+          customer_managed: boolean
+          data_plane_location: string
+          data_residency: string | null
+          deployment_type: string
+          edge_required: boolean
+          hosting_provider: string
+          id: string
+          lifecycle_status: string
+          notes: string | null
+          org_id: string
+          preferred_region: string | null
+          updated_at: string
+        }
+        Insert: {
+          automation_status?: string
+          capability_evidence?: Json
+          capability_status?: string
+          control_plane_location?: string
+          created_at?: string
+          customer_managed?: boolean
+          data_plane_location?: string
+          data_residency?: string | null
+          deployment_type?: string
+          edge_required?: boolean
+          hosting_provider?: string
+          id?: string
+          lifecycle_status?: string
+          notes?: string | null
+          org_id: string
+          preferred_region?: string | null
+          updated_at?: string
+        }
+        Update: {
+          automation_status?: string
+          capability_evidence?: Json
+          capability_status?: string
+          control_plane_location?: string
+          created_at?: string
+          customer_managed?: boolean
+          data_plane_location?: string
+          data_residency?: string | null
+          deployment_type?: string
+          edge_required?: boolean
+          hosting_provider?: string
+          id?: string
+          lifecycle_status?: string
+          notes?: string | null
+          org_id?: string
+          preferred_region?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_deployment_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null

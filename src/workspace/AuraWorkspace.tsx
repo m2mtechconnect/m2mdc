@@ -19,6 +19,8 @@ import { KpiStrip } from './KpiStrip';
 import { ContextPanel } from './ContextPanel';
 import { WorkspaceToolRail } from './WorkspaceToolRail';
 import { EvidenceDrawer } from './EvidenceDrawer';
+import { FlaskConical } from 'lucide-react';
+import { WorkspaceHeader } from '@/components/workspace-system';
 import { WorkspaceRecordHeader } from './WorkspaceRecordHeader';
 import { useFacilityModel } from './facilityModel';
 import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
@@ -210,6 +212,25 @@ export default function AuraWorkspace() {
         className="v2-canvas flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden"
         data-testid="aura-workspace"
       >
+        {/*
+          Shared, manifest-backed simulation banner. Compact density keeps the
+          canvas above the fold; the record header below keeps the run truth
+          line, role view selector and every existing action.
+        */}
+        <WorkspaceHeader
+          density="compact"
+          eyebrow={workspaceLabel ?? 'Simulation'}
+          title={facility.name}
+          icon={FlaskConical}
+          capabilityId="simulation.engine"
+          badges={
+            <span className="aura-ws-chip">
+              <span className="aura-ws-chip-dot" data-status="SIMULATED" aria-hidden="true" />
+              Results are simulated, not measured
+            </span>
+          }
+        />
+
         {/* One record header: identity, truth line, view selector, actions. */}
         <WorkspaceRecordHeader
           facility={facility}

@@ -108,7 +108,7 @@ describe('alias integrity', () => {
   // Evidence children are declared relative to their parent mount.
   const mounted = new Set([
     ...ALL_ROUTES.map((r) => r.path),
-    ...EVIDENCE_CHILD_ROUTES.map((r) => `/dsx/evidence-beta/${r.path}`),
+    ...EVIDENCE_CHILD_ROUTES.map((r) => `/evidence/${r.path}`),
   ]);
 
   it('has no duplicate alias sources', () => {

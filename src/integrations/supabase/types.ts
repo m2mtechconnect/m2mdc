@@ -2437,6 +2437,7 @@ export type Database = {
           location_id: string | null
           metadata: Json | null
           name: string
+          org_id: string | null
           pue_target: number | null
           region_code: string
           renewable_target_pct: number | null
@@ -2457,6 +2458,7 @@ export type Database = {
           location_id?: string | null
           metadata?: Json | null
           name: string
+          org_id?: string | null
           pue_target?: number | null
           region_code: string
           renewable_target_pct?: number | null
@@ -2477,6 +2479,7 @@ export type Database = {
           location_id?: string | null
           metadata?: Json | null
           name?: string
+          org_id?: string | null
           pue_target?: number | null
           region_code?: string
           renewable_target_pct?: number | null
@@ -2497,6 +2500,13 @@ export type Database = {
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "data_centre_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_centre_twins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -2946,6 +2956,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          org_id: string | null
           slug: string
           status: string | null
           updated_at: string
@@ -2957,6 +2968,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          org_id?: string | null
           slug: string
           status?: string | null
           updated_at?: string
@@ -2968,12 +2980,21 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          org_id?: string | null
           slug?: string
           status?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "digital_twins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_analysis_jobs: {
         Row: {
@@ -3427,6 +3448,135 @@ export type Database = {
           source_subject_hash?: string | null
         }
         Relationships: []
+      }
+      edge_gateway_events: {
+        Row: {
+          details: Json
+          event_type: string
+          gateway_id: string
+          id: string
+          message: string | null
+          occurred_at: string
+          severity: string
+        }
+        Insert: {
+          details?: Json
+          event_type: string
+          gateway_id: string
+          id?: string
+          message?: string | null
+          occurred_at?: string
+          severity?: string
+        }
+        Update: {
+          details?: Json
+          event_type?: string
+          gateway_id?: string
+          id?: string
+          message?: string | null
+          occurred_at?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edge_gateway_events_gateway_id_fkey"
+            columns: ["gateway_id"]
+            isOneToOne: false
+            referencedRelation: "edge_gateways"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edge_gateways: {
+        Row: {
+          capabilities: Json
+          certificate_fingerprint: string | null
+          created_at: string
+          created_by: string | null
+          credential_reference: string | null
+          desired_config: Json
+          display_name: string
+          enrolled_at: string | null
+          facility_id: string | null
+          gateway_key: string
+          id: string
+          last_error: string | null
+          last_seen_at: string | null
+          org_id: string
+          reported_config: Json
+          software_version: string | null
+          status: string
+          transport: string
+          twin_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          capabilities?: Json
+          certificate_fingerprint?: string | null
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          desired_config?: Json
+          display_name: string
+          enrolled_at?: string | null
+          facility_id?: string | null
+          gateway_key: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          org_id: string
+          reported_config?: Json
+          software_version?: string | null
+          status?: string
+          transport?: string
+          twin_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          capabilities?: Json
+          certificate_fingerprint?: string | null
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          desired_config?: Json
+          display_name?: string
+          enrolled_at?: string | null
+          facility_id?: string | null
+          gateway_key?: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          org_id?: string
+          reported_config?: Json
+          software_version?: string | null
+          status?: string
+          transport?: string
+          twin_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edge_gateways_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "sovereign_dc_facilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edge_gateways_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edge_gateways_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       environments: {
         Row: {
@@ -4608,6 +4758,195 @@ export type Database = {
         }
         Relationships: []
       }
+      org_memberships: {
+        Row: {
+          created_at: string
+          granted_by: string | null
+          id: string
+          is_default: boolean
+          org_id: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          is_default?: boolean
+          org_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          granted_by?: string | null
+          id?: string
+          is_default?: boolean
+          org_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_deployment_profiles: {
+        Row: {
+          automation_status: string
+          capability_evidence: Json
+          capability_status: string
+          control_plane_location: string
+          created_at: string
+          customer_managed: boolean
+          data_plane_location: string
+          data_residency: string | null
+          deployment_type: string
+          edge_required: boolean
+          hosting_provider: string
+          id: string
+          lifecycle_status: string
+          notes: string | null
+          org_id: string
+          preferred_region: string | null
+          updated_at: string
+        }
+        Insert: {
+          automation_status?: string
+          capability_evidence?: Json
+          capability_status?: string
+          control_plane_location?: string
+          created_at?: string
+          customer_managed?: boolean
+          data_plane_location?: string
+          data_residency?: string | null
+          deployment_type?: string
+          edge_required?: boolean
+          hosting_provider?: string
+          id?: string
+          lifecycle_status?: string
+          notes?: string | null
+          org_id: string
+          preferred_region?: string | null
+          updated_at?: string
+        }
+        Update: {
+          automation_status?: string
+          capability_evidence?: Json
+          capability_status?: string
+          control_plane_location?: string
+          created_at?: string
+          customer_managed?: boolean
+          data_plane_location?: string
+          data_residency?: string | null
+          deployment_type?: string
+          edge_required?: boolean
+          hosting_provider?: string
+          id?: string
+          lifecycle_status?: string
+          notes?: string | null
+          org_id?: string
+          preferred_region?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_deployment_profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_entitlements: {
+        Row: {
+          ai_monthly_units: number | null
+          billing_customer_ref: string | null
+          billing_provider: string
+          billing_subscription_ref: string | null
+          created_at: string
+          deployment_type: string
+          effective_at: string | null
+          enforcement_mode: string
+          entitlement_status: string
+          expires_at: string | null
+          id: string
+          max_connections: number | null
+          max_facilities: number | null
+          max_twins: number | null
+          max_users: number | null
+          org_id: string
+          plan_code: string
+          storage_gb: number | null
+          support_level: string
+          updated_at: string
+        }
+        Insert: {
+          ai_monthly_units?: number | null
+          billing_customer_ref?: string | null
+          billing_provider?: string
+          billing_subscription_ref?: string | null
+          created_at?: string
+          deployment_type?: string
+          effective_at?: string | null
+          enforcement_mode?: string
+          entitlement_status?: string
+          expires_at?: string | null
+          id?: string
+          max_connections?: number | null
+          max_facilities?: number | null
+          max_twins?: number | null
+          max_users?: number | null
+          org_id: string
+          plan_code?: string
+          storage_gb?: number | null
+          support_level?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_monthly_units?: number | null
+          billing_customer_ref?: string | null
+          billing_provider?: string
+          billing_subscription_ref?: string | null
+          created_at?: string
+          deployment_type?: string
+          effective_at?: string | null
+          enforcement_mode?: string
+          entitlement_status?: string
+          expires_at?: string | null
+          id?: string
+          max_connections?: number | null
+          max_facilities?: number | null
+          max_twins?: number | null
+          max_users?: number | null
+          org_id?: string
+          plan_code?: string
+          storage_gb?: number | null
+          support_level?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_entitlements_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null
@@ -4882,6 +5221,7 @@ export type Database = {
           id: string
           is_approved: boolean
           job_title: string | null
+          last_active_org_id: string | null
           locale: string | null
           org_id: string | null
           phone: string | null
@@ -4902,6 +5242,7 @@ export type Database = {
           id?: string
           is_approved?: boolean
           job_title?: string | null
+          last_active_org_id?: string | null
           locale?: string | null
           org_id?: string | null
           phone?: string | null
@@ -4922,6 +5263,7 @@ export type Database = {
           id?: string
           is_approved?: boolean
           job_title?: string | null
+          last_active_org_id?: string | null
           locale?: string | null
           org_id?: string | null
           phone?: string | null
@@ -4935,6 +5277,13 @@ export type Database = {
             columns: ["department_id"]
             isOneToOne: false
             referencedRelation: "departments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_last_active_org_id_fkey"
+            columns: ["last_active_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -5712,6 +6061,7 @@ export type Database = {
           id: string
           incident_scenarios: Json | null
           name: string
+          org_id: string | null
           owner_id: string
           region: string
           updated_at: string | null
@@ -5729,6 +6079,7 @@ export type Database = {
           id?: string
           incident_scenarios?: Json | null
           name: string
+          org_id?: string | null
           owner_id: string
           region: string
           updated_at?: string | null
@@ -5746,11 +6097,20 @@ export type Database = {
           id?: string
           incident_scenarios?: Json | null
           name?: string
+          org_id?: string | null
           owner_id?: string
           region?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sovereign_dc_facilities_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sovereign_dc_simulation_runs: {
         Row: {
@@ -5966,7 +6326,7 @@ export type Database = {
           id: string
           invited_by: string
           org_id: string | null
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           status: string
           token: string
         }
@@ -5977,7 +6337,7 @@ export type Database = {
           id?: string
           invited_by: string
           org_id?: string | null
-          role: Database["public"]["Enums"]["app_role"]
+          role: string
           status?: string
           token: string
         }
@@ -5988,7 +6348,7 @@ export type Database = {
           id?: string
           invited_by?: string
           org_id?: string | null
-          role?: Database["public"]["Enums"]["app_role"]
+          role?: string
           status?: string
           token?: string
         }
@@ -7040,6 +7400,11 @@ export type Database = {
       }
     }
     Functions: {
+      accept_org_invite: {
+        Args: { _invite_id: string; _user_id: string }
+        Returns: string
+      }
+      active_org_id: { Args: never; Returns: string }
       admin_assign_role: {
         Args: {
           _reason?: string
@@ -7145,6 +7510,10 @@ export type Database = {
         Returns: boolean
       }
       is_approved_user: { Args: { _user_id: string }; Returns: boolean }
+      is_org_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       link_system_integration: {
         Args: {
           p_integration_id: string
@@ -7167,7 +7536,34 @@ export type Database = {
           similarity: number
         }[]
       }
+      org_has_role: {
+        Args: { _org_id: string; _roles: string[]; _user_id: string }
+        Returns: boolean
+      }
+      platform_list_organizations: {
+        Args: { _page?: number; _page_size?: number; _search?: string }
+        Returns: Json
+      }
+      platform_provision_organization: {
+        Args: {
+          _domain: string
+          _industry: string
+          _invited_by: string
+          _name: string
+          _owner_email: string
+        }
+        Returns: {
+          invite_expires_at: string
+          invite_id: string
+          invite_token: string
+          org_id: string
+        }[]
+      }
       provision_default_twin: { Args: { _user_id: string }; Returns: string }
+      remove_active_org_member: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       rpc_kpi_agents_deployed: {
         Args: { p_from: string; p_org_id?: string; p_to: string }
         Returns: {
@@ -7196,10 +7592,17 @@ export type Database = {
           hours: number
         }[]
       }
+      set_active_org: { Args: { _org_id: string }; Returns: string }
+      set_active_org_member_role: {
+        Args: { _role: string; _user_id: string }
+        Returns: undefined
+      }
+      storage_object_org_id: { Args: { _name: string }; Returns: string }
       store_secret_in_vault: {
         Args: { secret_name: string; secret_value: string }
         Returns: string
       }
+      tenant_people_access_snapshot: { Args: never; Returns: Json }
       unlink_system_integration: {
         Args: { p_integration_id: string; p_system_id: string }
         Returns: undefined

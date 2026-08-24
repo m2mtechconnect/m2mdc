@@ -37,7 +37,40 @@ function resolveReleaseBranch() {
   ).trim();
 }
 
+function requiresStrictReleaseProvenance() {
+  const environment = process.env.AURA_RELEASE_ENVIRONMENT?.trim().toLowerCase();
+  return process.env.AURA_REQUIRE_RELEASE_PROVENANCE === '1' ||
+    environment === 'staging' ||
+    environment === 'production';
+}
+
+function assertStrictReleaseProvenance() {
+  if (!requiresStrictReleaseProvenance()) return;
+
+  const sha = process.env.AURA_COMMIT_SHA?.trim() ?? '';
+  const branch = process.env.AURA_RELEASE_BRANCH?.trim() ?? '';
+  const environment = process.env.AURA_RELEASE_ENVIRONMENT?.trim() ?? '';
+  const buildId = process.env.AURA_BUILD_ID?.trim() ?? '';
+
+  if (!/^[0-9a-f]{40}$/i.test(sha)) {
+    throw new Error('Release build requires explicit AURA_COMMIT_SHA as a full 40-character Git SHA');
+  }
+  if (!branch || ['unknown', 'HEAD', '__orphan__'].includes(branch)) {
+    throw new Error('Release build requires an explicit non-detached AURA_RELEASE_BRANCH');
+  }
+  if (!environment || environment === 'unknown') {
+    throw new Error('Release build requires an explicit AURA_RELEASE_ENVIRONMENT');
+  }
+  if (!buildId) {
+    throw new Error('Release build requires an explicit AURA_BUILD_ID');
+  }
+  if (process.env.SKIP_SEO_GATE === '1') {
+    throw new Error('SKIP_SEO_GATE is not permitted for a strict release build');
+  }
+}
+
 function releaseFingerprint(): Plugin {
+  assertStrictReleaseProvenance();
   const sha = resolveReleaseSha();
   const branch = resolveReleaseBranch();
   const builtAt = new Date().toISOString();
@@ -105,7 +138,8 @@ export default defineConfig(({ mode }) => {
       mode === "development" && componentTagger(),
       mode !== "development" && releaseFingerprint(),
       // Hard gate: fails `vite build` (and therefore Lovable publish) if
-      // the produced dist/ has SEO errors. Bypass with SKIP_SEO_GATE=1.
+      // the produced dist/ has SEO errors. Bypass is prohibited when strict
+      // release provenance is enabled for staging/production builds.
       mode !== "development" && seoBuildGate(),
     ].filter(Boolean),
     resolve: {

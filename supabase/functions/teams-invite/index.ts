@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { sendOrganizationInviteNotification } from "../_shared/notifications.ts";
 
 // Customer admins may delegate operational/admin membership inside their own
 // organization, but ordinary invitations never mint the owner role.
@@ -147,9 +148,29 @@ serve(async (req) => {
 
     if (error) throw error;
 
+    let organizationName = 'your organization';
+    const { data: organization } = await serviceClient
+      .from('organizations')
+      .select('name')
+      .eq('id', orgId)
+      .maybeSingle();
+    if (typeof organization?.name === 'string' && organization.name.trim()) {
+      organizationName = organization.name.trim();
+    }
+
+    const notification = await sendOrganizationInviteNotification({
+      email: normalisedEmail,
+      organizationName,
+      role,
+      token,
+      expiresAt: expiresAt.toISOString(),
+      inviteId: data.id,
+    });
+
     return json(corsHeaders, {
       success: true,
       invite: data,
+      delivery: notification,
       message: `Invitation created for ${normalisedEmail}`,
     });
   } catch (error) {

@@ -9,9 +9,10 @@
  */
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, FileSearch } from "lucide-react";
 import { Helmet } from 'react-helmet-async';
 import { cn } from '@/lib/utils';
+import { WorkspaceHeader } from "@/components/workspace-system";
 import { EvidenceBetaProvider, useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { OperationalTruthBar } from '@/components/dsx/OperationalTruthBar';
 import { ProvenanceDrawer } from '@/components/dsx/ProvenanceDrawer';
@@ -210,39 +211,47 @@ function WorkspaceNav() {
 }
 
 /** One h1 per route, plus the scope breadcrumb the workspace is answering for. */
-function WorkspaceHeader() {
+function EvidenceWorkspaceHeader() {
   const { pathname } = useLocation();
   const { selectedAncestry, selectAsset, hrefWithContext } = useWorkspace();
   const title = evidenceTitle(pathname);
 
+  const breadcrumb = (
+    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">
+      <Link
+        to={hrefWithContext(DSX_ROOT)}
+        className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        Operator workspace
+      </Link>
+      {selectedAncestry.map((a) => (
+        <span key={a.stable_asset_id} className="flex items-center gap-1">
+          <span aria-hidden>/</span>
+          <button
+            type="button"
+            onClick={() => selectAsset(a.stable_asset_id)}
+            className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {a.name}
+          </button>
+        </span>
+      ))}
+      <span aria-hidden>/</span>
+      <span className="font-medium text-foreground">{title}</span>
+    </nav>
+  );
+
   return (
-    <header className="v2-command-header mb-4">
-      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">
-        <Link
-          to={hrefWithContext(DSX_ROOT)}
-          className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          Operator workspace
-        </Link>
-        {selectedAncestry.map((a) => (
-          <span key={a.stable_asset_id} className="flex items-center gap-1">
-            <span aria-hidden>/</span>
-            <button
-              type="button"
-              onClick={() => selectAsset(a.stable_asset_id)}
-              className="rounded-sm underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {a.name}
-            </button>
-          </span>
-        ))}
-        <span aria-hidden>/</span>
-        <span className="font-medium text-foreground">{title}</span>
-      </nav>
-      <h1 className="v2-command-title" data-testid="dsx-workspace-title">{title}</h1>
-    </header>
+    <WorkspaceHeader
+      eyebrow="AURA Evidence"
+      title={<span data-testid="dsx-workspace-title">{title}</span>}
+      icon={FileSearch}
+      capabilityId="evidence.workspace"
+      meta={breadcrumb}
+    />
   );
 }
+
 
 function ShellBody() {
   return (
@@ -260,7 +269,7 @@ function ShellBody() {
         <WorkspaceNav />
         <div className="min-w-0 flex-1 p-4 sm:p-6">
           <div className="mx-auto w-full min-w-0 max-w-screen-2xl">
-            <WorkspaceHeader />
+            <EvidenceWorkspaceHeader />
             <Outlet />
             <RelatedWorkspaces />
           </div>

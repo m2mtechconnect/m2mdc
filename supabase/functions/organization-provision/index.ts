@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { sendOrganizationInviteNotification } from "../_shared/notifications.ts";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -105,6 +106,15 @@ serve(async (req) => {
       throw new Error('Organization provisioning did not return a complete result');
     }
 
+    const notification = await sendOrganizationInviteNotification({
+      email: ownerEmail,
+      organizationName: name,
+      role: 'owner',
+      token: result.invite_token,
+      expiresAt: result.invite_expires_at,
+      inviteId: result.invite_id,
+    });
+
     return json(corsHeaders, {
       success: true,
       organization: {
@@ -117,9 +127,8 @@ serve(async (req) => {
         id: result.invite_id,
         email: ownerEmail,
         role: 'owner',
-        token: result.invite_token,
         expiresAt: result.invite_expires_at,
-        delivery: 'pending',
+        delivery: notification,
       },
       status: 'pending_owner_acceptance',
     }, 201);

@@ -218,11 +218,12 @@ export default function AuraWorkspace() {
           line, role view selector and every existing action.
         */}
         <WorkspaceHeader
+          className="shrink-0"
           density="compact"
-          eyebrow={workspaceLabel ?? 'Simulation'}
+          eyebrow={workspaceLabel}
           title={facility.name}
           icon={FlaskConical}
-          capabilityId="simulation.engine"
+          capabilityId={workspaceLabel === 'Simulation' ? 'simulation.engine' : 'twin.openusd'}
           badges={
             <span className="aura-ws-chip">
               <span className="aura-ws-chip-dot" data-status="SIMULATED" aria-hidden="true" />

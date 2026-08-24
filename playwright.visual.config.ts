@@ -3,6 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 const PLAYWRIGHT_BASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim();
 const CAPTURE_CURRENT_HEAD = process.env.AURA_CAPTURE_CURRENT_HEAD === '1';
 
+// Baseline-control note: this branch is pinned to current main application
+// source. This comment-only change exists solely to trigger the path-filtered
+// visual workflow; it changes no viewport, browser, capture, or UI behavior.
 export default defineConfig({
   testDir: './tests/visual',
   fullyParallel: false,

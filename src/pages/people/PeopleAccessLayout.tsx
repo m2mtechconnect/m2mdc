@@ -10,13 +10,12 @@ interface PeopleAccessLayoutProps {
   children: ReactNode;
 }
 
-const LOCAL_NAV: Array<{
+const PLATFORM_NAV: Array<{
   label: string;
   href: string;
   match: string;
   permission?: Permission;
 }> = [
-  { label: 'Members & approvals', href: '/teams', match: '/teams' },
   {
     label: 'Access control',
     href: '/teams/access-control',
@@ -32,19 +31,26 @@ const LOCAL_NAV: Array<{
 ];
 
 /**
- * Platform and tenant authority use different persistence planes. The legacy
- * Teams page remains available for platform-only administration routes, while
- * /teams renders the organization-scoped member surface whenever an active
- * organization exists.
+ * Platform and tenant authority use different persistence planes. `/teams`
+ * is organization-scoped whenever an active organization exists. Platform-only
+ * callers are routed to the real Access Control / onboarding administration
+ * surfaces instead of rendering the retired legacy Teams demo page.
  */
 export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps) {
   const location = useLocation();
   const { can, resolution, activeOrganization } = useRBAC();
 
-  const tenantMembersRoute = location.pathname === '/teams' && !!activeOrganization;
-  if (tenantMembersRoute) {
-    if (!can('tenant.view_members')) return <Navigate to="/dashboard" replace />;
-    return <TenantPeopleAccess />;
+  if (location.pathname === '/teams') {
+    if (activeOrganization) {
+      if (!can('tenant.view_members')) return <Navigate to="/dashboard" replace />;
+      return <TenantPeopleAccess />;
+    }
+
+    if (resolution.status === 'internal') {
+      if (can('authz.view_assignments')) return <Navigate to="/teams/access-control" replace />;
+      if (can('platform.view_admin_console')) return <Navigate to="/teams/onboarding" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
   }
 
   // Tenant users do not enter platform authorization / onboarding pages by URL.
@@ -52,7 +58,7 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
     return <Navigate to={can('tenant.view_members') ? '/teams' : '/dashboard'} replace />;
   }
 
-  const visible = LOCAL_NAV.filter((item) => !item.permission || can(item.permission));
+  const visible = PLATFORM_NAV.filter((item) => !item.permission || can(item.permission));
   const current = [...visible]
     .sort((a, b) => b.match.length - a.match.length)
     .find((item) => location.pathname === item.match || location.pathname.startsWith(`${item.match}/`));
@@ -65,7 +71,7 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
         <span>Govern</span>
         <ChevronRight className="h-3 w-3" aria-hidden />
         <span className="text-foreground">People &amp; Access</span>
-        {current && current.href !== '/teams' && (
+        {current && (
           <>
             <ChevronRight className="h-3 w-3" aria-hidden />
             <span className="text-foreground">{current.label}</span>
@@ -78,9 +84,7 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
         className="mb-4 flex max-w-full gap-1 overflow-x-auto border-b border-border"
       >
         {visible.map((item) => {
-          const active = item.href === '/teams'
-            ? location.pathname === '/teams'
-            : location.pathname === item.match || location.pathname.startsWith(`${item.match}/`);
+          const active = location.pathname === item.match || location.pathname.startsWith(`${item.match}/`);
           return (
             <Link
               key={item.href}

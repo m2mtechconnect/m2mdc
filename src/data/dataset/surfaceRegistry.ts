@@ -205,7 +205,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   neutral('/account/access-control', 'Access control redirect', 'Redirect only.'),
   neutral('/admin/customers', 'Customer console', 'Platform customer provisioning and tenant inventory only.'),
   neutral('/admin/dataset-registry', 'Dataset registry', 'Owns the canary; reads the registry directly.'),
-  neutral('/admin/dsx-capabilities', 'Capability registry'),
+  neutral('/admin/accelerated-ai-capabilities', 'Capability registry'),
   neutral('/admin/user-approvals', 'User approvals redirect', 'Redirect only.'),
   neutral('/admin/signups-dashboard', 'Signups redirect', 'Redirect only.'),
   neutral('/admin/onboarding-submissions', 'Onboarding submissions redirect', 'Redirect only.'),

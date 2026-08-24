@@ -9,11 +9,12 @@ const people = read('src/pages/people/TenantPeopleAccess.tsx');
 const peopleLayout = read('src/pages/people/PeopleAccessLayout.tsx');
 const customers = read('src/pages/admin/Customers.tsx');
 const invite = read('supabase/functions/teams-invite/index.ts');
+const notifications = read('supabase/functions/_shared/notifications.ts');
 
 describe('enterprise audit remediation', () => {
   it('keeps read-oriented tenant roles out of core resource write policies', () => {
     const writerSet = "ARRAY['owner','admin','operator','engineer','manager']::text[]";
-    expect(remediation.match(new RegExp(writerSet.replace(/[\[\]'()*+?.\\^$|]/g, '\\$&'), 'g'))?.length ?? 0).toBeGreaterThanOrEqual(9);
+    expect(remediation.split(writerSet).length - 1).toBeGreaterThanOrEqual(9);
 
     for (const role of ['viewer', 'executive', 'security_admin', 'compliance', 'data_analyst', 'support']) {
       expect(ORGANIZATION_ROLE_PERMISSIONS[role as keyof typeof ORGANIZATION_ROLE_PERMISSIONS].includes('twin.edit')).toBe(false);
@@ -53,6 +54,11 @@ describe('enterprise audit remediation', () => {
     expect(customers).toContain('Owner invite expired');
     expect(customers).toContain("mode: 'platform_resend_owner'");
     expect(customers).toContain('invitation email delivery is');
+  });
+
+  it('rotates provider idempotency when an invite is legitimately reissued', () => {
+    expect(notifications).toContain('deliveryAttempt');
+    expect(notifications).toContain('aura-invite-${input.inviteId}-${deliveryAttempt}');
   });
 
   it('keeps platform provisioning and tenant invitations in one guarded Edge boundary', () => {

@@ -1,7 +1,7 @@
 /**
  * Shared card-activation synchronisation for the DSX drawer suites.
  *
- * Diagnosis (mobile-chromium, /dsx/evidence-beta): after a Radix Sheet
+ * Diagnosis (mobile-chromium, /evidence): after a Radix Sheet
  * closes, the scroll lock is released and scroll position is restored
  * asynchronously on a ~4400px mobile page. The next trigger therefore keeps
  * moving while Playwright runs its actionability check, and

@@ -21,7 +21,7 @@ import { installSupabaseMock } from './_setup/supabase-mock';
 import { seedDismissedTours } from './_setup/app-state';
 import { activateCard, closeAndSettle } from './_setup/card-activation';
 
-const ROOT = '/dsx/evidence-beta';
+const ROOT = '/evidence';
 
 const ROUTES = [
   '', 'overview', 'thermal', 'power', 'cooling', 'network', 'facility',

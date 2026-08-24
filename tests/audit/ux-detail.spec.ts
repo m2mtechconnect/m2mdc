@@ -5,7 +5,7 @@ import AxeBuilder from '@axe-core/playwright';
 test('detail', async ({ page, context }) => {
   test.setTimeout(300_000);
   await installSupabaseMock(context);
-  for (const route of ['/dashboard', '/builder', '/analytics', '/infrastructure', '/account/profile', '/help', '/dsx/evidence-beta']) {
+  for (const route of ['/dashboard', '/builder', '/analytics', '/infrastructure', '/account/profile', '/help', '/evidence']) {
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(1500);
     const info = await page.evaluate(() => {

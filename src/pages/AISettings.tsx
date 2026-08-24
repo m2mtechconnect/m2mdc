@@ -215,7 +215,7 @@ function AISettingsPage() {
         >
           <div className="grid gap-6">
             <div className="space-y-2">
-              <Label htmlFor="ai-project-id">Google Cloud Project ID</Label>
+              <Label htmlFor="ai-project-id">Managed AI Workspace ID</Label>
               <Input 
                 id="ai-project-id"
                 value={projectId}
@@ -223,7 +223,7 @@ function AISettingsPage() {
                   setProjectId(e.target.value);
                   if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
                 }}
-                placeholder="your-project-id"
+                placeholder="your-workspace-id"
                 aria-invalid={!!fieldErrors.projectId}
                 aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
               />
@@ -235,28 +235,28 @@ function AISettingsPage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Region</Label>
+              <Label>Data residency</Label>
               <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger aria-label="Region">
+                <SelectTrigger aria-label="Data residency">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="northamerica-northeast1">🇨🇦 northamerica-northeast1 (Montreal)</SelectItem>
-                  <SelectItem value="us-central1">🇺🇸 us-central1 (Iowa)</SelectItem>
-                  <SelectItem value="europe-west1">🇪🇺 europe-west1 (Belgium)</SelectItem>
+                  <SelectItem value="northamerica-northeast1">Canada</SelectItem>
+                  <SelectItem value="us-central1">United States</SelectItem>
+                  <SelectItem value="europe-west1">Europe</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Model</Label>
+              <Label>Response profile</Label>
               <Select value={model} onValueChange={setModel}>
-                <SelectTrigger aria-label="Model">
+                <SelectTrigger aria-label="Response profile">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="gemini-1.5-pro">gemini-1.5-pro (Recommended)</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">gemini-1.5-flash (Faster)</SelectItem>
+                  <SelectItem value="gemini-1.5-pro">Balanced (recommended)</SelectItem>
+                  <SelectItem value="gemini-1.5-flash">Fast</SelectItem>
                 </SelectContent>
               </Select>
             </div>

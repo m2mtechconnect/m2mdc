@@ -93,7 +93,7 @@ function ApprovedUserRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
-      <Route path="/builder" element={<Builder />} />
+      <Route path="/builder" element={<PermissionRouteGuard permission="twin.edit"><Builder /></PermissionRouteGuard>} />
       <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.view"><Deploy /></PermissionRouteGuard>} />
       <Route path="/deployments" element={<PermissionRouteGuard permission="deployment.view"><DeploymentHistory /></PermissionRouteGuard>} />
       <Route path="/agent/:id" element={<AgentWorkspace />} />
@@ -128,7 +128,7 @@ function ApprovedUserRoutes() {
       <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.view"><TwinManage /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
-      <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
+      <Route path="/studio/systems/:systemId/manage" element={<PermissionRouteGuard permission="twin.edit"><SystemManage /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />

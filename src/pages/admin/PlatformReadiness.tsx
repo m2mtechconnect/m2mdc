@@ -9,6 +9,7 @@ import { ClipboardCheck } from 'lucide-react';
 import { DsxExchangeTab } from '@/components/connections/DsxExchangeTab';
 import { AgentToolsTab } from '@/components/connections/AgentToolsTab';
 import { ManagedConnectorInventory } from '@/components/connections/ManagedConnectorInventory';
+import { AURAStackSummary } from '@/components/stack/AURAStackSummary';
 import {
   CommandHeader,
   SectionHeader,

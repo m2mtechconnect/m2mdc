@@ -3449,6 +3449,135 @@ export type Database = {
         }
         Relationships: []
       }
+      edge_gateway_events: {
+        Row: {
+          details: Json
+          event_type: string
+          gateway_id: string
+          id: string
+          message: string | null
+          occurred_at: string
+          severity: string
+        }
+        Insert: {
+          details?: Json
+          event_type: string
+          gateway_id: string
+          id?: string
+          message?: string | null
+          occurred_at?: string
+          severity?: string
+        }
+        Update: {
+          details?: Json
+          event_type?: string
+          gateway_id?: string
+          id?: string
+          message?: string | null
+          occurred_at?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edge_gateway_events_gateway_id_fkey"
+            columns: ["gateway_id"]
+            isOneToOne: false
+            referencedRelation: "edge_gateways"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      edge_gateways: {
+        Row: {
+          capabilities: Json
+          certificate_fingerprint: string | null
+          created_at: string
+          created_by: string | null
+          credential_reference: string | null
+          desired_config: Json
+          display_name: string
+          enrolled_at: string | null
+          facility_id: string | null
+          gateway_key: string
+          id: string
+          last_error: string | null
+          last_seen_at: string | null
+          org_id: string
+          reported_config: Json
+          software_version: string | null
+          status: string
+          transport: string
+          twin_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          capabilities?: Json
+          certificate_fingerprint?: string | null
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          desired_config?: Json
+          display_name: string
+          enrolled_at?: string | null
+          facility_id?: string | null
+          gateway_key: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          org_id: string
+          reported_config?: Json
+          software_version?: string | null
+          status?: string
+          transport?: string
+          twin_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          capabilities?: Json
+          certificate_fingerprint?: string | null
+          created_at?: string
+          created_by?: string | null
+          credential_reference?: string | null
+          desired_config?: Json
+          display_name?: string
+          enrolled_at?: string | null
+          facility_id?: string | null
+          gateway_key?: string
+          id?: string
+          last_error?: string | null
+          last_seen_at?: string | null
+          org_id?: string
+          reported_config?: Json
+          software_version?: string | null
+          status?: string
+          transport?: string
+          twin_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "edge_gateways_facility_id_fkey"
+            columns: ["facility_id"]
+            isOneToOne: false
+            referencedRelation: "sovereign_dc_facilities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edge_gateways_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "edge_gateways_twin_id_fkey"
+            columns: ["twin_id"]
+            isOneToOne: false
+            referencedRelation: "data_centre_twins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       environments: {
         Row: {
           created_at: string | null

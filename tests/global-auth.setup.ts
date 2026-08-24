@@ -112,6 +112,22 @@ export default async function globalAuthSetup(config: FullConfig) {
   try {
     const context = await browser.newContext({ baseURL });
     try {
+      // Guided tours are user onboarding, not part of the legacy functional
+      // corpus. Seed their normal persisted state before the first document so
+      // they cannot intercept unrelated controls while preserving tour coverage
+      // in dedicated tests and preserving the production behavior for real users.
+      await context.addInitScript(() => {
+        window.localStorage.setItem(
+          'm2m_tour_state_v1',
+          JSON.stringify({
+            studioIntro: { seen: true },
+            overview: { seen: true },
+            simulation: { seen: true },
+            blueprint: { seen: true },
+          }),
+        );
+      });
+
       const page = await context.newPage();
       await page.goto(QA_LOGIN_ROUTE);
       await expect(page.getByLabel('Email Address', { exact: true })).toBeVisible({ timeout: 10_000 });

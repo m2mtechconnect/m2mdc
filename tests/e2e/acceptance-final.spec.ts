@@ -32,7 +32,7 @@ test.describe('Functional acceptance — persisted behavior, not presence-only s
   test('Connections opens its real guarded setup workflow rather than a placeholder panel', async ({ page }) => {
     await page.goto('/manage/integrations');
     await expect(page.getByText('Connections', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole('tab', { name: 'Connected systems' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Connections & APIs' })).toBeVisible();
     await expect(page.getByRole('tab', { name: 'Available connectors' })).toBeVisible();
     await expect(page.getByRole('tab', { name: 'Health & audit' })).toBeVisible();
 

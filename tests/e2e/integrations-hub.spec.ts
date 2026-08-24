@@ -138,7 +138,7 @@ test.describe('AURA Connections hybrid-stack workspace', () => {
     await expect(page.getByRole('heading', { name: 'Connections', exact: true })).toBeVisible();
     await expect(page.getByText(/facility systems, edge gateways, twin runtimes, storage and enterprise workflows/i).first()).toBeVisible();
 
-    for (const tab of ['Overview', 'Connected systems', 'Data flows', 'Available connectors', 'Health & audit']) {
+    for (const tab of ['Overview', 'Connections & APIs', 'Data flows', 'Available connectors', 'Health & audit']) {
       await expect(page.getByRole('tab', { name: tab })).toBeVisible();
     }
     await expect(page.getByRole('tab', { name: 'Catalogue' })).toHaveCount(0);

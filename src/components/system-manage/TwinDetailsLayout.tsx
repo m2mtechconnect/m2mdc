@@ -1,9 +1,5 @@
-import { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UnifiedAgentPreview } from '@/components/agent-preview/UnifiedAgentPreview';
 import { SystemRuntimePanel } from './SystemRuntimePanel';
 import { SystemConfigTabs } from './SystemConfigTabs';
@@ -14,7 +10,6 @@ export type TwinDetailsMode = 'template' | 'system';
 
 interface TwinDetailsLayoutProps {
   mode: TwinDetailsMode;
-  // Template data (always present)
   agentName: string;
   status?: string;
   version?: string;
@@ -34,9 +29,7 @@ interface TwinDetailsLayoutProps {
     cloudReady: boolean;
     enterpriseSecure: boolean;
   };
-  // System-specific data (only in 'system' mode)
   system?: DeployedSystem;
-  // Callbacks
   onDeploy?: () => void;
   onRun?: () => void;
   onEdit?: () => void;
@@ -45,10 +38,9 @@ interface TwinDetailsLayoutProps {
 }
 
 /**
- * Shared layout component for displaying template previews and deployed system details.
- * 
- * Template mode: Shows static template info with "Use template" action
- * System mode: Shows template info + runtime controls, metrics, logs, and configuration tabs
+ * Shared template/system layout.
+ * Missing system metrics are passed through as unavailable rather than being
+ * converted to zero, which would falsely imply a measured value.
  */
 export function TwinDetailsLayout({
   mode,
@@ -73,19 +65,20 @@ export function TwinDetailsLayout({
   onClone,
   onArchive,
 }: TwinDetailsLayoutProps) {
+  const hasQuickActions = Boolean(onRun || onEdit || onClone || onArchive);
+
   return (
     <div className="space-y-6">
-      {/* Template Preview Section (shared by both modes) */}
       <UnifiedAgentPreview
         agentId={system?.id}
         agentName={agentName}
         status={mode === 'system' ? system?.status : status}
         version={mode === 'system' ? system?.version : version}
-        successRate={system?.successRate || 0}
-        totalRuns={system?.totalRuns || 0}
-        roi={system?.roi || 0}
-        connectedAppsCount={system?.connectedAppsCount || 0}
-        recentActivity={system?.recentActivity || []}
+        successRate={system?.successRate ?? undefined}
+        totalRuns={system?.totalRuns ?? undefined}
+        roi={system?.roi ?? undefined}
+        connectedAppsCount={system?.connectedAppsCount ?? undefined}
+        recentActivity={system?.recentActivity}
         onDeploy={onDeploy}
         mode={mode === 'template' ? 'preview' : 'full'}
         description={description}
@@ -101,43 +94,22 @@ export function TwinDetailsLayout({
         compatibility={compatibility}
       />
 
-      {/* System-Only Sections */}
       {mode === 'system' && system && (
         <>
-          {/* Runtime Controls & Quick Actions */}
-          <Card className="p-6">
-            <h3 className="text-h4 font-semibold mb-4">Quick Actions</h3>
-            <div className="flex flex-wrap gap-3">
-              {onRun && (
-                <Button onClick={onRun} className="gap-2">
-                  Run System
-                </Button>
-              )}
-              {onEdit && (
-                <Button onClick={onEdit} variant="outline" className="gap-2">
-                  Edit in Builder
-                </Button>
-              )}
-              {onClone && (
-                <Button onClick={onClone} variant="outline" className="gap-2">
-                  Clone System
-                </Button>
-              )}
-              {onArchive && (
-                <Button onClick={onArchive} variant="outline" className="gap-2">
-                  Archive
-                </Button>
-              )}
-            </div>
-          </Card>
+          {hasQuickActions && (
+            <Card className="p-6">
+              <h3 className="text-h4 font-semibold mb-4">Quick Actions</h3>
+              <div className="flex flex-wrap gap-3">
+                {onRun && <Button onClick={onRun}>Run System</Button>}
+                {onEdit && <Button onClick={onEdit} variant="outline">Edit in Builder</Button>}
+                {onClone && <Button onClick={onClone} variant="outline">Clone System</Button>}
+                {onArchive && <Button onClick={onArchive} variant="outline">Archive</Button>}
+              </div>
+            </Card>
+          )}
 
-          {/* Simulation Section */}
           <SystemSimulation system={system} />
-
-          {/* Live Metrics Snapshot */}
           <SystemRuntimePanel system={system} />
-
-          {/* Configuration Tabs */}
           <SystemConfigTabs system={system} onEdit={onEdit} />
         </>
       )}

@@ -36,7 +36,8 @@ describe('enterprise audit remediation', () => {
   });
 
   it('routes organization membership through the tenant-aware People & Access surface', () => {
-    expect(peopleLayout).toContain("location.pathname === '/teams' && !!activeOrganization");
+    expect(peopleLayout).toContain("if (location.pathname === '/teams')");
+    expect(peopleLayout).toContain('if (activeOrganization)');
     expect(peopleLayout).toContain("can('tenant.view_members')");
     expect(people).toContain("rpc('tenant_people_access_snapshot')");
     expect(people).toContain("rpc('set_active_org_member_role'");

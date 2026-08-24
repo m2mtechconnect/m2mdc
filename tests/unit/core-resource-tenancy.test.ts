@@ -65,7 +65,7 @@ describe('core resource organization tenancy', () => {
     }
     expect(sql).toContain('public.is_org_member(org_id, auth.uid())');
     expect(remediation).toContain("ARRAY['owner','admin','operator','engineer','manager']::text[]");
-    expect(remediation).toContain("ARRAY['owner','admin']::text[]");
+    expect(sql).toContain("ARRAY['owner','admin']::text[]");
 
     const writePolicies = remediation.slice(
       remediation.indexOf('DROP POLICY IF EXISTS "Users can create their own twins"'),

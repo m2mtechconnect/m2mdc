@@ -37,8 +37,8 @@ export function HealthCheck() {
   if (!health) return null;
 
   const services = [
-    { name: 'Gemini', status: health.gemini.status, latency: health.gemini.latency },
-    { name: 'Vertex', status: health.vertex.status, latency: health.vertex.latency },
+    { name: 'Managed AI', status: health.gemini.status, latency: health.gemini.latency },
+    { name: 'Grounding Search', status: health.vertex.status, latency: health.vertex.latency },
     { name: 'Zapier', status: health.zapier.status, latency: health.zapier.latency },
   ];
 

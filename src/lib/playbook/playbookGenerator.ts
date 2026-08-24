@@ -114,7 +114,7 @@ function generateArchitecture(context: PlaybookContext): any {
     'Slack (notifications)',
     'Salesforce (CRM)',
     'Microsoft Teams (collaboration)',
-    'Google Analytics (metrics)'
+    'Web analytics (metrics)'
   ];
   
   const components = agentMetadata?.blueprint?.agents?.map((a: any) => a.name) || [
@@ -232,7 +232,7 @@ function generateTeam(context: PlaybookContext): any {
     ],
     techStack: [
       'AURA Platform (M2M)',
-      'Google Gemini / OpenAI GPT',
+      'Managed AI language model',
       'Supabase (database)',
       'Python / TypeScript',
       'Docker / Kubernetes',

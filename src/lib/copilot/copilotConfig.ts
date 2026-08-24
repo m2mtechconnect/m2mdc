@@ -21,7 +21,7 @@ export interface CoPilotOrchestrationConfig {
 }
 
 /**
- * Latest Gemini 3.x Model Configuration
+ * Managed AI model configuration
  * 
  * CRITICAL: This is the single source of truth for model selection.
  * All Co-Pilot features MUST use these models.
@@ -80,7 +80,7 @@ export function resolveCurrentModel(preferFallback: boolean = false): string {
  * Get display name for current model
  */
 export function getModelDisplayName(): string {
-  return 'Gemini 3.0 Pro';
+  return 'AURA Assistant (Balanced)';
 }
 
 /**

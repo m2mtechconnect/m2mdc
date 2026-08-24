@@ -77,7 +77,7 @@ export default function SystemManage() {
         } : undefined,
         recentActivity: [],
         intelligence: intelligence ? {
-          modelId: intelligence.model_id || 'Gemini 2.5 Flash',
+          modelId: intelligence.model_id ?? null,
           temperature: 0.7,
           knowledgeSources: [],
         } : undefined,
@@ -224,7 +224,7 @@ export default function SystemManage() {
         setupInstructions={[]}
         compatibility={{
           mcpEnabled: true,
-          llmCompatible: ['Gemini', 'OpenAI'],
+          llmCompatible: ['Managed AI'],
           cloudReady: true,
           enterpriseSecure: true,
         }}

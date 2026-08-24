@@ -48,16 +48,25 @@ describe('canonical authorization model (B-01)', () => {
     expect(r.primaryRole).toBeNull();
   });
 
-  it('does not let a resource-scoped grant confer global permissions', () => {
+  it('keeps a resource-scoped grant visible only as a resource grant', () => {
     const r = resolveAuthorization(
       [{ role: 'admin', scope: 'agent:11111111-1111-1111-1111-111111111111', expires_at: null }],
       NOW,
     );
+    expect(r.grants).toEqual([
+      {
+        role: 'admin',
+        scope: 'agent:11111111-1111-1111-1111-111111111111',
+        expiresAt: null,
+      },
+    ]);
+    expect(r.roles).toEqual([]);
+    expect(r.primaryRole).toBeNull();
     expect(r.permissions.has('authz.manage_assignments')).toBe(false);
     expect(r.permissions.has('platform.access_internal_shell')).toBe(false);
   });
 
-  it('unions permissions across multiple active grants', () => {
+  it('unions permissions across multiple active global grants', () => {
     const r = resolveAuthorization(
       [
         { role: 'viewer', scope: 'global', expires_at: null },

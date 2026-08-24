@@ -15,13 +15,14 @@ describe('AURA tenant analytics contract', () => {
     expect(source).not.toContain('lovable.dev');
   });
 
-  it('requires an organization id on every event envelope and keeps it authoritative', () => {
-    expect(source).toContain('organizationId: string');
-    expect(source).toContain('!context.organizationId.trim()');
+  it('requires organization identity for tenant-scoped business events and keeps it authoritative', () => {
+    expect(source).toContain('organizationId?: string');
+    expect(source).toContain('TENANT_SCOPED_EVENTS');
+    expect(source).toContain("TENANT_SCOPED_EVENTS.has(event) && !organizationId");
     expect(source).toContain("RESERVED_PROPERTY_KEYS = new Set(['organization_id', 'distinct_id'])");
-    expect(source).toContain('organization_id: context.organizationId');
+    expect(source).toContain('properties.organization_id = organizationId');
     expect(source.indexOf('...sanitizeAnalyticsProperties(context.properties)')).toBeLessThan(
-      source.indexOf('organization_id: context.organizationId'),
+      source.indexOf('properties.organization_id = organizationId'),
     );
   });
 
@@ -31,6 +32,8 @@ describe('AURA tenant analytics contract', () => {
       'platform.customer_provisioned',
       'onboarding.invite_created',
       'onboarding.invite_delivery',
+      'runtime.client_error',
+      'runtime.unhandled_rejection',
     ]) {
       expect(source).toContain(`'${event}'`);
     }

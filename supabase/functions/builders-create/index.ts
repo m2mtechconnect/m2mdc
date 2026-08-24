@@ -1,9 +1,9 @@
 /**
  * /v1/builders-create
- * 
+ *
  * PURPOSE: Create a new builder draft (agent/twin draft)
  * AUTH: user (requires valid JWT token)
- * 
+ *
  * REQUEST:
  * - source: string (optional) - "file" | "questionnaire" | "template" | "url" | "manual" | "homepage" | "dashboard" | "imported" | "manage-agents" | "blank"
  * - goal: string (optional)
@@ -11,7 +11,7 @@
  * - department: string (optional)
  * - type: string (optional) - "agent" | "process_twin" | "3d_twin"
  * - template_id: string (optional)
- * 
+ *
  * RESPONSE:
  * - id: Builder ID
  * - builder: Full builder object
@@ -40,13 +40,26 @@ serve(createHandler({
 
     log("Creating builder draft", { source, goal, industry, department, type });
 
-    // Create draft agent with builder state
+    // Resolve tenant authority server-side. The request never supplies org_id.
+    // Users without an organization retain the legacy owner-only draft path.
+    const { data: resolvedActiveOrgId, error: activeOrgError } = await supabase.rpc('active_org_id');
+    if (activeOrgError) {
+      log("Builder tenant resolution failed", { error: activeOrgError.message });
+      throw {
+        code: 'DATABASE_ERROR',
+        message: 'Unable to resolve active organization',
+        status: 500,
+      };
+    }
+    const activeOrgId = typeof resolvedActiveOrgId === 'string' ? resolvedActiveOrgId : null;
+
     const { data: draft, error: dbError } = await supabase
       .from('agents')
       .insert({
         name: goal || 'Untitled Agent',
         description: `Draft ${type || 'agent'} for ${department || 'unspecified department'}`,
         owner_id: userId,
+        org_id: activeOrgId,
         status: 'draft',
         version: 'v0',
         template_id: template_id || null,

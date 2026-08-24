@@ -53,10 +53,18 @@ describe('AURA Private packaging scaffold', () => {
     expect(dockerignore).toContain('secrets*');
   });
 
-  it('provides SPA routing and web-only health/readiness endpoints', () => {
+  it('provides SPA routing, health endpoints and hardened response headers', () => {
     expect(nginx).toContain('location = /healthz');
     expect(nginx).toContain('location = /readyz');
     expect(nginx).toContain('try_files $uri $uri/ /index.html');
+    expect(nginx).toContain('X-Content-Type-Options "nosniff"');
+    expect(nginx).toContain('X-Frame-Options "SAMEORIGIN"');
+    expect(nginx).toContain('Permissions-Policy');
+    expect(nginx).toContain('microphone=(self)');
+    expect(nginx).toContain('Content-Security-Policy');
+    expect(nginx).toContain("frame-ancestors 'self'");
+    expect(nginx).toContain("object-src 'none'");
+    expect(nginx).toContain('upgrade-insecure-requests');
     expect(dockerfile).toContain('http://127.0.0.1:8080/healthz');
     expect(readme).toContain('Neither endpoint proves that authentication');
   });

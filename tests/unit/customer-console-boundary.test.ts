@@ -11,6 +11,7 @@ const config = read('supabase/config.toml');
 const shell = read('src/AuthenticatedShell.tsx');
 const router = read('src/ApprovedUserRouter.tsx');
 const rbac = read('src/contexts/RBACContext.tsx');
+const tenantStorage = read('src/auth/tenantStorageIsolation.ts');
 
 describe('platform customer console boundary', () => {
   it('guards cross-tenant inventory inside the SECURITY DEFINER RPC', () => {
@@ -42,9 +43,14 @@ describe('platform customer console boundary', () => {
     expect(rbac).toContain("const isInternal = resolution.status === 'internal'");
   });
 
-  it('flushes tenant-scoped twin selection before an organization switch reload', () => {
-    expect(rbac).toContain("localStorage.removeItem('dc_active_location_id')");
-    expect(rbac).toContain("localStorage.removeItem('dc_active_twin_id')");
+  it('flushes tenant-scoped client state after the server approves an organization switch', () => {
+    expect(tenantStorage).toContain("'dc_active_location_id'");
+    expect(tenantStorage).toContain("'dc_active_twin_id'");
     expect(rbac).toContain("tenantDb.rpc('set_active_org', { _org_id: orgId })");
+    expect(rbac).toContain('clearTenantScopedClientState(window.localStorage, window.sessionStorage)');
+    expect(rbac.indexOf("tenantDb.rpc('set_active_org', { _org_id: orgId })"))
+      .toBeLessThan(rbac.indexOf('clearTenantScopedClientState(window.localStorage, window.sessionStorage)'));
+    expect(rbac.indexOf('clearTenantScopedClientState(window.localStorage, window.sessionStorage)'))
+      .toBeLessThan(rbac.indexOf("window.location.assign('/dashboard')"));
   });
 });

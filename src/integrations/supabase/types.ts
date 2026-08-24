@@ -4870,6 +4870,83 @@ export type Database = {
           },
         ]
       }
+      organization_entitlements: {
+        Row: {
+          ai_monthly_units: number | null
+          billing_customer_ref: string | null
+          billing_provider: string
+          billing_subscription_ref: string | null
+          created_at: string
+          deployment_type: string
+          effective_at: string | null
+          enforcement_mode: string
+          entitlement_status: string
+          expires_at: string | null
+          id: string
+          max_connections: number | null
+          max_facilities: number | null
+          max_twins: number | null
+          max_users: number | null
+          org_id: string
+          plan_code: string
+          storage_gb: number | null
+          support_level: string
+          updated_at: string
+        }
+        Insert: {
+          ai_monthly_units?: number | null
+          billing_customer_ref?: string | null
+          billing_provider?: string
+          billing_subscription_ref?: string | null
+          created_at?: string
+          deployment_type?: string
+          effective_at?: string | null
+          enforcement_mode?: string
+          entitlement_status?: string
+          expires_at?: string | null
+          id?: string
+          max_connections?: number | null
+          max_facilities?: number | null
+          max_twins?: number | null
+          max_users?: number | null
+          org_id: string
+          plan_code?: string
+          storage_gb?: number | null
+          support_level?: string
+          updated_at?: string
+        }
+        Update: {
+          ai_monthly_units?: number | null
+          billing_customer_ref?: string | null
+          billing_provider?: string
+          billing_subscription_ref?: string | null
+          created_at?: string
+          deployment_type?: string
+          effective_at?: string | null
+          enforcement_mode?: string
+          entitlement_status?: string
+          expires_at?: string | null
+          id?: string
+          max_connections?: number | null
+          max_facilities?: number | null
+          max_twins?: number | null
+          max_users?: number | null
+          org_id?: string
+          plan_code?: string
+          storage_gb?: number | null
+          support_level?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_entitlements_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: true
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organizations: {
         Row: {
           created_at: string | null

@@ -40,6 +40,7 @@ import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { stackLabel } from '@/config/auraStackManifest';
 import { modelDisplayLabel } from '@/lib/llm/modelLabels';
+import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 
 interface SystemSummary {
   name: string;
@@ -520,70 +521,75 @@ export default function Deploy() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-7xl">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(`/builder?id=${systemId}&step=6`)}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t('nav.backToBuilder')}
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-semibold flex items-center gap-3 text-foreground">
-              <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
-                <Rocket className="h-6 w-6 text-primary" />
-              </div>
-              {t('deploy.title')}
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">{t('deploy.subtitle')}</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/deployments')}
-            className="border-border hover:bg-muted"
-          >
-            View History
-          </Button>
-          <Badge variant={canDeploy ? "default" : "secondary"} className="bg-primary/20 text-primary border-primary/30">
-            {role || 'user'}
-          </Badge>
-        </div>
+        {/* Configuration + identity: shared, manifest-backed workspace banner. */}
+        <WorkspaceHeader
+          eyebrow="Runtime"
+          title={t('deploy.title')}
+          icon={Rocket}
+          capabilityId="governance.controls"
+          description={t('deploy.subtitle')}
+          badges={
+            <>
+              <span className="aura-ws-chip">{summary?.name ?? 'System not loaded'}</span>
+              <span className="aura-ws-chip">{role || 'user'}</span>
+            </>
+          }
+          actions={
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate(`/builder?id=${systemId}&step=6`)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {t('nav.backToBuilder')}
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate('/deployments')}>
+                View History
+              </Button>
+            </>
+          }
+        />
 
-        {/* DC KPI Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <DCKPITile
-            label="System"
-            value={summary?.name || 'Loading...'}
-            sublabel={summary?.department || 'Subsystem'}
-            status="info"
-            icon={<Server className="h-4 w-4" />}
-          />
-          <DCKPITile
-            label={stackLabel('ai.managed')}
-            value={summary?.model ? modelDisplayLabel(summary.model) : 'Not set'}
-            sublabel={summary?.grounding ? 'Grounded' : 'Standard'}
-            status={summary?.model ? 'normal' : 'warning'}
-            icon={<Cpu className="h-4 w-4" />}
-          />
-          <DCKPITile
-            label={stackLabel('connections.enterprise')}
-            value={summary?.connectedTools?.toString() || '0'}
-            sublabel="Configured connections"
-            status={summary?.connectedTools && summary.connectedTools > 0 ? 'normal' : 'info'}
-            icon={<Zap className="h-4 w-4" />}
-          />
-          <DCKPITile
-            label="Validation"
-            value={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'Passed' : 'Issues'}
-            sublabel={`${validationIssues.length} items`}
-            status={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'normal' : 'critical'}
-            icon={<Activity className="h-4 w-4" />}
-          />
-        </div>
+        {/* Readiness: configuration facts that gate execution. No invented metrics. */}
+        <SectionCard
+          title="Deployment readiness"
+          description="Configuration and validation state read from the saved system record."
+          icon={Activity}
+          className="mb-6"
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <DCKPITile
+              label="System"
+              value={summary?.name || 'Loading...'}
+              sublabel={summary?.department || 'Subsystem'}
+              status="info"
+              icon={<Server className="h-4 w-4" />}
+            />
+            <DCKPITile
+              label={stackLabel('ai.managed')}
+              value={summary?.model ? modelDisplayLabel(summary.model) : 'Not set'}
+              sublabel={summary?.grounding ? 'Grounded' : 'Standard'}
+              status={summary?.model ? 'normal' : 'warning'}
+              icon={<Cpu className="h-4 w-4" />}
+            />
+            <DCKPITile
+              label={stackLabel('connections.enterprise')}
+              value={summary?.connectedTools?.toString() || '0'}
+              sublabel="Configured connections"
+              status={summary?.connectedTools && summary.connectedTools > 0 ? 'normal' : 'info'}
+              icon={<Zap className="h-4 w-4" />}
+            />
+            <DCKPITile
+              label="Validation"
+              value={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'Passed' : 'Issues'}
+              sublabel={`${validationIssues.length} items`}
+              status={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'normal' : 'critical'}
+              icon={<Activity className="h-4 w-4" />}
+            />
+          </div>
+        </SectionCard>
 
       {/* Validation Issues - Errors */}
       {validationIssues.filter(i => i.severity === 'error').length > 0 && (

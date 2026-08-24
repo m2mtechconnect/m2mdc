@@ -93,7 +93,7 @@ function ApprovedUserRoutes() {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
-      <Route path="/builder" element={<Builder />} />
+      <Route path="/builder" element={<PermissionRouteGuard permission="twin.edit"><Builder /></PermissionRouteGuard>} />
       <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.view"><Deploy /></PermissionRouteGuard>} />
       <Route path="/deployments" element={<PermissionRouteGuard permission="deployment.view"><DeploymentHistory /></PermissionRouteGuard>} />
       <Route path="/agent/:id" element={<AgentWorkspace />} />
@@ -106,10 +106,7 @@ function ApprovedUserRoutes() {
 
       <Route path="/teams" element={<PermissionRouteGuard permission="tenant.view_members"><PeopleAccessLayout><Teams /></PeopleAccessLayout></PermissionRouteGuard>} />
       <Route path="/teams/access-control" element={<PermissionRouteGuard permission="authz.view_assignments"><PeopleAccessLayout><AccessControl /></PeopleAccessLayout></PermissionRouteGuard>} />
-      <Route
-        path="/teams/onboarding"
-        element={<AdminRouteGuard><PeopleAccessLayout><OnboardingSubmissions /></PeopleAccessLayout></AdminRouteGuard>}
-      />
+      <Route path="/teams/onboarding" element={<AdminRouteGuard><PeopleAccessLayout><OnboardingSubmissions /></PeopleAccessLayout></AdminRouteGuard>} />
 
       <Route path="/admin/customers" element={<AdminRouteGuard permission="platform.manage_customers"><AdminConsoleLayout><Customers /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/asset-preview" element={<AdminRouteGuard><AdminConsoleLayout><AssetPreview /></AdminConsoleLayout></AdminRouteGuard>} />
@@ -128,7 +125,7 @@ function ApprovedUserRoutes() {
       <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.view"><TwinManage /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
-      <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
+      <Route path="/studio/systems/:systemId/manage" element={<PermissionRouteGuard permission="twin.edit"><SystemManage /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
@@ -144,9 +141,7 @@ function ApprovedUserRoutes() {
       <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
 
-      {ROUTE_ALIASES.map((alias) => (
-        <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />
-      ))}
+      {ROUTE_ALIASES.map((alias) => <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />)}
 
       <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
         <Route index element={<OverviewWorkspace />} />
@@ -193,13 +188,7 @@ export default function AuthenticatedShell() {
               <LazyTourRenderer />
               <ReferenceRouteGate>
                 <RouteLoadRecovery resetKey={location.pathname}>
-                  <Suspense
-                    fallback={
-                      <div role="status" aria-live="polite" className="p-6 text-sm text-muted-foreground">
-                        Loading workspace...
-                      </div>
-                    }
-                  >
+                  <Suspense fallback={<div role="status" aria-live="polite" className="p-6 text-sm text-muted-foreground">Loading workspace...</div>}>
                     <ApprovedUserRoutes />
                   </Suspense>
                 </RouteLoadRecovery>

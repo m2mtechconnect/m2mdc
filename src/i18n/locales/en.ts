@@ -1047,7 +1047,7 @@ const en = {
     capabilities: 'Capabilities',
     disconnected: 'disconnected successfully',
     failedDisconnect: 'Failed to disconnect integration',
-    comingSoon: 'integration coming soon!',
+    comingSoon: 'integration is not available yet',
   },
 
   // Universal Search

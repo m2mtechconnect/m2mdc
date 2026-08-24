@@ -36,9 +36,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          git fetch origin main "$MIRROR_REF"
+          git fetch origin \
+            "refs/heads/main:refs/remotes/origin/main" \
+            "refs/heads/$MIRROR_REF:refs/remotes/origin/$MIRROR_REF"
           main_sha="$(git rev-parse origin/main)"
-          mirror_sha="$(git rev-parse FETCH_HEAD)"
+          mirror_sha="$(git rev-parse "origin/$MIRROR_REF")"
 
           if [ "$main_sha" = "$mirror_sha" ]; then
             echo "Mirror already matches main: $main_sha"
@@ -80,9 +82,11 @@ jobs:
           MIRROR_REF: remediation/hybrid-stack-p0
         run: |
           set -euo pipefail
-          git fetch origin main "$MIRROR_REF"
+          git fetch origin \
+            "refs/heads/main:refs/remotes/origin/main" \
+            "refs/heads/$MIRROR_REF:refs/remotes/origin/$MIRROR_REF"
           main_sha="$(git rev-parse origin/main)"
-          mirror_sha="$(git rev-parse FETCH_HEAD)"
+          mirror_sha="$(git rev-parse "origin/$MIRROR_REF")"
           main_tree="$(git rev-parse "$main_sha^{tree}")"
           mirror_tree="$(git rev-parse "$mirror_sha^{tree}")"
 

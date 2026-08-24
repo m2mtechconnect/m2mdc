@@ -7,6 +7,50 @@ BEGIN;
 -- intentionally rely on agents RLS, so the table policy must use the same
 -- active membership model as the rest of the enterprise tenancy plane.
 
+-- Compatibility stamp: older application builds create agents without sending
+-- org_id. If the authenticated caller has an active organization, stamp that
+-- organization before RLS WITH CHECK runs. A platform-only caller with no
+-- active organization may continue creating a legacy owner-only null-org row.
+-- A caller may never nominate a different organization.
+CREATE OR REPLACE FUNCTION public.stamp_agent_active_org_id()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public
+AS $$
+DECLARE
+  v_org_id uuid;
+BEGIN
+  IF auth.uid() IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  v_org_id := public.active_org_id();
+
+  IF v_org_id IS NULL THEN
+    IF NEW.org_id IS NOT NULL THEN
+      RAISE EXCEPTION 'active organization is required for organization-owned agent insert';
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  IF NEW.org_id IS NULL THEN
+    NEW.org_id := v_org_id;
+  ELSIF NEW.org_id IS DISTINCT FROM v_org_id THEN
+    RAISE EXCEPTION 'agent organization must match the active organization';
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.stamp_agent_active_org_id() FROM PUBLIC, anon;
+
+DROP TRIGGER IF EXISTS agents_stamp_org ON public.agents;
+CREATE TRIGGER agents_stamp_org
+BEFORE INSERT ON public.agents
+FOR EACH ROW EXECUTE FUNCTION public.stamp_agent_active_org_id();
+
 -- Remove overlapping permissive policies so an org-owned row cannot retain an
 -- owner-only bypass after organization assignment.
 DROP POLICY IF EXISTS "Users can view agents in their org" ON public.agents;
@@ -32,9 +76,9 @@ CREATE POLICY agents_select_authorized
     OR (org_id IS NOT NULL AND public.is_org_member(org_id, auth.uid()))
   );
 
--- Insert: platform-only/legacy users with no active organization may continue
--- creating owner-only rows. Once a caller has an active organization, the row
--- must be bound to that exact org and the caller must hold a tenant writer role.
+-- Insert: after the BEFORE INSERT compatibility stamp, platform-only/legacy
+-- users with no active organization may retain null org ownership. Tenant rows
+-- must be bound to the active organization and require a canonical writer role.
 CREATE POLICY agents_insert_authorized
   ON public.agents FOR INSERT TO authenticated
   WITH CHECK (

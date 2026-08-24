@@ -14,6 +14,21 @@ const builderGet = fs.readFileSync(
 const writerRoles = "ARRAY['owner','admin','operator','engineer','manager']::text[]";
 
 describe('agents membership-backed tenancy hardening', () => {
+  it('server-stamps the active org for older clients without breaking platform-only legacy inserts', () => {
+    const stampFunction = migration.slice(
+      migration.indexOf('CREATE OR REPLACE FUNCTION public.stamp_agent_active_org_id()'),
+      migration.indexOf('REVOKE ALL ON FUNCTION public.stamp_agent_active_org_id()'),
+    );
+    expect(stampFunction).toContain('v_org_id := public.active_org_id()');
+    expect(stampFunction).toContain('IF v_org_id IS NULL THEN');
+    expect(stampFunction).toContain('IF NEW.org_id IS NOT NULL THEN');
+    expect(stampFunction).toContain('NEW.org_id := v_org_id');
+    expect(stampFunction).toContain('NEW.org_id IS DISTINCT FROM v_org_id');
+    expect(migration).toContain('CREATE TRIGGER agents_stamp_org');
+    expect(migration).toContain('BEFORE INSERT ON public.agents');
+    expect(migration).toContain('EXECUTE FUNCTION public.stamp_agent_active_org_id()');
+  });
+
   it('removes overlapping legacy agents policies before creating canonical replacements', () => {
     for (const policy of [
       '"Users can view agents in their org"',

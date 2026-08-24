@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
 import { sendOrganizationInviteNotification } from "../_shared/notifications.ts";
+import { enqueueAuraWorkflow } from "../_shared/workflows.ts";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -115,6 +116,16 @@ serve(async (req) => {
       inviteId: result.invite_id,
     });
 
+    const workflow = await enqueueAuraWorkflow({
+      name: 'aura/onboarding.organization.provisioned',
+      organizationId: result.org_id,
+      data: {
+        invite_id: result.invite_id,
+        deployment_type: 'shared_cloud',
+        notification_status: notification.status,
+      },
+    });
+
     return json(corsHeaders, {
       success: true,
       organization: {
@@ -130,6 +141,7 @@ serve(async (req) => {
         expiresAt: result.invite_expires_at,
         delivery: notification,
       },
+      workflow,
       status: 'pending_owner_acceptance',
     }, 201);
   } catch (error) {

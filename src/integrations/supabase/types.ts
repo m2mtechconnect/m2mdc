@@ -7540,6 +7540,10 @@ export type Database = {
         Args: { _org_id: string; _roles: string[]; _user_id: string }
         Returns: boolean
       }
+      platform_list_organizations: {
+        Args: { _page?: number; _page_size?: number; _search?: string }
+        Returns: Json
+      }
       platform_provision_organization: {
         Args: {
           _domain: string
@@ -7556,6 +7560,10 @@ export type Database = {
         }[]
       }
       provision_default_twin: { Args: { _user_id: string }; Returns: string }
+      remove_active_org_member: {
+        Args: { _user_id: string }
+        Returns: undefined
+      }
       rpc_kpi_agents_deployed: {
         Args: { p_from: string; p_org_id?: string; p_to: string }
         Returns: {
@@ -7585,11 +7593,16 @@ export type Database = {
         }[]
       }
       set_active_org: { Args: { _org_id: string }; Returns: string }
+      set_active_org_member_role: {
+        Args: { _role: string; _user_id: string }
+        Returns: undefined
+      }
       storage_object_org_id: { Args: { _name: string }; Returns: string }
       store_secret_in_vault: {
         Args: { secret_name: string; secret_value: string }
         Returns: string
       }
+      tenant_people_access_snapshot: { Args: never; Returns: Json }
       unlink_system_integration: {
         Args: { p_integration_id: string; p_system_id: string }
         Returns: undefined

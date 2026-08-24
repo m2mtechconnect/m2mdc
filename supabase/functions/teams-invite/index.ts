@@ -253,8 +253,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const [{ data: existingMembership, error: existingMembershipError }, { data: existingInvites, error: existingError }] = await Promise.all([
-      serviceClient.from('org_memberships').select('status').eq('org_id', orgId).eq('user_id', caller.userId).maybeSingle(),
+    // Invitations are for adding membership, not for changing an existing
+    // member's role. Role changes go through set_active_org_member_role(), which
+    // applies the tenant-management rules directly and cannot be replayed by an
+    // emailed acceptance token.
+    const [{ data: inviteeProfile, error: inviteeProfileError }, { data: existingInvites, error: existingError }] = await Promise.all([
+      serviceClient.from('profiles').select('user_id').ilike('email', email).limit(1).maybeSingle(),
       serviceClient
         .from('team_invites')
         .select('id, expires_at')
@@ -264,11 +268,25 @@ serve(async (req) => {
         .gt('expires_at', new Date().toISOString())
         .limit(1),
     ]);
-    if (existingMembershipError) throw existingMembershipError;
-    if (!existingMembership || existingMembership.status !== 'active') {
-      return json(corsHeaders, { error: 'Active organization membership required', stage: 'authorization' }, 403);
-    }
+    if (inviteeProfileError) throw inviteeProfileError;
     if (existingError) throw existingError;
+
+    if (inviteeProfile?.user_id) {
+      const { data: inviteeMembership, error: inviteeMembershipError } = await serviceClient
+        .from('org_memberships')
+        .select('status, role')
+        .eq('org_id', orgId)
+        .eq('user_id', inviteeProfile.user_id)
+        .maybeSingle();
+      if (inviteeMembershipError) throw inviteeMembershipError;
+      if (inviteeMembership?.status === 'active') {
+        return json(corsHeaders, {
+          error: 'This account is already an active organization member. Edit the member role in People & Access instead.',
+          stage: 'state',
+        }, 409);
+      }
+    }
+
     if (existingInvites && existingInvites.length > 0) {
       return json(corsHeaders, {
         error: 'An active invitation already exists for this email in the organization',

@@ -1,11 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
 
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
+  }
+
+  // Defense in depth. Gateway JWT verification is enabled for this function in
+  // supabase/config.toml; the in-code check means the provider configuration is
+  // never disclosed even if the gateway setting is later relaxed.
+  try {
+    await requireCaller(req);
+  } catch (error) {
+    const rejected = callerRejectedResponse(error, req);
+    if (rejected) return rejected;
+    return new Response(
+      JSON.stringify({ error: "Unauthorized" }),
+      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 
   try {

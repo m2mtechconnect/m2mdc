@@ -1,4 +1,8 @@
 import { useTranslation } from "react-i18next";
+import { Navigate } from "react-router-dom";
+import { useRBAC } from "@/contexts/RBACContext";
+import type { Permission } from "@/auth/permissions";
+import type { ReactNode } from "react";
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,7 +32,20 @@ interface HealthStatus {
   region: string;
 }
 
-export default function AISettings() {
+
+/**
+ * Defense in depth for P1-1. The route is wrapped in PermissionRouteGuard, but
+ * this page governs agent grounding and safety configuration and previously
+ * carried no authorization check of its own.
+ */
+function RequirePermission({ permission, children }: { permission: Permission; children: ReactNode }) {
+  const { resolution, can } = useRBAC();
+  if (resolution.status === 'loading') return null;
+  if (resolution.status === 'pilot' || !can(permission)) return <Navigate to="/dashboard" replace />;
+  return <>{children}</>;
+}
+
+function AISettingsPage() {
   const { t } = useTranslation();
   const [projectId, setProjectId] = useState("");
   const [region, setRegion] = useState("northamerica-northeast1");
@@ -430,5 +447,13 @@ export default function AISettings() {
           </DCCard>
         )}
     </div>
+  );
+}
+
+export default function AISettings() {
+  return (
+    <RequirePermission permission="agent.administer">
+      <AISettingsPage />
+    </RequirePermission>
   );
 }

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { useUserPermissions } from '@/hooks/useUserPermissions';
+import { useRBAC } from '@/contexts/RBACContext';
+import type { AnyRole } from '@/auth/permissions';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -30,8 +31,47 @@ type Profile = {
   full_name: string | null;
 };
 
+/*
+ * The grant dropdown previously offered only admin/operator/viewer while the
+ * invite flow could assign nine further platform personas. The two surfaces now
+ * offer the same set, so a persona granted by invitation can also be granted,
+ * inspected and corrected here. `owner` and `security_admin` are deliberately
+ * excluded: they are provisioned out of band, not from this screen.
+ */
+type GrantableRole = Extract<
+  AnyRole,
+  | 'viewer' | 'operator' | 'admin'
+  | 'executive' | 'manager' | 'engineer' | 'compliance'
+  | 'data_analyst' | 'marketing' | 'sales' | 'support' | 'finance'
+>;
+
+const GRANTABLE_ROLES: ReadonlyArray<{ value: GrantableRole; label: string }> = [
+  { value: 'viewer', label: 'Viewer (Read-only)' },
+  { value: 'operator', label: 'Operator (Run agents)' },
+  { value: 'admin', label: 'Admin (Full control)' },
+  { value: 'executive', label: 'Executive (Read-only oversight)' },
+  { value: 'manager', label: 'Manager (Operate and view members)' },
+  { value: 'engineer', label: 'Engineer / DevOps (Operate)' },
+  { value: 'compliance', label: 'Compliance (Read-only and audit)' },
+  { value: 'data_analyst', label: 'Data analyst (Read-only and export)' },
+  { value: 'finance', label: 'Finance (Read-only and export)' },
+  { value: 'marketing', label: 'Marketing (Read-only)' },
+  { value: 'sales', label: 'Sales (Read-only)' },
+  { value: 'support', label: 'Support (Read-only)' },
+];
+
 export default function AccessControl() {
-  const { isGlobalAdmin, isLoading: permissionsLoading } = useUserPermissions();
+  /*
+   * Nav visibility and page authority are now the same question asked twice at
+   * the right granularity. `authz.view_assignments` (held by `compliance`)
+   * admits a read-only roster view - the nav link previously led to a hard
+   * "Access Denied". `authz.manage_assignments` remains required for every
+   * grant and revoke.
+   */
+  const { can, resolution } = useRBAC();
+  const permissionsLoading = resolution.status === 'loading';
+  const canViewAssignments = can('authz.view_assignments');
+  const canManageAssignments = can('authz.manage_assignments');
   const queryClient = useQueryClient();
   const [isGrantDialogOpen, setIsGrantDialogOpen] = useState(false);
   const [isRevokeDialogOpen, setIsRevokeDialogOpen] = useState(false);
@@ -39,7 +79,7 @@ export default function AccessControl() {
 
   // Form state
   const [userEmail, setUserEmail] = useState('');
-  const [role, setRole] = useState<'admin' | 'operator' | 'viewer'>('viewer');
+  const [role, setRole] = useState<GrantableRole>('viewer');
   const [scope, setScope] = useState<'global' | 'agent'>('global');
   const [agentId, setAgentId] = useState('');
 
@@ -71,7 +111,7 @@ export default function AccessControl() {
       const byUser = new Map((profileRows ?? []).map((p) => [p.user_id, p]));
       return (roles ?? []).map((r) => ({ ...r, profiles: byUser.get(r.user_id) ?? null }));
     },
-    enabled: isGlobalAdmin,
+    enabled: canViewAssignments,
   });
 
   // Fetch agents for scope selection
@@ -86,7 +126,7 @@ export default function AccessControl() {
       if (error) throw error;
       return data;
     },
-    enabled: isGlobalAdmin,
+    enabled: canViewAssignments,
   });
 
   // Grant role mutation
@@ -161,12 +201,12 @@ export default function AccessControl() {
     );
   }
 
-  if (!isGlobalAdmin) {
+  if (!canViewAssignments) {
     return (
       <div className="container mx-auto p-6">
         <DCCard 
           title="Access Denied" 
-          subtitle="You need global admin permissions to access this page."
+          subtitle="You need role-assignment visibility to access this page."
           icon={<Shield className="h-5 w-5 text-info" />}
         >
           <div />
@@ -182,7 +222,9 @@ export default function AccessControl() {
         title="Access control"
         subtitle="Manage user roles and permissions across the platform"
         icon={<Shield className="h-5 w-5 text-info" />}
-        action={
+        action={!canManageAssignments ? (
+          <Badge variant="outline">Read-only</Badge>
+        ) : (
           <Dialog open={isGrantDialogOpen} onOpenChange={setIsGrantDialogOpen}>
             <DialogTrigger asChild>
               <Button>
@@ -212,14 +254,16 @@ export default function AccessControl() {
 
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
-                  <Select value={role} onValueChange={(v) => setRole(v as any)}>
+                  <Select value={role} onValueChange={(v) => setRole(v as GrantableRole)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="viewer">Viewer (Read-only)</SelectItem>
-                      <SelectItem value="operator">Operator (Run agents)</SelectItem>
-                      <SelectItem value="admin">Admin (Full control)</SelectItem>
+                      {GRANTABLE_ROLES.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -269,7 +313,7 @@ export default function AccessControl() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        }
+        )}
       />
 
       {/* Role Descriptions */}
@@ -424,6 +468,7 @@ export default function AccessControl() {
                           </DialogFooter>
                         </DialogContent>
                       </Dialog>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

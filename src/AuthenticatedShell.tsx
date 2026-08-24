@@ -15,6 +15,7 @@ import { DatasetProvider } from '@/data/dataset/DatasetProvider';
 import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
 import { AdminRouteGuard } from '@/routing/AdminRouteGuard';
+import { PermissionRouteGuard } from '@/routing/PermissionRouteGuard';
 import NotFound from "./pages/NotFound";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -93,18 +94,18 @@ function ApprovedUserRoutes() {
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
       <Route path="/builder" element={<Builder />} />
-      <Route path="/deploy" element={<Deploy />} />
-      <Route path="/deployments" element={<DeploymentHistory />} />
+      <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.view"><Deploy /></PermissionRouteGuard>} />
+      <Route path="/deployments" element={<PermissionRouteGuard permission="deployment.view"><DeploymentHistory /></PermissionRouteGuard>} />
       <Route path="/agent/:id" element={<AgentWorkspace />} />
       <Route path="/agents/:id/chat" element={<AgentChat />} />
-      <Route path="/analytics" element={<IntelligenceDashboard />} />
+      <Route path="/analytics" element={<PermissionRouteGuard permission="analytics.view"><IntelligenceDashboard /></PermissionRouteGuard>} />
       <Route path="/compliance" element={<Compliance />} />
       <Route path="/infrastructure" element={<InfrastructurePage />} />
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
 
-      <Route path="/teams" element={<PeopleAccessLayout><Teams /></PeopleAccessLayout>} />
-      <Route path="/teams/access-control" element={<PeopleAccessLayout><AccessControl /></PeopleAccessLayout>} />
+      <Route path="/teams" element={<PermissionRouteGuard permission="tenant.view_members"><PeopleAccessLayout><Teams /></PeopleAccessLayout></PermissionRouteGuard>} />
+      <Route path="/teams/access-control" element={<PermissionRouteGuard permission="authz.view_assignments"><PeopleAccessLayout><AccessControl /></PeopleAccessLayout></PermissionRouteGuard>} />
       <Route
         path="/teams/onboarding"
         element={<AdminRouteGuard><PeopleAccessLayout><OnboardingSubmissions /></PeopleAccessLayout></AdminRouteGuard>}
@@ -119,12 +120,12 @@ function ApprovedUserRoutes() {
       <Route path="/admin/dataset-registry" element={<AdminRouteGuard><AdminConsoleLayout><DatasetRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
 
-      <Route path="/manage/integrations" element={<Connections />} />
-      <Route path="/manage/facilities" element={<ManageFacilities />} />
+      <Route path="/manage/integrations" element={<PermissionRouteGuard permission="twin.edit"><Connections /></PermissionRouteGuard>} />
+      <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.edit"><ManageFacilities /></PermissionRouteGuard>} />
       <Route path="/marketplace" element={<Marketplace />} />
-      <Route path="/app/agents" element={<ManageAgents />} />
-      <Route path="/app/agents/:slug/detail" element={<AgentDetail />} />
-      <Route path="/app/agents/:agentId/manage" element={<TwinManage />} />
+      <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
+      <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />
+      <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.view"><TwinManage /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<SystemManage />} />
@@ -137,7 +138,7 @@ function ApprovedUserRoutes() {
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
       <Route path="/search" element={<Search />} />
-      <Route path="/settings/ai" element={<AISettings />} />
+      <Route path="/settings/ai" element={<PermissionRouteGuard permission="agent.administer"><AISettings /></PermissionRouteGuard>} />
       <Route path="/sign-out" element={<SignOut />} />
       <Route path="/twin-preview" element={<TwinPreview />} />
       <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />

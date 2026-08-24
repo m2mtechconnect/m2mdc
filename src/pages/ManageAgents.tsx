@@ -1,7 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useRBAC } from '@/contexts/RBACContext';
+import type { Permission } from '@/auth/permissions';
+import type { ReactNode } from 'react';
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,7 +23,20 @@ import { LoadingState, NoAgentsEmptyState } from '@/components/ui/empty-state';
 import { useTwinAgents } from '@/hooks/useTwinAgentsCatalog';
 import { AGENT_CATALOG, type AgentDefinitionCatalog } from '@/domain/greenDc/agentsCatalog';
 
-export default function ManageAgents() {
+
+/**
+ * Defense in depth for P1-1. The route is wrapped in PermissionRouteGuard, but
+ * this page governs agent grounding and safety configuration and previously
+ * carried no authorization check of its own.
+ */
+function RequirePermission({ permission, children }: { permission: Permission; children: ReactNode }) {
+  const { resolution, can } = useRBAC();
+  if (resolution.status === 'loading') return null;
+  if (resolution.status === 'pilot' || !can(permission)) return <Navigate to='/dashboard' replace />;
+  return <>{children}</>;
+}
+
+function ManageAgentsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -282,5 +298,13 @@ export default function ManageAgents() {
         isDeleting={deleteMutation.isPending}
       />
     </div>
+  );
+}
+
+export default function ManageAgents() {
+  return (
+    <RequirePermission permission="agent.view">
+      <ManageAgentsPage />
+    </RequirePermission>
   );
 }

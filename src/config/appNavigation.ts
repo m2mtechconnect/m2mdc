@@ -129,7 +129,10 @@ export const MANAGE_NAV: AppNavItem[] = [
   },
   {
     name: 'Operations',
-    fullName: 'Operations',
+    // Matches the page heading exactly; the destination previously advertised
+    // three different names (nav "Operations", route /analytics, component
+    // IntelligenceDashboard, heading "Operations & Telemetry").
+    fullName: 'Operations & Telemetry',
     href: '/analytics',
     icon: BarChart3,
     matches: ['/intelligence', '/analytics', '/operations'],
@@ -185,6 +188,7 @@ export const MANAGE_NAV: AppNavItem[] = [
       '/admin/asset-preview',
       '/admin/asset-pipeline',
       '/admin/asset-validation',
+      '/admin/customers',
       '/admin/reference-facility-validation',
       '/twin-debug',
     ],
@@ -231,6 +235,15 @@ export const MANAGE_NAV: AppNavItem[] = [
         icon: Shield,
         matches: ['/admin/reference-facility-validation'],
         description: 'Reference-facility model and evidence validation.',
+      },
+      {
+        name: 'Customers',
+        fullName: 'Customer accounts',
+        href: '/admin/customers',
+        icon: Shield,
+        matches: ['/admin/customers'],
+        permission: 'platform.manage_customers',
+        description: 'Platform-owned customer accounts and their provisioning state.',
       },
       {
         name: 'Twin diagnostics',
@@ -293,6 +306,18 @@ export function navGroups(can: (permission: Permission) => boolean): NavGroup[] 
       ...SUPPORT_NAV.filter((item) => item.group === id),
     ],
   })).filter((group) => group.items.length > 0);
+}
+
+/**
+ * Children carry their own optional permission (Customers requires
+ * `platform.manage_customers`, which not every admin-console user holds).
+ * Nav rendering must filter them the same way top-level items are filtered.
+ */
+export function visibleNavChildren(
+  item: AppNavItem,
+  can: (permission: Permission) => boolean,
+): AppNavItem[] {
+  return visible(item.children ?? [], can);
 }
 
 export function isNavItemActive(item: AppNavItem, pathname: string): boolean {

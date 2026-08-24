@@ -1066,7 +1066,7 @@ const en = {
   // AI Settings
   aiSettings: {
     title: 'AI settings',
-    subtitle: 'Configure Google Gemini (Vertex AI) for AURA Assistant',
+    subtitle: 'Configure the managed language model provider for AURA Assistant',
     gcpConfig: 'Google Cloud Configuration',
     projectId: 'Google Cloud Project ID',
     region: 'Region',
@@ -1087,7 +1087,7 @@ const en = {
     saveConfig: 'Save Configuration',
     runHealthCheck: 'Run Health Check',
     healthResults: 'Health Check Results',
-    geminiApi: 'Gemini API',
+    geminiApi: 'Model API',
     configError: 'Please configure Project ID and select an AI model',
     saveSuccess: 'AI settings saved successfully',
     saveFailed: 'Failed to save settings',

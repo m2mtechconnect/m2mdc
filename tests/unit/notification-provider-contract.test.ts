@@ -5,7 +5,6 @@ import { describe, expect, it } from 'vitest';
 const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
 
 const notifications = read('supabase/functions/_shared/notifications.ts');
-const organizationProvision = read('supabase/functions/organization-provision/index.ts');
 const teamsInvite = read('supabase/functions/teams-invite/index.ts');
 const publicRoutes = read('src/PublicAppRoutes.tsx');
 const inviteRedirect = read('src/routing/InviteSignInRedirect.tsx');
@@ -15,12 +14,12 @@ describe('AURA notification provider contract', () => {
     expect(notifications).toContain("'disabled' | 'resend' | 'brevo' | 'mailgun'");
     expect(notifications).toContain("Deno.env.get('AURA_NOTIFICATION_PROVIDER') ?? 'disabled'");
     expect(notifications).toContain("provider === 'disabled'");
-    expect(notifications).toContain("status: NotificationDeliveryStatus");
+    expect(notifications).toContain('status: NotificationDeliveryStatus');
     expect(notifications).not.toContain('lovable.app');
     expect(notifications).not.toContain('lovable.dev');
   });
 
-  it('reads provider credentials only from server environment', () => {
+  it('reads provider credentials only from server environment and bounds provider calls', () => {
     for (const envName of [
       'RESEND_API_KEY',
       'BREVO_API_KEY',
@@ -32,45 +31,49 @@ describe('AURA notification provider contract', () => {
     ]) {
       expect(notifications).toContain(`Deno.env.get('${envName}')`);
     }
+    expect(notifications).toContain('AbortSignal.timeout(PROVIDER_TIMEOUT_MS)');
     expect(notifications).not.toMatch(/(?:re_|xkeysib-|key-)[A-Za-z0-9_-]{16,}/);
   });
 
-  it('uses the real invite route and escapes invite content', () => {
+  it('uses the real invite route, escapes content and permits local HTTP only for development', () => {
     expect(publicRoutes).toContain('path="/invite/accept"');
     expect(inviteRedirect).toContain('location.search');
     expect(notifications).toContain('/invite/accept?token=${encodeURIComponent(input.token)}');
     expect(notifications).toContain('escapeHtml(organizationName)');
     expect(notifications).toContain('escapeHtml(role)');
     expect(notifications).toContain('escapeHtml(acceptUrl)');
+    expect(notifications).toContain("url.protocol === 'https:'");
+    expect(notifications).toContain("url.protocol === 'http:'");
   });
 
-  it('does not expose an owner invite token in the provisioning response', () => {
-    expect(organizationProvision).toContain('token: result.invite_token');
-    expect(organizationProvision).toContain('sendOrganizationInviteNotification');
+  it('does not expose an owner invite token in the platform-provision response', () => {
+    expect(teamsInvite).toContain("mode === 'platform_provision'");
+    expect(teamsInvite).toContain('token: result.invite_token');
+    expect(teamsInvite).toContain('sendOrganizationInviteNotification');
 
-    const responseStart = organizationProvision.indexOf('return json(corsHeaders, {\n      success: true');
-    expect(responseStart).toBeGreaterThan(-1);
-    const response = organizationProvision.slice(responseStart, organizationProvision.indexOf("}, 201);", responseStart));
+    const modeStart = teamsInvite.indexOf("mode === 'platform_provision'");
+    const responseStart = teamsInvite.indexOf('ownerInvite: {', modeStart);
+    const responseEnd = teamsInvite.indexOf('workflow,', responseStart);
+    const response = teamsInvite.slice(responseStart, responseEnd);
     expect(response).not.toContain('token:');
     expect(response).toContain('delivery: notification');
   });
 
-  it('creates invitations before attempting delivery and never returns the team invite token', () => {
-    const insertIndex = teamsInvite.indexOf(".from('team_invites')");
-    const notifyIndex = teamsInvite.indexOf('sendOrganizationInviteNotification({');
+  it('creates tenant invitations before attempting delivery and never returns the token', () => {
+    const insertIndex = teamsInvite.lastIndexOf(".from('team_invites')");
+    const notifyIndex = teamsInvite.lastIndexOf('sendOrganizationInviteNotification({');
     expect(insertIndex).toBeGreaterThan(-1);
     expect(notifyIndex).toBeGreaterThan(insertIndex);
 
-    const responseStart = teamsInvite.indexOf('return json(corsHeaders, {\n      success: true');
-    expect(responseStart).toBeGreaterThan(-1);
-    const response = teamsInvite.slice(responseStart, teamsInvite.indexOf('});', responseStart));
-    expect(response).not.toContain('token');
+    const responseStart = teamsInvite.lastIndexOf('return json(corsHeaders, {');
+    const response = teamsInvite.slice(responseStart);
+    expect(response).not.toContain('token,');
     expect(response).toContain('delivery: notification');
   });
 
-  it('keeps notification failure non-transactional with invite creation', () => {
+  it('keeps notification failure non-transactional with persisted invitation state', () => {
     expect(notifications).toContain("return delivery(provider, 'failed'");
-    expect(organizationProvision).toContain('status: \'pending_owner_acceptance\'');
-    expect(teamsInvite).toContain('Invitation created for ${normalisedEmail}');
+    expect(teamsInvite).toContain("status: 'pending_owner_acceptance'");
+    expect(teamsInvite).toContain('Invitation created for ${email}');
   });
 });

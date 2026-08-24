@@ -105,6 +105,30 @@ export function createTestSupabaseClient(options: { accessToken?: string } = {})
   });
 }
 
+/**
+ * Service-role client for disposable QA fixture construction only.
+ * The same loopback guard used by browser tests is applied before the key is
+ * accepted, so an ambient cloud URL can never receive the service credential.
+ */
+export function createTestServiceSupabaseClient(
+  env: Record<string, string | undefined> = process.env,
+) {
+  const { url } = resolveTestSupabaseConfig(env);
+  const serviceRoleKey = env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!serviceRoleKey) {
+    throw new Error('Disposable test service-role credential is not configured');
+  }
+
+  return createClient<Database>(url, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+    realtime: { transport: WebSocket },
+  });
+}
+
 /** Reads the authenticated browser session without logging or returning refresh tokens. */
 export async function getBrowserTestSession(
   context: BrowserContext,

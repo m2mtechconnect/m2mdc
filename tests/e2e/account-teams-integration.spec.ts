@@ -19,7 +19,7 @@ test.describe('Account Profile & Governance Integration', () => {
     expect(profileName.trim()).not.toBe('');
     expect(profileEmail).toMatch(/@/);
 
-    await page.goto('/teams');
+    await page.goto('/teams/access-control');
     await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
     await expect(page.getByRole('heading', { name: /Access control/i })).toBeVisible();
 
@@ -46,7 +46,7 @@ test.describe('Account Profile & Governance Integration', () => {
     await page.reload();
     await expect(page.locator('input#full_name')).toHaveValue(testName, { timeout: 15_000 });
 
-    await page.goto('/teams');
+    await page.goto('/teams/access-control');
     await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
     const roleRow = page.getByRole('row').filter({ hasText: profileEmail });
     await expect(roleRow).toBeVisible({ timeout: 15_000 });

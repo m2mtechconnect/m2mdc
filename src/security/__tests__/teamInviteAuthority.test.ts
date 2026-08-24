@@ -12,37 +12,43 @@ const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
 describe('team invite authority', () => {
   const fn = read('supabase/functions/teams-invite/index.ts');
 
-  it('verifies approval and active org admin/owner membership before service role creation', () => {
+  it('verifies approval and active org member-management authority before tenant service-role work', () => {
     const profileCheck = fn.indexOf("from('profiles')");
-    const membershipCheck = fn.indexOf("from('org_memberships')");
-    const roleCheck = fn.indexOf('INVITER_ROLES.has');
+    const activeOrgCheck = fn.indexOf("authClient.rpc('active_org_id')");
+    const membershipCheck = fn.indexOf("from('org_memberships')", activeOrgCheck);
+    const roleCheck = fn.indexOf('INVITER_ROLES.has', membershipCheck);
     const serviceClient = fn.indexOf('const serviceClient = createClient', membershipCheck);
 
-    expect(fn).toContain("const INVITER_ROLES = new Set(['admin', 'owner'])");
+    expect(fn).toContain("const INVITER_ROLES = new Set(['admin', 'owner', 'security_admin'])");
     expect(profileCheck).toBeGreaterThanOrEqual(0);
-    expect(membershipCheck).toBeGreaterThan(profileCheck);
+    expect(activeOrgCheck).toBeGreaterThan(profileCheck);
+    expect(membershipCheck).toBeGreaterThan(activeOrgCheck);
     expect(roleCheck).toBeGreaterThan(membershipCheck);
     expect(serviceClient).toBeGreaterThan(roleCheck);
     expect(fn).toContain("membership.status !== 'active'");
     expect(fn).toContain("stage: 'authorization'");
   });
 
-  it('allows delegated admin invitations but never mints owner through the ordinary invite flow', () => {
+  it('allows tenant administration roles but never mints owner through the ordinary invite flow', () => {
     expect(fn).toContain("'admin',");
+    expect(fn).toContain("'security_admin',");
     const allowlist = fn.slice(fn.indexOf('const INVITABLE_ROLES'), fn.indexOf('const INVITER_ROLES'));
     expect(allowlist).not.toContain("'owner'");
-    expect(fn).toContain("if (role === 'admin' && membership.role !== 'owner')");
+    expect(fn).toContain("const ELEVATED_INVITE_ROLES = new Set(['admin', 'security_admin'])");
+    expect(fn).toContain("ELEVATED_INVITE_ROLES.has(role) && membership.role !== 'owner'");
   });
 
-  it('binds every invitation to the active organization and never returns the acceptance token', () => {
+  it('binds every tenant invitation to the active organization and never returns the acceptance token', () => {
     expect(fn).toContain('org_id: orgId');
     expect(fn).not.toMatch(/\.select\(\)\s*\n?\s*\.single\(\)/);
     expect(fn).toContain(".select('id, email, role, status, invited_by, org_id, expires_at, created_at')");
   });
 
-  it('reads invites with an explicit column list that omits the token', () => {
+  it('keeps the legacy platform Teams read explicit while tenant People & Access uses its guarded snapshot RPC', () => {
     const teams = read('src/pages/Teams.tsx');
+    const tenantPeople = read('src/pages/people/TenantPeopleAccess.tsx');
     expect(teams).toContain('.select("id, email, role, status, invited_by, expires_at, created_at")');
     expect(teams).not.toMatch(/from\("team_invites"\)\s*\n\s*\.select\("\*"\)/);
+    expect(tenantPeople).toContain("rpc('tenant_people_access_snapshot')");
   });
 });

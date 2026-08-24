@@ -70,16 +70,10 @@ verify_jwt = true
 [functions.ops-systems]
 verify_jwt = true
 
-# Enterprise onboarding boundaries. The gateway verifies Supabase JWTs and the
-# functions perform their own approval / tenant / role checks before creating a
-# service-role client. Invite acceptance still validates the signed-in email
-# against the opaque organization-bound invitation before membership mutation.
-[functions.organization-provision]
-verify_jwt = true
-
-[functions.organization-list]
-verify_jwt = true
-
+# Enterprise onboarding boundary. Customer provisioning, owner-invite recovery
+# and tenant member invitations share one guarded function. Customer inventory
+# is now a SECURITY DEFINER RPC with its own approval + global-owner checks, so
+# no extra Edge Function inventory surface is introduced.
 [functions.teams-invite]
 verify_jwt = true
 

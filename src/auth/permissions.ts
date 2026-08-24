@@ -74,17 +74,13 @@ export function isTenantRole(value: string): value is TenantRole {
  * Adding a role must never require touching a component.
  */
 export type Permission =
-  // platform surface
   | 'platform.access_internal_shell'
   | 'platform.view_admin_console'
   | 'platform.manage_customers'
-  // authorization administration
   | 'authz.view_assignments'
   | 'authz.manage_assignments'
-  // tenant / organization
   | 'tenant.view_members'
   | 'tenant.manage_members'
-  // digital twin + operations
   | 'twin.view'
   | 'twin.edit'
   | 'twin.delete'
@@ -93,12 +89,10 @@ export type Permission =
   | 'agent.administer'
   | 'deployment.view'
   | 'deployment.execute'
-  // analytics / reporting
   | 'analytics.view'
   | 'analytics.export';
 
 const VIEWER_BASE: Permission[] = ['twin.view', 'agent.view', 'deployment.view', 'analytics.view'];
-
 const OPERATOR_BASE: Permission[] = [
   ...VIEWER_BASE,
   'twin.edit',
@@ -106,7 +100,6 @@ const OPERATOR_BASE: Permission[] = [
   'deployment.execute',
   'analytics.export',
 ];
-
 const ADMIN_BASE: Permission[] = [
   ...OPERATOR_BASE,
   'twin.delete',
@@ -118,13 +111,7 @@ const ADMIN_BASE: Permission[] = [
   'tenant.manage_members',
 ];
 
-/**
- * Authoritative role -> permission matrix.
- * Every label in the `app_role` enum is mapped explicitly; there is no
- * implicit fallthrough, so an unmapped label grants nothing.
- */
 export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
-  // --- platform roles ---
   security_admin: [...ADMIN_BASE],
   admin: [...ADMIN_BASE],
   executive: [...VIEWER_BASE, 'analytics.export', 'tenant.view_members'],
@@ -136,18 +123,11 @@ export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
   sales: [...VIEWER_BASE],
   support: [...VIEWER_BASE],
   finance: [...VIEWER_BASE, 'analytics.export'],
-  // --- legacy global tenant-role grants ---
-  // Only a global owner grant may provision/enumerate customer organizations.
   owner: [...ADMIN_BASE, 'platform.manage_customers'],
   operator: [...OPERATOR_BASE],
   viewer: [...VIEWER_BASE],
 };
 
-/**
- * Precedence used only to derive a single display label and to satisfy legacy
- * call sites that still ask "what is my role?". Authorization decisions must
- * use permissions, not this ordering.
- */
 const ROLE_PRECEDENCE: AnyRole[] = [
   'security_admin',
   'admin',
@@ -165,17 +145,12 @@ const ROLE_PRECEDENCE: AnyRole[] = [
   'viewer',
 ];
 
-/**
- * A single active grant, as stored server-side. `scope` is `'global'` or a
- * resource-qualified string such as `agent:<uuid>`.
- */
 export interface RoleGrant {
   role: AnyRole;
   scope: string | null;
   expiresAt: string | null;
 }
 
-/** A grant is only active while unexpired. Revoked grants are deleted rows. */
 export function isGrantActive(grant: RoleGrant, now: Date = new Date()): boolean {
   if (!grant.expiresAt) return true;
   const expiry = new Date(grant.expiresAt);
@@ -183,15 +158,14 @@ export function isGrantActive(grant: RoleGrant, now: Date = new Date()): boolean
 }
 
 export interface ResolvedAuthorization {
-  /** Active, recognised grants only. */
+  /** All active, recognised grants, including resource-scoped grants. */
   grants: RoleGrant[];
-  /** Distinct active role labels. */
+  /** Distinct active GLOBAL role labels only. */
   roles: AnyRole[];
-  /** Highest-precedence active role, for display and legacy call sites. */
+  /** Highest-precedence active GLOBAL role, for display and legacy call sites. */
   primaryRole: AnyRole | null;
   /** Union of permissions across all active global grants. */
   permissions: Set<Permission>;
-  /** Grants that could not be mapped to the canonical model. */
   unmapped: string[];
 }
 
@@ -206,9 +180,9 @@ export const EMPTY_AUTHORIZATION: ResolvedAuthorization = {
 /**
  * Resolve raw `user_roles` rows into the canonical model.
  *
- * Scope-qualified grants (e.g. `agent:<uuid>`) intentionally do NOT contribute
- * to the global permission set; resource-level checks are answered server-side
- * by `user_can_access_agent`.
+ * Resource-scoped grants remain available in `grants` for server-backed
+ * resource checks, but they never contribute to global roles, primaryRole,
+ * permissions, or internal-shell admission.
  */
 export function resolveAuthorization(
   rows: Array<{ role: string | null; scope?: string | null; expires_at?: string | null }>,
@@ -232,20 +206,16 @@ export function resolveAuthorization(
     if (isGrantActive(grant, now)) grants.push(grant);
   }
 
-  const roles = Array.from(new Set(grants.map((g) => g.role)));
-  const primaryRole = ROLE_PRECEDENCE.find((r) => roles.includes(r)) ?? null;
+  const globalGrants = grants.filter((grant) => grant.scope === null || grant.scope === 'global');
+  const roles = Array.from(new Set(globalGrants.map((grant) => grant.role)));
+  const primaryRole = ROLE_PRECEDENCE.find((role) => roles.includes(role)) ?? null;
 
   const permissions = new Set<Permission>();
-  for (const grant of grants) {
-    const global = grant.scope === null || grant.scope === 'global';
-    if (!global) continue;
+  for (const grant of globalGrants) {
     for (const permission of ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
   }
 
-  // Any recognised, active, global grant admits the internal shell.
-  if (grants.some((g) => g.scope === null || g.scope === 'global')) {
-    permissions.add('platform.access_internal_shell');
-  }
+  if (globalGrants.length > 0) permissions.add('platform.access_internal_shell');
 
   return { grants, roles, primaryRole, permissions, unmapped };
 }

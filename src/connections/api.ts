@@ -51,7 +51,7 @@ async function selectAll<T>(table: string, order: string, ascending = false): Pr
 export async function fetchCurrentTenantId(): Promise<string | null> {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth?.user) return null;
-  const { data, error } = await db.rpc('active_org_id');
+  const { data, error } = await supabase.rpc('active_org_id');
   if (error) return null;
   return typeof data === 'string' && data.length > 0 ? data : null;
 }

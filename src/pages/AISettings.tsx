@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
 
-const DEFAULT_SYSTEM_PROMPT = `You are M2M Co-Pilot inside an enterprise control center.
+const DEFAULT_SYSTEM_PROMPT = `You are AURA Assistant inside an enterprise control center.
 Be concise and business-ready.
 Always cite sources when grounding is enabled.
 If you are unsure, say so and suggest a next step.

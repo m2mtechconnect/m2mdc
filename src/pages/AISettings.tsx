@@ -264,19 +264,19 @@ function AISettingsPage() {
         </DCCard>
 
         <DCCard
-          title="Vertex AI search and grounding"
+          title="Grounding search"
           icon={<Database className="h-5 w-5 text-primary" />}
           status="info"
         >
           <div className="flex items-center justify-between mb-6">
             <div className="space-y-0.5">
               <Label>Enable Grounding</Label>
-              <p className="text-xs text-muted-foreground">Connect to your Vertex AI Search data store</p>
+              <p className="text-xs text-muted-foreground">Connect to your approved grounding search index</p>
             </div>
             <Switch
               checked={groundingEnabled}
               onCheckedChange={setGroundingEnabled}
-              aria-label="Enable grounding against Vertex AI Search"
+              aria-label="Enable grounding search"
             />
           </div>
 

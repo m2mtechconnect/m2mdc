@@ -53,6 +53,7 @@ import { WhoIsThisFor } from './overview/WhoIsThisFor';
 import { HowItWorks } from './overview/HowItWorks';
 import { FacilityStatusPanel } from './overview/FacilityStatusPanel';
 import { TemplateChatInterface } from './preview/TemplateChatInterface';
+import { modelDisplayLabel } from "@/lib/llm/modelLabels";
 
 interface StandardizedTemplatePreviewProps {
   template: ValidatedTemplate;
@@ -486,7 +487,7 @@ export function StandardizedTemplatePreview({
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div className="flex-1">
-                      <p className="font-medium text-sm mb-1">Model: {config.model || 'google/gemini-2.5-flash'}</p>
+                      <p className="font-medium text-sm mb-1">Model: {modelDisplayLabel(config.model || 'google/gemini-2.5-flash')}</p>
                       <p className="text-xs text-muted-foreground">
                         → Used for live diagnostic reasoning and scenario analysis.
                       </p>

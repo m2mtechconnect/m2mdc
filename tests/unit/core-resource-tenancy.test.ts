@@ -6,6 +6,10 @@ const sql = fs.readFileSync(
   path.resolve(process.cwd(), 'supabase/migrations/20260823224500_core_resource_tenancy.sql'),
   'utf8',
 );
+const remediation = fs.readFileSync(
+  path.resolve(process.cwd(), 'supabase/migrations/20260824003000_enterprise_audit_remediation.sql'),
+  'utf8',
+);
 
 describe('core resource organization tenancy', () => {
   it('adds tenant ownership to the three core parent resources and backfills from owners', () => {
@@ -55,12 +59,19 @@ describe('core resource organization tenancy', () => {
     }
   });
 
-  it('uses membership for reads and tenant roles for writes on organization-owned parents', () => {
+  it('uses membership for reads and the canonical writer set for tenant-owned writes', () => {
     for (const table of ['data_centre_twins', 'digital_twins', 'sovereign_dc_facilities']) {
       expect(sql).toContain(`ON public.${table} FOR SELECT TO authenticated`);
     }
     expect(sql).toContain('public.is_org_member(org_id, auth.uid())');
-    expect(sql).toContain("ARRAY['owner','admin','operator','engineer','manager','executive']::text[]");
-    expect(sql).toContain("ARRAY['owner','admin']::text[]");
+    expect(remediation).toContain("ARRAY['owner','admin','operator','engineer','manager']::text[]");
+    expect(remediation).toContain("ARRAY['owner','admin']::text[]");
+
+    const writePolicies = remediation.slice(
+      remediation.indexOf('DROP POLICY IF EXISTS "Users can create their own twins"'),
+      remediation.indexOf('-- Tenant People & Access snapshot'),
+    );
+    expect(writePolicies).not.toContain("'executive']::text[]");
+    expect(writePolicies).not.toContain("'viewer']::text[]");
   });
 });

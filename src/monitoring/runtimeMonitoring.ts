@@ -7,14 +7,6 @@ import { getBuildFingerprint } from '@/lib/buildFingerprint';
 
 const MAX_DEDUPE_KEYS = 100;
 
-function runtimeAnalyticsConfig(): AuraAnalyticsConfig {
-  return {
-    provider: import.meta.env.VITE_AURA_ANALYTICS_PROVIDER === 'posthog' ? 'posthog' : 'disabled',
-    posthogKey: import.meta.env.VITE_POSTHOG_KEY,
-    posthogHost: import.meta.env.VITE_POSTHOG_HOST,
-  };
-}
-
 function classifyError(value: unknown): string {
   if (value instanceof Error) return value.name || 'Error';
   if (value && typeof value === 'object') {
@@ -31,18 +23,19 @@ function boundedRoute(): string {
 }
 
 /**
- * Installs privacy-safe global browser diagnostics.
+ * Installs privacy-safe global browser diagnostics only when an approved caller
+ * supplies an explicit analytics configuration.
+ *
+ * The module deliberately does not read browser environment variables. That
+ * keeps production telemetry behind the same explicit configuration boundary as
+ * the analytics adapter and preserves the production-perimeter allowlist.
  *
  * Raw error messages, stack traces, URLs with query strings, user ids, emails,
  * tokens, request bodies and tenant identifiers are deliberately not captured.
- * Only error class, route pathname and immutable build metadata are sent, and
- * delivery remains disabled unless a public PostHog configuration is supplied.
  */
-export function startRuntimeMonitoring(): () => void {
+export function startRuntimeMonitoring(config: AuraAnalyticsConfig = {}): () => void {
   if (typeof window === 'undefined') return () => {};
-
-  const config = runtimeAnalyticsConfig();
-  if (config.provider === 'disabled') return () => {};
+  if (config.provider !== 'posthog') return () => {};
 
   const build = getBuildFingerprint();
   const seen = new Set<string>();

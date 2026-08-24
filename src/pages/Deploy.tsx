@@ -36,7 +36,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DCCard } from "@/components/dc-ui/DCCard";
-import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import { stackLabel } from '@/config/auraStackManifest';
 import { modelDisplayLabel } from '@/lib/llm/modelLabels';

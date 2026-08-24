@@ -13,6 +13,7 @@ import {
   type OrganizationMembershipSummary,
   type OrganizationRole,
 } from '@/auth/organizationAuthorization';
+import { clearTenantScopedClientState } from '@/auth/tenantStorageIsolation';
 
 /**
  * Canonical authorization provider.
@@ -299,11 +300,10 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await tenantDb.rpc('set_active_org', { _org_id: orgId });
       if (error) throw error;
 
-      // Twin/location selections are tenant-scoped but historically persisted
-      // without an org prefix. Remove them before reloading so a switch can
-      // never carry a stale customer selection into the next organization.
-      localStorage.removeItem('dc_active_location_id');
-      localStorage.removeItem('dc_active_twin_id');
+      // Legacy customer stores are not namespaced by organization. Purge the
+      // complete tenant-scoped set before the hard reload so content from the
+      // previous customer can never be rehydrated into the new organization.
+      clearTenantScopedClientState(window.localStorage, window.sessionStorage);
 
       // A full shell reload intentionally flushes React/query/store state from
       // the previous tenant. The server-side active-org membership check has

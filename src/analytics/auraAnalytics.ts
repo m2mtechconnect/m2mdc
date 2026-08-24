@@ -4,10 +4,12 @@ export type AuraAnalyticsEventName =
   | 'tenant.organization_switched'
   | 'platform.customer_provisioned'
   | 'onboarding.invite_created'
-  | 'onboarding.invite_delivery';
+  | 'onboarding.invite_delivery'
+  | 'runtime.client_error'
+  | 'runtime.unhandled_rejection';
 
 export interface AuraAnalyticsEvent {
-  organizationId: string;
+  organizationId?: string;
   properties?: Record<string, AuraAnalyticsPrimitive>;
 }
 
@@ -24,6 +26,12 @@ export interface AuraAnalyticsResult {
 
 const SENSITIVE_KEY_PATTERN = /(token|secret|password|authorization|credential|cookie|content|document|body|email|phone|address|api[_-]?key)/i;
 const RESERVED_PROPERTY_KEYS = new Set(['organization_id', 'distinct_id']);
+const TENANT_SCOPED_EVENTS = new Set<AuraAnalyticsEventName>([
+  'tenant.organization_switched',
+  'platform.customer_provisioned',
+  'onboarding.invite_created',
+  'onboarding.invite_delivery',
+]);
 const SESSION_KEY = 'aura_analytics_distinct_id';
 const ANALYTICS_TIMEOUT_MS = 5_000;
 
@@ -74,6 +82,10 @@ function analyticsDistinctId(): string {
  * Analytics is disabled unless the caller supplies an explicit public runtime
  * configuration. This avoids hidden build-time browser environment dependencies
  * and keeps private/white-label packaging provider-neutral.
+ *
+ * Tenant-scoped business events require an organization id. Runtime diagnostics
+ * are intentionally allowed without one so failures that occur before tenant
+ * context resolves can still be observed without inventing tenant authority.
  */
 export async function captureAuraEvent(
   event: AuraAnalyticsEventName,
@@ -85,18 +97,21 @@ export async function captureAuraEvent(
 
   const apiKey = (config.posthogKey ?? '').trim();
   const host = posthogHost(config);
-  if (!apiKey || !host || !context.organizationId.trim()) {
+  const organizationId = context.organizationId?.trim() ?? '';
+  if (!apiKey || !host || (TENANT_SCOPED_EVENTS.has(event) && !organizationId)) {
     return { provider, status: 'not_configured' };
   }
+
+  const properties: Record<string, AuraAnalyticsPrimitive> = {
+    ...sanitizeAnalyticsProperties(context.properties),
+    distinct_id: analyticsDistinctId(),
+  };
+  if (organizationId) properties.organization_id = organizationId;
 
   const payload = {
     api_key: apiKey,
     event,
-    properties: {
-      ...sanitizeAnalyticsProperties(context.properties),
-      distinct_id: analyticsDistinctId(),
-      organization_id: context.organizationId,
-    },
+    properties,
   };
 
   try {

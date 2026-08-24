@@ -4,6 +4,7 @@ import path from "path";
 import { execFileSync } from "node:child_process";
 import { componentTagger } from "lovable-tagger";
 import { seoBuildGate } from "./scripts/seoBuildGate";
+import { normalizeReleaseBranch, resolveReleaseEnvironment } from "./scripts/releaseMetadata";
 
 function resolveGitValue(args: string[], fallback = 'unknown') {
   try {
@@ -26,7 +27,7 @@ function resolveReleaseSha() {
   ).trim();
 }
 
-function resolveReleaseBranch() {
+function resolveRawReleaseBranch() {
   return (
     process.env.AURA_RELEASE_BRANCH ||
     process.env.GITHUB_HEAD_REF ||
@@ -37,12 +38,21 @@ function resolveReleaseBranch() {
   ).trim();
 }
 
+function resolveReleaseBranch() {
+  return normalizeReleaseBranch(resolveRawReleaseBranch());
+}
+
 function releaseFingerprint(): Plugin {
   const sha = resolveReleaseSha();
-  const branch = resolveReleaseBranch();
+  const rawBranch = resolveRawReleaseBranch();
+  const branch = normalizeReleaseBranch(rawBranch);
   const builtAt = new Date().toISOString();
   const buildId = process.env.AURA_BUILD_ID || `b${Date.now().toString(36)}`;
-  const environment = process.env.AURA_RELEASE_ENVIRONMENT || 'unknown';
+  const environment = resolveReleaseEnvironment({
+    rawBranch,
+    explicitEnvironment: process.env.AURA_RELEASE_ENVIRONMENT,
+    providerEnvironment: process.env.VERCEL_ENV,
+  });
   const version = process.env.npm_package_version || '1.0.0';
 
   return {

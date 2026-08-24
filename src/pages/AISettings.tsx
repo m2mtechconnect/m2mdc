@@ -407,7 +407,7 @@ function AISettingsPage() {
                     <XCircle className="h-5 w-5 text-red-500" />
                   )}
                   <div>
-                    <p className="font-medium">Gemini API</p>
+                    <p className="font-medium">Managed AI</p>
                     {healthStatus.gemini.error && (
                       <p className="text-xs text-red-500">{healthStatus.gemini.error}</p>
                     )}
@@ -427,7 +427,7 @@ function AISettingsPage() {
                       <XCircle className="h-5 w-5 text-red-500" />
                     )}
                     <div>
-                      <p className="font-medium">Vertex AI Search</p>
+                      <p className="font-medium">Grounding Search</p>
                       {healthStatus.vertexSearch.error && (
                         <p className="text-xs text-red-500">{healthStatus.vertexSearch.error}</p>
                       )}
@@ -440,7 +440,7 @@ function AISettingsPage() {
               )}
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <p className="font-medium">Region</p>
+                <p className="font-medium">Data residency</p>
                 <Badge variant="secondary">{healthStatus.region}</Badge>
               </div>
             </div>

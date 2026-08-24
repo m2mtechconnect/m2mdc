@@ -14,10 +14,14 @@ describe('AURA tenant analytics contract', () => {
     expect(source).not.toContain('lovable.dev');
   });
 
-  it('requires an organization id on every event envelope', () => {
+  it('requires an organization id on every event envelope and keeps it authoritative', () => {
     expect(source).toContain('organizationId: string');
     expect(source).toContain('!context.organizationId.trim()');
+    expect(source).toContain("RESERVED_PROPERTY_KEYS = new Set(['organization_id', 'distinct_id'])");
     expect(source).toContain('organization_id: context.organizationId');
+    expect(source.indexOf('...sanitizeAnalyticsProperties(context.properties)')).toBeLessThan(
+      source.indexOf('organization_id: context.organizationId'),
+    );
   });
 
   it('uses a constrained AURA-owned event vocabulary', () => {
@@ -32,7 +36,7 @@ describe('AURA tenant analytics contract', () => {
     expect(source).toContain('event: AuraAnalyticsEventName');
   });
 
-  it('removes sensitive and direct-contact fields before capture', () => {
+  it('removes sensitive, direct-contact and reserved fields before capture', () => {
     const sanitized = sanitizeAnalyticsProperties({
       source: 'customer_console',
       count: 2,
@@ -43,6 +47,8 @@ describe('AURA tenant analytics contract', () => {
       email: 'person@example.com',
       document_content: 'do-not-send',
       api_key: 'do-not-send',
+      organization_id: 'attacker-controlled-org',
+      distinct_id: 'attacker-controlled-user',
     });
 
     expect(sanitized).toEqual({ source: 'customer_console', count: 2, enabled: true });

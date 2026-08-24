@@ -45,7 +45,7 @@ import {
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
-  { value: 'connections', label: 'Connected systems' },
+  { value: 'connections', label: 'Connections & APIs' },
   { value: 'data-flows', label: 'Data flows' },
   { value: 'data-storage', label: 'Data & Storage' },
   { value: 'catalogue', label: 'Available connectors' },

@@ -163,6 +163,23 @@ describe('backend-to-UI capability parity', () => {
     expect(tab).toContain('SectionCard');
   });
 
+  it('keeps Connections & APIs distinct from Data & Storage', () => {
+    const connections = read('src/pages/Connections.tsx');
+    expect(connections).toContain('Connections & APIs');
+    const apisIndex = connections.indexOf('Connections & APIs');
+    const storageIndex = connections.indexOf('Data & Storage');
+    expect(apisIndex).toBeGreaterThan(-1);
+    expect(storageIndex).toBeGreaterThan(-1);
+    expect(apisIndex).not.toBe(storageIndex);
+  });
+
+  it('renders no raw provider or implementation names in the Data & Storage surface', () => {
+    const tab = read('src/components/connections/DataStorageTab.tsx');
+    for (const forbidden of ['Supabase', 'supabase', 'S3', 'Snowflake', 'Databricks', 'BigQuery', 'ClickHouse', 'Redshift', 'gemini', 'openai']) {
+      expect(tab).not.toContain(forbidden);
+    }
+  });
+
   it('surfaces deployment evidence on /deploy and deep-links to Runtime History', () => {
     const deploy = read('src/pages/Deploy.tsx');
     expect(deploy).toContain('DeploymentEvidenceCard');

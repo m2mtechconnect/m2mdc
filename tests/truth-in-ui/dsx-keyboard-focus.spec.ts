@@ -159,7 +159,9 @@ for (const vp of VIEWPORTS) {
       const hasScope = await scope.isVisible().catch(() => false);
       test.skip(!hasScope, 'facility scope tree is not rendered at this viewport');
 
-      const trigger = '[data-testid^="dsx-scope-"]';
+      const triggerTestId = await scope.getAttribute('data-testid');
+      expect(triggerTestId, 'asset trigger must have a stable test id').toBeTruthy();
+      const trigger = `[data-testid="${triggerTestId}"]`;
       await keyboardFocus(page, trigger);
       await page.keyboard.press('Enter');
 

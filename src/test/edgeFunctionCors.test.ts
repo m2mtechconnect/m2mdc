@@ -59,6 +59,8 @@ describe('edge function CORS source guard', () => {
   });
 
   it('covers every Edge Function entrypoint', () => {
+    // Customer inventory/provisioning reuse guarded RPCs + teams-invite rather than
+    // adding ad-hoc Edge Function directories to the production perimeter.
     expect(functionEntrypoints()).toHaveLength(163);
   });
 

@@ -1,0 +1,9 @@
+apiVersion: v2
+name: aura-web
+description: AURA private-deployment web-shell scaffold. Requires an external compatible backend.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+annotations:
+  aura.m2mtechconnect.com/release-status: scaffold-not-release-qualified
+  aura.m2mtechconnect.com/scope: web-shell-only

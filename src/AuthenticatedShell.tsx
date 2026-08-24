@@ -52,6 +52,7 @@ const AccessControl = lazy(() => import("./pages/account/AccessControl"));
 const PeopleAccessLayout = lazy(() => import("./pages/people/PeopleAccessLayout"));
 const AdminConsoleLayout = lazy(() => import("./pages/admin/AdminConsoleLayout"));
 
+const Customers = lazy(() => import("./pages/admin/Customers"));
 const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
 const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
 const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
@@ -109,6 +110,7 @@ function ApprovedUserRoutes() {
         element={<AdminRouteGuard><PeopleAccessLayout><OnboardingSubmissions /></PeopleAccessLayout></AdminRouteGuard>}
       />
 
+      <Route path="/admin/customers" element={<AdminRouteGuard permission="platform.manage_customers"><AdminConsoleLayout><Customers /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/asset-preview" element={<AdminRouteGuard><AdminConsoleLayout><AssetPreview /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AdminConsoleLayout><AssetPipeline /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AdminConsoleLayout><AssetValidation /></AdminConsoleLayout></AdminRouteGuard>} />

@@ -219,6 +219,7 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
       const chain = ancestryFor(id);
       const building = chain.find((a) => a.asset_class === 'site') ?? null;
       const hall = chain.find((a) => a.asset_class === 'data_hall') ?? null;
+      if (options?.openDrawer !== false && context.inspector !== 'asset') rememberTrigger();
       writeContext({
         ...context,
         facility_id: identity?.facility_id ?? context.facility_id,
@@ -229,7 +230,6 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
         source_workspace: currentWorkspace,
         inspector: options?.openDrawer === false ? context.inspector : 'asset',
       });
-      if (options?.openDrawer !== false && context.inspector !== 'asset') rememberTrigger();
     },
     [context, writeContext, currentWorkspace, rememberTrigger],
   );

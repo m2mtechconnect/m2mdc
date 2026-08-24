@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-23T03:16:08.025Z",
+  "generated_at": "2026-08-24T07:35:00.000Z",
   "policy": "default-deny",
   "checkpoint": "B7.5",
   "notes": [
@@ -37,7 +37,9 @@
     "B7.5 promotion basis: only edge functions actually invoked from src/ (46 of 170) were considered. The 20 promoted functions are the subset that both appear in that call graph and satisfy the guard requirement above. Everything else stays unknown-blocked under default-deny. Not promoted: public-intake (anonymous intake, outside the perimeter), dsx-ingest (verify_jwt=false, remains signed-webhook), green-dc-recommend and generate-ai-recommendations (disabled), and every function whose handler declares authLevel 'public'.",
     "B7.5 route classification: rules 6 and 8 previously scanned only src/App.tsx, which now declares a single route, leaving the shipped router unenforced. The scan now also covers src/PublicAppRoutes.tsx and src/AuthenticatedShell.tsx. The 23 routes surfaced by that change are classified production_blocked_routes; promoting them is deferred to a separate checkpoint, so promoting a function here does not implicitly open its calling route.",
     "2026-08-23 post-publish hardening: promoted shipped authenticated product routes; aliases reconciled against src/config/routeAliases.ts; agent-stream promoted (createHandler authLevel:\"authenticated\" + shared CORS). Dev/debug/demo surfaces (/twin-debug, /digital-twins-demo/funding-intake, /admin/asset-*, /blueprint/preview, /simulation/preview) remain blocked.",
-    "alias_production_exceptions: \"/\" and \"/forgot-password\" are shipped public routes that additionally redirect authenticated sessions to /dashboard."
+    "alias_production_exceptions: \"/\" and \"/forgot-password\" are shipped public routes that additionally redirect authenticated sessions to /dashboard.",
+    "2026-08-24 enterprise remediation: /admin/customers is classified as a production platform-administration route. Cross-tenant inventory is served by platform_list_organizations(), a SECURITY DEFINER RPC that independently requires an approved profile plus a live global owner grant. Customer provisioning and owner-invite recovery reuse the existing guarded teams-invite function; no new Edge Function inventory entry is introduced.",
+    "2026-08-24 enterprise edge promotion: teams-invite is promoted through edge-function-promotions.json. The perimeter overlays only explicit production-allowlisted promotions onto the historical inventory, rejects malformed/unknown/duplicate promotions, and independently re-verifies the actual caller-identity plus scoped-CORS source guard and gateway JWT setting."
   ],
   "production_functions": [
     "agent-execute",
@@ -59,6 +61,7 @@
     "systems-create",
     "systems-delete",
     "systems-update",
+    "teams-invite",
     "website-cache-clear",
     "zapier-auto-refresh"
   ],
@@ -66,6 +69,7 @@
     "/",
     "/account/profile",
     "/account/settings",
+    "/admin/customers",
     "/admin/dataset-registry",
     "/admin/dsx-capabilities",
     "/admin/platform-readiness",

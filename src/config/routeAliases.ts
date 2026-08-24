@@ -14,8 +14,8 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/omniverse-scene', to: '/twin-preview' },
 
   { from: '/admin', to: '/admin/platform-readiness' },
-  { from: '/admin/signups-dashboard', to: '/teams' },
-  { from: '/admin/user-approvals', to: '/teams' },
+  { from: '/admin/signups-dashboard', to: '/teams/access-control' },
+  { from: '/admin/user-approvals', to: '/teams/access-control' },
   { from: '/admin/onboarding-submissions', to: '/teams/onboarding' },
   { from: '/account/access-control', to: '/teams/access-control' },
 

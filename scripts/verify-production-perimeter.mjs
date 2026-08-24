@@ -8,13 +8,13 @@
  *   1. An edge-function directory in supabase/functions/ has no disposition
  *      in evidence/pr-0.1/edge-function-inventory.json.
  *   2. A function is production-allowlisted in route-allowlist.json but
- *      not marked "production-allowlisted" in the inventory.
+ *      is not effectively marked "production-allowlisted" by the historical
+ *      inventory plus an explicit edge-function-promotions.json entry.
  *   3. A function is production-allowlisted but does NOT demonstrate an
  *      in-code authorization guard: either it routes through
  *      _shared/handler.ts with an explicit non-public `authLevel`, or it
  *      imports _shared/callerIdentity.ts / _shared/adminAuthorization.ts
  *      together with the scoped _shared/cors.ts allowlist.
-
  *   4. Any client-side source references VITE_LOVABLE_API_KEY.
  *   5. supabase/config.toml sets verify_jwt = false without an explicitly
  *      approved signed-webhook classification.
@@ -31,6 +31,7 @@ const failures = [];
 function fail(msg) { failures.push(msg); }
 
 const inventoryPath = join(REPO, 'docs/remediation/evidence/pr-0.1/edge-function-inventory.json');
+const promotionPath = join(REPO, 'docs/remediation/evidence/pr-0.1/edge-function-promotions.json');
 const allowlistPath = join(REPO, 'docs/remediation/evidence/pr-0.1/route-allowlist.json');
 
 if (!existsSync(inventoryPath) || !existsSync(allowlistPath)) {
@@ -38,9 +39,46 @@ if (!existsSync(inventoryPath) || !existsSync(allowlistPath)) {
   process.exit(1);
 }
 
-const inventory = JSON.parse(readFileSync(inventoryPath, 'utf8'));
+const inventory = JSON.parse(readFileSync(inventoryPath, 'utf8')).map((entry) => ({ ...entry }));
 const allowlist = JSON.parse(readFileSync(allowlistPath, 'utf8'));
 const invByName = new Map(inventory.map((e) => [e.function, e]));
+
+// Additive promotion ledgers preserve the immutable/historical inventory while
+// allowing a later, reviewed checkpoint to promote a previously blocked entry.
+// The ledger can only promote an already inventoried function, and rule 3 below
+// still re-verifies the actual source guard so metadata can never bypass auth.
+if (existsSync(promotionPath)) {
+  let promotionDoc;
+  try {
+    promotionDoc = JSON.parse(readFileSync(promotionPath, 'utf8'));
+  } catch (error) {
+    fail(`promotion ledger: invalid JSON (${error instanceof Error ? error.message : String(error)})`);
+  }
+  const promotions = Array.isArray(promotionDoc?.promotions) ? promotionDoc.promotions : [];
+  const seenPromotions = new Set();
+  for (const promotion of promotions) {
+    if (!promotion || typeof promotion.function !== 'string' || !promotion.function.trim()) {
+      fail('promotion ledger: invalid promotion entry');
+      continue;
+    }
+    const name = promotion.function.trim();
+    if (seenPromotions.has(name)) {
+      fail(`promotion ledger: duplicate promotion for ${name}`);
+      continue;
+    }
+    seenPromotions.add(name);
+    if (promotion.production_disposition !== 'production-allowlisted') {
+      fail(`promotion ledger/${name}: only production-allowlisted promotions are accepted`);
+      continue;
+    }
+    const current = invByName.get(name);
+    if (!current) {
+      fail(`promotion ledger references unknown function: ${name}`);
+      continue;
+    }
+    Object.assign(current, promotion, { function: name });
+  }
+}
 
 const VALID_DISPOSITIONS = new Set([
   'production-allowlisted',
@@ -63,7 +101,7 @@ for (const name of fnDirs) {
   }
 }
 
-// 2. allowlisted functions must match inventory disposition.
+// 2. allowlisted functions must match effective inventory disposition.
 for (const name of allowlist.production_functions) {
   const entry = invByName.get(name);
   if (!entry) fail(`allowlist references unknown function: ${name}`);
@@ -110,7 +148,6 @@ for (const name of allowlist.production_functions) {
     }
   }
 }
-
 
 // 4. no client-side VITE_LOVABLE_API_KEY.
 function walk(dir) {
@@ -277,11 +314,9 @@ if (existsSync(workflowDir)) {
 }
 
 // 8. NEG-A — every absolute <Route path="..."> declared in the shipped
-// router files must be
-// classified in the route-allowlist as exactly one of: production_routes,
-// production_blocked_routes, development_only_routes, redirect_only_routes,
-// or match a forbidden_production_routes pattern. DEV-gated routes are
-// exempt.
+// router files must be classified in the route-allowlist as exactly one of:
+// production_routes, production_blocked_routes, development_only_routes,
+// redirect_only_routes, or match a forbidden_production_routes pattern.
 {
   const prod       = new Set(allowlist.production_routes || []);
   const blocked    = new Set(allowlist.production_blocked_routes || []);
@@ -289,10 +324,8 @@ if (existsSync(workflowDir)) {
   const redirect   = new Set(allowlist.redirect_only_routes || []);
   const forbidden  = allowlist.forbidden_production_routes || [];
   const forbiddenRe = forbidden.map((p) => new RegExp('^' + p.replace(/\*/g, '.*') + '$'));
-  const pathRe = /<Route[^>]*path=["']([^"']+)["']/g;
   const lines = appSrc.split('\n');
   const seen = new Set();
-  let m;
   const pathAndDev = /<Route[^>]*path=["']([^"']+)["']/;
   for (const line of lines) {
     const lm = pathAndDev.exec(line);
@@ -364,8 +397,6 @@ if (existsSync(workflowDir)) {
     }
   }
 }
-
-
 
 if (failures.length) {
   console.error('PR-0.1 production-perimeter enforcement FAILED:');

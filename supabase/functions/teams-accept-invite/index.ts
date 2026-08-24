@@ -2,24 +2,24 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
 
-// Scoped CORS headers for this invocation. Module-level helpers below render
-// responses, so the resolved headers are held here and refreshed per request.
-let corsHeaders = getCorsHeaders(null);
-
-
-// An invite may only ever confer a non-privileged role. Kept in sync with
-// teams-invite so a stale row can never escalate on acceptance.
+// Kept in sync with the org membership role constraint. Owner is accepted here
+// only because the platform provisioner issues the first customer-owner invite;
+// ordinary teams-invite calls never mint owner.
 const INVITABLE_ROLES = new Set([
+  'owner',
+  'admin',
   'viewer',
   'operator',
   'engineer',
   'manager',
   'executive',
+  'security_admin',
   'compliance',
   'data_analyst',
   'support',
 ]);
 
+let corsHeaders = getCorsHeaders(null);
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -41,13 +41,16 @@ serve(async (req) => {
       { global: { headers: { Authorization: authHeader || '' } } },
     );
 
-    const { data: { user } } = await authClient.auth.getUser();
-    if (!user) return json({ error: 'Unauthorized', stage: 'authentication' }, 401);
+    const { data: { user }, error: authError } = await authClient.auth.getUser();
+    if (authError || !user) return json({ error: 'Unauthorized', stage: 'authentication' }, 401);
 
     const body = await req.json().catch(() => ({}));
     const token = typeof body?.token === 'string' ? body.token.trim() : '';
     if (!token) return json({ error: 'An invite token is required', stage: 'validation' }, 400);
 
+    // The recipient is authenticated before the privileged client is created.
+    // The service client is then used only to resolve the opaque invite token
+    // and execute the service-role-only transactional acceptance RPC.
     const serviceClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
@@ -55,12 +58,11 @@ serve(async (req) => {
 
     const { data: invite, error: inviteError } = await serviceClient
       .from('team_invites')
-      .select('id, email, role, status, invited_by, expires_at')
+      .select('id, email, role, status, invited_by, org_id, expires_at')
       .eq('token', token)
       .maybeSingle();
 
     if (inviteError) throw inviteError;
-    // Do not distinguish "no such token" from "not yours": both are just invalid.
     if (!invite) return json({ error: 'This invite is not valid', stage: 'lookup' }, 404);
 
     if (invite.status !== 'pending') {
@@ -72,8 +74,10 @@ serve(async (req) => {
       return json({ error: 'This invite has expired', stage: 'state' }, 410);
     }
 
-    // Recipient identity comes from the signed JWT claim, never from a
-    // client-supplied or user-editable email mirror.
+    if (!invite.org_id) {
+      return json({ error: 'This legacy invite is not organization-bound', stage: 'organization' }, 409);
+    }
+
     const claimEmail = String(user.email ?? '').trim().toLowerCase();
     if (!claimEmail || claimEmail !== String(invite.email).trim().toLowerCase()) {
       return json({ error: 'This invite was issued to a different account', stage: 'authorization' }, 403);
@@ -83,30 +87,19 @@ serve(async (req) => {
       return json({ error: 'That role cannot be granted through an invite', stage: 'authorization' }, 403);
     }
 
-    const { error: grantError } = await serviceClient
-      .from('user_roles')
-      .upsert(
-        {
-          user_id: user.id,
-          role: invite.role,
-          scope: 'global',
-          granted_by: invite.invited_by,
-          granted_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,role,scope' },
-      );
+    const { data: orgId, error: acceptError } = await serviceClient.rpc('accept_org_invite', {
+      _invite_id: invite.id,
+      _user_id: user.id,
+    });
 
-    if (grantError) throw grantError;
+    if (acceptError) throw acceptError;
 
-    const { error: consumeError } = await serviceClient
-      .from('team_invites')
-      .update({ status: 'accepted' })
-      .eq('id', invite.id)
-      .eq('status', 'pending');
-
-    if (consumeError) throw consumeError;
-
-    return json({ success: true, role: invite.role, redirectTo: '/teams' });
+    return json({
+      success: true,
+      role: invite.role,
+      organizationId: orgId,
+      redirectTo: '/dashboard',
+    });
   } catch (error) {
     console.error('Team invite acceptance error:', error);
     return json({

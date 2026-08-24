@@ -69,3 +69,13 @@ verify_jwt = true
 
 [functions.ops-systems]
 verify_jwt = true
+
+# Enterprise onboarding boundary. Customer provisioning, owner-invite recovery
+# and tenant member invitations share one guarded function. Customer inventory
+# is now a SECURITY DEFINER RPC with its own approval + global-owner checks, so
+# no extra Edge Function inventory surface is introduced.
+[functions.teams-invite]
+verify_jwt = true
+
+[functions.teams-accept-invite]
+verify_jwt = true

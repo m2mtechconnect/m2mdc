@@ -1,7 +1,6 @@
 /**
- * DC Builder Step 5: Deployment
- * Includes Financial Assumptions section for customer editing
- * P0 Fix: Now persists twin to database on deploy
+ * DC Builder Step 5: Review and activate the twin record.
+ * Infrastructure provisioning is intentionally separate from this action.
  */
 
 import { useState } from 'react';
@@ -18,9 +17,9 @@ import { Progress } from '@/components/ui/progress';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { 
-  Rocket, MapPin, CheckCircle2, XCircle, Clock, 
-  Activity, Download, AlertTriangle, ChevronDown, Loader2 
+import {
+  Rocket, MapPin, CheckCircle2, XCircle, Clock,
+  Activity, Download, AlertTriangle, ChevronDown, Loader2
 } from 'lucide-react';
 
 const STATUS_ICONS: Record<string, React.ReactNode> = {
@@ -31,11 +30,11 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 export function DCStep5Deploy() {
   const navigate = useNavigate();
-  const { 
-    deployment, 
-    setTargetRegion, 
-    getReadinessScore, 
-    isReadyForDeployment, 
+  const {
+    deployment,
+    setTargetRegion,
+    getReadinessScore,
+    isReadyForDeployment,
     getBlueprintJSON,
     updateOverview,
     updateDeployment,
@@ -65,21 +64,18 @@ export function DCStep5Deploy() {
 
   const handleDeploy = async () => {
     if (!canDeploy) {
-      toast.error('Please complete all required configuration before deploying');
+      toast.error('Please complete all required configuration before activating the twin');
       return;
     }
 
     setIsDeploying(true);
     try {
-      // P0 Fix: Persist twin to database
       const builderState = useDCTwinBuilderStore.getState();
       const existingTwinId = builderState.overview.deployedTwinId;
-      
       const twinId = await saveTwinToDatabase(builderState, existingTwinId);
-      
+
       if (twinId) {
-        // Update store with deployed twin ID
-        updateOverview({ 
+        updateOverview({
           deployedTwinId: twinId,
           updatedAt: new Date().toISOString(),
         });
@@ -87,19 +83,18 @@ export function DCStep5Deploy() {
           deployedTwinId: twinId,
           deployedAt: new Date().toISOString(),
         });
-        
-        toast.success('Data Centre Twin deployed successfully!');
-        
-        // Navigate to the twin dashboard
+
+        toast.success('Data Centre Twin activated successfully');
+
         setTimeout(() => {
           navigate(`/data-centre-twin?twinId=${twinId}`);
         }, 1000);
       } else {
-        toast.error('The twin could not be saved. No deployment record was created. Please try again.');
+        toast.error('The twin could not be saved. No activation record was created. Please try again.');
       }
     } catch (error) {
-      console.error('Deploy error:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to deploy twin');
+      console.error('Twin activation error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to activate twin');
     } finally {
       setIsDeploying(false);
     }
@@ -108,18 +103,17 @@ export function DCStep5Deploy() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h2 className="text-xl font-semibold">Review & Deploy</h2>
+        <h2 className="text-xl font-semibold">Review &amp; Activate</h2>
         <p className="text-sm text-muted-foreground">
-          Finalize your twin configuration and deploy to your chosen region.
+          Finalize the twin configuration, record the preferred data region, and activate the twin. This action does not provision cloud infrastructure.
         </p>
       </div>
 
-      {/* Readiness Score */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-primary" />
-            Deployment Readiness
+            Twin Readiness
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -130,7 +124,7 @@ export function DCStep5Deploy() {
             </span>
           </div>
           <Progress value={readinessScore} className="h-3" />
-          
+
           {failedChecks.length > 0 && (
             <div className="rounded-lg bg-warning/10 p-3 space-y-2">
               <div className="flex items-center gap-2 text-warning">
@@ -149,28 +143,27 @@ export function DCStep5Deploy() {
         </CardContent>
       </Card>
 
-      {/* Target Region */}
       <Card data-tour="blueprint-deploy">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-primary" />
-            Deployment Region
+            Twin Data Region
           </CardTitle>
           <CardDescription>
-            Choose where your twin will be deployed
+            Select the preferred region metadata for this twin. Infrastructure placement is configured separately.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <RadioGroup 
-            value={deployment.targetDeploymentRegion} 
-            onValueChange={setTargetRegion} 
+          <RadioGroup
+            value={deployment.targetDeploymentRegion}
+            onValueChange={setTargetRegion}
             className="grid gap-3 md:grid-cols-2"
           >
             {deployment.cloudRegions.map((region) => (
               <div key={region.regionCode} className="flex items-center space-x-2">
                 <RadioGroupItem value={region.regionCode} id={region.regionCode} />
-                <Label 
-                  htmlFor={region.regionCode} 
+                <Label
+                  htmlFor={region.regionCode}
                   className="flex flex-1 items-center justify-between cursor-pointer rounded-lg border p-3 hover:bg-muted/50"
                 >
                   <div>
@@ -179,7 +172,7 @@ export function DCStep5Deploy() {
                       {region.provider} • {region.regionCode}
                     </div>
                   </div>
-                  <Badge variant="default">Sovereign</Badge>
+                  <Badge variant="outline">Region preference</Badge>
                 </Label>
               </div>
             ))}
@@ -187,17 +180,15 @@ export function DCStep5Deploy() {
         </CardContent>
       </Card>
 
-      {/* Financial Assumptions - Customer-editable */}
       <FinancialAssumptionsCard />
 
-      {/* Deployment Checks - Collapsed by default in Quick Edit */}
       <Card>
         <Collapsible open={isArchitectMode || showAllChecks}>
           <CardHeader className="cursor-pointer" onClick={() => setShowAllChecks(!showAllChecks)}>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-primary" />
-                Deployment Checks
+                Activation Checks
                 <Badge variant="outline" className="ml-2">
                   {passedChecks}/{deployment.deploymentChecks.length} passed
                 </Badge>
@@ -212,8 +203,8 @@ export function DCStep5Deploy() {
           <CollapsibleContent>
             <CardContent className="space-y-2 pt-0">
               {deployment.deploymentChecks.map((check) => (
-                <div 
-                  key={check.id} 
+                <div
+                  key={check.id}
                   className="flex items-center justify-between rounded-lg border p-3"
                 >
                   <div className="flex items-center gap-3">
@@ -228,7 +219,6 @@ export function DCStep5Deploy() {
         </Collapsible>
       </Card>
 
-      {/* Actions */}
       <div className="flex flex-col gap-3 sm:flex-row">
         {isArchitectMode && (
           <Button variant="outline" onClick={handleDownloadBlueprint} className="flex-1">
@@ -236,8 +226,8 @@ export function DCStep5Deploy() {
             Download Blueprint JSON
           </Button>
         )}
-        <Button 
-          disabled={!canDeploy || isDeploying || isSaving} 
+        <Button
+          disabled={!canDeploy || isDeploying || isSaving}
           onClick={handleDeploy}
           className="flex-1"
         >
@@ -246,7 +236,7 @@ export function DCStep5Deploy() {
           ) : (
             <Rocket className="h-4 w-4 mr-2" />
           )}
-          {isDeploying ? 'Deploying...' : 'Deploy Twin'}
+          {isDeploying ? 'Activating...' : 'Save & Activate Twin'}
         </Button>
       </div>
 
@@ -254,7 +244,7 @@ export function DCStep5Deploy() {
         <div className="flex items-center gap-2 rounded-lg bg-warning/10 p-3 text-warning">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">
-            Readiness score must be at least 70% to deploy. Review the checks above.
+            Readiness score must be at least 70% to activate the twin. Review the checks above.
           </span>
         </div>
       )}

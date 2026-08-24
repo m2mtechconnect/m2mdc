@@ -1,92 +1,55 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Account Profile & Teams Integration', () => {
-  test('should maintain data consistency between Profile and Teams pages', async ({ page }) => {
-    // First, go to Profile and get user data
+const LIVE_QA = process.env.QA_AUTH_BOOTSTRAP === '1';
+
+test.describe('Account Profile & Governance Integration', () => {
+  test.skip(!LIVE_QA, 'Requires the disposable authenticated QA backend');
+
+  test('profile identity is backed by the same persisted user used by Access Control', async ({ page }) => {
     await page.goto('/account/profile');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    const nameInput = page.locator('input[id="full_name"]');
-    const emailInput = page.locator('input[id="email"]');
-    
-    let profileName = '';
-    let profileEmail = '';
-    
-    if (await nameInput.isVisible()) {
-      profileName = await nameInput.inputValue();
-    }
-    
-    if (await emailInput.isVisible()) {
-      profileEmail = await emailInput.inputValue();
-    }
-    
-    // Navigate to Teams page
-    await page.goto('/teams');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    // Verify the same data appears in Teams list
-    if (profileEmail) {
-      const emailInTeams = page.locator(`text=${profileEmail}`);
-      await expect(emailInTeams).toBeVisible({ timeout: 5000 });
-    }
-    
-    if (profileName) {
-      const nameInTeams = page.locator(`text=${profileName}`);
-      await expect(nameInTeams).toBeVisible({ timeout: 5000 });
-    }
+    await expect(page.locator('h1:has-text("Profile")').first()).toBeVisible({ timeout: 15_000 });
+
+    const nameInput = page.locator('input#full_name');
+    const emailInput = page.locator('input#email');
+    await expect(nameInput).toBeVisible();
+    await expect(emailInput).toBeVisible();
+
+    const profileName = await nameInput.inputValue();
+    const profileEmail = await emailInput.inputValue();
+    expect(profileName.trim()).not.toBe('');
+    expect(profileEmail).toMatch(/@/);
+
+    await page.goto('/teams/access-control');
+    await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: /Access control/i })).toBeVisible();
+
+    const roleRow = page.getByRole('row').filter({ hasText: profileEmail });
+    await expect(roleRow).toBeVisible({ timeout: 15_000 });
+    await expect(roleRow).toContainText(profileName);
+    await expect(roleRow).toContainText(/admin/i);
   });
 
-  test('should reflect Profile updates in Teams list', async ({ page }) => {
-    const testName = `Test User ${Date.now()}`;
-    
-    // Update profile
-    await page.goto('/account/profile');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    const nameInput = page.locator('input[id="full_name"]');
-    if (await nameInput.isVisible()) {
-      await nameInput.clear();
-      await nameInput.fill(testName);
-      
-      // Save changes
-      await page.click('button:has-text("Save Changes")');
-      await page.waitForTimeout(1000);
-    }
-    
-    // Navigate to Teams and verify update
-    await page.goto('/teams');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    // Look for the updated name in Teams list
-    const updatedNameInTeams = page.locator(`text=${testName}`);
-    await expect(updatedNameInTeams).toBeVisible({ timeout: 5000 });
-  });
+  test('profile update persists after reload and propagates to the governance roster', async ({ page }) => {
+    const testName = `AURA QA Profile ${Date.now()}`;
 
-  test('should show consistent role information across Profile and Teams', async ({ page }) => {
-    // Get role from Profile page
     await page.goto('/account/profile');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    const roleSection = page.locator('text=Role & Department').locator('..');
-    let profileRole = '';
-    
-    if (await roleSection.isVisible()) {
-      const roleText = await roleSection.textContent();
-      profileRole = roleText || '';
-    }
-    
-    // Navigate to Teams and verify role consistency
-    await page.goto('/teams');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    // Role should be visible in Teams list
-    // Test passes if pages load - specific role matching depends on user
-    expect(true).toBe(true);
+    const nameInput = page.locator('input#full_name');
+    const emailInput = page.locator('input#email');
+    await expect(nameInput).toBeVisible({ timeout: 15_000 });
+    await expect(emailInput).toBeVisible();
+    const profileEmail = await emailInput.inputValue();
+
+    await nameInput.fill(testName);
+    await page.getByRole('button', { name: /Save Changes/i }).click();
+    await expect(page.getByText('Profile updated successfully', { exact: true })).toBeVisible({ timeout: 10_000 });
+
+    await page.reload();
+    await expect(page.locator('input#full_name')).toHaveValue(testName, { timeout: 15_000 });
+
+    await page.goto('/teams/access-control');
+    await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
+    const roleRow = page.getByRole('row').filter({ hasText: profileEmail });
+    await expect(roleRow).toBeVisible({ timeout: 15_000 });
+    await expect(roleRow).toContainText(testName);
   });
 });

@@ -1,6 +1,7 @@
 import { chmod } from 'node:fs/promises';
 import { chromium, firefox, webkit, expect, type FullConfig } from '@playwright/test';
 import {
+  createTestServiceSupabaseClient,
   getBrowserTestSession,
   resolveTestUserCredentials,
 } from './helpers/testSupabaseClient';
@@ -18,6 +19,59 @@ async function launchConfiguredBrowser(browserName: string) {
       return webkit.launch();
     default:
       throw new Error('QA browser bootstrap rejected: unsupported or missing browser');
+  }
+}
+
+/**
+ * The broad legacy E2E corpus historically assumed one authenticated user could
+ * exercise both platform-admin and tenant-scoped surfaces. Enterprise tenancy
+ * correctly separated those authority planes, so the QA fixture must now grant
+ * both explicitly instead of relying on a platform role to imply membership.
+ *
+ * Dedicated persona tests create their own platform-only, tenant-only, viewer,
+ * pending and pilot identities and therefore continue to prove the negative
+ * authorization boundaries independently.
+ */
+async function ensureLegacyQaTenantContext(userId: string) {
+  const admin = createTestServiceSupabaseClient();
+  const suffix = userId.replace(/-/g, '').slice(0, 16);
+  const { data: organization, error: organizationError } = await admin
+    .from('organizations')
+    .insert({
+      name: `AURA QA Tenant ${suffix}`,
+      domain: `qa-${suffix}.example.invalid`,
+      industry: 'QA',
+    })
+    .select('id')
+    .single();
+
+  if (organizationError || !organization?.id) {
+    throw organizationError ?? new Error('QA tenant fixture organization was not created');
+  }
+
+  const { error: membershipError } = await admin.from('org_memberships').insert({
+    org_id: organization.id,
+    user_id: userId,
+    role: 'owner',
+    status: 'active',
+    is_default: true,
+    granted_by: userId,
+  });
+  if (membershipError) throw membershipError;
+
+  const { data: profile, error: profileError } = await admin
+    .from('profiles')
+    .update({
+      is_approved: true,
+      org_id: organization.id,
+      last_active_org_id: organization.id,
+    })
+    .eq('user_id', userId)
+    .select('user_id')
+    .single();
+
+  if (profileError || profile?.user_id !== userId) {
+    throw profileError ?? new Error('QA tenant fixture profile bridge was not established');
   }
 }
 
@@ -41,6 +95,11 @@ export default async function globalAuthSetup(config: FullConfig) {
     throw new Error('QA browser bootstrap rejected: TEST_USER_ID is not configured');
   }
 
+  // The workflow separately grants this identity a global platform-admin role.
+  // Add an explicit disposable tenant membership for legacy tenant-scoped suites;
+  // never infer tenant authority from the platform role itself.
+  await ensureLegacyQaTenantContext(expectedUserId);
+
   const credentials = resolveTestUserCredentials();
   const project = config.projects.find(({ name }) => name === browserName);
   const configuredBaseURL = project?.use?.baseURL;
@@ -53,6 +112,22 @@ export default async function globalAuthSetup(config: FullConfig) {
   try {
     const context = await browser.newContext({ baseURL });
     try {
+      // Guided tours are user onboarding, not part of the legacy functional
+      // corpus. Seed their normal persisted state before the first document so
+      // they cannot intercept unrelated controls while preserving tour coverage
+      // in dedicated tests and preserving the production behavior for real users.
+      await context.addInitScript(() => {
+        window.localStorage.setItem(
+          'm2m_tour_state_v1',
+          JSON.stringify({
+            studioIntro: { seen: true },
+            overview: { seen: true },
+            simulation: { seen: true },
+            blueprint: { seen: true },
+          }),
+        );
+      });
+
       const page = await context.newPage();
       await page.goto(QA_LOGIN_ROUTE);
       await expect(page.getByLabel('Email Address', { exact: true })).toBeVisible({ timeout: 10_000 });

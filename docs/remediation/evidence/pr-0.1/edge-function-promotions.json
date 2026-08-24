@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-24T07:25:00.000Z",
+  "policy": "explicit-promotion-only",
+  "promotions": [
+    {
+      "function": "teams-invite",
+      "production_disposition": "production-allowlisted",
+      "consumer_files": [
+        "src/pages/people/TenantPeopleAccess.tsx",
+        "src/pages/admin/Customers.tsx",
+        "src/components/teams/InviteTeamMemberModal.tsx"
+      ],
+      "consumer_count": 3,
+      "verify_jwt_gateway": true,
+      "local_getUser_or_getClaims": true,
+      "uses_shared_auth_helper": true,
+      "checks_role_or_admin": true,
+      "checks_is_approved": true,
+      "webhook_signature_verification": false,
+      "uses_service_role_key": true,
+      "evidence": "Enterprise integration: requireCaller authenticates through the shared caller-identity boundary; scoped _shared/cors.ts is imported; approved-profile checks precede service-role construction; tenant invitations require active owner/admin/security_admin membership and platform provisioning/reissue requires a live global owner grant. Production Perimeter rule 3 independently re-verifies the in-code guard."
+    }
+  ]
+}

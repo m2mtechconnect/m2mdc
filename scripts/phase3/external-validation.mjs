@@ -294,13 +294,28 @@ async function httpBoundary() {
   }
   record('synthetic identity provisioning', 'PASS', 'tenantA + tenantB real GoTrue sessions (tokens redacted)');
 
-  // Each tenant owns a twin, created with the service role (test fixture setup).
+  // Each disposable identity gets a durable organization membership and an
+  // explicitly tenant-owned twin. Fixture setup runs through the privileged DB
+  // connection, so the production stamp trigger correctly requires org_id.
+  const organization = {};
   const twin = {};
   for (const t of Object.values(tenants)) {
+    organization[t.label] = scalar(
+      `WITH org AS (` +
+        `INSERT INTO public.organizations (name) VALUES ('Validation ${t.label}') RETURNING id` +
+      `), membership AS (` +
+        `INSERT INTO public.org_memberships (org_id, user_id, role, status, is_default) ` +
+        `SELECT id, '${t.id}', 'owner', 'active', true FROM org RETURNING org_id` +
+      `), profile AS (` +
+        `UPDATE public.profiles SET org_id=(SELECT org_id FROM membership), ` +
+        `last_active_org_id=(SELECT org_id FROM membership), updated_at=now() ` +
+        `WHERE user_id='${t.id}' RETURNING user_id` +
+      `) SELECT org_id FROM membership`,
+    );
     twin[t.label] = scalar(
       `WITH inserted AS (` +
-        `INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user) ` +
-        `VALUES ('validation-${t.label}', 'Validation City', 'validation-${t.label}', '${t.id}') ` +
+        `INSERT INTO public.data_centre_twins (name, city, region_code, created_by_user, org_id) ` +
+        `VALUES ('validation-${t.label}', 'Validation City', 'validation-${t.label}', '${t.id}', '${organization[t.label]}') ` +
         `RETURNING id` +
       `) SELECT id FROM inserted`,
     );

@@ -50,6 +50,7 @@ const PUBLIC_PATHS = new Set([
   '/onboarding',
   '/oauth/managed-user/return',
   '/invite/accept',
+  ...(import.meta.env.DEV ? ['/dev-overlays'] : []),
 ]);
 
 function RouteEntry() {

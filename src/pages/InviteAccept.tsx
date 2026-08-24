@@ -4,7 +4,7 @@
  * The token is redeemed server-side by the `teams-accept-invite` function,
  * which verifies the signed JWT email against the invite recipient before
  * granting the role. This page only reports the outcome and routes the user
- * onward to the team page.
+ * onward to the server-selected safe destination.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -15,8 +15,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 type State =
   | { status: 'working' }
-  | { status: 'accepted'; role: string }
+  | { status: 'accepted'; role: string; redirectTo: string }
   | { status: 'error'; message: string };
+
+function safeDestination(value: unknown): string {
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) return '/dashboard';
+  return value;
+}
 
 export default function InviteAccept() {
   const [searchParams] = useSearchParams();
@@ -46,21 +51,26 @@ export default function InviteAccept() {
         setState({ status: 'error', message: String(data.error) });
         return;
       }
-      setState({ status: 'accepted', role: String(data?.role ?? 'member') });
+      setState({
+        status: 'accepted',
+        role: String(data?.role ?? 'member'),
+        redirectTo: safeDestination(data?.redirectTo),
+      });
     })();
   }, [token]);
 
-  // A granted role changes the authenticated shell the user is entitled to, so
-  // the handoff is a full document load rather than a client-side navigation.
-  const goToTeams = useCallback(() => {
-    window.location.assign('/teams');
-  }, []);
+  // A granted tenant role changes the authenticated shell and RLS context, so
+  // the handoff is a full document load rather than client-side navigation.
+  const continueToApp = useCallback(() => {
+    if (state.status !== 'accepted') return;
+    window.location.assign(state.redirectTo);
+  }, [state]);
 
   useEffect(() => {
     if (state.status !== 'accepted') return;
-    const timer = window.setTimeout(goToTeams, 1200);
+    const timer = window.setTimeout(continueToApp, 1200);
     return () => window.clearTimeout(timer);
-  }, [state.status, goToTeams]);
+  }, [state.status, continueToApp]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
@@ -76,13 +86,13 @@ export default function InviteAccept() {
           </CardTitle>
           <CardDescription>
             {state.status === 'working' && 'Verifying the invite token against your account.'}
-            {state.status === 'accepted' && `You now hold the ${state.role} role. Taking you to your team.`}
+            {state.status === 'accepted' && `You now hold the ${state.role} role. Taking you into AURA.`}
             {state.status === 'error' && state.message}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex gap-2">
           {state.status === 'accepted' && (
-            <Button onClick={goToTeams}>Go to team</Button>
+            <Button onClick={continueToApp}>Continue</Button>
           )}
           {state.status === 'error' && (
             <Button variant="outline" asChild>

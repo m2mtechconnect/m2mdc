@@ -2437,6 +2437,7 @@ export type Database = {
           location_id: string | null
           metadata: Json | null
           name: string
+          org_id: string | null
           pue_target: number | null
           region_code: string
           renewable_target_pct: number | null
@@ -2457,6 +2458,7 @@ export type Database = {
           location_id?: string | null
           metadata?: Json | null
           name: string
+          org_id?: string | null
           pue_target?: number | null
           region_code: string
           renewable_target_pct?: number | null
@@ -2477,6 +2479,7 @@ export type Database = {
           location_id?: string | null
           metadata?: Json | null
           name?: string
+          org_id?: string | null
           pue_target?: number | null
           region_code?: string
           renewable_target_pct?: number | null
@@ -2497,6 +2500,13 @@ export type Database = {
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "data_centre_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "data_centre_twins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -2946,6 +2956,7 @@ export type Database = {
           description: string | null
           id: string
           name: string
+          org_id: string | null
           slug: string
           status: string | null
           updated_at: string
@@ -2957,6 +2968,7 @@ export type Database = {
           description?: string | null
           id?: string
           name: string
+          org_id?: string | null
           slug: string
           status?: string | null
           updated_at?: string
@@ -2968,12 +2980,21 @@ export type Database = {
           description?: string | null
           id?: string
           name?: string
+          org_id?: string | null
           slug?: string
           status?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "digital_twins_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_analysis_jobs: {
         Row: {
@@ -5766,6 +5787,7 @@ export type Database = {
           id: string
           incident_scenarios: Json | null
           name: string
+          org_id: string | null
           owner_id: string
           region: string
           updated_at: string | null
@@ -5783,6 +5805,7 @@ export type Database = {
           id?: string
           incident_scenarios?: Json | null
           name: string
+          org_id?: string | null
           owner_id: string
           region: string
           updated_at?: string | null
@@ -5800,11 +5823,20 @@ export type Database = {
           id?: string
           incident_scenarios?: Json | null
           name?: string
+          org_id?: string | null
           owner_id?: string
           region?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sovereign_dc_facilities_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sovereign_dc_simulation_runs: {
         Row: {

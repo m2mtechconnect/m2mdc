@@ -2,16 +2,17 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "5ac5096de1fa5e6914d495f570a450f58fa00e51",
-    "workflowRunId": 32699243950,
-    "artifactId": 9509945307,
-    "artifactZipSha256": "60d253edf090a130aba2bd48cb391383c48058246df9da40041a3f40c9091b9f"
+    "sha": "96c474be47012020b18dd9570a06b4fcce24a07b",
+    "workflowRunId": 32702287346,
+    "artifactId": 9510981142,
+    "artifactZipSha256": "c3a0810df5ba096a6e0fe787b67c21c18cb4234f9282a8575fe41ae4aa9645a1"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
     "Fingerprints were derived from the exact-head visual artifact after route, build, responsive-containment and UI hierarchy review.",
-    "The enterprise integration baseline promotes only the seven current-head drifts reviewed as intentional; Analytics, Compliance and Teams remain byte-identical to the prior approved baseline.",
+    "For source 96c474be47012020b18dd9570a06b4fcce24a07b, 10 of 11 surfaces remained byte-identical to the prior approved enterprise baseline.",
+    "The sole promoted drift is teams-light: /teams intentionally resolves to the Platform Access control workspace after the enterprise routing remediation; the exact-head artifact was human-reviewed before this fingerprint update.",
     "Builder mobile remains contained at 375px with no horizontal viewport overflow; its height increase reflects intentional content/layout growth.",
     "Dashboard mobile remains complete through the footer at 375px; its reduced height reflects intentional hierarchy changes rather than clipping."
   ],
@@ -26,6 +27,6 @@
     {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"cacd56e140905844977a8276ce372d2ebc9a6fca29b0d25051dfe17b791d8a15","width":1280,"height":720},
     {"file":"dashboard-mobile-chromium-linux.png","mode":"sha256","sha256":"13459b2ff95839fcfef76d27b689f6a3bb0ae7076224a6bbc7e5b1dc8c65e3dc","width":375,"height":1911},
     {"file":"integrations-light-chromium-linux.png","mode":"sha256","sha256":"72ec423b758be560a7f90824ead24b0029f69eb37dd0260725c2c6c0c03bec33","width":1280,"height":720},
-    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"634db33af5d1c6d66490451c3c9e0e8258782d65996e3a65d884a403a0148dee","width":1280,"height":720}
+    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"14774a76b75ca75946bc11fb4acb315d244c21c8f9d464d40d15d9ddbcbd9a0e","width":1280,"height":720}
   ]
 }

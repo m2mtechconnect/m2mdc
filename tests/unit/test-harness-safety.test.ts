@@ -181,8 +181,8 @@ describe('test harness safety guards', () => {
     expect(replayOverlay).toContain(
       'DROP POLICY IF EXISTS "Admins can read twin asset source packages" ON storage.objects',
     );
-    expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user\)/g)).toHaveLength(2);
-    expect(validator).toContain('data_centre_twins (name, city, region_code, created_by_user)');
+    expect(matrix.match(/data_centre_twins \(name, city, region_code, created_by_user, org_id\)/g)).toHaveLength(2);
+    expect(validator).toContain('data_centre_twins (name, city, region_code, created_by_user, org_id)');
     expect(validator).toContain('WITH inserted AS (');
     expect(validator).toContain(') SELECT id FROM inserted');
     expect(matrix.match(/simulation_runs \(user_id, tenant_id, twin_id, scenario_key,/g)).toHaveLength(5);

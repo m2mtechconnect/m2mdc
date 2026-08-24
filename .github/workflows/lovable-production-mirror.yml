@@ -1,12 +1,14 @@
 name: Lovable Production Mirror
 
 # GitHub `main` is the authoritative production source. The existing Lovable
-# project is still bound to remediation/hybrid-stack-p0, so keep that ref as a
-# fast-forward-only compatibility mirror until the provider connection can be
-# repointed directly to main.
+# project is still bound to remediation/hybrid-stack-p0. This workflow keeps
+# both refs on one common commit without force-pushing, even when Lovable adds
+# provider-generated commits to its compatibility branch.
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -18,7 +20,7 @@ concurrency:
 
 jobs:
   mirror:
-    name: Fast-forward production compatibility ref
+    name: Reconcile production compatibility ref
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -27,48 +29,66 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Verify source is authoritative main
-        shell: bash
-        run: |
-          set -euo pipefail
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test "$GITHUB_REF" = "refs/heads/main" || test "$GITHUB_EVENT_NAME" = "workflow_dispatch"
-
-      - name: Fast-forward compatibility mirror
+      - name: Reconcile mirror to authoritative main tree
         shell: bash
         env:
           MIRROR_REF: remediation/hybrid-stack-p0
         run: |
           set -euo pipefail
-          git fetch origin "$MIRROR_REF"
+
+          git fetch origin main "$MIRROR_REF"
+          main_sha="$(git rev-parse origin/main)"
           mirror_sha="$(git rev-parse FETCH_HEAD)"
 
-          if [ "$mirror_sha" = "$GITHUB_SHA" ]; then
-            echo "Mirror already matches main: $GITHUB_SHA"
+          if [ "$main_sha" = "$mirror_sha" ]; then
+            echo "Mirror already matches main: $main_sha"
             exit 0
           fi
 
-          if ! git merge-base --is-ancestor "$mirror_sha" "$GITHUB_SHA"; then
-            echo "PRODUCTION_MIRROR_BLOCKED: $MIRROR_REF diverged from main. Refusing force update."
-            echo "mirror=$mirror_sha"
-            echo "main=$GITHUB_SHA"
-            exit 1
+          main_tree="$(git rev-parse "$main_sha^{tree}")"
+
+          if git merge-base --is-ancestor "$mirror_sha" "$main_sha"; then
+            echo "Mirror is behind main; fast-forwarding compatibility ref."
+            git push origin "$main_sha:refs/heads/$MIRROR_REF"
+            exit 0
           fi
 
-          git push origin "$GITHUB_SHA:refs/heads/$MIRROR_REF"
+          echo "Mirror contains provider-side history not present on main."
+          echo "Creating a normal two-parent reconciliation commit with the exact main tree."
 
-      - name: Verify exact ref binding
+          reconcile_sha="$({
+            printf 'tree %s\n' "$main_tree"
+            printf 'parent %s\n' "$main_sha"
+            printf 'parent %s\n' "$mirror_sha"
+            printf 'author AURA Release Bot <release-bot@m2mtechconnect.com> %s +0000\n' "$(date +%s)"
+            printf 'committer AURA Release Bot <release-bot@m2mtechconnect.com> %s +0000\n' "$(date +%s)"
+            printf '\nchore(release): reconcile Lovable provider drift to main tree\n'
+          } | git hash-object -t commit --stdin -w)"
+
+          test "$(git rev-parse "$reconcile_sha^{tree}")" = "$main_tree"
+
+          # The reconciliation commit has both current refs as parents, so each
+          # update is a normal fast-forward. Push the provider ref first, then
+          # advance main to the identical common SHA.
+          git push origin "$reconcile_sha:refs/heads/$MIRROR_REF"
+          git push origin "$reconcile_sha:refs/heads/main"
+
+          echo "reconciled_sha=$reconcile_sha"
+
+      - name: Verify common release ref
         shell: bash
         env:
           MIRROR_REF: remediation/hybrid-stack-p0
         run: |
           set -euo pipefail
-          remote_sha="$(git ls-remote origin "refs/heads/$MIRROR_REF" | awk '{print $1}')"
-          test "$remote_sha" = "$GITHUB_SHA"
+          git fetch origin main "$MIRROR_REF"
+          main_sha="$(git rev-parse origin/main)"
+          mirror_sha="$(git rev-parse FETCH_HEAD)"
+          test "$main_sha" = "$mirror_sha"
           {
             echo "### Lovable production compatibility mirror"
             echo ""
-            echo "- Authoritative source: main @ $GITHUB_SHA"
-            echo "- Mirrored ref: $MIRROR_REF @ $remote_sha"
-            echo "- Update mode: fast-forward only"
+            echo "- Authoritative source: main @ $main_sha"
+            echo "- Mirrored ref: $MIRROR_REF @ $mirror_sha"
+            echo "- Update mode: fast-forward only, history-preserving reconciliation"
           } >> "$GITHUB_STEP_SUMMARY"

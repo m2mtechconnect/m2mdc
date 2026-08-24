@@ -6,6 +6,7 @@ const QA_AUTH_STATE = process.env.QA_AUTH_STATE?.trim() || '/tmp/aura-playwright
 
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
@@ -45,7 +46,7 @@ export default defineConfig({
       name: 'screenshots',
       testDir: './scripts',
       testMatch: 'captureMarketingScreenshots.ts',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1440, height: 900 },
       },

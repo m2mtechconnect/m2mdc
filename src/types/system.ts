@@ -31,7 +31,8 @@ export interface DeployedSystem {
 
   lastRun?: {
     timestamp: string;
-    channel: string;
+    /** Null because agent_runs currently has no authoritative channel field. */
+    channel: string | null;
     status: string;
   };
 
@@ -76,9 +77,11 @@ export interface DeployedSystem {
   recentRuns?: Array<{
     id: string;
     timestamp: string;
-    status: 'success' | 'error';
+    /** Preserve the stored status rather than coercing unknown values. */
+    status: string;
     duration: number | null;
-    channel: string;
+    /** Null because the persisted run record does not expose an authoritative channel. */
+    channel: string | null;
     user?: string;
     error?: string;
   }>;

@@ -379,17 +379,16 @@ export default function IntelligenceDashboard() {
   // --------------------------------------------------------------------------
 
   /**
-   * GPU Utilization by Zone - Industry Reference
-   * Based on NVIDIA DGX SuperPOD deployment guidelines
-   * - Target GPU utilization: 70-90%
-   * - Thermal envelope per GPU: 350-700W (H100 SXM: 700W TDP)
+   * Accelerated compute utilization by zone - reference band only.
+   * Based on published accelerated-compute reference architecture guidance.
+   * - Target accelerator utilization: 70-90%
+   * - Thermal envelope per accelerator: 350-700W
    * - ASHRAE A1 class: 18-27°C inlet temperature
-   * Source: docs.nvidia.com/dgx-superpod
    */
   const gpuUtilData = [
-    { zone: 'DGX Pod A - LLM Training', utilization: 94, temp: 24 },       // Heavy training workloads
-    { zone: 'DGX Pod B - Fine-tuning', utilization: 78, temp: 22 },        // Mixed fine-tuning jobs
-    { zone: 'Inference Cluster C', utilization: 86, temp: 23 },            // Real-time inference
+    { zone: 'Accelerated Compute Pod A - LLM Training', utilization: 94, temp: 24 }, // Heavy training workloads
+    { zone: 'Accelerated Compute Pod B - Fine-tuning', utilization: 78, temp: 22 },  // Mixed fine-tuning jobs
+    { zone: 'Inference Cluster C', utilization: 86, temp: 23 },            // Inference workloads
     { zone: 'Development Pod D', utilization: 52, temp: 21 },              // Dev/test workloads
   ];
 
@@ -404,7 +403,7 @@ export default function IntelligenceDashboard() {
   const thermalIncidents = [
     { zone: 'Cold Aisle A1-A4', count: 0, severity: 'low' },              // Optimal cooling
     { zone: 'Hot Aisle B (GPU)', count: 3, severity: 'medium' },          // GPU exhaust hotspots
-    { zone: 'DGX SuperPOD Row 1', count: 1, severity: 'high' },           // High-density thermal event
+    { zone: 'High-Density Compute Row 1', count: 1, severity: 'high' },   // High-density thermal event
     { zone: 'Network/Storage Hall', count: 0, severity: 'low' },          // Stable low-power zone
   ];
 
@@ -561,7 +560,7 @@ export default function IntelligenceDashboard() {
           References:
             - PUE / DCIE: The Green Grid PUE v3 spec; Uptime Institute 2024.
             - Tier uptime: Uptime Institute Tier Standard (Tier III 99.982%).
-            - GPU util band 70-90%: NVIDIA DGX SuperPOD reference.
+            - Accelerator util band 70-90%: accelerated-compute reference architecture guidance.
             - Carbon: IEA 2024 + electricityMap; gCO2eq/kWh at grid-region grain.
             - Sovereignty: compliant_workloads / in-scope_workloads.
         */}
@@ -633,7 +632,7 @@ export default function IntelligenceDashboard() {
                 change="+5%"
                 trend="up"
                 icon={Cpu}
-                tooltip="Average GPU compute utilization across clusters in scope. Optimal band 70-90% per NVIDIA DGX SuperPOD reference."
+                tooltip="Average accelerated compute utilization across clusters in scope. Optimal band 70-90% per accelerated-compute reference architecture guidance."
                 onClick={() => navigate('/data-centre-twin')}
               />
               <KpiCardProvenance
@@ -915,7 +914,7 @@ export default function IntelligenceDashboard() {
                 <CardContent>
                   <HotspotZonesList
                     zones={[
-                      { zone: 'DGX SuperPOD Row 1', inletTempC: 28.4, events: 1, note: 'High-density cluster' },
+                      { zone: 'High-Density Compute Row 1', inletTempC: 28.4, events: 1, note: 'High-density cluster' },
                       { zone: 'Hot Aisle B (GPU)', inletTempC: 25.6, events: 3, note: 'GPU exhaust hotspots' },
                       { zone: 'Cold Aisle A1-A4', inletTempC: 21.3, events: 0 },
                       { zone: 'Network/Storage Hall', inletTempC: 22.8, events: 0 },
@@ -958,7 +957,7 @@ export default function IntelligenceDashboard() {
                       </thead>
                       <tbody>
                         {[
-                          { id: 'evt-1', zone: 'DGX SuperPOD Row 1', severity: 'critical', age: '12 min', owner: 'NOC' },
+                          { id: 'evt-1', zone: 'High-Density Compute Row 1', severity: 'critical', age: '12 min', owner: 'NOC' },
                           { id: 'evt-2', zone: 'Hot Aisle B (GPU)', severity: 'warning', age: '47 min', owner: 'Thermal' },
                           { id: 'evt-3', zone: 'CRAH-04 inlet', severity: 'warning', age: '2 h', owner: 'Cooling' },
                         ].map((e) => (

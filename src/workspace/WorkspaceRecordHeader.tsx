@@ -55,9 +55,9 @@ export function WorkspaceRecordHeader({ facility, isFallback, panelOpen, onOpenP
         className="flex h-[52px] w-full shrink-0 items-center gap-x-3 border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] px-3 sm:px-4"
       >
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <h1 className="v2-command-title min-w-0 truncate text-base sm:text-[17px]">
+          <h2 className="v2-command-title min-w-0 truncate text-base sm:text-[17px]">
             {workspaceLabel ? `${facility.name} - ${workspaceLabel}` : facility.name}
-          </h1>
+          </h2>
           <Badge
             variant="outline"
             className={cn('shrink-0 rounded-sm px-1.5 py-0 text-[11px] font-semibold uppercase tracking-wider', mode.className)}

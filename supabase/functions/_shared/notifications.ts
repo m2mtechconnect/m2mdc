@@ -26,6 +26,7 @@ interface OrganizationInviteNotification {
 }
 
 const KNOWN_PROVIDERS = new Set<NotificationProvider>(['disabled', 'resend', 'brevo', 'mailgun']);
+const PROVIDER_TIMEOUT_MS = 10_000;
 
 function configuredProvider(): NotificationProvider {
   const raw = (Deno.env.get('AURA_NOTIFICATION_PROVIDER') ?? 'disabled').trim().toLowerCase();
@@ -50,10 +51,19 @@ function escapeHtml(value: string): string {
     .replaceAll("'", '&#039;');
 }
 
+function safeHeaderText(value: string): string {
+  return value.replace(/[\r\n]+/g, ' ').trim();
+}
+
+function isAllowedApplicationUrl(url: URL): boolean {
+  if (url.protocol === 'https:') return true;
+  return url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1');
+}
+
 function senderConfig(): { address: string; name: string } | null {
   const address = (Deno.env.get('AURA_EMAIL_FROM_ADDRESS') ?? '').trim();
   if (!address) return null;
-  const name = (Deno.env.get('AURA_EMAIL_FROM_NAME') ?? 'AURA').trim() || 'AURA';
+  const name = safeHeaderText((Deno.env.get('AURA_EMAIL_FROM_NAME') ?? 'AURA').trim() || 'AURA');
   return { address, name };
 }
 
@@ -62,7 +72,7 @@ function appBaseUrl(): string | null {
   if (!raw) return null;
   try {
     const url = new URL(raw);
-    if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') return null;
+    if (!isAllowedApplicationUrl(url)) return null;
     return url.toString().replace(/\/$/, '');
   } catch {
     return null;
@@ -94,6 +104,7 @@ async function sendViaResend(message: NotificationMessage, from: { address: stri
         html: message.html,
         text: message.text,
       }),
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
     if (!response.ok) return providerError(provider, response.status);
     const body = await response.json().catch(() => ({}));
@@ -123,6 +134,7 @@ async function sendViaBrevo(message: NotificationMessage, from: { address: strin
         textContent: message.text,
         headers: message.idempotencyKey ? { 'X-AURA-Idempotency-Key': message.idempotencyKey } : undefined,
       }),
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
     if (!response.ok) return providerError(provider, response.status);
     const body = await response.json().catch(() => ({}));
@@ -151,6 +163,7 @@ async function sendViaMailgun(message: NotificationMessage, from: { address: str
       method: 'POST',
       headers: { Authorization: `Basic ${btoa(`api:${apiKey}`)}` },
       body: form,
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     });
     if (!response.ok) return providerError(provider, response.status);
     const body = await response.json().catch(() => ({}));
@@ -189,8 +202,8 @@ export async function sendOrganizationInviteNotification(
   if (!baseUrl) return delivery(provider, 'not_configured', null, 'AURA application URL is not configured');
 
   const acceptUrl = `${baseUrl}/invite/accept?token=${encodeURIComponent(input.token)}`;
-  const organizationName = input.organizationName.trim() || 'your organization';
-  const role = input.role.trim() || 'member';
+  const organizationName = safeHeaderText(input.organizationName.trim() || 'your organization');
+  const role = safeHeaderText(input.role.trim() || 'member');
   const expiration = new Date(input.expiresAt);
   const expirationText = Number.isNaN(expiration.getTime()) ? input.expiresAt : expiration.toUTCString();
 

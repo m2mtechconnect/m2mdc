@@ -15,6 +15,9 @@ import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
  */
 
 const VISUAL_BUILDER_ID = '00000000-0000-4000-8000-000000000099';
+const MOBILE_WIDTH = 375;
+const MOBILE_HEIGHT = 667;
+
 const visualBuilder = {
   id: VISUAL_BUILDER_ID,
   name: 'Visual Regression Data Centre Twin',
@@ -93,6 +96,16 @@ async function expectNoHorizontalOverflow(page: Page) {
   expect(dimensions.bodyScrollWidth, `body overflow: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.innerWidth);
 }
 
+async function expectPinnedMobileViewport(page: Page) {
+  const dimensions = await page.evaluate(() => ({
+    innerWidth: window.innerWidth,
+    outerWidth: window.outerWidth,
+    devicePixelRatio: window.devicePixelRatio,
+  }));
+  expect(dimensions.innerWidth, `mobile visual viewport drifted: ${JSON.stringify(dimensions)}`).toBe(MOBILE_WIDTH);
+  expect(dimensions.devicePixelRatio, `mobile visual device scale drifted: ${JSON.stringify(dimensions)}`).toBe(1);
+}
+
 test.use({ colorScheme: 'light' });
 
 test.beforeEach(async ({ context, page }) => {
@@ -164,12 +177,23 @@ test.describe('Visual Regression - Supported Global Light Surfaces', () => {
 });
 
 test.describe('Visual Regression - Mobile', () => {
-  test.use({ viewport: { width: 375, height: 667 }, isMobile: true });
+  // Responsive acceptance depends on a deterministic CSS viewport, not on
+  // browser mobile-device heuristics. Explicitly pin viewport, screen and DPR
+  // so Playwright/browser upgrades cannot silently turn a 375px baseline into
+  // a 425px capture while still reporting a passing overflow check.
+  test.use({
+    viewport: { width: MOBILE_WIDTH, height: MOBILE_HEIGHT },
+    screen: { width: MOBILE_WIDTH, height: MOBILE_HEIGHT },
+    deviceScaleFactor: 1,
+    isMobile: false,
+    hasTouch: true,
+  });
 
   test('Dashboard mobile', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot('dashboard-mobile.png', { maxDiffPixels: 100, fullPage: true });
   });
@@ -179,16 +203,16 @@ test.describe('Visual Regression - Mobile', () => {
     await page.goto('/builder?new=true&step=1');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
-    // Capture before enforcing width so CI still uploads exact evidence when
-    // this responsive invariant fails.
-    await expect(page).toHaveScreenshot('builder-mobile.png', { maxDiffPixels: 100, fullPage: true });
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
+    await expect(page).toHaveScreenshot('builder-mobile.png', { maxDiffPixels: 100, fullPage: true });
   });
 
   test('Operations and telemetry mobile', async ({ page }) => {
     await page.goto('/analytics');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot('analytics-mobile.png', { maxDiffPixels: 150, fullPage: true });
   });

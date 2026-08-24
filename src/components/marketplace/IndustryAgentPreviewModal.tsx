@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilderSelectionStore } from '@/stores/builderSelectionStore';
 import { normalizeIndustryAgent } from '@/lib/marketplaceNormalizer';
 import { UnifiedAgentPreview } from '@/components/agent-preview/UnifiedAgentPreview';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface IndustryAgentPreviewModalProps {
   agent: any;

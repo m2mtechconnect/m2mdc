@@ -20,6 +20,7 @@ import {
 import { formatDate, formatRelativeTime } from '@/lib/formatters';
 import { useNavigate } from 'react-router-dom';
 import type { DeployedSystem } from '@/types/system';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface SystemConfigTabsProps {
   system: DeployedSystem;

@@ -119,7 +119,12 @@ function ApprovedUserRoutes() {
       <Route path="/agent/:id" element={<AgentWorkspace />} />
       <Route path="/agents/:id/chat" element={<AgentChat />} />
       <Route path="/analytics" element={<PermissionRouteGuard permission="analytics.view"><IntelligenceDashboard /></PermissionRouteGuard>} />
-      <Route path="/compliance" element={<Compliance />} />
+      {/* Sovereignty / compliance evidence is a read-only reporting surface in
+          the same family as /analytics and the Evidence workspaces, so it is
+          gated on the same least-privileged read permission. Previously it was
+          mounted unguarded, which let any authenticated caller (including a
+          pilot-plane caller) reach the page and its queries. */}
+      <Route path="/compliance" element={<PermissionRouteGuard permission="analytics.view"><Compliance /></PermissionRouteGuard>} />
       {import.meta.env.DEV && InfrastructurePage && (
         <Route path="/infrastructure" element={<InfrastructurePage />} />
       )}

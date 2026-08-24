@@ -26,6 +26,12 @@ If you are unsure, say so and suggest a next step.
 Respect user role (Executive | Manager | Engineer).
 Never expose secrets or internal IDs.`;
 
+const RESIDENCY_LABELS: Record<string, string> = {
+  'northamerica-northeast1': 'Canada',
+  'us-central1': 'United States',
+  'europe-west1': 'Europe',
+};
+
 interface HealthStatus {
   gemini: { status: 'ok' | 'error'; latency?: number; error?: string };
   vertexSearch: { status: 'ok' | 'error'; latency?: number; error?: string };
@@ -441,7 +447,7 @@ function AISettingsPage() {
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <p className="font-medium">Data residency</p>
-                <Badge variant="secondary">{healthStatus.region}</Badge>
+                <Badge variant="secondary">{RESIDENCY_LABELS[healthStatus.region] ?? healthStatus.region}</Badge>
               </div>
             </div>
           </DCCard>

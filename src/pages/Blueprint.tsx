@@ -20,6 +20,7 @@ import {
   GitBranch, 
   Plus,
   Loader2,
+  Boxes,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
@@ -62,6 +63,7 @@ import { normalizeLocation } from '@/lib/location/normalizeLocation';
 import { classifyCreateTwinFields } from '@/lib/provenance/twinFieldProvenance';
 import type { DataCentreBlueprint } from '@/types/dataCentreBlueprint';
 import { stackDescription } from '@/config/auraStackManifest';
+import { CapabilityChips, WorkspaceHeader } from '@/components/workspace-system';
 
 /**
  * Static Tailwind class map. Interpolated classes (`bg-${color}/10`) are not
@@ -244,6 +246,39 @@ export default function Blueprint() {
                 stays above the fold, and the assistant has exactly one entry
                 point.
               */}
+              {/*
+                Final visual parity: the shared, manifest-backed workspace
+                banner sits above the designer toolbar so Blueprint reads with
+                the same hierarchy as Command Center. The designer header keeps
+                every existing action and data binding untouched.
+              */}
+              <WorkspaceHeader
+                eyebrow="Blueprint"
+                title={resolveFacilityNaming({
+                  name: twin?.name || blueprint.name,
+                  city: twin?.city || blueprint.location,
+                  regionCode: twin?.region_code,
+                  tier: twin?.tier,
+                  sovereigntyLevel: twin?.sovereignty_level,
+                  industry: twin?.industry,
+                }).displayName}
+                icon={Boxes}
+                capabilityId="twin.openusd"
+                badges={
+                  <>
+                    <span className="aura-ws-chip">Design-time model</span>
+                    <span className="aura-ws-chip">
+                      {t('blueprint.tierBadge', { tier: stripTierPrefix(blueprint.tier) })}
+                    </span>
+                    <span className="aura-ws-chip">{formatPower(blueprint.capacityKw)}</span>
+                    <span className="aura-ws-chip">
+                      {t('blueprint.racksBadge', { racks: blueprint.racks })}
+                    </span>
+                  </>
+                }
+                meta={<CapabilityChips surface="blueprint" limit={4} />}
+              />
+
               <DesignerModeHeader
                 twinName={resolveFacilityNaming({
                   name: twin?.name || blueprint.name,

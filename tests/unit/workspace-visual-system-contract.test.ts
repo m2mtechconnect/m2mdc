@@ -14,7 +14,27 @@ const PRIMARY_SURFACES = [
   'src/workspace/CommandCentre.tsx',
   'src/pages/Connections.tsx',
   'src/pages/dsx/EvidenceBetaShell.tsx',
+  // Final visual parity pass: designer, simulation, runtime and learning.
+  'src/pages/Blueprint.tsx',
+  'src/workspace/AuraWorkspace.tsx',
+  'src/pages/Deploy.tsx',
+  'src/pages/DeploymentHistory.tsx',
+  'src/pages/Help.tsx',
 ];
+
+/** Surfaces that must render a manifest-backed capability, not local copy. */
+const MANIFEST_BACKED: Array<[string, string]> = [
+  ['src/workspace/CommandCentre.tsx', 'platform.command'],
+  ['src/pages/Blueprint.tsx', 'twin.openusd'],
+  ['src/workspace/AuraWorkspace.tsx', 'simulation.engine'],
+  ['src/pages/Deploy.tsx', 'governance.controls'],
+  ['src/pages/DeploymentHistory.tsx', 'governance.controls'],
+  ['src/pages/dsx/EvidenceBetaShell.tsx', 'evidence.workspace'],
+  ['src/pages/Connections.tsx', 'connections.enterprise'],
+];
+
+/** Runtime/deploy surfaces must keep neutral model labelling. */
+const NEUTRAL_MODEL_SURFACES = ['src/pages/Deploy.tsx'];
 
 describe('AURA shared workspace visual system', () => {
   it('exposes the shared components from one entry point', () => {
@@ -28,6 +48,33 @@ describe('AURA shared workspace visual system', () => {
     const source = read(file);
     expect(source).toContain('@/components/workspace-system');
     expect(source).toContain('<WorkspaceHeader');
+  });
+
+  it.each(MANIFEST_BACKED)('%s renders the manifest capability %s', (file, capabilityId) => {
+    expect(read(file)).toContain(capabilityId);
+  });
+
+  it('keeps Help driven by the manifest stack summary and shared cards', () => {
+    const help = read('src/pages/Help.tsx');
+    expect(help).toContain('AURAStackSummary');
+    expect(help).toContain('<SectionCard');
+    expect(help).not.toContain('DCCard');
+  });
+
+  it('keeps raw model identifiers out of the runtime/deploy surfaces', () => {
+    for (const file of NEUTRAL_MODEL_SURFACES) {
+      const source = read(file);
+      expect(source).toContain('modelDisplayLabel');
+      // The raw model identifier may exist as a stored default, but it must
+      // never be rendered directly: every display path goes through the label.
+      expect(source).not.toContain('value={summary?.model}');
+      expect(source).not.toContain('>{summary?.model}<');
+    }
+  });
+
+  it('supports a compact density for full-height canvas workspaces', () => {
+    expect(read('src/components/workspace-system/WorkspaceHeader.tsx')).toContain('data-density');
+    expect(read('src/index.css')).toContain("[data-density='compact']");
   });
 
   it('drives workspace header copy from the stack manifest', () => {

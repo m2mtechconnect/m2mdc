@@ -132,9 +132,9 @@ export function DesignerModeHeader({
 
         <div className="flex min-w-0 items-center gap-2">
           <Server className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden />
-          <h1 className="truncate text-base font-semibold text-foreground">
+          <h2 className="truncate text-base font-semibold text-foreground">
             {twinName}
-          </h1>
+          </h2>
         </div>
 
         {/* Exactly one edit-state label. */}

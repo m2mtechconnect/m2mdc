@@ -22,7 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AURAStackSummary } from '@/components/stack/AURAStackSummary';
-import { DCCard, DCSectionHeader } from '@/components/dc-ui';
+import { CapabilityChips, SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
 import { getBuildFingerprint } from '@/lib/buildFingerprint';
@@ -151,18 +151,18 @@ export default function Help() {
   return (
 
     <div className="mx-auto max-w-7xl space-y-6 py-6 pb-12">
-      <DCSectionHeader
-        as="h1"
+      <WorkspaceHeader
+        eyebrow="Learning"
         title={t('help.title')}
-        subtitle="Learn AURA DC by workspace: model the facility, simulate changes, operate the platform and verify evidence."
-        icon={<GraduationCap className="h-6 w-6" />}
+        icon={GraduationCap}
+        description="Learn AURA DC by workspace: model the facility, simulate changes, operate the platform and verify evidence."
+        meta={<CapabilityChips surface="help" />}
       />
 
-      <DCCard
+      <SectionCard
         title="Start with the operating model"
-        subtitle="AURA separates the facility model, simulations, operational status and evidence so each claim has a clear owner."
-        icon={<BookOpen className="h-5 w-5" />}
-        status="operational"
+        description="AURA separates the facility model, simulations, operational status and evidence so each claim has a clear owner."
+        icon={BookOpen}
       >
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => navigate('/dashboard')}>
@@ -178,26 +178,25 @@ export default function Help() {
             Open Simulation
           </Button>
         </div>
-      </DCCard>
+      </SectionCard>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <DCCard title="Getting Started" icon={<Compass className="h-5 w-5" />} status="operational">
+        <SectionCard title="Getting Started" icon={Compass}>
           <GuideGrid items={GETTING_STARTED} />
-        </DCCard>
+        </SectionCard>
 
-        <DCCard title="Operate" icon={<Activity className="h-5 w-5" />} status="operational">
+        <SectionCard title="Operate" icon={Activity}>
           <GuideGrid items={OPERATE} />
-        </DCCard>
+        </SectionCard>
 
-        <DCCard title="Govern" icon={<Shield className="h-5 w-5" />} status="operational">
+        <SectionCard title="Govern" icon={Shield}>
           <GuideGrid items={GOVERN} />
-        </DCCard>
+        </SectionCard>
 
-        <DCCard
+        <SectionCard
           title="How to read AURA data"
-          subtitle="Use these rules before acting on a metric or export."
-          icon={<FileSearch className="h-5 w-5" />}
-          status="operational"
+          description="Use these rules before acting on a metric or export."
+          icon={FileSearch}
         >
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-2">
@@ -217,14 +216,13 @@ export default function Help() {
               <p className="text-muted-foreground">Absence of evidence is shown explicitly rather than converted into a score.</p>
             </div>
           </div>
-        </DCCard>
+        </SectionCard>
       </div>
 
-      <DCCard
+      <SectionCard
         title="Guided Tours"
-        subtitle="Interactive walkthroughs of the four core AURA DC workspaces."
-        icon={<Compass className="h-5 w-5" />}
-        status="operational"
+        description="Interactive walkthroughs of the four core AURA DC workspaces."
+        icon={Compass}
       >
         <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {GUIDED_TOURS.map(({ id, route, icon: Icon }) => {
@@ -254,31 +252,30 @@ export default function Help() {
           <RefreshCw className="mr-2 h-3.5 w-3.5" />
           Reset tours
         </Button>
-      </DCCard>
+      </SectionCard>
 
-      <DCCard
+      <SectionCard
         title="Platform architecture"
-        subtitle="What AURA is made of, in the same vocabulary the product uses. Each capability carries its evidence status."
-        icon={<Server className="h-5 w-5" />}
+        description="What AURA is made of, in the same vocabulary the product uses. Each capability carries its evidence status."
+        icon={Server}
       >
         <AURAStackSummary surface="help" />
-      </DCCard>
+      </SectionCard>
 
-      <DCCard
+      <SectionCard
         title="Need product support?"
-        subtitle="Use the Learning Hub for product guidance. For account or implementation assistance, contact the M2M team."
-        icon={<GraduationCap className="h-5 w-5" />}
+        description="Use the Learning Hub for product guidance. For account or implementation assistance, contact the M2M team."
+        icon={GraduationCap}
       >
         <Button asChild variant="outline">
           <a href="mailto:business@m2mtechconnect.com">Contact M2M Support</a>
         </Button>
-      </DCCard>
+      </SectionCard>
 
-      <DCCard
+      <SectionCard
         title="Build information"
-        subtitle="Version and commit identifier for the running application bundle."
-        icon={<Server className="h-5 w-5" />}
-        status="operational"
+        description="Version and commit identifier for the running application bundle."
+        icon={Server}
       >
         <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <div>
@@ -304,7 +301,7 @@ export default function Help() {
             </p>
           </div>
         </div>
-      </DCCard>
+      </SectionCard>
     </div>
   );
 }

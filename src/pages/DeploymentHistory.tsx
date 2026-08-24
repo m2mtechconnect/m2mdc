@@ -38,7 +38,7 @@ import {
 import { format } from "date-fns";
 import { DCCard } from "@/components/dc-ui/DCCard";
 import { PagePurpose } from "@/components/capability/PagePurpose";
-import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
+import { SectionCard, WorkspaceHeader } from "@/components/workspace-system";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
 import {
   listDeploymentEvents,
@@ -239,22 +239,23 @@ export default function DeploymentHistory() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto p-6 max-w-[1600px]">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
-              <Rocket className="h-6 w-6 text-primary" />
-            </div>
-            <h1 className="text-2xl font-semibold text-foreground">Runtime Environments</h1>
-          </div>
-          <PagePurpose route="/deployments" />
-          <p className="mt-1 text-muted-foreground text-sm">
-            {t('deploy.completeAuditTrail', 'Complete audit trail of all system deployments')}
-          </p>
-        </div>
+        {/* Execution + evidence: shared, manifest-backed workspace banner. */}
+        <WorkspaceHeader
+          eyebrow="Runtime"
+          title="Runtime Environments"
+          icon={Rocket}
+          capabilityId="governance.controls"
+          description={t('deploy.completeAuditTrail', 'Complete audit trail of all system deployments')}
+          meta={<PagePurpose route="/deployments" />}
+        />
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        {/* Execution summary: counts read from recorded deployments only. */}
+        <SectionCard
+          title="Execution summary"
+          description="Recorded deployment outcomes. Counts come from stored deployment records."
+          className="mb-6"
+        >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <DCKPITile
             label="Total Deployments"
             value={deployments.length.toString()}
@@ -284,6 +285,7 @@ export default function DeploymentHistory() {
             icon={<Clock className="h-4 w-4" />}
           />
         </div>
+        </SectionCard>
 
         {/* Filters */}
         <DCCard status="info" className="p-6 mb-6">

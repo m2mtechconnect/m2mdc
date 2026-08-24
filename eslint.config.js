@@ -176,6 +176,15 @@ export default tseslint.config(
     },
   },
   {
+    // Lovable owns this generated preview-auth bridge and can regenerate it.
+    // Keep the repository lint contract strict everywhere else while allowing
+    // the provider's canonical declaration style in this one generated file.
+    files: ["src/integrations/supabase/previewAuthStorage.ts"],
+    rules: {
+      "prefer-const": "off",
+    },
+  },
+  {
     // Test doubles legitimately model untyped third-party surfaces.
     files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
     rules: {

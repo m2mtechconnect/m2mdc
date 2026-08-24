@@ -116,7 +116,7 @@ export const AURA_STACK_MANIFEST: StackCapability[] = [
     label: 'Accelerated AI',
     category: 'accelerated-ai',
     description:
-      'DSX-aligned architecture for accelerated data centre design and analysis. Alignment only: no accelerated vendor runtime is deployed by AURA.',
+      'Architecture alignment for accelerated data centre design and analysis. Alignment only: no accelerated vendor runtime is deployed by AURA.',
     evidenceStatus: 'UNAVAILABLE',
     customerVisible: true,
     allowedSurfaces: ['landing', 'readiness', 'help'],
@@ -208,6 +208,43 @@ export function customerVisibleStack(surface?: StackSurface): StackCapability[] 
   return AURA_STACK_MANIFEST.filter(
     (c) => c.customerVisible && (!surface || c.allowedSurfaces.includes(surface)),
   );
+}
+
+/**
+ * Approved product-visible name for a capability.
+ *
+ * Surfaces must call this instead of re-typing stack wording, otherwise the
+ * manifest drifts back into dead configuration and vendor names creep in.
+ */
+export function stackLabel(id: string): string {
+  return stackCapability(id)?.label ?? 'AURA capability';
+}
+
+/** Canonical customer-facing description for a capability. */
+export function stackDescription(id: string): string {
+  return stackCapability(id)?.description ?? '';
+}
+
+/**
+ * Label, description and truth qualifier for a capability in one call, for
+ * surfaces that render a heading plus supporting copy.
+ */
+export function stackCopy(id: string): {
+  label: string;
+  description: string;
+  qualifier: string | null;
+  /** Label with its truth qualifier appended when the status is not plain AVAILABLE. */
+  qualifiedLabel: string;
+} {
+  const capability = stackCapability(id);
+  const label = capability?.label ?? 'AURA capability';
+  const qualifier = capability ? evidenceQualifier(capability.evidenceStatus) : null;
+  return {
+    label,
+    description: capability?.description ?? '',
+    qualifier,
+    qualifiedLabel: qualifier ? `${label} (${qualifier.toLowerCase()})` : label,
+  };
 }
 
 /** Human-readable truth suffix for a capability, or null when unqualified. */

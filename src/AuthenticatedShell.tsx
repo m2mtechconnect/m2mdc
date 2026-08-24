@@ -4,6 +4,7 @@ import { AuthenticatedEntryRedirect } from "@/routing/AuthenticatedEntryRedirect
 import { Layout } from "@/components/Layout";
 import { PreserveNavigate } from "@/routing/PreserveNavigate";
 import { ROUTE_ALIASES } from "@/config/routeAliases";
+import { EVIDENCE_ROOT } from "@/config/evidenceRoutes";
 import { CoPilotProvider } from "@/contexts/CoPilotContext";
 import { CoPilotCommandProvider } from "@/contexts/CoPilotCommandContext";
 import { TourProvider } from "@/context/TourContext";
@@ -95,6 +96,17 @@ function TwinManageRedirect() {
   return <Navigate to={`/app/agents/${instanceId}/manage`} replace />;
 }
 
+/**
+ * Single compatibility hop from the retired implementation-named Evidence
+ * family onto the neutral `/evidence` family. `PreserveNavigate` carries the
+ * query string and hash across, so an old shared deep link keeps its context.
+ */
+function LegacyEvidenceRedirect() {
+  const params = useParams();
+  const splat = params['*'] ?? '';
+  return <PreserveNavigate to={splat ? `${EVIDENCE_ROOT}/${splat}` : `${EVIDENCE_ROOT}/overview`} />;
+}
+
 function ApprovedUserRoutes() {
   return (
     <Routes>
@@ -126,7 +138,7 @@ function ApprovedUserRoutes() {
       <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AdminConsoleLayout><AssetPipeline /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AdminConsoleLayout><AssetValidation /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><AdminConsoleLayout><ReferenceFacilityValidation /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/admin/dsx-capabilities" element={<AdminRouteGuard><AdminConsoleLayout><DsxCapabilityRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
+      <Route path="/admin/accelerated-ai-capabilities" element={<AdminRouteGuard><AdminConsoleLayout><DsxCapabilityRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/dataset-registry" element={<AdminRouteGuard><AdminConsoleLayout><DatasetRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
 
@@ -162,10 +174,12 @@ function ApprovedUserRoutes() {
         <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />
       ))}
 
-      <Route path="/dsx/evidence-beta" element={<EvidenceBetaShell />}>
-        <Route index element={<OverviewWorkspace />} />
+      {/* Neutral canonical Evidence family. The same shell and workspaces as
+          before; only the URL vocabulary changed. */}
+      <Route path="/evidence" element={<EvidenceBetaShell />}>
+        <Route index element={<PreserveNavigate to="/evidence/overview" />} />
         <Route path="overview" element={<OverviewWorkspace />} />
-        <Route path="operations" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
+        <Route path="operations" element={<PreserveNavigate to="/evidence/operations/thermal" />} />
         <Route path="operations/thermal" element={<ThermalWorkspace />} />
         <Route path="operations/power" element={<PowerWorkspace />} />
         <Route path="operations/cooling" element={<CoolingWorkspace />} />
@@ -178,17 +192,21 @@ function ApprovedUserRoutes() {
         <Route path="decisions/log" element={<EvidenceWorkspace />} />
         <Route path="assets" element={<FacilityWorkspace />} />
       </Route>
-      <Route path="/dsx/evidence-beta/thermal" element={<PreserveNavigate to="/dsx/evidence-beta/operations/thermal" />} />
-      <Route path="/dsx/evidence-beta/power" element={<PreserveNavigate to="/dsx/evidence-beta/operations/power" />} />
-      <Route path="/dsx/evidence-beta/cooling" element={<PreserveNavigate to="/dsx/evidence-beta/operations/cooling" />} />
-      <Route path="/dsx/evidence-beta/network" element={<PreserveNavigate to="/dsx/evidence-beta/operations/compute" />} />
-      <Route path="/dsx/evidence-beta/workload" element={<PreserveNavigate to="/dsx/evidence-beta/operations/workload" />} />
-      <Route path="/dsx/evidence-beta/facility" element={<PreserveNavigate to="/dsx/evidence-beta/assets" />} />
-      <Route path="/dsx/evidence-beta/simulations" element={<PreserveNavigate to="/dsx/evidence-beta/decisions" />} />
-      <Route path="/dsx/evidence-beta/evidence" element={<PreserveNavigate to="/dsx/evidence-beta/decisions/log" />} />
-      <Route path="/dsx/evidence-beta/carbon" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability" />} />
-      <Route path="/dsx/evidence-beta/financials" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/financial" />} />
-      <Route path="/dsx/evidence-beta/sovereignty" element={<PreserveNavigate to="/dsx/evidence-beta/sustainability/sovereignty" />} />
+      {/* Pre-consolidation flat paths, still accepted as deep links. */}
+      <Route path="/evidence/thermal" element={<PreserveNavigate to="/evidence/operations/thermal" />} />
+      <Route path="/evidence/power" element={<PreserveNavigate to="/evidence/operations/power" />} />
+      <Route path="/evidence/cooling" element={<PreserveNavigate to="/evidence/operations/cooling" />} />
+      <Route path="/evidence/network" element={<PreserveNavigate to="/evidence/operations/compute" />} />
+      <Route path="/evidence/workload" element={<PreserveNavigate to="/evidence/operations/workload" />} />
+      <Route path="/evidence/facility" element={<PreserveNavigate to="/evidence/assets" />} />
+      <Route path="/evidence/simulations" element={<PreserveNavigate to="/evidence/decisions" />} />
+      <Route path="/evidence/evidence" element={<PreserveNavigate to="/evidence/decisions/log" />} />
+      <Route path="/evidence/carbon" element={<PreserveNavigate to="/evidence/sustainability" />} />
+      <Route path="/evidence/financials" element={<PreserveNavigate to="/evidence/sustainability/financial" />} />
+      <Route path="/evidence/sovereignty" element={<PreserveNavigate to="/evidence/sustainability/sovereignty" />} />
+      {/* Compatibility only: the retired implementation-named family maps onto
+          the neutral one in a single hop, preserving query and hash. */}
+      <Route path="/dsx/evidence-beta/*" element={<LegacyEvidenceRedirect />} />
       {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}
       <Route path="*" element={<NotFound />} />
     </Routes>

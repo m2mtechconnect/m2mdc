@@ -58,7 +58,7 @@ export function evidenceHrefForKpi(key: KpiKey): string {
   const params = new URLSearchParams({ kpi: key });
   const claim = EVIDENCE_CLAIM[key];
   if (claim) params.set('claim', claim);
-  return `/dsx/evidence-beta/${workspace}?${params.toString()}`;
+  return `/evidence/${workspace}?${params.toString()}`;
 }
 
 /** Human-readable layer name used in drilldown affordances. */

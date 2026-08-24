@@ -17,6 +17,13 @@
  * two registries against each other.
  */
 
+import {
+  ACCELERATED_AI_CAPABILITIES_ROUTE,
+  EVIDENCE_ROOT,
+  LEGACY_CAPABILITIES_ROUTE,
+  LEGACY_EVIDENCE_ROOT,
+} from './evidenceRoutes';
+
 /** Which router mounts the route. */
 export type RouteShell =
   /** `src/App.tsx`, rendered when there is no session. */
@@ -129,7 +136,13 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/admin/asset-pipeline', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/asset-validation/:assetId', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/reference-facility-validation', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/dsx-capabilities', shell: 'internal', kind: 'canonical', guard: 'admin' },
+  {
+    path: '/admin/accelerated-ai-capabilities',
+    shell: 'internal',
+    kind: 'canonical',
+    guard: 'admin',
+    note: 'Accelerated AI capability registry. /admin/dsx-capabilities aliases here.',
+  },
   { path: '/admin/dataset-registry', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/admin/platform-readiness', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/manage/integrations', shell: 'internal', kind: 'canonical' },
@@ -166,27 +179,38 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
     kind: 'dev-only',
     note: 'Explicit demo namespace. Mounted under import.meta.env.DEV only; not a production route.',
   },
-  { path: '/dsx/evidence-beta', shell: 'internal', kind: 'canonical', note: 'Evidence shell; children below.' },
-  // Pre-consolidation flat Evidence paths. These are mounted at the shell's
-  // top level (outside the `/dsx/evidence-beta` parent) so deep links commit
-  // without the parent route resolving first.
-  { path: '/dsx/evidence-beta/thermal', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/power', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/cooling', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/network', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/workload', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/facility', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/simulations', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/evidence', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/carbon', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/financials', shell: 'internal', kind: 'redirect' },
-  { path: '/dsx/evidence-beta/sovereignty', shell: 'internal', kind: 'redirect' },
+  {
+    path: '/evidence',
+    shell: 'internal',
+    kind: 'canonical',
+    note: 'Neutral canonical Evidence shell; children below. Index redirects to /evidence/overview.',
+  },
+  // Pre-consolidation flat Evidence paths. Mounted at the shell's top level
+  // (outside the `/evidence` parent) so deep links commit without the parent
+  // route resolving first.
+  { path: '/evidence/thermal', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/power', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/cooling', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/network', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/workload', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/facility', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/simulations', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/evidence', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/carbon', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/financials', shell: 'internal', kind: 'redirect' },
+  { path: '/evidence/sovereignty', shell: 'internal', kind: 'redirect' },
+  {
+    path: '/dsx/evidence-beta/*',
+    shell: 'internal',
+    kind: 'redirect',
+    note: 'Retired implementation-named Evidence family. Accepted deep link, never emitted; single hop to /evidence preserving query and hash.',
+  },
   { path: '/dev-overlays', shell: 'internal', kind: 'dev-only' },
   { path: '*', shell: 'internal', kind: 'catch-all' },
 ];
 
 /**
- * Children of `/dsx/evidence-beta`, relative paths as mounted.
+ * Children of `/evidence`, relative paths as mounted.
  * The canonical five-section IA lives in `src/dsx/nav/evidenceNav.ts`; the
  * pre-consolidation flat paths remain only as redirects.
  */
@@ -247,6 +271,20 @@ export interface ShareLinkRule {
 
 export const SHARE_LINK_RULES: ShareLinkRule[] = [
   {
+    legacy: LEGACY_EVIDENCE_ROOT,
+    publicCanonical: `${EVIDENCE_ROOT}/overview`,
+    internalCanonical: `${EVIDENCE_ROOT}/overview`,
+    reason:
+      'Retired implementation-named Evidence family. Accepted as a deep link, never emitted: the neutral /evidence family is the only canonical Evidence vocabulary.',
+  },
+  {
+    legacy: LEGACY_CAPABILITIES_ROUTE,
+    publicCanonical: ACCELERATED_AI_CAPABILITIES_ROUTE,
+    internalCanonical: ACCELERATED_AI_CAPABILITIES_ROUTE,
+    reason:
+      'Capability registry moved to a neutral admin path; the programme-named path remains only for existing bookmarks.',
+  },
+  {
     legacy: '/twin-datacentre',
     publicCanonical: '/data-centre-twin',
     internalCanonical: '/blueprint/default',
@@ -261,11 +299,35 @@ export const SHARE_LINK_RULES: ShareLinkRule[] = [
   },
 ];
 
-/** Vendor-named or legacy paths that must never be emitted as canonical links. */
-export const NON_EMITTABLE_PATHS: string[] = SHARE_LINK_RULES.map((r) => r.legacy);
+/**
+ * Vendor-named, implementation-named or legacy paths that must never be
+ * emitted as canonical links. They stay mounted as compatibility redirects, so
+ * an existing external deep link still resolves, but navigation, breadcrumbs,
+ * share/copy affordances, Help and canonical metadata must use the neutral
+ * canonical path instead.
+ */
+export const NON_EMITTABLE_PATHS: string[] = Array.from(
+  new Set([
+    ...SHARE_LINK_RULES.map((r) => r.legacy),
+    LEGACY_EVIDENCE_ROOT,
+    LEGACY_CAPABILITIES_ROUTE,
+    '/settings/integrations/nvidia-dsx',
+  ]),
+);
+
+/** True when `path` still carries a retired implementation or vendor name. */
+export function isNonEmittablePath(path: string): boolean {
+  return NON_EMITTABLE_PATHS.includes(path) || path.startsWith(`${LEGACY_EVIDENCE_ROOT}/`);
+}
 
 /** Canonical path a share/copy-link affordance should emit for `path`. */
 export function canonicalSharePath(path: string, audience: 'public' | 'internal'): string {
+  // Legacy Evidence deep links keep their section: only the root vocabulary
+  // changes, so `/dsx/evidence-beta/operations/power` shares as
+  // `/evidence/operations/power` rather than collapsing to the overview.
+  if (path.startsWith(`${LEGACY_EVIDENCE_ROOT}/`)) {
+    return `${EVIDENCE_ROOT}${path.slice(LEGACY_EVIDENCE_ROOT.length)}`;
+  }
   const rule = SHARE_LINK_RULES.find((r) => r.legacy === path);
   if (!rule) return path;
   return audience === 'public' ? rule.publicCanonical : rule.internalCanonical;

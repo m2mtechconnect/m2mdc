@@ -18,7 +18,7 @@ import { installSupabaseMock } from './_setup/supabase-mock';
 import { seedDismissedTours, assertNoOnboardingOverlay } from './_setup/app-state';
 import { activateCard, closeAndSettle, assertNoOverlayArtifacts, waitForScrollSettled } from './_setup/card-activation';
 
-const ROOT = '/dsx/evidence-beta';
+const ROOT = '/evidence';
 
 async function open(page: Page) {
   await page.goto(ROOT, { waitUntil: 'domcontentloaded' });

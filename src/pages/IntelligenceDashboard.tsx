@@ -735,7 +735,7 @@ export default function IntelligenceDashboard() {
           {/* Evidence owns per-domain analysis; this page stays aggregate-only. */}
           <p className="text-xs text-muted-foreground">
             Aggregated trend views only. For per-domain analysis with provenance, open{' '}
-            <a className="underline underline-offset-2 hover:text-foreground" href="/dsx/evidence-beta/operations/thermal">
+            <a className="underline underline-offset-2 hover:text-foreground" href="/evidence/operations/thermal">
               Evidence operations
             </a>
             .

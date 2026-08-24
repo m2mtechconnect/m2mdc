@@ -11,7 +11,7 @@ const ROUTES = [
   '/compliance', '/teams', '/marketplace', '/app/agents',
   '/blueprint/default', '/simulation/preview', '/help', '/playbook',
   '/data-centre-twin', '/infrastructure', '/admin/signups-dashboard',
-  '/dsx/evidence-beta', '/dsx/evidence-beta/thermal', '/dsx/evidence-beta/decisions',
+  '/evidence', '/evidence/thermal', '/evidence/decisions',
 ];
 const VIEWPORTS = [{ n: 'mobile', w: 390, h: 844 }, { n: 'desktop', w: 1440, h: 900 }];
 

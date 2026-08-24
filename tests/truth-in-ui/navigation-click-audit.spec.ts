@@ -73,7 +73,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     const matrix = [
       { name: 'Facility Blueprint', path: '/blueprint/default' },
       { name: 'Simulation', path: '/simulation' },
-      { name: 'Evidence', path: '/dsx/evidence-beta/overview' },
+      { name: 'Evidence', path: '/evidence/overview' },
       { name: 'Command Center', path: '/dashboard' },
     ];
 
@@ -132,7 +132,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
-    await expectPath(page, '/dsx/evidence-beta');
+    await expectPath(page, '/evidence');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();
     expect(nestedInteractive, 'dashboard must not nest links and buttons').toBe(0);

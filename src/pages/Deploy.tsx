@@ -38,6 +38,8 @@ import {
 import { DCCard } from "@/components/dc-ui/DCCard";
 import { DCSectionHeader } from "@/components/dc-ui/DCSectionHeader";
 import { DCKPITile } from "@/components/dc-ui/DCKPITile";
+import { stackLabel } from '@/config/auraStackManifest';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 interface SystemSummary {
   name: string;
@@ -561,16 +563,16 @@ export default function Deploy() {
             icon={<Server className="h-4 w-4" />}
           />
           <DCKPITile
-            label="AI Model"
-            value={summary?.model?.split('/')[1] || 'Not Set'}
+            label={stackLabel('ai.managed')}
+            value={summary?.model ? modelDisplayLabel(summary.model) : 'Not set'}
             sublabel={summary?.grounding ? 'Grounded' : 'Standard'}
             status={summary?.model ? 'normal' : 'warning'}
             icon={<Cpu className="h-4 w-4" />}
           />
           <DCKPITile
-            label="Integrations"
+            label={stackLabel('connections.enterprise')}
             value={summary?.connectedTools?.toString() || '0'}
-            sublabel="Connected tools"
+            sublabel="Configured connections"
             status={summary?.connectedTools && summary.connectedTools > 0 ? 'normal' : 'info'}
             icon={<Zap className="h-4 w-4" />}
           />

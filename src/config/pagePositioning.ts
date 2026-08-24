@@ -48,7 +48,7 @@ export const PAGE_POSITIONING: PagePositioning[] = [
     capabilityId: 'facilities',
   },
   {
-    route: '/dsx/evidence-beta/overview',
+    route: '/evidence/overview',
     title: 'Validation & Evidence',
     purpose:
       'Validation results, provenance, simulation evidence, exports and audit history for a specific facility, blueprint version, run or asset.',

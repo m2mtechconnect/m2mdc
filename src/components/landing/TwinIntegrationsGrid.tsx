@@ -4,10 +4,18 @@
  * Uses M2M brand design tokens from index.css
  */
 
-import { Cloud, Cpu, Server, Gauge, Zap, BarChart3 } from "lucide-react";
+import { Cloud, Cpu, Server, Gauge, Boxes, Sparkles, Cable, FileSearch } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { evidenceQualifier, stackCapability } from "@/config/auraStackManifest";
 
+/**
+ * Named third-party systems are only listed where they are genuine, selectable
+ * connection or deployment destinations. Platform capability wording never
+ * lives here: it comes from the stack manifest below, so the landing page and
+ * the product share one stack vocabulary.
+ */
 const integrationDefs = [
   { nameKey: "landing.intAws", descKey: "landing.intAwsDesc", icon: Cloud, category: "cloud" },
   { nameKey: "landing.intAzure", descKey: "landing.intAzureDesc", icon: Cloud, category: "cloud" },
@@ -15,16 +23,20 @@ const integrationDefs = [
   { nameKey: "landing.intNvidia", descKey: "landing.intNvidiaDesc", icon: Cpu, category: "compute" },
   { nameKey: "landing.intNlyte", descKey: "landing.intNlyteDesc", icon: Server, category: "dcim" },
   { nameKey: "landing.intSchneider", descKey: "landing.intSchneiderDesc", icon: Gauge, category: "dcim" },
-  { nameKey: "landing.intAura", descKey: "landing.intAuraDesc", icon: Zap, category: "platform" },
-  { nameKey: "landing.intCarbon", descKey: "landing.intCarbonDesc", icon: BarChart3, category: "sustainability" },
+];
+
+/** Platform stack cards, driven entirely by the canonical stack manifest. */
+const STACK_CARD_IDS: { id: string; icon: LucideIcon }[] = [
+  { id: 'twin.openusd', icon: Boxes },
+  { id: 'ai.managed', icon: Sparkles },
+  { id: 'connections.enterprise', icon: Cable },
+  { id: 'evidence.workspace', icon: FileSearch },
 ];
 
 const categoryDefs = [
   { key: "cloud", labelKey: "landing.catCloud", color: "text-info" },
   { key: "compute", labelKey: "landing.catCompute", color: "text-warning" },
   { key: "dcim", labelKey: "landing.catDcim", color: "text-success" },
-  { key: "platform", labelKey: "landing.catPlatform", color: "text-primary" },
-  { key: "sustainability", labelKey: "landing.catSustainability", color: "text-success" },
 ];
 
 const containerVariants = {
@@ -100,11 +112,45 @@ export function TwinIntegrationsGrid() {
                     {t(integration.descKey)}
                   </div>
                   {category && (
-                    <span className={`text-[10px] uppercase tracking-wider ${category.color} opacity-70`}>
+                    <span className={`text-xs uppercase tracking-wider ${category.color}`}>
                       {t(category.labelKey)}
                     </span>
                   )}
                 </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+
+        <motion.div
+          className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
+          {STACK_CARD_IDS.map(({ id, icon: Icon }) => {
+            const capability = stackCapability(id);
+            if (!capability || !capability.customerVisible) return null;
+            const qualifier = evidenceQualifier(capability.evidenceStatus);
+            return (
+              <motion.div
+                key={id}
+                variants={itemVariants}
+                className="rounded-2xl border border-border/60 bg-card/70 p-5 text-left"
+              >
+                <Icon className="mb-3 h-6 w-6 text-primary" aria-hidden="true" />
+                <div className="mb-1 flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-foreground">{capability.label}</span>
+                  {qualifier && (
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                      {qualifier}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {capability.description}
+                </p>
               </motion.div>
             );
           })}

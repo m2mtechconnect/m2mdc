@@ -16,7 +16,7 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const ROUTE = '/dsx/evidence-beta';
+const ROUTE = '/evidence';
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },

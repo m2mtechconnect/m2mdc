@@ -19,8 +19,10 @@ function declaredRoutes(): string[] {
   const source = readFileSync(SHELL, 'utf8');
   const paths = [...source.matchAll(/<Route\s+path=(?:"([^"]+)"|\{`?([^`}"]+)`?\})/g)]
     .map((m) => m[1] ?? m[2])
-    .filter((p): p is string => Boolean(p) && p !== '*');
-  return paths.map((p) => (p.startsWith('/') ? p : `/dsx/evidence-beta/${p}`));
+    .filter((p): p is string => Boolean(p) && p !== '*')
+    // The retired evidence root is a redirect-only compatibility mount.
+    .filter((p) => !p.startsWith('/dsx/evidence-beta'));
+  return paths.map((p) => (p.startsWith('/') ? p : `/evidence/${p}`));
 }
 
 describe('surface matrix covers the authenticated shell', () => {
@@ -33,8 +35,8 @@ describe('surface matrix covers the authenticated shell', () => {
     expect(declaredRoutes().length).toBeGreaterThan(50);
   });
 
-  it('never leaves an evidence-beta workspace mountable in reference mode', () => {
-    const evidence = SURFACE_MATRIX.filter((s) => s.path.startsWith('/dsx/evidence-beta'));
+  it('never leaves an evidence workspace mountable in reference mode', () => {
+    const evidence = SURFACE_MATRIX.filter((s) => s.path.startsWith('/evidence'));
     expect(evidence.length).toBeGreaterThan(20);
     for (const surface of evidence) {
       expect(surface.classification).toBe('REFERENCE_UNAVAILABLE');

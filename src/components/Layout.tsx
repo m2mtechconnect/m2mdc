@@ -415,7 +415,7 @@ export function Layout({ children }: LayoutProps) {
                 Learning Hub
               </Link>
               <Link
-                to="/dsx/evidence-beta/sustainability/sovereignty"
+                to="/evidence/sustainability/sovereignty"
                 className="hover:text-foreground transition-smooth"
               >
                 Governance evidence

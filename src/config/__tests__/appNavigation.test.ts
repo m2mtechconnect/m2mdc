@@ -26,11 +26,11 @@ describe('canonical navigation', () => {
       '/dashboard',
       '/blueprint',
       '/simulation',
-      '/dsx/evidence-beta/overview',
+      '/evidence/overview',
     ]);
     const workspace = Object.fromEntries(WORKSPACE_NAV.map((i) => [i.fullName, i.href]));
     expect(workspace['Facility Blueprint']).toBe('/blueprint');
-    expect(workspace['Evidence']).toBe('/dsx/evidence-beta/overview');
+    expect(workspace['Evidence']).toBe('/evidence/overview');
 
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
     expect(manage['Agents']).toBe('/app/agents');
@@ -72,7 +72,7 @@ describe('canonical navigation', () => {
     const blueprint = WORKSPACE_NAV[1];
     expect(isNavItemActive(blueprint, '/blueprint/abc')).toBe(true);
     const evidence = WORKSPACE_NAV[3];
-    expect(isNavItemActive(evidence, '/dsx/evidence-beta/thermal')).toBe(true);
+    expect(isNavItemActive(evidence, '/evidence/thermal')).toBe(true);
   });
 
   it('hides manage items the caller cannot use', () => {
@@ -118,14 +118,14 @@ describe('DSX lifecycle grouping', () => {
     const viewer = navGroups((p) => p === 'twin.view');
     expect(viewer.map((g) => g.id)).toEqual(['overview', 'design', 'simulate', 'govern', 'support']);
     const hrefs = viewer.flatMap((g) => g.items.map((i) => i.href));
-    expect(hrefs).toContain('/dsx/evidence-beta/overview');
+    expect(hrefs).toContain('/evidence/overview');
     expect(hrefs).not.toContain('/settings/ai');
   });
 
   it('exposes the admin capability registry only under Govern > Platform Admin', () => {
     const admin = MANAGE_NAV.find((i) => i.fullName === 'Platform Administration')!;
     expect(admin.group).toBe('govern');
-    expect(admin.children?.map((c) => c.href)).toContain('/admin/dsx-capabilities');
+    expect(admin.children?.map((c) => c.href)).toContain('/admin/accelerated-ai-capabilities');
   });
 
 });

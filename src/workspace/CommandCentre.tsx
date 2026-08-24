@@ -91,7 +91,7 @@ export default function CommandCentre() {
   );
   const rackCount = assets.filter((a) => a.kind === 'rack').length;
   const blueprintHref = `/blueprint/${facility.id || 'default'}`;
-  const evidenceHref = '/dsx/evidence-beta';
+  const evidenceHref = '/evidence';
   const simulationHref = `/simulation?twin=${encodeURIComponent(facility.id || 'default')}`;
   const calculatedAt = latestRun
     ? new Date(latestRun.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })

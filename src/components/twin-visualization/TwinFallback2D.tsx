@@ -153,7 +153,7 @@ export function TwinFallback2D({
               size="sm"
               className="gap-1 text-slate-200 hover:bg-slate-800"
             >
-              <Link to="/dsx/evidence-beta/assets">
+              <Link to="/evidence/assets">
                 Open asset evidence
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
               </Link>

@@ -18,6 +18,8 @@ import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { BuilderToolsPanel } from '@/components/dc-tools';
 import { SovereigntyConfigSection } from '@/components/builder/SovereigntyConfigSection';
 import { CarbonFinancialConfigSection } from '@/components/builder/CarbonFinancialConfigSection';
+import { stackDescription, stackLabel } from '@/config/auraStackManifest';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
@@ -106,8 +108,10 @@ export function Step2Intelligence() {
   }, [modelConfig, setModelConfig, supervisorEnabled, deepResearchEnabled, hallucinationPrevention, knowledgeRestrictions, requireCitations]);
 
   const handleModelChange = async (model: string) => {
+    // The stored value keeps its internal provider/model identifier; the
+    // customer only ever sees the approved capacity label.
     await setModelConfig({ model, provider: model.split('/')[0] });
-    toast.success(`Model updated to ${model.split('/')[1]}`);
+    toast.success(`${stackLabel('ai.managed')} updated to ${modelDisplayLabel(model)}`);
   };
 
   const handleSystemPromptChange = (value: string) => {
@@ -204,8 +208,8 @@ export function Step2Intelligence() {
     <>
       <div className="space-y-6 max-w-[920px] mx-auto">
         <DCSectionHeader
-          title="Intelligence Configuration"
-          subtitle="Configure AI model, knowledge sources, and monitoring behavior"
+          title={`${stackLabel('ai.managed')} configuration`}
+          subtitle={stackDescription('ai.managed')}
           icon={<Brain className="h-5 w-5" />}
         />
 
@@ -420,13 +424,13 @@ export function Step2Intelligence() {
           </TabsList>
 
           <TabsContent value="model" className="space-y-4 mt-6">
-            <DCCard title="AI Model Selection" icon={<Brain className="h-4 w-4" />}>
+            <DCCard title={`${stackLabel('ai.managed')} capacity`} icon={<Brain className="h-4 w-4" />}>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>Model</Label>
+                  <Label>Response profile</Label>
                   <Select value={modelConfig.model} onValueChange={handleModelChange}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a model" />
+                      <SelectValue placeholder="Select a response profile" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="google/gemini-3-pro-preview">Advanced (preview)</SelectItem>

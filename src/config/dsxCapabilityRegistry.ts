@@ -210,7 +210,7 @@ export const DSX_CAPABILITIES: DsxCapability[] = [
   {
     id: 'validation-evidence',
     name: 'Validation & Evidence',
-    route: '/dsx/evidence-beta/overview',
+    route: '/evidence/overview',
     dsxArea: 'Data lake',
     owner: 'AURA',
     status: 'AURA_NATIVE',

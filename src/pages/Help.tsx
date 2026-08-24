@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AURAStackSummary } from '@/components/stack/AURAStackSummary';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { useTour } from '@/context/TourContext';
 import { tourRegistry, type TourId } from '@/tours/tourRegistry';
@@ -56,7 +57,7 @@ const GETTING_STARTED: GuideLink[] = [
   {
     title: 'Review Evidence',
     description: 'Trace operational and sustainability claims back to provenance and decision records.',
-    route: '/dsx/evidence-beta/overview',
+    route: '/evidence/overview',
     icon: FileSearch,
   },
 ];
@@ -104,7 +105,7 @@ const GOVERN: GuideLink[] = [
   {
     title: 'Sovereignty Evidence',
     description: 'Review residency, sovereignty and sustainability evidence without treating modelled claims as certified facts.',
-    route: '/dsx/evidence-beta/sustainability/sovereignty',
+    route: '/evidence/sustainability/sovereignty',
     icon: Shield,
   },
 ];
@@ -253,6 +254,14 @@ export default function Help() {
           <RefreshCw className="mr-2 h-3.5 w-3.5" />
           Reset tours
         </Button>
+      </DCCard>
+
+      <DCCard
+        title="Platform architecture"
+        subtitle="What AURA is made of, in the same vocabulary the product uses. Each capability carries its evidence status."
+        icon={<Server className="h-5 w-5" />}
+      >
+        <AURAStackSummary surface="help" />
       </DCCard>
 
       <DCCard

@@ -25,6 +25,7 @@ import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetai
 import { ConnectionSetupWizard } from '@/components/connections/ConnectionSetupWizard';
 import { CredentialVaultDialog } from '@/components/connections/CredentialVaultDialog';
 import { buildConnectionRows } from '@/connections/presentation';
+import { stackDescription } from '@/config/auraStackManifest';
 import {
   runHealthCheck,
   useAuditEvents,
@@ -282,7 +283,8 @@ export default function Connections() {
         }
         subtitle={
           <>
-            Runtime status is evidence-derived; internal platform dependencies and capability assessment live on{' '}
+            {stackDescription('connections.enterprise')} {stackDescription('data.storage')} Runtime status is
+            evidence-derived; internal platform dependencies and capability assessment live on{' '}
             <Link className="underline underline-offset-4" to="/admin/platform-readiness">
               platform readiness
             </Link>

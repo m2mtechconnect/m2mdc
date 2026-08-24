@@ -1781,6 +1781,41 @@ html:not(.dark) .aura-workspace-theme {
   .aura-ws-title { font-size: 30px; }
 }
 
+/* ---- compact density: canvas workspaces that cannot spend vertical space ---- */
+.aura-ws-header[data-density='compact'] {
+  margin-bottom: 0;
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  box-shadow: none;
+  padding: 10px 16px;
+  gap: 10px;
+}
+
+.aura-ws-header[data-density='compact'] .aura-ws-header-icon {
+  height: 30px;
+  width: 30px;
+  border-radius: 8px;
+}
+
+.aura-ws-header[data-density='compact'] .aura-ws-title,
+@media (min-width: 900px) {
+  .aura-ws-header[data-density='compact'] .aura-ws-title { font-size: 16px; }
+}
+
+.aura-ws-header[data-density='compact'] .aura-ws-title { font-size: 16px; }
+
+.aura-ws-header[data-density='compact'] .aura-ws-description {
+  margin-top: 2px;
+  font-size: 12.5px;
+}
+
+.aura-ws-header[data-density='compact'] .aura-ws-header-meta {
+  padding-top: 8px;
+}
+
+
 .aura-ws-description {
   margin-top: 8px;
   max-width: 78ch;

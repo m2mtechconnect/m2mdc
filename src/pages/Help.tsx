@@ -181,15 +181,15 @@ export default function Help() {
       </SectionCard>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <SectionCard title="Getting Started" icon={Compass} status="operational">
+        <SectionCard title="Getting Started" icon={Compass}>
           <GuideGrid items={GETTING_STARTED} />
         </SectionCard>
 
-        <SectionCard title="Operate" icon={Activity} status="operational">
+        <SectionCard title="Operate" icon={Activity}>
           <GuideGrid items={OPERATE} />
         </SectionCard>
 
-        <SectionCard title="Govern" icon={Shield} status="operational">
+        <SectionCard title="Govern" icon={Shield}>
           <GuideGrid items={GOVERN} />
         </SectionCard>
 

@@ -5,8 +5,8 @@ import { AURA_DEPLOYMENT_OFFERINGS, deploymentOffering } from '../../src/deploym
 
 const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
 const migration = read('supabase/migrations/20260823233000_organization_deployment_profiles.sql');
+const remediation = read('supabase/migrations/20260824003000_enterprise_audit_remediation.sql');
 const builder = read('src/components/builder/dc-steps/DCStep5Deploy.tsx');
-const organizationList = read('supabase/functions/organization-list/index.ts');
 
 describe('AURA deployment topology truth', () => {
   it('keeps shared cloud as the only currently available topology', () => {
@@ -35,11 +35,11 @@ describe('AURA deployment topology truth', () => {
     expect(migration).toContain('CREATE TRIGGER organizations_seed_deployment_profile');
   });
 
-  it('returns deployment truth in the platform customer inventory', () => {
-    expect(organizationList).toContain(".from('organization_deployment_profiles')");
-    expect(organizationList).toContain('deploymentProfile: deployment');
-    expect(organizationList).toContain('capabilityStatus: deployment.capability_status');
-    expect(organizationList).toContain('automationStatus: deployment.automation_status');
+  it('returns deployment truth through the guarded platform customer inventory RPC', () => {
+    expect(remediation).toContain('CREATE OR REPLACE FUNCTION public.platform_list_organizations');
+    expect(remediation).toContain("'deploymentProfile', CASE WHEN dp.org_id IS NULL THEN NULL");
+    expect(remediation).toContain("'capabilityStatus', dp.capability_status");
+    expect(remediation).toContain("'automationStatus', dp.automation_status");
   });
 
   it('does not claim twin activation provisions infrastructure', () => {

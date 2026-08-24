@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
-  "generated_at": "2026-08-24T21:40:00.000Z",
+  "generated_at": "2026-08-24T22:07:00.000Z",
   "policy": "default-deny",
-  "checkpoint": "B7.5-neutral-route-reconciliation",
+  "checkpoint": "P1-batch-b-route-promotion",
   "notes": [
     "PR-0.1 Checkpoint B7.4C: B7.4B verdict corrected to BLOCKED because the",
     "authorized controlled pilot is an approved-user, read-only AURA",
@@ -40,7 +40,8 @@
     "alias_production_exceptions: \"/\" and \"/forgot-password\" are shipped public routes that additionally redirect authenticated sessions to /dashboard.",
     "2026-08-24 enterprise remediation: /admin/customers is classified as a production platform-administration route. Cross-tenant inventory is served by platform_list_organizations(), a SECURITY DEFINER RPC that independently requires an approved profile plus a live global owner grant. Customer provisioning and owner-invite recovery reuse the existing guarded teams-invite function; no new Edge Function inventory entry is introduced.",
     "2026-08-24 enterprise edge promotion: teams-invite is promoted through edge-function-promotions.json. The perimeter overlays only explicit production-allowlisted promotions onto the historical inventory, rejects malformed/unknown/duplicate promotions, and independently re-verifies the actual caller-identity plus scoped-CORS source guard and gateway JWT setting.",
-    "2026-08-24 neutral-route reconciliation: the shipped router now uses /evidence as the provider-neutral authenticated evidence workspace and /admin/accelerated-ai-capabilities as the canonical admin capability route. Flat /evidence compatibility paths and /dsx/evidence-beta/* are redirects only. /admin/dsx-capabilities is also redirect-only. This classification change promotes no Edge Function and preserves default-deny route enforcement."
+    "2026-08-24 neutral-route reconciliation: the shipped router now uses /evidence as the provider-neutral authenticated evidence workspace and /admin/accelerated-ai-capabilities as the canonical admin capability route. Flat /evidence compatibility paths and /dsx/evidence-beta/* are redirects only. /admin/dsx-capabilities is also redirect-only. This classification change promotes no Edge Function and preserves default-deny route enforcement.",
+    "2026-08-24 P1 Batch B route promotion: /blueprint/preview and /simulation/preview are authenticated read-only recommendation previews whose displays are now restricted to recommendation-backed planning values and committed scenario metadata. /studio/systems/:systemId/manage remains protected by twin.edit and now preserves missing runtime/configuration evidence instead of fabricating capability or metric claims. No new Edge Function is promoted by this checkpoint."
   ],
   "production_functions": [
     "agent-execute",
@@ -80,6 +81,7 @@
     "/app/agents/:slug/detail",
     "/auth/callback",
     "/blueprint/:id",
+    "/blueprint/preview",
     "/builder",
     "/compliance",
     "/dashboard",
@@ -103,6 +105,8 @@
     "/settings/ai",
     "/sign-out",
     "/simulation",
+    "/simulation/preview",
+    "/studio/systems/:systemId/manage",
     "/teams",
     "/teams/access-control",
     "/teams/onboarding",
@@ -126,12 +130,9 @@
     "/admin/reference-facility-validation",
     "/agent/:id",
     "/agents/:id/chat",
-    "/blueprint/preview",
     "/deploy",
     "/digital-twins-demo/funding-intake",
     "/marketplace",
-    "/simulation/preview",
-    "/studio/systems/:systemId/manage",
     "/twin-debug"
   ],
   "development_only_routes": [

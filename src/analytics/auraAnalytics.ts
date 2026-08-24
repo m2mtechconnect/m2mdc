@@ -1,5 +1,10 @@
 export type AuraAnalyticsProvider = 'disabled' | 'posthog';
 export type AuraAnalyticsPrimitive = string | number | boolean | null;
+export type AuraAnalyticsEventName =
+  | 'tenant.organization_switched'
+  | 'platform.customer_provisioned'
+  | 'onboarding.invite_created'
+  | 'onboarding.invite_delivery';
 
 export interface AuraAnalyticsEvent {
   organizationId: string;
@@ -30,14 +35,16 @@ function posthogHost(): string | null {
   }
 }
 
-function safeProperties(properties: Record<string, AuraAnalyticsPrimitive> | undefined) {
+export function sanitizeAnalyticsProperties(
+  properties: Record<string, AuraAnalyticsPrimitive> | undefined,
+): Record<string, AuraAnalyticsPrimitive> {
   if (!properties) return {};
   return Object.fromEntries(
     Object.entries(properties).filter(([key, value]) => {
       if (SENSITIVE_KEY_PATTERN.test(key)) return false;
       return value === null || ['string', 'number', 'boolean'].includes(typeof value);
     }),
-  );
+  ) as Record<string, AuraAnalyticsPrimitive>;
 }
 
 function analyticsDistinctId(): string {
@@ -54,7 +61,7 @@ function analyticsDistinctId(): string {
 }
 
 export async function captureAuraEvent(
-  event: string,
+  event: AuraAnalyticsEventName,
   context: AuraAnalyticsEvent,
 ): Promise<AuraAnalyticsResult> {
   const provider = configuredProvider();
@@ -72,7 +79,7 @@ export async function captureAuraEvent(
     properties: {
       distinct_id: analyticsDistinctId(),
       organization_id: context.organizationId,
-      ...safeProperties(context.properties),
+      ...sanitizeAnalyticsProperties(context.properties),
     },
   };
 

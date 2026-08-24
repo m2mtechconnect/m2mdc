@@ -385,7 +385,7 @@ export default function Customers() {
                         <span className="text-sm text-muted-foreground">Owner active</span>
                       ) : organization.ownerInvite ? (
                         <div className="space-y-1">
-                          <div className="max-w-[220px] truncate text-sm text-foreground">{organization.ownerInvite.email ?? 'Email unavailable'}</div>
+                          <div className="max-w-56 truncate text-sm text-foreground">{organization.ownerInvite.email ?? 'Email unavailable'}</div>
                           <div className="text-xs text-muted-foreground">
                             {organization.ownerInvite.expiresAt
                               ? `${isExpired(organization.ownerInvite.expiresAt) ? 'Expired' : 'Expires'} ${new Date(organization.ownerInvite.expiresAt).toLocaleString()}`

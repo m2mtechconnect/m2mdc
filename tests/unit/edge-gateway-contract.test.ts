@@ -5,7 +5,7 @@ import { EDGE_GATEWAY_CAPABILITIES } from '../../src/edge/edgeGatewayCapabilitie
 
 const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
 const migration = read('supabase/migrations/20260823235000_edge_gateway_contract.sql');
-const organizationList = read('supabase/functions/organization-list/index.ts');
+const remediation = read('supabase/migrations/20260824003000_enterprise_audit_remediation.sql');
 
 describe('AURA Edge Gateway contract', () => {
   it('binds every gateway to an organization and validates facility/twin scope', () => {
@@ -44,9 +44,8 @@ describe('AURA Edge Gateway contract', () => {
   });
 
   it('adds gateway inventory counts without claiming connectivity', () => {
-    expect(organizationList).toContain(".from('edge_gateways')");
-    expect(organizationList).toContain('edgeGatewayCount:');
-    expect(organizationList).toContain('onlineEdgeGatewayCount:');
-    expect(organizationList).not.toContain('edgeConnected: true');
+    expect(remediation).toContain("'edgeGatewayCount', (SELECT count(*) FROM public.edge_gateways");
+    expect(remediation).toContain("'onlineEdgeGatewayCount', (SELECT count(*) FROM public.edge_gateways");
+    expect(remediation).not.toContain("'edgeConnected', true");
   });
 });

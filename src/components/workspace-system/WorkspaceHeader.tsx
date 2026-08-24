@@ -33,6 +33,8 @@ export interface WorkspaceHeaderProps {
   /** Optional dense meta row (ids, timestamps). */
   meta?: React.ReactNode;
   as?: 'h1' | 'h2';
+  /** `compact` is for full-height canvas workspaces with no vertical budget. */
+  density?: 'default' | 'compact';
   className?: string;
 }
 
@@ -46,6 +48,7 @@ export function WorkspaceHeader({
   actions,
   meta,
   as: Heading = 'h1',
+  density = 'default',
   className,
 }: WorkspaceHeaderProps) {
   const capability = capabilityId ? stackCopy(capabilityId) : null;
@@ -56,6 +59,7 @@ export function WorkspaceHeader({
       className={cn('aura-ws-header', className)}
       data-testid="workspace-header"
       data-capability={capabilityId}
+      data-density={density}
     >
       <div className="aura-ws-header-main">
         {Icon ? (

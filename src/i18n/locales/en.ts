@@ -1067,8 +1067,8 @@ const en = {
   aiSettings: {
     title: 'AI settings',
     subtitle: 'Configure the managed language model provider for AURA Assistant',
-    gcpConfig: 'Google Cloud Configuration',
-    projectId: 'Google Cloud Project ID',
+    gcpConfig: 'Managed AI Configuration',
+    projectId: 'Managed AI Workspace ID',
     region: 'Region',
     model: 'Model',
     vertexSearch: 'Vertex AI Search & Grounding',

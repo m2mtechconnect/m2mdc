@@ -777,7 +777,7 @@ export default function IntelligenceDashboard() {
                       grain="Facility"
                       window={windowLabel}
                       aggregation="Daily weighted avg"
-                      source="DCIM · BMS"
+                      source="Simulated series (no DCIM feed)"
                     />
                     <div className="mt-2">
                       <MetricProvenanceManifest

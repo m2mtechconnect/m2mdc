@@ -1048,7 +1048,7 @@ const frCA = {
     capabilities: 'Capacités',
     disconnected: 'déconnecté avec succès',
     failedDisconnect: "Échec de la déconnexion de l'intégration",
-    comingSoon: 'intégration bientôt disponible!',
+    comingSoon: "intégration non disponible pour l'instant",
   },
 
   // Recherche universelle

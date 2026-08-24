@@ -431,7 +431,9 @@ async function handleStateUpdate(node: DigitalTwinNode, context: TwinRunContext)
 }
 
 /**
- * Handle notification node - log notification (TODO: implement real notifications)
+ * Handle notification node. Notification delivery is not implemented in the
+ * client runtime: the node records the intent it would dispatch so a run log
+ * stays truthful about what did and did not leave the browser.
  */
 async function handleNotification(node: DigitalTwinNode, context: TwinRunContext): Promise<Partial<TwinRunContext>> {
   const recipient = node.config.recipient || "system";
@@ -439,7 +441,7 @@ async function handleNotification(node: DigitalTwinNode, context: TwinRunContext
 
   context.logs.push({
     nodeId: node.id,
-    message: `[TODO] Would send notification to ${recipient}: ${message}`,
+    message: `Notification not dispatched (delivery unavailable in this runtime). Intended recipient ${recipient}: ${message}`,
     timestamp: new Date().toISOString(),
     level: "info",
   });

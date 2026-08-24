@@ -59,8 +59,9 @@ describe('edge function CORS source guard', () => {
   });
 
   it('covers every Edge Function entrypoint', () => {
-    // Enterprise onboarding adds organization-provision + organization-list.
-    expect(functionEntrypoints()).toHaveLength(165);
+    // Customer inventory/provisioning reuse guarded RPCs + teams-invite rather than
+    // adding ad-hoc Edge Function directories to the production perimeter.
+    expect(functionEntrypoints()).toHaveLength(163);
   });
 
   it('keeps browserless webhooks denying every browser origin', () => {

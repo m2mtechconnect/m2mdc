@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
 import { useRBAC } from '@/contexts/RBACContext';
 import type { Permission } from '@/auth/permissions';
 import { cn } from '@/lib/utils';
+import TenantPeopleAccess from '@/pages/people/TenantPeopleAccess';
 
 interface PeopleAccessLayoutProps {
   children: ReactNode;
@@ -30,10 +31,27 @@ const LOCAL_NAV: Array<{
   },
 ];
 
-/** Salesforce-style local navigation; child pages retain the single page H1. */
+/**
+ * Platform and tenant authority use different persistence planes. The legacy
+ * Teams page remains available for platform-only administration routes, while
+ * /teams renders the organization-scoped member surface whenever an active
+ * organization exists.
+ */
 export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps) {
   const location = useLocation();
-  const { can } = useRBAC();
+  const { can, resolution, activeOrganization } = useRBAC();
+
+  const tenantMembersRoute = location.pathname === '/teams' && !!activeOrganization;
+  if (tenantMembersRoute) {
+    if (!can('tenant.view_members')) return <Navigate to="/dashboard" replace />;
+    return <TenantPeopleAccess />;
+  }
+
+  // Tenant users do not enter platform authorization / onboarding pages by URL.
+  if (resolution.status === 'tenant') {
+    return <Navigate to={can('tenant.view_members') ? '/teams' : '/dashboard'} replace />;
+  }
+
   const visible = LOCAL_NAV.filter((item) => !item.permission || can(item.permission));
   const current = [...visible]
     .sort((a, b) => b.match.length - a.match.length)

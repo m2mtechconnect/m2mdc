@@ -14,7 +14,6 @@ import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loader2, AlertTriangle } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
@@ -25,6 +24,30 @@ Always cite sources when grounding is enabled.
 If you are unsure, say so and suggest a next step.
 Respect user role (Executive | Manager | Engineer).
 Never expose secrets or internal IDs.`;
+
+const DEFAULT_EXTERNAL_MODEL = 'gemini-3.5-flash';
+const FAST_EXTERNAL_MODEL = 'gemini-3.5-flash-lite';
+const SUPPORTED_EXTERNAL_MODELS = new Set([
+  DEFAULT_EXTERNAL_MODEL,
+  FAST_EXTERNAL_MODEL,
+]);
+const LEGACY_FAST_MODELS = new Set([
+  'gemini-1.5-flash',
+  'gemini-1.5-flash-001',
+  'gemini-1.5-flash-002',
+]);
+
+/**
+ * Browser-saved AI settings can outlive a provider model. Migrate the model
+ * choice onto the supported response profiles instead of silently submitting a
+ * retired identifier to the external managed-AI health probe.
+ */
+function normalizeExternalModel(value: unknown): string {
+  if (typeof value !== 'string') return DEFAULT_EXTERNAL_MODEL;
+  if (SUPPORTED_EXTERNAL_MODELS.has(value)) return value;
+  if (LEGACY_FAST_MODELS.has(value)) return FAST_EXTERNAL_MODEL;
+  return DEFAULT_EXTERNAL_MODEL;
+}
 
 const RESIDENCY_LABELS: Record<string, string> = {
   'northamerica-northeast1': 'Canada',
@@ -62,7 +85,7 @@ function AISettingsPage() {
   const { t } = useTranslation();
   const [projectId, setProjectId] = useState("");
   const [region, setRegion] = useState("northamerica-northeast1");
-  const [model, setModel] = useState("gemini-1.5-pro");
+  const [model, setModel] = useState(DEFAULT_EXTERNAL_MODEL);
   const [groundingEnabled, setGroundingEnabled] = useState(false);
   const [dataStoreId, setDataStoreId] = useState("");
   const [topK, setTopK] = useState(20);
@@ -92,7 +115,7 @@ function AISettingsPage() {
         const settings = JSON.parse(stored);
         if (settings.projectId) setProjectId(settings.projectId);
         if (settings.region) setRegion(settings.region);
-        if (settings.model) setModel(settings.model);
+        setModel(normalizeExternalModel(settings.model));
         if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
         if (settings.dataStoreId) setDataStoreId(settings.dataStoreId);
         if (typeof settings.topK === 'number') setTopK(settings.topK);
@@ -222,9 +245,9 @@ function AISettingsPage() {
         )}
 
         <DCCard
-          title={t("aiSettings.gcpConfig")}
+          title="Managed AI configuration"
           icon={<Sparkles className="h-5 w-5 text-primary" />}
-          status="operational"
+          status="neutral"
         >
           <div className="grid gap-6">
             <div className="space-y-2">
@@ -268,10 +291,13 @@ function AISettingsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card z-50">
-                  <SelectItem value="gemini-1.5-pro">Balanced (recommended)</SelectItem>
-                  <SelectItem value="gemini-1.5-flash">Fast</SelectItem>
+                  <SelectItem value={DEFAULT_EXTERNAL_MODEL}>Balanced (recommended)</SelectItem>
+                  <SelectItem value={FAST_EXTERNAL_MODEL}>Fast</SelectItem>
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground">
+                The selected profile is validated only when you run the health check.
+              </p>
             </div>
           </div>
         </DCCard>
@@ -341,7 +367,7 @@ function AISettingsPage() {
         <DCCard
           title="Generation Parameters"
           icon={<Shield className="h-5 w-5 text-primary" />}
-          status="operational"
+          status="neutral"
         >
           <div className="space-y-6">
             <div className="space-y-2">

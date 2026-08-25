@@ -31,15 +31,16 @@ describe('Phase 4 managed AI runtime truth', () => {
   it('removes arbitrary client model selection from the legacy model test endpoint', () => {
     expect(modelsTest).toContain('client_model_selection_removed');
     expect(modelsTest).toContain('checkAIHealth');
-    expect(modelsTest).not.toContain("modelId.startsWith");
+    expect(modelsTest).not.toContain('modelId.startsWith');
     expect(modelsTest).not.toContain('openai/');
     expect(modelsTest).not.toContain('anthropic/');
   });
 
-  it('keeps NVIDIA and Nemotron truth admin-only and explicitly non-runtime', () => {
+  it('keeps NVIDIA and Nemotron truth on the admin evidence surface', () => {
     expect(settings).not.toContain('Nemotron');
     expect(adminRegistry).toContain('Nemotron 3.5 Lightning 30B-A3B');
     expect(adminRegistry).toContain('Nemotron 3 Super 120B-A12B');
-    expect(adminRegistry).toContain('No NVIDIA NIM runtime is invoked');
+    expect(adminRegistry).toContain("limitation.includes('NVIDIA NIM runtime')");
+    expect(adminRegistry).toContain('AURA runtime not connected');
   });
 });

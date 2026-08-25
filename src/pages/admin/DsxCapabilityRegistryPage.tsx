@@ -1,10 +1,7 @@
 /**
  * Admin-only accelerated AI capability registry.
- *
- * The underlying registry retains internal compatibility identifiers, but the
- * canonical admin surface is provider-neutral. A vendor/reference mapping may
- * be displayed only when the source-controlled registry carries that evidence;
- * it never implies a connected runtime by itself.
+ * Vendor/reference material may be shown here only when it is clearly separated
+ * from AURA runtime evidence. A reference model is never treated as connected.
  */
 import { useEffect } from 'react';
 import { useRBAC } from '@/contexts/RBACContext';
@@ -19,11 +16,20 @@ import { allowedClaimsFor, prohibitedClaimsFor } from '@/config/dsxClaimsPolicy'
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+const NVIDIA_NIM_SUPPORT_MATRIX = 'https://docs.nvidia.com/nim/large-language-models/latest/reference/support-matrix.html';
+const NVIDIA_REFERENCE_MODELS = [
+  'Nemotron 3.5 Lightning 30B-A3B',
+  'Nemotron 3 Super 120B-A12B',
+] as const;
+
 export default function DsxCapabilityRegistryPage() {
   const { can, loading } = useRBAC();
   const authorized = can('platform.view_admin_console');
   const counts = capabilityCountsByStatus();
   const problems = validateRegistry();
+  const agentRuntime = DSX_CAPABILITIES.find((capability) => capability.id === 'agents-optimization');
+  const nimRuntimeEvidence = agentRuntime?.limitations.find((limitation) => limitation.includes('NVIDIA NIM runtime')) ??
+    'NVIDIA NIM runtime status is not evidenced.';
 
   useEffect(() => {
     document.title = 'Accelerated AI capability registry | AURA admin';
@@ -50,8 +56,8 @@ export default function DsxCapabilityRegistryPage() {
         <h1 className="text-xl font-semibold text-foreground">Accelerated AI capability registry</h1>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">
           Source-controlled evidence for AURA accelerated AI capabilities, reference-architecture mappings,
-          limitations, and validation status. A reference mapping is not evidence that a vendor runtime is
-          connected. Status cannot be promoted from this UI.
+          limitations and validation status. A reference mapping is not evidence that a vendor runtime is connected.
+          Status cannot be promoted from this UI.
         </p>
       </header>
 
@@ -62,6 +68,33 @@ export default function DsxCapabilityRegistryPage() {
           </Badge>
         ))}
       </div>
+
+      <Card data-testid="nvidia-nemotron-reference-status">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <span>NVIDIA Nemotron reference validation</span>
+            <Badge variant="outline" className="text-[11px]">
+              AURA runtime not connected
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2 text-xs text-muted-foreground">
+          <p>
+            NVIDIA's current NIM support matrix lists {NVIDIA_REFERENCE_MODELS.join(' and ')} as supported model families.
+            Their presence in NVIDIA documentation is reference evidence only and does not make them executable in AURA.
+          </p>
+          <p><span className="text-foreground">AURA runtime evidence:</span> {nimRuntimeEvidence}</p>
+          <p>
+            Promotion requires an AURA-controlled NIM endpoint, approved credentials, a successful runtime probe and retained
+            evidence for the exact deployed model/profile.
+          </p>
+          <p>
+            <a href={NVIDIA_NIM_SUPPORT_MATRIX} target="_blank" rel="noreferrer" className="underline underline-offset-4">
+              NVIDIA NIM support matrix
+            </a>
+          </p>
+        </CardContent>
+      </Card>
 
       {Object.keys(problems).length > 0 && (
         <Card className="border-destructive/40">

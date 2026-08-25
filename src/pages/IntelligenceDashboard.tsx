@@ -864,7 +864,7 @@ export default function IntelligenceDashboard() {
                     source="IPMI · Scheduler"
                   />
                 </CardHeader>
-                <CardContent>
+                <CardContent className="overflow-x-clip">
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={gpuUtilData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />

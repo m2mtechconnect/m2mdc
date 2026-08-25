@@ -9,9 +9,9 @@ import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
  * styling is scoped to NOC/data-centre modules through the separate
  * `.noc-theme` contract; it is not a global user-selectable application mode.
  *
- * These tests therefore capture supported global-light desktop/mobile
- * surfaces only. CI generates fresh Linux Chromium screenshots and verifies
- * them against the reviewed text fingerprint manifest.
+ * These tests capture the supported lifecycle workspaces on desktop and the
+ * highest-value responsive surfaces on mobile. CI generates fresh Linux
+ * Chromium screenshots for human review and fingerprint verification.
  */
 
 const VISUAL_BUILDER_ID = '00000000-0000-4000-8000-000000000099';
@@ -62,6 +62,13 @@ async function primeGlobalLightTheme(page: Page) {
 async function expectGlobalLightTheme(page: Page) {
   await expect(page.locator('html')).toHaveClass(/(^|\s)light(\s|$)/);
   await expect(page.locator('html')).not.toHaveClass(/(^|\s)dark(\s|$)/);
+}
+
+async function expectLifecycleNavigation(page: Page) {
+  await expect(page.getByRole('link', { name: /^Build$/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Operate$/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Simulation$/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Evidence$/i }).first()).toBeVisible();
 }
 
 async function installBuilderVisualMock(context: BrowserContext) {
@@ -140,12 +147,13 @@ test.beforeEach(async ({ context, page }) => {
   await primeGlobalLightTheme(page);
 });
 
-test.describe('Visual Regression - Supported Global Light Surfaces', () => {
-  test('Dashboard command centre', async ({ page }) => {
+test.describe('Visual Regression - Lifecycle Workspaces', () => {
+  test('Dashboard command centre and lifecycle navigation', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expect(page.getByTestId('command-centre')).toBeVisible();
+    await expectLifecycleNavigation(page);
     await expect(page).toHaveScreenshot('dashboard-hero-light.png', { maxDiffPixels: 100 });
   });
 
@@ -174,10 +182,19 @@ test.describe('Visual Regression - Supported Global Light Surfaces', () => {
   });
 
   test('Connections', async ({ page }) => {
-    await page.goto('/integrations');
+    await page.goto('/manage/integrations');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
     await expect(page).toHaveScreenshot('integrations-light.png', { maxDiffPixels: 100 });
+  });
+
+  test('AI runtime', async ({ page }) => {
+    await page.goto('/settings/ai');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
+    await expect(page).toHaveScreenshot('ai-runtime-light.png', { maxDiffPixels: 100, fullPage: true });
   });
 
   test('Operations and telemetry', async ({ page }) => {
@@ -185,7 +202,32 @@ test.describe('Visual Regression - Supported Global Light Surfaces', () => {
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
     await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
     await expect(page).toHaveScreenshot('analytics-roi-light.png', { maxDiffPixels: 200 });
+  });
+
+  test('Simulation workspace', async ({ page }) => {
+    await page.goto('/simulation');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
+    await expect(page).toHaveScreenshot('simulation-light.png', { maxDiffPixels: 200 });
+  });
+
+  test('Evidence workspace', async ({ page }) => {
+    await page.goto('/evidence/overview');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
+    await expect(page).toHaveScreenshot('evidence-overview-light.png', { maxDiffPixels: 150 });
+  });
+
+  test('Deployment history', async ({ page }) => {
+    await page.goto('/deployments');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectLifecycleNavigation(page);
+    await expect(page).toHaveScreenshot('deployments-light.png', { maxDiffPixels: 100 });
   });
 
   test('Teams', async ({ page }) => {
@@ -238,5 +280,23 @@ test.describe('Visual Regression - Mobile', () => {
     await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot('analytics-mobile.png', { maxDiffPixels: 150, fullPage: true });
+  });
+
+  test('Simulation mobile', async ({ page }) => {
+    await page.goto('/simulation');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
+    await expectNoHorizontalOverflow(page);
+    await expect(page).toHaveScreenshot('simulation-mobile.png', { maxDiffPixels: 200, fullPage: true });
+  });
+
+  test('Connections mobile', async ({ page }) => {
+    await page.goto('/manage/integrations');
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
+    await expectNoHorizontalOverflow(page);
+    await expect(page).toHaveScreenshot('connections-mobile.png', { maxDiffPixels: 150, fullPage: true });
   });
 });

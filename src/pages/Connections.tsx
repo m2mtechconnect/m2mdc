@@ -3,7 +3,7 @@
  * systems. Canonical route: /manage/integrations
  * Alias: /manage/connections
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Cable, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -74,6 +74,7 @@ export default function Connections() {
   const [credentialFor, setCredentialFor] = useState<string | null>(null);
   const [mapRequestFor, setMapRequestFor] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
+  const detailTriggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     document.title = 'Connections | AURA DC';
@@ -107,6 +108,30 @@ export default function Connections() {
     eventCount.refetch();
     setLastRefreshedAt(Date.now());
   }, [connections, healthChecks, ingestRuns, auditEvents, mappings, credentials, eventCount]);
+
+  const openDetail = useCallback((connectionId: string) => {
+    const active = document.activeElement;
+    detailTriggerRef.current = active instanceof HTMLElement ? active : null;
+    setDetailId(connectionId);
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    const trigger = detailTriggerRef.current;
+    detailTriggerRef.current = null;
+    setDetailId(null);
+    if (!trigger || !trigger.isConnected) return;
+
+    let attempts = 0;
+    const restoreFocus = () => {
+      attempts += 1;
+      if (!trigger.isConnected) return;
+      trigger.focus();
+      if (document.activeElement !== trigger && attempts < 8) {
+        requestAnimationFrame(restoreFocus);
+      }
+    };
+    requestAnimationFrame(restoreFocus);
+  }, []);
 
   const rows = useMemo(
     () => buildConnectionRows(
@@ -145,6 +170,7 @@ export default function Connections() {
   }
 
   function handleMap(connectionId: string) {
+    detailTriggerRef.current = null;
     setDetailId(null);
     setMapRequestFor(connectionId);
     setTab('data-flows');
@@ -210,7 +236,7 @@ export default function Connections() {
             eventCount={eventCount.data ?? 0}
             loading={loading}
             lastRefreshedAt={lastRefreshedAt}
-            onOpenConnection={setDetailId}
+            onOpenConnection={openDetail}
             onGoToTab={setTab}
           />
         </TabsContent>
@@ -220,7 +246,7 @@ export default function Connections() {
             rows={rows}
             loading={loading}
             isAdmin={isAdmin}
-            onOpen={setDetailId}
+            onOpen={openDetail}
             onAdd={() => setWizardOpen(true)}
             onTest={handleTest}
             onMap={handleMap}
@@ -275,7 +301,7 @@ export default function Connections() {
       <ConnectionDetailDrawer
         row={detailRow}
         open={detailRow !== null}
-        onOpenChange={(open) => { if (!open) setDetailId(null); }}
+        onOpenChange={(open) => { if (!open) closeDetail(); }}
         isAdmin={isAdmin}
         credential={(credentials.data ?? []).find((c) => c.connection_id === detailRow?.connection.id) ?? null}
         contracts={(contracts.data ?? []).filter((c) => c.connection_id === detailRow?.connection.id)}

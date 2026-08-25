@@ -63,7 +63,7 @@ test.describe('PR13 automated persona acceptance', () => {
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await expectBuilderStep(page, 2, 'Intelligence');
-    await expect(page.getByText('AURA Intelligence')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'AURA Intelligence', exact: true })).toBeVisible();
     await expect(page.getByText('1. Intelligence profile')).toBeVisible();
     await expect(page.getByText('2. Knowledge')).toBeVisible();
     await expect(page.getByText('3. Behavior & evidence')).toBeVisible();
@@ -212,7 +212,7 @@ test.describe('PR13 automated visual, reflow and accessibility acceptance', () =
     await expectBuilderStep(page, 1, 'Overview');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await expectBuilderStep(page, 2, 'Intelligence');
-    await expect(page.getByText('AURA Intelligence')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'AURA Intelligence', exact: true })).toBeVisible();
 
     await page.goto('/manage/integrations', { waitUntil: 'domcontentloaded' });
     await expect(page.getByRole('tab', { name: 'Overview', exact: true })).toHaveAttribute('data-state', 'active');
@@ -231,7 +231,7 @@ test.describe('PR13 automated visual, reflow and accessibility acceptance', () =
     await expectBuilderStep(page, 1, 'Overview');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
     await expectBuilderStep(page, 2, 'Intelligence');
-    await expect(page.getByText('AURA Intelligence')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'AURA Intelligence', exact: true })).toBeVisible();
     await runAxe(page, 'Builder Intelligence');
   });
 });

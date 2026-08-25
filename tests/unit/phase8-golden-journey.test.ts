@@ -67,7 +67,9 @@ describe('Phase 8 AURA golden journey', () => {
   });
 
   it('persists review decisions to the server evidence boundary before local presentation state', () => {
-    expect(decisionPersistence).toContain("invokeEdgeFunction('record-decision'");
+    expect(decisionPersistence).toContain("supabase.functions.invoke('record-decision'");
+    expect(decisionPersistence).toContain('if (!input.run.serverId)');
+    expect(decisionPersistence).toContain('idempotencyKey');
     expect(decisionPersistence).toContain('recommendationId');
     expect(decisionPersistence).toContain('rationale');
   });

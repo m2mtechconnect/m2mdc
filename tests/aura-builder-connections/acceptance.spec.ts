@@ -93,7 +93,7 @@ test.describe('PR13 automated persona acceptance', () => {
     await expect(dialog.getByText('Deployment completed')).toBeVisible();
     expect(backend.deploymentCalls()).toBe(1);
 
-    await assertWhiteLabelVisibleSurface(page, 'main');
+    await assertWhiteLabelVisibleSurface(page, '[data-builder-flow="standard"]');
     expect(backend.blockedRequests()).toEqual([]);
   });
 

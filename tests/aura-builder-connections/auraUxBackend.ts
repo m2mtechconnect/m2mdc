@@ -48,6 +48,13 @@ function sessionPayload() {
   };
 }
 
+function isNonFunctionalExternal(url: URL): boolean {
+  return url.hostname === 'fonts.googleapis.com'
+    || url.hostname === 'fonts.gstatic.com'
+    || url.hostname === 'clarity.ms'
+    || url.hostname.endsWith('.clarity.ms');
+}
+
 const DEFINITIONS = [
   {
     id: 'bacnet_ip', name: 'BACnet/IP', category: 'Facility and OT', provider: 'AURA', version: '1.0',
@@ -120,6 +127,7 @@ const AUDIT_EVENTS = [{
 export interface AuraUxBackendHandle {
   requests: () => string[];
   blockedRequests: () => string[];
+  nonFunctionalRequests: () => string[];
   deploymentCalls: () => number;
   countPath: (pathname: string) => number;
 }
@@ -132,6 +140,7 @@ export async function installAuraUxBackend(
   const session = sessionPayload();
   const requests: string[] = [];
   const blocked: string[] = [];
+  const nonFunctional: string[] = [];
   let deploymentCalls = 0;
   let builderConfig: Record<string, unknown> = {
     source: 'blank',
@@ -190,7 +199,12 @@ export async function installAuraUxBackend(
 
     if (url.origin !== SUPABASE_ORIGIN) {
       if (url.hostname === '127.0.0.1' || url.hostname === 'localhost') return route.fallback();
-      blocked.push(`${request.method()} ${url.origin}${url.pathname}`);
+      const entry = `${request.method()} ${url.origin}${url.pathname}`;
+      if (isNonFunctionalExternal(url)) {
+        nonFunctional.push(entry);
+        return route.abort('blockedbyclient');
+      }
+      blocked.push(entry);
       return route.abort('blockedbyclient');
     }
 
@@ -294,6 +308,7 @@ export async function installAuraUxBackend(
   return {
     requests: () => requests.slice(),
     blockedRequests: () => blocked.slice(),
+    nonFunctionalRequests: () => nonFunctional.slice(),
     deploymentCalls: () => deploymentCalls,
     countPath: (pathname: string) => requests.filter((entry) => entry.endsWith(` ${pathname}`)).length,
   };

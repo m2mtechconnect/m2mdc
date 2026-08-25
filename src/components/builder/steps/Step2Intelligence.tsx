@@ -347,13 +347,16 @@ export function Step2Intelligence() {
 }
 
 function PolicyToggle({ label, description, checked, onChange }: { label: string; description: string; checked: boolean; onChange: (value: boolean) => void }) {
+  const controlId = `aura-policy-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
+  const descriptionId = `${controlId}-description`;
+
   return (
     <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
       <div>
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <Label htmlFor={controlId} className="text-sm font-medium">{label}</Label>
+        <p id={descriptionId} className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <Switch id={controlId} checked={checked} onCheckedChange={onChange} aria-describedby={descriptionId} />
     </div>
   );
 }

@@ -64,6 +64,10 @@ export default function Builder() {
   const [initError, setInitError] = useState<string | null>(null);
 
   const requestedTwinId = searchParams.get('twin');
+  const configuredTwins = useMemo(
+    () => twins.filter((candidate) => candidate.metadata?.provisioned !== 'default_starter_twin'),
+    [twins],
+  );
 
   const hasIntent = useMemo(() => {
     if (fromScanner) return true;
@@ -155,13 +159,13 @@ export default function Builder() {
 
   useEffect(() => {
     if (!authChecked || !requestedTwinId || twinLoading) return;
-    const requested = twins.find((candidate) => candidate.id === requestedTwinId);
+    const requested = configuredTwins.find((candidate) => candidate.id === requestedTwinId);
     if (!requested) {
-      setInitError('The selected facility is not available to this workspace.');
+      setInitError('The selected facility is not available or still requires operator setup.');
       return;
     }
     if (activeTwinId !== requested.id) void setActiveTwin(requested.id);
-  }, [authChecked, requestedTwinId, twinLoading, twins, activeTwinId, setActiveTwin]);
+  }, [authChecked, requestedTwinId, twinLoading, configuredTwins, activeTwinId, setActiveTwin]);
 
   useEffect(() => {
     if (!authChecked || isInitialized) return;
@@ -273,7 +277,7 @@ export default function Builder() {
     );
   }
 
-  if (!fromScanner && twins.length === 0) {
+  if (!fromScanner && configuredTwins.length === 0) {
     return (
       <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="facility-required-heading">
         <div className="mx-auto max-w-2xl space-y-6 text-center">
@@ -295,7 +299,8 @@ export default function Builder() {
 
   if (!hasIntent || initError || (!isLoading && !builderId)) {
     const startFacilityBuild = async () => {
-      const facilityId = activeTwinId ?? twins[0]?.id;
+      const activeConfiguredTwin = configuredTwins.find((candidate) => candidate.id === activeTwinId);
+      const facilityId = activeConfiguredTwin?.id ?? configuredTwins[0]?.id;
       if (!facilityId) {
         navigate('/manage/facilities?create=true&next=builder');
         return;
@@ -350,9 +355,9 @@ export default function Builder() {
             message: 'This build is not bound to a facility. Start the build from the Facilities workspace.',
           };
         }
-        const boundTwin = twins.find((candidate) => candidate.id === boundTwinId);
+        const boundTwin = configuredTwins.find((candidate) => candidate.id === boundTwinId);
         if (!boundTwin) {
-          return { success: false, message: 'The bound facility is no longer available to this workspace.' };
+          return { success: false, message: 'The bound facility is no longer available or still requires operator setup.' };
         }
         if (activeTwinId !== boundTwinId) await setActiveTwin(boundTwinId);
       } catch (bindingError) {

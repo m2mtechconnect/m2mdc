@@ -85,9 +85,6 @@ export default function ManageFacilities() {
     [twins],
   );
 
-  // Build and Command Center can deep-link directly into the one canonical
-  // creation dialog. Keep `next` in the URL until creation succeeds so the
-  // handoff remains explicit across refreshes and validation errors.
   useEffect(() => {
     if (!canEdit || params.get('create') !== 'true') return;
     setOpen(true);
@@ -220,7 +217,7 @@ export default function ManageFacilities() {
               <div className="min-w-[220px] flex-1">
                 <p className="flex flex-wrap items-center gap-2 text-sm font-medium text-foreground">
                   {twin.name}
-                  {twin.id === activeTwinId && <Badge variant="outline" className="text-[11px]">Current</Badge>}
+                  {twin.id === activeTwinId && <Badge variant="outline" className="text-xs">Current</Badge>}
                 </p>
                 <p className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                   <MapPin className="h-3 w-3" aria-hidden />

@@ -65,7 +65,7 @@ async function expectGlobalLightTheme(page: Page) {
 }
 
 async function expectLifecycleNavigation(page: Page) {
-  await expect(page.getByRole('link', { name: /^Build$/i }).first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Build & Configure$/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /^Operate$/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /^Simulation$/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /^Evidence$/i }).first()).toBeVisible();

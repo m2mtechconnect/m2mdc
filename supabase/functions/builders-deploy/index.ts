@@ -64,10 +64,18 @@ serve(createHandler({
       } else {
         const { data: facility, error: facilityError } = await supabase
           .from('data_centre_twins')
-          .select('id')
+          .select('id, metadata')
           .eq('id', boundTwinId)
           .maybeSingle();
-        if (facilityError || !facility) errors.push('Bound facility is not available');
+
+        if (facilityError || !facility) {
+          errors.push('Bound facility is not available');
+        } else {
+          const metadata = facility.metadata as Record<string, unknown> | null;
+          if (metadata?.provisioned === 'default_starter_twin') {
+            errors.push('Bound facility requires operator setup');
+          }
+        }
       }
     }
 

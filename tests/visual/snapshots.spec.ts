@@ -50,8 +50,15 @@ const visualBuilder = {
 
 async function primeGlobalLightTheme(page: Page) {
   await page.addInitScript(() => {
-    try { window.localStorage.setItem('theme', 'light'); }
-    catch { /* storage disabled */ }
+    try {
+      window.localStorage.setItem('theme', 'light');
+      window.localStorage.setItem('m2m_tour_state_v1', JSON.stringify({
+        studioIntro: { seen: true },
+        overview: { seen: true },
+        simulation: { seen: true },
+        blueprint: { seen: true },
+      }));
+    } catch { /* storage disabled */ }
     const root = document.documentElement;
     root.classList.remove('dark');
     root.classList.add('light');

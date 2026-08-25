@@ -1,14 +1,7 @@
 /**
  * AURA connection classes and managed connector presentation model.
- *
- * Customer-facing terminology only. AURA is the product; the implementation
- * platform behind a managed binding is never named in this module, in any
- * string it exports, or in anything rendered from it.
- *
- * The authorization mirror below explains a decision in the UI. It is NOT the
- * gate: the authoritative check runs server-side in
- * `supabase/functions/_shared/managedConnectorAuthz.ts`, and the two
- * implementations are kept identical by the unit suite.
+ * Customer-facing terminology only. The authorization mirror explains the
+ * server decision; it is never the security gate.
  */
 
 export type ConnectionClass = 'MANAGED_SHARED' | 'MANAGED_USER' | 'AURA_NATIVE' | 'EXTERNAL_DSX_RUNTIME';
@@ -66,11 +59,6 @@ export const ELIGIBILITY_TONE: Record<RuntimeEligibility, 'positive' | 'caution'
   NOT_VERIFIED: 'neutral',
 };
 
-/**
- * A build-time chat connector is never an operational AURA integration, and a
- * connector that is merely supported by the platform is not selectable until
- * an operator has verified the project binding.
- */
 export function isRuntimeSelectable(entry: { eligibility: RuntimeEligibility; linked_to_project: boolean }): boolean {
   return (
     (entry.eligibility === 'RUNTIME_SHARED_SUPPORTED' || entry.eligibility === 'RUNTIME_USER_SUPPORTED') &&
@@ -78,7 +66,6 @@ export function isRuntimeSelectable(entry: { eligibility: RuntimeEligibility; li
   );
 }
 
-/** Copy shown when authorization must leave AURA. Deliberately not reassuring. */
 export const EXTERNAL_AUTHORIZATION_NOTICE =
   'Continue to the provider\u2019s secure authorization service. This step leaves AURA, and the external authorization domain is visible in the browser address bar and in network inspection.';
 
@@ -137,8 +124,8 @@ export function authorizeManagedOperation(ctx: AuthorizationContext): Authorizat
   if (!c.enabled || c.status === 'DISABLED' || c.status === 'REVOKED') {
     return deny('connection_revoked', 'This connection is disabled or revoked.');
   }
-  if (c.tenant_id !== null && c.tenant_id !== ctx.actor_tenant_id) {
-    return deny('tenant_scope_violation', 'This connection belongs to another tenant.');
+  if (!c.tenant_id || !ctx.actor_tenant_id || c.tenant_id !== ctx.actor_tenant_id) {
+    return deny('tenant_scope_violation', 'This connection is not scoped to your active organization.');
   }
   if (c.facility_id !== null && ctx.requested_facility_id !== null && c.facility_id !== ctx.requested_facility_id) {
     return deny('facility_scope_violation', 'This connection is scoped to a different facility.');
@@ -147,7 +134,7 @@ export function authorizeManagedOperation(ctx: AuthorizationContext): Authorizat
     return deny('operation_not_allowlisted', 'This operation is not on the connector allowlist.');
   }
   if (!ctx.operation.allowed_roles.some((role) => ctx.actor_roles.includes(role))) {
-    return deny('role_not_permitted', 'Your role cannot perform this operation.');
+    return deny('role_not_permitted', 'Your organization role cannot perform this operation.');
   }
   if (ctx.operation.classification === 'WRITE' || ctx.operation.requires_approval) {
     const approval = ctx.approval;
@@ -184,9 +171,7 @@ export interface ManagedCapabilityEntry {
   native_required_reason: string | null;
   verified_at: string | null;
   evidence_note: string;
-  /** True when this connector can be authorized per user at all. */
   user_bindable?: boolean;
-  /** True only when a connector client exists for this project. */
   user_client_configured?: boolean;
   requested_scopes?: string[];
   user_binding: {

@@ -2,21 +2,23 @@
  * Operator-triggered runtime verification for an AURA Managed Connector.
  *
  * Executes the manifest-declared read-only probe against the managed gateway
- * and records the evidence-derived verification state. Fail-closed rules:
- *   - Session JWT required; roles, tenant and probe path resolved server-side.
- *   - The caller never supplies a URL, host, path, credential or gateway key.
- *   - authorizeManagedOperation() is the only gate; default is deny.
- *   - The state is derived from the probe result, never from the request.
+ * and records evidence-derived verification state. Tenant and role authority
+ * are derived from the caller-scoped database client before service-role access.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
+import {
+  MANAGED_OPERATOR_ROLES,
+  resolveCallerOrgRoles,
+  resolveCallerTenant,
+  tenantVisible,
+  TENANT_FORBIDDEN,
+  TENANT_REQUIRED,
+} from '../_shared/connectionTenant.ts';
 import { manifestEntry, operationFor } from '../_shared/managedConnectorManifest.ts';
 import { authorizeManagedOperation } from '../_shared/managedConnectorAuthz.ts';
 import { countLiveRecords, evaluateVerification } from '../_shared/managedVerification.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -24,7 +26,6 @@ const CORS_EXTRA: Record<string, string> = {
 let CORS: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 const GATEWAY_BASE = 'https://connector-gateway.lovable.dev';
-const OPERATOR_ROLES = ['owner', 'admin', 'operator', 'engineer'];
 
 function json(status: number, body: Record<string, unknown>) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -38,13 +39,29 @@ Deno.serve(async (req) => {
   const correlationId = crypto.randomUUID();
   const startedAtIso = new Date().toISOString();
   const startedAt = Date.now();
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const authHeader = req.headers.get('Authorization') ?? '';
   if (!authHeader.startsWith('Bearer ')) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
-  const { data: userData } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-  const user = userData?.user;
-  if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const caller = createClient(
+    supabaseUrl,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+  const { data: authData, error: authError } = await caller.auth.getUser();
+  const user = authData?.user;
+  if (authError || !user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const tenantId = await resolveCallerTenant(caller);
+  if (!tenantId) return json(403, { ...TENANT_REQUIRED, correlation_id: correlationId });
+  const roles = await resolveCallerOrgRoles(caller, user.id, tenantId, MANAGED_OPERATOR_ROLES);
+  if (roles.length === 0) {
+    return json(403, {
+      error_code: 'operator_role_required',
+      safe_message: 'Runtime verification requires an organization operator, engineer, administrator or owner role.',
+      correlation_id: correlationId,
+    });
+  }
 
   let body: Record<string, unknown>;
   try {
@@ -55,24 +72,16 @@ Deno.serve(async (req) => {
   const connectionId = typeof body.connection_id === 'string' ? body.connection_id : '';
   if (!connectionId) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
 
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const { data: connection } = await admin
     .from('connection_instances')
     .select('id, connector_id, tenant_id, facility_id, binding_class, platform_binding_state, enabled, status, verification_state')
     .eq('id', connectionId)
     .maybeSingle();
 
-  const tenantId = await resolveCallerTenant(admin, user.id);
   if (!connection) return json(404, { error_code: 'connection_not_found', correlation_id: correlationId });
-  if (!tenantVisible(connection.tenant_id, tenantId)) return json(403, { ...TENANT_FORBIDDEN, correlation_id: correlationId });
-
-  const { data: roleRows } = await admin.from('user_roles').select('role').eq('user_id', user.id);
-  const roles = (roleRows ?? []).map((r: { role: string }) => r.role);
-  if (!roles.some((r) => OPERATOR_ROLES.includes(r))) {
-    return json(403, {
-      error_code: 'operator_role_required',
-      safe_message: 'Runtime verification requires an operator, engineer, administrator or owner role.',
-      correlation_id: correlationId,
-    });
+  if (!tenantVisible(connection.tenant_id ?? null, tenantId)) {
+    return json(403, { ...TENANT_FORBIDDEN, correlation_id: correlationId });
   }
 
   const entry = manifestEntry(connection.connector_id);
@@ -99,7 +108,7 @@ Deno.serve(async (req) => {
       enabled: connection.enabled,
       status: connection.status,
     },
-    requested_facility_id: null,
+    requested_facility_id: connection.facility_id ?? null,
     operation,
     approval: null,
     invocations_last_hour: 0,
@@ -155,7 +164,6 @@ Deno.serve(async (req) => {
   const verdict = evaluateVerification({ reachable, http_status: httpStatus, record_count: recordCount });
   const previousState = (connection.verification_state as string | null) ?? 'NOT_VERIFIED';
   const completedAt = new Date().toISOString();
-  // Only shape-level evidence is stored. No provider payload is retained.
   const evidence = {
     probe_operation_id: probe.operation_id,
     http_status: httpStatus,
@@ -175,7 +183,8 @@ Deno.serve(async (req) => {
       last_tested_at: completedAt,
       ...(verdict.state === 'VERIFIED' ? { last_success_at: completedAt, last_verified_at: completedAt } : {}),
     })
-    .eq('id', connection.id);
+    .eq('id', connection.id)
+    .eq('tenant_id', tenantId);
 
   await admin.from('connection_health_checks').insert({
     connection_id: connection.id,
@@ -199,7 +208,7 @@ Deno.serve(async (req) => {
     connection_id: connection.id,
     previous_state: previousState,
     new_state: verdict.state,
-    tenant_id: connection.tenant_id,
+    tenant_id: tenantId,
     correlation_id: correlationId,
     evidence,
   });

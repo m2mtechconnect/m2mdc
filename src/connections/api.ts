@@ -1,11 +1,10 @@
 /**
  * Server-backed reads for the Connections control plane. Every record in the
- * UI comes from these queries — nothing is a hardcoded status object.
+ * UI comes from these queries, nothing is a hardcoded status object.
  *
- * Tenant isolation: row-level security scopes every table to the caller's
- * tenant (platform-scope rows have a null tenant). The client additionally
- * filters connection instances by the resolved tenant so an over-broad policy
- * change can never silently widen what the UI renders.
+ * Tenant isolation is fail closed. The browser resolves active_org_id() and
+ * never widens a read to null-tenant platform scope. Edge functions re-check
+ * the same organization authority before every privileged operation.
  */
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,11 +16,8 @@ import type {
   TwinMappingRecord,
 } from './model';
 
-/** The generated types file does not yet know these tables. */
 const db = supabase as unknown as {
-  // Chaining on the Postgrest builder is dynamic; the concrete row shapes are
-  // asserted at each call site below.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped generated tables
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- generated types do not yet include every connection table
   from: (table: string) => any;
   functions: typeof supabase.functions;
 };
@@ -44,9 +40,8 @@ async function selectAll<T>(table: string, order: string, ascending = false): Pr
 }
 
 /**
- * The caller's tenant, resolved by the server via the canonical `active_org_id()`
- * function (org_memberships authority). Null means no active org: callers must
- * fail closed rather than falling back to a client-side guess.
+ * The caller's active organization, resolved by the server from membership
+ * authority. Null means no active organization and all tenant reads fail closed.
  */
 export async function fetchCurrentTenantId(): Promise<string | null> {
   const { data: auth } = await supabase.auth.getUser();
@@ -77,10 +72,12 @@ export function useConnectionInstances() {
     queryKey: ['connection-instances'],
     queryFn: async (): Promise<ConnectionInstance[]> => {
       const tenantId = await fetchCurrentTenantId();
-      let query = db.from('connection_instances').select('*').order('created_at', { ascending: true });
-      // Platform-scope rows (null tenant) plus the caller's own tenant.
-      query = tenantId ? query.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`) : query.is('tenant_id', null);
-      const { data, error } = await query;
+      if (!tenantId) throw new Error('An active organization is required to load connections.');
+      const { data, error } = await db
+        .from('connection_instances')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: true });
       if (error) throw error;
       return (data ?? []) as ConnectionInstance[];
     },
@@ -115,7 +112,7 @@ export function useAuditEvents() {
   });
 }
 
-/** DSX ingest evidence: the authoritative event count for the platform. */
+/** DSX ingest evidence. RLS remains authoritative for the visible event count. */
 export function useDsxEventCount() {
   return useQuery({
     queryKey: ['dsx-event-count'],
@@ -141,10 +138,6 @@ export interface HealthCheckResult {
   error_code?: string;
 }
 
-/**
- * Health checks are executed server-side only. The browser never receives or
- * submits credentials; it passes a connection id and reads a sanitized result.
- */
 export async function runHealthCheck(connectionId: string): Promise<HealthCheckResult> {
   const { data, error } = await supabase.functions.invoke<HealthCheckResult>('connection-health-check', {
     body: { connection_id: connectionId },
@@ -163,10 +156,6 @@ export interface RuntimeVerificationResult {
   correlation_id: string;
 }
 
-/**
- * Operator-triggered runtime verification. The server runs the managed
- * read-only probe and derives the state; the client cannot assert it.
- */
 export async function runRuntimeVerification(connectionId: string): Promise<RuntimeVerificationResult> {
   const { data, error } = await supabase.functions.invoke<RuntimeVerificationResult>('managed-connector-verify', {
     body: { connection_id: connectionId },
@@ -190,17 +179,22 @@ export interface FacilityOption {
   name: string;
 }
 
-/** Facilities a mapping may target. Sourced from the twin records themselves. */
+/** Canonical, non-placeholder facilities in the caller's active organization. */
 export function useFacilityOptions() {
   return useQuery({
     queryKey: ['mapping-facility-options'],
     queryFn: async (): Promise<FacilityOption[]> => {
+      const tenantId = await fetchCurrentTenantId();
+      if (!tenantId) return [];
       const { data, error } = await db
         .from('data_centre_twins')
-        .select('id, name')
+        .select('id, name, metadata, org_id')
+        .eq('org_id', tenantId)
         .order('name', { ascending: true });
       if (error) throw error;
-      return (data ?? []) as FacilityOption[];
+      return (data ?? [])
+        .filter((row: { metadata?: { provisioned?: string } | null }) => row.metadata?.provisioned !== 'default_starter_twin')
+        .map((row: { id: string; name: string }) => ({ id: row.id, name: row.name }));
     },
     staleTime: 60_000,
   });
@@ -211,7 +205,7 @@ export interface TenantOption {
   name: string;
 }
 
-/** Tenants a connection may be scoped to. Read is RLS-scoped to the caller. */
+/** Retained for non-provisioning display use only. Provisioning never trusts it. */
 export function useTenantOptions() {
   return useQuery({
     queryKey: ['connection-tenant-options'],
@@ -224,10 +218,6 @@ export function useTenantOptions() {
   });
 }
 
-/**
- * Provisioning runs server-side only: role checks, connector eligibility,
- * duplicate rejection and audit writes all happen in the edge function.
- */
 async function provision<T>(payload: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.functions.invoke('connection-provision', { body: payload });
   if (error) {
@@ -238,7 +228,9 @@ async function provision<T>(payload: Record<string, unknown>): Promise<T> {
     try {
       const parsed = JSON.parse(details);
       message = parsed.safe_message ?? parsed.error_code ?? details;
-    } catch { /* details is not JSON */ }
+    } catch {
+      /* details is not JSON */
+    }
     throw new Error(message);
   }
   return data as T;
@@ -246,7 +238,6 @@ async function provision<T>(payload: Record<string, unknown>): Promise<T> {
 
 export interface CreateConnectionInput {
   connector_id: string;
-  tenant_id: string | null;
   facility_id: string | null;
   environment: string;
   display_name: string;
@@ -277,7 +268,6 @@ type MappingWrite = Omit<TwinMappingRecord, 'id' | 'last_mapped_value' | 'last_m
   validation_status: string;
 };
 
-/** Writes are RLS-gated to admin and owner roles; failures surface verbatim. */
 export async function saveTwinMapping(id: string | null, record: MappingWrite): Promise<string> {
   if (id) {
     const { error } = await db.from('connection_twin_mappings').update(record).eq('id', id);
@@ -302,19 +292,10 @@ export async function deleteTwinMapping(id: string): Promise<void> {
   const { error } = await db.from('connection_twin_mappings').delete().eq('id', id);
   if (error) throw error;
 }
-/* ------------------------------------------------------------------ */
-/* Credential vault                                                    */
-/* ------------------------------------------------------------------ */
 
-/**
- * Credential metadata is the only credential-shaped thing that ever reaches
- * the browser. Ciphertext lives in a backend-only table, the plaintext exists
- * solely inside an edge function invocation, and no endpoint returns either.
- */
 export interface CredentialMetadata {
   connection_id: string;
   auth_method: string;
-  /** Short SHA-256 prefix operators can compare with the source system. */
   fingerprint: string;
   version: number;
   status: string;
@@ -333,13 +314,14 @@ async function vault<T>(payload: Record<string, unknown>): Promise<T> {
     try {
       const parsed = JSON.parse(details);
       message = parsed.safe_message ?? parsed.error_code ?? details;
-    } catch { /* details is not JSON */ }
+    } catch {
+      /* details is not JSON */
+    }
     throw new Error(message);
   }
   return data as T;
 }
 
-/** Vault metadata for every connection visible to the caller's tenant. */
 export function useConnectionCredentials(enabled = true) {
   return useQuery({
     queryKey: ['connection-credentials'],
@@ -349,7 +331,6 @@ export function useConnectionCredentials(enabled = true) {
         const result = await vault<{ credentials: CredentialMetadata[] }>({ action: 'list' });
         return result.credentials ?? [];
       } catch {
-        // Non-admins are refused by design; the UI renders "not visible".
         return [];
       }
     },
@@ -357,7 +338,6 @@ export function useConnectionCredentials(enabled = true) {
   });
 }
 
-/** Stores or rotates the credential. The value leaves the browser exactly once. */
 export async function storeConnectionCredential(
   connectionId: string,
   secret: string,
@@ -381,14 +361,9 @@ export async function getConnectionCredentialStatus(connectionId: string): Promi
   return result.credential;
 }
 
-/** Destroys the stored material and disables the connection. */
 export async function revokeConnectionCredential(connectionId: string): Promise<void> {
   await vault({ action: 'revoke', connection_id: connectionId });
 }
-
-/* ------------------------------------------------------------------ */
-/* Data contracts                                                      */
-/* ------------------------------------------------------------------ */
 
 export interface DataContractRecord {
   id: string;
@@ -403,7 +378,6 @@ export interface DataContractRecord {
   created_at: string;
 }
 
-/** Contracts declare the shape a connection is allowed to exchange. */
 export function useDataContracts() {
   return useQuery({
     queryKey: ['connection-data-contracts'],

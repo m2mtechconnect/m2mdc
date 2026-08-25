@@ -1,18 +1,16 @@
 /**
  * Starts an AURA Managed User Connection authorization for the signed-in user.
- * Returns only an authorization URL - never a token, credential name or handle.
+ * Returns only an authorization URL, never a token, credential name or handle.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeAppUserOAuth } from '../_shared/appUserConnector.ts';
 import { getConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
-import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
+import { resolveCallerTenant, TENANT_REQUIRED } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -26,26 +24,33 @@ function json(status: number, body: Record<string, unknown>) {
 Deno.serve(async (req) => {
   CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (req.method !== 'POST') return json(405, { error_code: 'method_not_allowed' });
   const correlationId = crypto.randomUUID();
 
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const authHeader = req.headers.get('Authorization') ?? '';
   if (!authHeader.startsWith('Bearer ')) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
-  const { data: userData } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-  const user = userData?.user;
-  if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
 
-  let body: { connector_definition_id?: unknown; origin?: unknown };
+  const caller = createClient(
+    supabaseUrl,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+  const { data: authData, error: authError } = await caller.auth.getUser();
+  const user = authData?.user;
+  if (authError || !user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const tenantId = await resolveCallerTenant(caller);
+  if (!tenantId) return json(403, { ...TENANT_REQUIRED, correlation_id: correlationId });
+
+  let body: { connector_definition_id?: unknown };
   try {
     body = await req.json();
   } catch {
     return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
   }
   const definitionId = typeof body.connector_definition_id === 'string' ? body.connector_definition_id : '';
-  const origin = typeof body.origin === 'string' ? body.origin : '';
-  if (!definitionId || !/^https?:\/\/[^\s]+$/.test(origin)) {
-    return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
-  }
+  if (!definitionId) return json(400, { error_code: 'invalid_request', correlation_id: correlationId });
 
   const binding = managedUserBinding(definitionId);
   if (!binding) {
@@ -59,13 +64,18 @@ Deno.serve(async (req) => {
   if (!clientAPIKey) {
     return json(503, {
       error_code: 'managed_client_not_configured',
-      safe_message:
-        'No managed connector client is configured for this connector, so no user can authorize it yet. An administrator must configure it first.',
+      safe_message: 'No managed connector client is configured for this connector, so no user can authorize it yet.',
       correlation_id: correlationId,
     });
   }
 
-  const tenantId = await resolveCallerTenant(admin, user.id);
+  // The OAuth return origin is derived only from the already CORS-evaluated
+  // request origin. A body field can never choose an authorization callback.
+  const requestOrigin = req.headers.get('origin') ?? '';
+  if (!/^https?:\/\/[^\s]+$/.test(requestOrigin)) {
+    return json(400, { error_code: 'origin_required', correlation_id: correlationId });
+  }
+
   let connectionAPIKey: string | null = null;
   try {
     connectionAPIKey = await getConnectionKeyForUser(user.id, binding.gateway_connector_key);
@@ -80,7 +90,7 @@ Deno.serve(async (req) => {
       connectorId: binding.gateway_connector_key,
       appUserId: user.id,
       clientAPIKey,
-      returnUrl: new URL('/oauth/managed-user/return', origin).toString(),
+      returnUrl: new URL('/oauth/managed-user/return', requestOrigin).toString(),
       connectionAPIKey: connectionAPIKey ?? undefined,
       credentialsConfiguration: { scopes: binding.scopes },
     });
@@ -93,6 +103,7 @@ Deno.serve(async (req) => {
     });
   }
 
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   await admin.from('managed_user_connections').upsert(
     {
       user_id: user.id,

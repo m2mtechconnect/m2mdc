@@ -2,9 +2,9 @@
  * /v1/builders-deploy
  *
  * Validates and activates a configured builder record. This endpoint does not
- * claim cloud runtime provisioning. Twin/process-twin configurations must be
- * durably bound to a facility visible through the authenticated caller's RLS
- * context before activation is allowed.
+ * claim cloud runtime provisioning and does not create a deployment record.
+ * Twin/process-twin configurations must be durably bound to a facility visible
+ * through the authenticated caller's RLS context before activation is allowed.
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
@@ -56,17 +56,16 @@ serve(createHandler({
     const hasModelConfig = config.model_config?.model || config.intelligence?.modelId;
     if (!hasModelConfig) errors.push('Model configuration is required');
 
-    // Facility identity is a hard prerequisite for DC/process-twin activation.
-    // The caller-bound client provides the authorization boundary.
+    let boundTwinId: string | null = null;
     if (effectiveType === '3d_twin' || effectiveType === 'process_twin') {
-      const twinId = typeof config.twin_id === 'string' ? config.twin_id : null;
-      if (!twinId) {
+      boundTwinId = typeof config.twin_id === 'string' ? config.twin_id : null;
+      if (!boundTwinId) {
         errors.push('Facility binding is required');
       } else {
         const { data: facility, error: facilityError } = await supabase
           .from('data_centre_twins')
           .select('id')
-          .eq('id', twinId)
+          .eq('id', boundTwinId)
           .maybeSingle();
         if (facilityError || !facility) errors.push('Bound facility is not available');
       }
@@ -75,7 +74,7 @@ serve(createHandler({
     log("Activation validation", {
       isDCTwin,
       effectiveType,
-      twinId: config.twin_id ?? null,
+      twinId: boundTwinId,
       hasStandardWorkflow,
       hasDCWorkflows,
       standardActions: config.workflow?.actions?.length || 0,
@@ -94,18 +93,18 @@ serve(createHandler({
       industry: effectiveIndustry,
       department: effectiveDepartment,
       type: effectiveType,
-      deployed_at: nowIso,
+      configuration_activated_at: nowIso,
+      runtime_provisioned: false,
       model_config: config.model_config || {
         model: config.intelligence?.modelId || 'google/gemini-2.5-flash',
         provider: config.intelligence?.modelProvider || 'google',
       },
     };
 
-    const { data: deployedAgent, error: deployError } = await supabase
+    const { data: activatedAgent, error: activationError } = await supabase
       .from('agents')
       .update({
         status: 'active',
-        deployed_at: nowIso,
         config: updatedConfig,
       })
       .eq('id', builderId)
@@ -113,39 +112,18 @@ serve(createHandler({
       .select()
       .single();
 
-    if (deployError) {
-      log("Configuration activation failed", { error: deployError.message });
-      throw { code: 'DATABASE_ERROR', message: deployError.message, status: 500 };
+    if (activationError) {
+      log("Configuration activation failed", { error: activationError.message });
+      throw { code: 'DATABASE_ERROR', message: activationError.message, status: 500 };
     }
 
-    // This row records configuration activation only. Runtime provisioning and
-    // runtime health are separate Phase 6 contracts and must remain unclaimed.
-    const { error: deploymentError } = await supabase
-      .from('deployments')
-      .insert({
-        system_id: builderId,
-        version: 'v1',
-        status: 'configured',
-        deployed_by: userId,
-        region: isDCTwin ? (config.deployment?.targetDeploymentRegion || 'ca-central-1') : 'unassigned',
-        model: updatedConfig.model_config.model,
-        grounding: !!config.model_config?.rag || !!config.intelligence?.ragEnabled,
-        runtime_url: null,
-        health: null,
-      });
-
-    if (deploymentError) {
-      log("Configuration activation record creation failed", { error: deploymentError.message });
-      throw { code: 'DATABASE_ERROR', message: 'Activation evidence could not be recorded', status: 500 };
-    }
-
-    log("Builder configuration activated", { builderId, twinId: config.twin_id ?? null });
+    log("Builder configuration activated", { builderId, twinId: boundTwinId });
 
     return {
       deployment_id: builderId,
       status: 'success',
-      agent_url: `/app/agents/${builderId}/manage`,
-      agent: deployedAgent,
+      agent_url: boundTwinId ? `/blueprint/${boundTwinId}` : `/app/agents/${builderId}/manage`,
+      agent: activatedAgent,
       runtime_provisioned: false,
     };
   }

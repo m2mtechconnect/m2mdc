@@ -4,7 +4,7 @@
  * Facility identity is created before Builder configuration begins. Region,
  * tier and capacity are explicit operator inputs, never silent defaults.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Building2, Loader2, MapPin, Plus, Zap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +24,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useRBAC } from '@/contexts/RBACContext';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 const REGIONS = [
@@ -42,11 +43,33 @@ const EMPTY_FORM = {
   capacity_kw: 0,
 };
 
+type FacilitySetupRow = {
+  location_id: string;
+  twin_id: string;
+};
+
+type RpcResult = {
+  data: unknown;
+  error: { message: string } | null;
+};
+
+const callRpc = supabase.rpc as unknown as (
+  fn: string,
+  args?: Record<string, unknown>,
+) => Promise<RpcResult>;
+
 export default function ManageFacilities() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const { can } = useRBAC();
-  const { twins, activeTwinId, setActiveTwin, isLoading, createLocation, createTwin } = useActiveTwin();
+  const {
+    twins,
+    activeTwinId,
+    setActiveTwin,
+    isLoading,
+    refreshLocations,
+    refreshTwins,
+  } = useActiveTwin();
   const [open, setOpen] = useState(false);
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -57,6 +80,10 @@ export default function ManageFacilities() {
 
   const canEdit = can('twin.edit');
   const nextStep = params.get('next');
+  const configuredTwins = useMemo(
+    () => twins.filter((twin) => twin.metadata?.provisioned !== 'default_starter_twin'),
+    [twins],
+  );
 
   // Build and Command Center can deep-link directly into the one canonical
   // creation dialog. Keep `next` in the URL until creation succeeds so the
@@ -98,50 +125,37 @@ export default function ManageFacilities() {
 
     setCreating(true);
     try {
-      const location = await createLocation({
-        name: `${name} - ${region.name}`,
-        city: region.name,
-        province: region.province,
-        country: 'Canada',
-        cloud_region: form.region_code,
-        provider_type: 'Hybrid',
-        industry: 'cloud_saas',
-        capacity_kw: form.capacity_kw,
-        tier: form.tier,
-        tags: [],
+      const { data, error } = await callRpc('create_facility_setup', {
+        _name: name,
+        _city: region.name,
+        _province: region.province,
+        _country: 'Canada',
+        _region_code: form.region_code,
+        _tier: form.tier,
+        _capacity_kw: form.capacity_kw,
+        _source: nextStep === 'builder' ? 'build-setup' : 'manage-facilities',
       });
-      if (!location) throw new Error('Facility location could not be created');
 
-      const created = await createTwin(location.id, {
-        name,
-        city: region.name,
-        region_code: form.region_code,
-        tier: form.tier,
-        capacity_kw: form.capacity_kw,
-        sovereignty_level: null,
-        pue_target: null,
-        renewable_target_pct: null,
-        carbon_intensity: null,
-        metadata: {
-          created_from: nextStep === 'builder' ? 'build-setup' : 'manage-facilities',
-          facility_inputs: {
-            region_code: form.region_code,
-            tier: form.tier,
-            capacity_kw: form.capacity_kw,
-          },
-        },
-      });
-      if (!created) throw new Error('Facility twin could not be created');
+      if (error) throw new Error(error.message);
+      if (!Array.isArray(data) || data.length !== 1) {
+        throw new Error('Facility transaction did not return a canonical facility');
+      }
 
-      await setActiveTwin(created.id);
-      toast.success(`${created.name} created.`);
+      const row = data[0] as Partial<FacilitySetupRow>;
+      if (typeof row.twin_id !== 'string' || typeof row.location_id !== 'string') {
+        throw new Error('Facility transaction returned an invalid identity');
+      }
+
+      await Promise.all([refreshLocations(), refreshTwins()]);
+      await setActiveTwin(row.twin_id);
+      toast.success(`${name} created.`);
       setOpen(false);
       setForm(EMPTY_FORM);
 
       if (nextStep === 'builder') {
-        navigate(`/builder?new=true&twin=${encodeURIComponent(created.id)}&source=facility&type=3d_twin`, { replace: true });
+        navigate(`/builder?new=true&twin=${encodeURIComponent(row.twin_id)}&source=facility&type=3d_twin`, { replace: true });
       } else {
-        navigate(`/blueprint/${created.id}`);
+        navigate(`/blueprint/${row.twin_id}`);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to create facility');
@@ -187,9 +201,9 @@ export default function ManageFacilities() {
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading facilities…
             </p>
           )}
-          {!isLoading && twins.length === 0 && (
+          {!isLoading && configuredTwins.length === 0 && (
             <div className="rounded-md border border-dashed p-5 text-sm text-muted-foreground">
-              <p>No facility has been configured yet.</p>
+              <p>No configured facility is available yet.</p>
               {canEdit && (
                 <Button className="mt-3" size="sm" onClick={() => setOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" aria-hidden />
@@ -198,7 +212,7 @@ export default function ManageFacilities() {
               )}
             </div>
           )}
-          {twins.map((twin) => (
+          {configuredTwins.map((twin) => (
             <div
               key={twin.id}
               className="v2-subpanel flex min-w-0 flex-wrap items-center justify-between gap-3"
@@ -248,7 +262,7 @@ export default function ManageFacilities() {
                 id="facility-name"
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
-                placeholder="Montreal Sovereign AI DC"
+                placeholder="Toronto AI Data Centre"
                 autoComplete="organization"
               />
             </div>

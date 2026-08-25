@@ -2,27 +2,30 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "b831ee29c465f2907b274710433a3d0de04f764d",
-    "workflowRunId": 32795438626,
-    "artifactId": 9544692045,
-    "artifactZipSha256": "0732e442e04d5bd08714ff5c1fa62da3097dcf2367eeb992fb0d5217ffcb850f"
+    "sha": "eb1e3ce7751519d73c172cbcb2014bf4425bbb31",
+    "workflowRunId": 32799010592,
+    "artifactId": 9545876014,
+    "artifactZipSha256": "9cfb461858484e2327afbb19c703902172769455874d3717dfac96e51d1138cc"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
-    "All 17 lifecycle screenshots were generated successfully at source b831ee29c465f2907b274710433a3d0de04f764d and reviewed before approval.",
-    "The reviewed desktop set covers Command Center, Builder, Connections, AI Runtime, Operations, Simulation, Evidence, Deployments, Teams and Compliance.",
+    "All 18 lifecycle screenshots were generated successfully at source eb1e3ce7751519d73c172cbcb2014bf4425bbb31 and reviewed before approval.",
+    "Phase 2 adds an explicit first-run Builder facility gate. The reviewed state shows the lifecycle shell and a single Create facility handoff without fabricated facility values.",
+    "Builder step screenshots use a deterministic, non-placeholder facility fixture so the visual contract separately validates first-run setup and the actual bound Builder wizard.",
+    "The reviewed desktop set covers Command Center, first-run facility setup, Builder, Connections, AI Runtime, Operations, Simulation, Evidence, Deployments, Teams and Compliance.",
     "The reviewed mobile set covers Command Center, Builder, Operations, Simulation and Connections at a pinned 375 by 667 CSS viewport with devicePixelRatio 1 where applicable.",
     "Settled-state visual fixtures mark product tours as already seen so screenshot evidence validates the normal application workspace rather than a one-time guided-tour overlay.",
     "Desktop Simulation visual qualification uses the product's deterministic 2D facility view because live WebGL rendering is nondeterministic at pixel level; 3D behavior remains subject to functional and route tests.",
     "Across two otherwise identical clean desktop Simulation captures, only 11 anti-aliased corner pixels on the selected Compare rail button varied by one RGB level. The full screenshot remains generated and human-reviewed, while CI enforces its dimensions, route semantics and overflow invariant instead of an unstable byte hash.",
-    "The other 16 screenshots remain exact SHA-256 fingerprints.",
+    "The other 17 screenshots remain exact SHA-256 fingerprints.",
     "No reviewed screenshot showed broken layout, clipped primary controls, overlapping text, unexpected horizontal overflow or a contradictory lifecycle navigation state."
   ],
   "screenshots": [
     {"file":"ai-runtime-light-chromium-linux.png","mode":"sha256","sha256":"760d0b317ce4448f456db07436a5ccbc306ddd7a42e7bcebf3d66a57a961ae9f","width":1280,"height":1804},
     {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"18f9dd5427eb80de2e48871e338d986d467fa02531116e49cfbf0eb88dcfbdbb","width":375,"height":5424},
     {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"7cdbde46b6377706db290ccb8241be71cc74beff08c62f8fc902705aa55ab9b7","width":1280,"height":720},
+    {"file":"builder-first-run-light-chromium-linux.png","mode":"sha256","sha256":"cc6847fbbdb4694b0b44e27b6368dbd6c451a9b65e0b02c09f1bfad97f867cc4","width":1280,"height":720},
     {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"ff61811b3c98307fd2d6d43096f4f80a72b8acf47bee071c8c16f4ce1c626008","width":375,"height":2476},
     {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"b82a69a3acdf1b691b49c75c431edbb2f27a793912b4baa4a6a5d896646b4544","width":1280,"height":720},
     {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"76212d4a67eddcdee9e95b546653fccb0b67dbe2672ce5ab89653f342555aeb4","width":1280,"height":720},

@@ -74,7 +74,8 @@ jobs:
           if compgen -G 'tests/visual/activation.spec.ts-snapshots/*.png' > /dev/null; then
             cp tests/visual/activation.spec.ts-snapshots/*.png tests/visual/snapshots.spec.ts-snapshots/
           fi
-          echo "Fresh screenshots are review evidence only. Activation screenshots are consolidated into the same reviewed release artifact. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
+          echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
+          echo "Activation screenshots are consolidated into the same reviewed release artifact." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Enforce visual gate
         run: node scripts/verify-visual-fingerprints.mjs tests/visual/snapshots.spec.ts-snapshots tests/visual/approved-linux-visuals.json

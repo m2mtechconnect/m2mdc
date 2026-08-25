@@ -2,18 +2,20 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "7161c705a3432f79a62c99d664abe2be121b672c",
-    "workflowRunId": 32804518086,
-    "artifactId": 9547693471,
-    "artifactZipSha256": "a5d07b467d66ba4afaeb5def54b8977936a1254c08f9a5a8dc05075bd3d72af3"
+    "sha": "a0add97cc86acd79acd2c880b93eb7dd4d42610f",
+    "workflowRunId": 32806559157,
+    "artifactId": 9548366251,
+    "artifactZipSha256": "dc874945124dd4acc18900c7c3eb88c0b86c847ff7a7682268993e8d45e36737"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
-    "All 18 lifecycle screenshots were generated successfully at source 7161c705a3432f79a62c99d664abe2be121b672c. Sixteen remained byte-identical to the prior reviewed baseline; the two changed Connections screenshots were reviewed before approval.",
+    "All 18 lifecycle screenshots were generated successfully at source a0add97cc86acd79acd2c880b93eb7dd4d42610f. Seventeen remained byte-identical to the prior reviewed baseline; the redesigned AI Runtime screenshot was reviewed before approval.",
     "Phase 2 adds an explicit first-run Builder facility gate. The reviewed state shows the lifecycle shell and a single Create facility handoff without fabricated facility values.",
     "Builder step screenshots use a deterministic, non-placeholder facility fixture so the visual contract separately validates first-run setup and the actual bound Builder wizard.",
     "Phase 3 makes Connections fail closed to the caller active organization. The reviewed desktop and mobile Connections states show the expected shorter tenant-bound fixture without clipped text, overlapping controls, page-level horizontal overflow or missing footer content.",
+    "Phase 4 replaces browser-configurable provider and raw-model settings with a server-owned AI Runtime & Policies surface. The reviewed state truthfully shows the managed runtime unavailable and grounding not exposed under the deterministic test fixture, with no route recovery, clipping, overlap or broken controls.",
+    "A dedicated AI runtime route test captures browser page errors and forbids the route recovery surface before visual fingerprints are evaluated.",
     "The reviewed desktop set covers Command Center, first-run facility setup, Builder, Connections, AI Runtime, Operations, Simulation, Evidence, Deployments, Teams and Compliance.",
     "The reviewed mobile set covers Command Center, Builder, Operations, Simulation and Connections at a pinned 375 by 667 CSS viewport with devicePixelRatio 1 where applicable.",
     "Settled-state visual fixtures mark product tours as already seen so screenshot evidence validates the normal application workspace rather than a one-time guided-tour overlay.",
@@ -23,7 +25,7 @@
     "No reviewed screenshot showed broken layout, clipped primary controls, overlapping text, unexpected horizontal overflow or a contradictory lifecycle navigation state."
   ],
   "screenshots": [
-    {"file":"ai-runtime-light-chromium-linux.png","mode":"sha256","sha256":"760d0b317ce4448f456db07436a5ccbc306ddd7a42e7bcebf3d66a57a961ae9f","width":1280,"height":1804},
+    {"file":"ai-runtime-light-chromium-linux.png","mode":"sha256","sha256":"0403792c028c481214e43b829e3812ed6c8e4ec331803481c074ab041b919aec","width":1280,"height":906},
     {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"18f9dd5427eb80de2e48871e338d986d467fa02531116e49cfbf0eb88dcfbdbb","width":375,"height":5424},
     {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"7cdbde46b6377706db290ccb8241be71cc74beff08c62f8fc902705aa55ab9b7","width":1280,"height":720},
     {"file":"builder-first-run-light-chromium-linux.png","mode":"sha256","sha256":"cc6847fbbdb4694b0b44e27b6368dbd6c451a9b65e0b02c09f1bfad97f867cc4","width":1280,"height":720},

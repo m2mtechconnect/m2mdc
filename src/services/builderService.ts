@@ -35,8 +35,18 @@ export interface Builder {
   updated_at: string;
 }
 
+function routedTwinId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const value = new URL(window.location.href).searchParams.get('twin');
+  return value || undefined;
+}
+
 export const builderService = {
-  /** Create a new builder draft bound to an optional existing facility twin. */
+  /**
+   * Create a new builder draft. The canonical Build route carries the facility
+   * identity in `?twin=`; include it in the server request unless an explicit
+   * caller-supplied twin_id already exists.
+   */
   async create(params: {
     source?: string;
     goal?: string;
@@ -47,8 +57,12 @@ export const builderService = {
     twin_id?: string;
   }): Promise<{ id: string; builder: Builder }> {
     try {
+      const request = {
+        ...params,
+        twin_id: params.twin_id ?? routedTwinId(),
+      };
       const { data, error } = await supabase.functions.invoke('builders-create', {
-        body: params
+        body: request
       });
 
       if (error) {

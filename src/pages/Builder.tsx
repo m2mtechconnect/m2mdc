@@ -288,7 +288,7 @@ export default function Builder() {
               Build, Blueprint, Connections, Simulation and deployment share one facility identity. Define that facility before starting configuration.
             </p>
           </div>
-          <Button size="lg" onClick={() => navigate('/manage/facilities?create=true&next=builder')}>
+          <Button size="lg" onClick={() => window.location.assign('/manage/facilities?create=true&next=builder')}>
             <Building2 className="mr-2 h-4 w-4" aria-hidden="true" />
             Create facility
           </Button>
@@ -302,7 +302,7 @@ export default function Builder() {
       const activeConfiguredTwin = configuredTwins.find((candidate) => candidate.id === activeTwinId);
       const facilityId = activeConfiguredTwin?.id ?? configuredTwins[0]?.id;
       if (!facilityId) {
-        navigate('/manage/facilities?create=true&next=builder');
+        window.location.assign('/manage/facilities?create=true&next=builder');
         return;
       }
       if (activeTwinId !== facilityId) await setActiveTwin(facilityId);
@@ -330,7 +330,7 @@ export default function Builder() {
                 <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
                 Start build
               </Button>
-              <Button variant="outline" size="lg" onClick={() => navigate('/manage/facilities')}>
+              <Button variant="outline" size="lg" onClick={() => window.location.assign('/manage/facilities')}>
                 Change facility
               </Button>
             </div>

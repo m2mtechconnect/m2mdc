@@ -1,12 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BuilderConfig {
-  source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank';
+  source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank' | 'facility';
   goal?: string;
   industry?: string;
   department?: string;
   type?: 'agent' | 'process_twin' | '3d_twin' | null;
   template_id?: string | null;
+  /** Durable facility identity for twin/process-twin builds. */
+  twin_id?: string | null;
   workflow?: {
     triggers: string[];
     actions: string[];
@@ -34,9 +36,7 @@ export interface Builder {
 }
 
 export const builderService = {
-  /**
-   * Create a new builder draft
-   */
+  /** Create a new builder draft bound to an optional existing facility twin. */
   async create(params: {
     source?: string;
     goal?: string;
@@ -44,6 +44,7 @@ export const builderService = {
     department?: string;
     type?: string;
     template_id?: string;
+    twin_id?: string;
   }): Promise<{ id: string; builder: Builder }> {
     try {
       const { data, error } = await supabase.functions.invoke('builders-create', {
@@ -66,9 +67,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Get builder by ID
-   */
+  /** Get builder by ID. */
   async get(builderId: string): Promise<{ builder: Builder }> {
     try {
       const { data, error } = await supabase.functions.invoke('builders-get', {
@@ -91,9 +90,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Update builder (patch specific fields)
-   */
+  /** Update builder config fields. */
   async update(builderId: string, updates: Partial<BuilderConfig>): Promise<{ builder: Builder }> {
     try {
       const { data, error } = await supabase.functions.invoke('builders-update', {
@@ -116,9 +113,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Deploy builder as live agent/twin
-   */
+  /** Activate the configured builder record. Runtime provisioning is handled separately. */
   async deploy(builderId: string): Promise<{
     deployment_id: string;
     status: 'success' | 'error';

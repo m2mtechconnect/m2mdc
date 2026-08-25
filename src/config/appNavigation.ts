@@ -86,7 +86,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
       '/manage/facilities',
     ],
     group: 'design',
-    description: 'Create the facility, configure the twin, define the blueprint and prepare deployment inputs.',
+    description: 'Create the facility, configure the twin, define the blueprint and prepare activation inputs.',
   },
   {
     name: 'Operate',
@@ -103,7 +103,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
       '/agents',
     ],
     group: 'operate',
-    description: 'Runtime health, telemetry, deployed systems, agents and operational status.',
+    description: 'Operational telemetry, agents, configuration activation, runtime evidence and current health state.',
   },
   {
     name: 'Simulation',
@@ -164,7 +164,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     matches: ['/settings/ai'],
     permission: 'agent.administer',
     group: 'design',
-    description: `${stackDescription('ai.managed')} Runtime selection, grounding boundaries, health and safety settings.`,
+    description: `${stackDescription('ai.managed')} Runtime readiness, grounding boundaries, health and safety policy.`,
   },
   {
     name: 'Agents',
@@ -178,13 +178,13 @@ export const MANAGE_NAV: AppNavItem[] = [
   },
   {
     name: 'Runtime',
-    fullName: 'Runtime & Deployments',
+    fullName: 'Activation & Runtime Evidence',
     href: '/deployments',
     icon: Rocket,
     matches: ['/deployments', '/deploy'],
     permission: 'deployment.view',
     group: 'operate',
-    description: `Deployment history, runtime state and execution evidence. ${stackDescription('governance.controls')}`,
+    description: `Configuration activation, external runtime evidence and immutable lifecycle events. ${stackDescription('governance.controls')}`,
   },
   {
     name: 'People & Access',

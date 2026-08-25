@@ -252,7 +252,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.goto(builderVisualUrl(1));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
-    await expect(page.getByRole('heading', { name: /summary/i }).first()).toBeVisible();
+    await expect(page.getByText('System Configuration', { exact: true }).first()).toBeVisible();
     await expect(page).toHaveScreenshot('builder-step1-light.png', { maxDiffPixels: 100 });
   });
 

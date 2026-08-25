@@ -2,31 +2,38 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "7dbcbc831ab03edad6089417e3610e36d4242683",
-    "workflowRunId": 32787794231,
-    "artifactId": 9542088089,
-    "artifactZipSha256": "c261286d6210aab1250318072a93e87d8b12925b49e0dd18fde3b3e09ff26216"
+    "sha": "b831ee29c465f2907b274710433a3d0de04f764d",
+    "workflowRunId": 32795438626,
+    "artifactId": 9544692045,
+    "artifactZipSha256": "0732e442e04d5bd08714ff5c1fa62da3097dcf2367eeb992fb0d5217ffcb850f"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
-    "Fingerprints were derived from the exact-head P1 release-candidate artifact after route, build, responsive-containment and UI hierarchy review.",
-    "All 11 screenshots were generated successfully at source 7dbcbc831ab03edad6089417e3610e36d4242683 and reviewed before approval.",
-    "Mobile acceptance is pinned to a 375 by 667 CSS viewport with devicePixelRatio 1. Dashboard, Builder and Operations and Telemetry passed the document-overflow invariant at 375px.",
-    "The Operations and Telemetry mobile overflow was traced to idle Recharts tooltip geometry. Recharts wrapper containment prevents hidden tooltip nodes from widening the document while preserving visible chart content.",
-    "The approved visual set contains no observed broken layout, clipped controls, overlapping text or catastrophic responsive defects."
+    "All 17 lifecycle screenshots were generated successfully at source b831ee29c465f2907b274710433a3d0de04f764d and reviewed before approval.",
+    "The reviewed desktop set covers Command Center, Builder, Connections, AI Runtime, Operations, Simulation, Evidence, Deployments, Teams and Compliance.",
+    "The reviewed mobile set covers Command Center, Builder, Operations, Simulation and Connections at a pinned 375 by 667 CSS viewport with devicePixelRatio 1 where applicable.",
+    "Settled-state visual fixtures mark product tours as already seen so screenshot evidence validates the normal application workspace rather than a one-time guided-tour overlay.",
+    "Desktop Simulation visual qualification uses the product's deterministic 2D facility view because live WebGL rendering is nondeterministic at pixel level; 3D behavior remains subject to functional and route tests.",
+    "No reviewed screenshot showed broken layout, clipped primary controls, overlapping text, unexpected horizontal overflow or a contradictory lifecycle navigation state."
   ],
   "screenshots": [
+    {"file":"ai-runtime-light-chromium-linux.png","mode":"sha256","sha256":"760d0b317ce4448f456db07436a5ccbc306ddd7a42e7bcebf3d66a57a961ae9f","width":1280,"height":1804},
     {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"18f9dd5427eb80de2e48871e338d986d467fa02531116e49cfbf0eb88dcfbdbb","width":375,"height":5424},
-    {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"2fa34669b7df712f54f3193c494b8a4d94214772ca32fd917ae4de153c48b2cc","width":1280,"height":720},
+    {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"7cdbde46b6377706db290ccb8241be71cc74beff08c62f8fc902705aa55ab9b7","width":1280,"height":720},
     {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"ff61811b3c98307fd2d6d43096f4f80a72b8acf47bee071c8c16f4ce1c626008","width":375,"height":2476},
-    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"961fa826e2003fcd59df82f2d3d831ab2d020b3ae84d516263ca8720f9bcf4e1","width":1280,"height":720},
-    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"bb06682ca5ce6b2d4669ad98f0114c0b06dd9d5f75fffee70995f81d166425f4","width":1280,"height":720},
-    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"362d4a77fef4614bd34a3b120742bdb67af82975cf4e3d745feead184f426174","width":1280,"height":720},
-    {"file":"compliance-light-chromium-linux.png","mode":"sha256","sha256":"eaf540494cf2fb34010d220a5673d7239bfb0278467fbeb5dee95d68bdf26453","width":1280,"height":720},
-    {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"cbe35bfc224c66dacb5dd4ea018143a07ac1cdd7be2059095b731410ea8fcdcb","width":1280,"height":720},
+    {"file":"builder-step1-light-chromium-linux.png","mode":"sha256","sha256":"b82a69a3acdf1b691b49c75c431edbb2f27a793912b4baa4a6a5d896646b4544","width":1280,"height":720},
+    {"file":"builder-step2-light-chromium-linux.png","mode":"sha256","sha256":"76212d4a67eddcdee9e95b546653fccb0b67dbe2672ce5ab89653f342555aeb4","width":1280,"height":720},
+    {"file":"builder-step5-light-chromium-linux.png","mode":"sha256","sha256":"e30b300c3d32e15f2468159c6a1fde52913057c64baf80125c825f7ceff49642","width":1280,"height":720},
+    {"file":"compliance-light-chromium-linux.png","mode":"sha256","sha256":"c7eb150321b49d5a29ee6eb9c271c3f5501c1291d325fcd059ebcdd04ff9db3d","width":1280,"height":720},
+    {"file":"connections-mobile-chromium-linux.png","mode":"sha256","sha256":"d56ee5474f7db7ee8e28f5c04844227a114f52e8100fc25803d211541f4c05a0","width":375,"height":2780},
+    {"file":"dashboard-hero-light-chromium-linux.png","mode":"sha256","sha256":"d2dfd126cb75670d0dab57e2f07bce0da2e648714e74222ea586ed5a9255a6a0","width":1280,"height":720},
     {"file":"dashboard-mobile-chromium-linux.png","mode":"sha256","sha256":"c13adfc579a4203cb6b9f85fd58b8294c4fce2f80e6cd8a02701505424a00f72","width":375,"height":2321},
-    {"file":"integrations-light-chromium-linux.png","mode":"sha256","sha256":"49b3991122845769e82439df1ec67092acb6aae09006ed5e1fda25d96a09ff46","width":1280,"height":720},
-    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"8b781a5e8baa23877ffd04213042eb7df59fc798ab312a9a1184df32ac7076ac","width":1280,"height":720}
+    {"file":"deployments-light-chromium-linux.png","mode":"sha256","sha256":"ce4503fcb5007d8d4ce41ce8bd2a7fd9e489967125e1c2b6f7b5e2316fe288e1","width":1280,"height":720},
+    {"file":"evidence-overview-light-chromium-linux.png","mode":"sha256","sha256":"164533762bf2cd8e5155c153d0ad8054237295a0f55993098607e86da5dfcfc0","width":1280,"height":720},
+    {"file":"integrations-light-chromium-linux.png","mode":"sha256","sha256":"33027182b0ed79c4f553730e7f647ace2572d720c7a13c1adb8151ab424543e4","width":1280,"height":720},
+    {"file":"simulation-light-chromium-linux.png","mode":"sha256","sha256":"e86df5d5b5256849bffdb0835cda6669f2e7438c9e6916828713c5cd6f1ec261","width":1280,"height":720},
+    {"file":"simulation-mobile-chromium-linux.png","mode":"sha256","sha256":"4e686a104ba593a12ec2de1cec231fdbd5296a76e90242f256ef65065e4f73b0","width":375,"height":667},
+    {"file":"teams-light-chromium-linux.png","mode":"sha256","sha256":"6175398cbc8cdd22531fa9df0ca9f77a84fe6c90902f33107463dca5672b3808","width":1280,"height":720}
   ]
 }

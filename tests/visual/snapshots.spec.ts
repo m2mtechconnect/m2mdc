@@ -211,6 +211,9 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expectLifecycleNavigation(page);
+    await expect(page.getByTestId('facility-model-canvas')).toBeVisible();
+    await page.getByRole('button', { name: '2D' }).click();
+    await expect(page.getByRole('button', { name: '2D' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page).toHaveScreenshot('simulation-light.png', { maxDiffPixels: 200 });
   });
 

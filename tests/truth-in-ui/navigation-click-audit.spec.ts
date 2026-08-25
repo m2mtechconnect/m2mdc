@@ -71,7 +71,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     const matrix = [
-      { name: 'Facility Blueprint', path: '/blueprint/default' },
+      { name: 'Build & Configure', path: '/builder' },
       { name: 'Simulation', path: '/simulation' },
       { name: 'Evidence', path: '/evidence/overview' },
       { name: 'Command Center', path: '/dashboard' },

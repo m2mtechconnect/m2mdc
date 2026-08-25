@@ -26,7 +26,10 @@ test.describe('Golden AURA DC user journey', () => {
     await expect(page).toHaveURL(/\/builder(?:[/?#]|$)/, { timeout: 20_000 });
 
     const firstFacility = page.getByRole('heading', { name: /create your first facility/i });
-    if (await firstFacility.isVisible().catch(() => false)) {
+    const startBuild = page.getByRole('heading', { name: /start a facility build/i });
+    await expect(firstFacility.or(startBuild)).toBeVisible({ timeout: 20_000 });
+
+    if (await firstFacility.isVisible()) {
       await page.getByRole('button', { name: /^create facility$/i }).click();
       await expect(page).toHaveURL(/\/manage\/facilities\?[^#]*next=builder/, { timeout: 15_000 });
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 10_000 });
@@ -44,7 +47,6 @@ test.describe('Golden AURA DC user journey', () => {
 
       await expect(page).toHaveURL(/\/builder\?[^#]*(draft|new)=/, { timeout: 30_000 });
     } else {
-      await expect(page.getByRole('heading', { name: /start a facility build/i })).toBeVisible({ timeout: 15_000 });
       await page.getByRole('button', { name: /^start build$/i }).click();
       await expect(page).toHaveURL(/\/builder\?[^#]*(draft|new)=/, { timeout: 30_000 });
     }

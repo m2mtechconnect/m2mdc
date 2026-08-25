@@ -54,6 +54,23 @@ jobs:
           AURA_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: node scripts/verify-aura-demo-build.mjs
 
+      - name: Install Chromium for automated persona acceptance
+        run: bunx playwright install --with-deps chromium
+
+      - name: Automated persona, interaction, accessibility and reflow acceptance
+        run: bunx playwright test --config=playwright.aura-builder-connections.config.ts
+
+      - name: Upload automated browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-builder-connections-browser-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            test-results/aura-builder-connections/
+            playwright-report/aura-builder-connections/
+          if-no-files-found: warn
+          retention-days: 7
+
       - name: Upload exact-head UX audit artifact
         uses: actions/upload-artifact@v4
         with:

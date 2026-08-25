@@ -9,74 +9,85 @@ import { getCorsHeaders } from '../_shared/cors.ts';
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
-let corsHeaders: Record<string, string> = { ...getCorsHeaders(null), ...CORS_EXTRA };
 
 // Where the browser is sent after the exchange. Overridable per environment.
 const APP_BASE_URL = (Deno.env.get('APP_BASE_URL') ?? 'https://auradc.m2mtechconnect.com').replace(/\/$/, '');
+const MAX_OAUTH_PARAMETER_LENGTH = 4096;
+
+type SafeOAuthErrorCode =
+  | 'invalid_oauth_callback'
+  | 'invalid_oauth_state'
+  | 'oauth_configuration_error'
+  | 'oauth_exchange_failed'
+  | 'oauth_credential_store_failed'
+  | 'oauth_connection_store_failed';
+
+class OAuthCallbackError extends Error {
+  constructor(public readonly safeCode: SafeOAuthErrorCode, internalMessage: string) {
+    super(internalMessage);
+    this.name = 'OAuthCallbackError';
+  }
+}
 
 serve(async (req) => {
-  corsHeaders = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
+  // Edge isolates can interleave async requests, so request-derived headers
+  // must never be stored in module-level mutable state.
+  const corsHeaders = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
+  const correlationId = crypto.randomUUID();
+
+  const redirectFailure = (code: SafeOAuthErrorCode) =>
+    new Response(null, {
+      status: 302,
+      headers: {
+        ...corsHeaders,
+        'Location': `${APP_BASE_URL}/integrations?error=${encodeURIComponent(code)}&correlation_id=${encodeURIComponent(correlationId)}`,
+      },
+    });
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!supabaseUrl || !supabaseKey) {
+      throw new OAuthCallbackError('oauth_configuration_error', 'Supabase service configuration is missing');
+    }
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const url = new URL(req.url);
-    const code = url.searchParams.get('code');
-    const stateToken = url.searchParams.get('state');
+    const code = url.searchParams.get('code') ?? '';
+    const stateToken = url.searchParams.get('state') ?? '';
 
-    if (!code || !stateToken) {
-      throw new Error('Missing code or state parameter');
+    if (
+      !code ||
+      !stateToken ||
+      code.length > MAX_OAUTH_PARAMETER_LENGTH ||
+      stateToken.length > MAX_OAUTH_PARAMETER_LENGTH
+    ) {
+      throw new OAuthCallbackError('invalid_oauth_callback', 'OAuth callback parameters are missing or oversized');
     }
 
-    // SECURITY: Validate state token server-side
-    console.log('Validating OAuth state token...');
-    const { data: stateRecord, error: stateError } = await supabase
-      .from('oauth_states')
-      .select('*')
-      .eq('state_token', stateToken)
-      .eq('used', false)
-      .single();
+    // SECURITY: consume the one-time state atomically. The RPC is service-role
+    // only and performs UPDATE ... WHERE used=false AND expires_at>now()
+    // RETURNING, so concurrent callbacks cannot both claim the same state.
+    const { data: consumedStates, error: stateError } = await supabase.rpc(
+      'consume_zapier_oauth_state',
+      { p_state_token: stateToken },
+    );
+    const stateRecord = Array.isArray(consumedStates) ? consumedStates[0] : null;
 
     if (stateError || !stateRecord) {
-      console.error('Invalid or missing OAuth state:', stateError);
-      throw new Error('Invalid or expired OAuth state token');
+      console.warn(`[zapier-oauth-callback] state_rejected correlation_id=${correlationId}`);
+      throw new OAuthCallbackError('invalid_oauth_state', 'OAuth state was invalid, expired, or already consumed');
     }
 
-    // Check if state token has expired
-    if (new Date() > new Date(stateRecord.expires_at)) {
-      console.error('OAuth state expired:', stateRecord.expires_at);
-      throw new Error('OAuth state token has expired');
-    }
-
-    // Mark state as used (one-time use only)
-    const { error: updateError } = await supabase
-      .from('oauth_states')
-      .update({ 
-        used: true,
-        used_at: new Date().toISOString(),
-      })
-      .eq('id', stateRecord.id);
-
-    if (updateError) {
-      console.error('Failed to mark state as used:', updateError);
-      throw new Error('OAuth state validation failed');
-    }
-
-    // Extract validated data from state record
-    const { user_id, system_id, app_id } = stateRecord;
-    
-    console.log('OAuth state validated successfully:', { 
-      user_id, 
-      app_id, 
-      system_id,
-      state_created: stateRecord.created_at,
-    });
+    const { user_id, system_id, app_id } = stateRecord as {
+      user_id: string;
+      system_id: string | null;
+      app_id: string;
+    };
 
     const zapierClientId = Deno.env.get('ZAPIER_CLIENT_ID');
     const zapierClientSecret = Deno.env.get('ZAPIER_CLIENT_SECRET');
@@ -85,11 +96,9 @@ serve(async (req) => {
       `${supabaseUrl.replace(/\/$/, '')}/functions/v1/zapier-oauth-callback`;
 
     if (!zapierClientId || !zapierClientSecret) {
-      throw new Error('Zapier credentials not configured');
+      throw new OAuthCallbackError('oauth_configuration_error', 'Zapier credentials are not configured');
     }
 
-    // Exchange code for tokens
-    console.log('Exchanging code for tokens:', { user_id, app_id });
     const tokenResponse = await fetch('https://zapier.com/oauth/token', {
       method: 'POST',
       headers: {
@@ -105,52 +114,64 @@ serve(async (req) => {
     });
 
     if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('Token exchange failed:', errorText);
-      throw new Error('Failed to exchange code for tokens');
+      console.error(
+        `[zapier-oauth-callback] exchange_failed correlation_id=${correlationId} status=${tokenResponse.status}`,
+      );
+      throw new OAuthCallbackError('oauth_exchange_failed', 'Zapier token exchange failed');
     }
 
-    const tokens = await tokenResponse.json();
-    const { access_token, refresh_token, scope, expires_in } = tokens;
+    const tokens = await tokenResponse.json() as {
+      access_token?: unknown;
+      refresh_token?: unknown;
+      scope?: unknown;
+      expires_in?: unknown;
+    };
+    const accessToken = typeof tokens.access_token === 'string' ? tokens.access_token : '';
+    const refreshToken = typeof tokens.refresh_token === 'string' ? tokens.refresh_token : '';
+    const scope = typeof tokens.scope === 'string' ? tokens.scope : null;
+    const expiresIn = typeof tokens.expires_in === 'number' && Number.isFinite(tokens.expires_in)
+      ? tokens.expires_in
+      : 3600;
 
-    // Calculate expiry
-    const expiresAt = new Date(Date.now() + (expires_in || 3600) * 1000);
+    if (!accessToken || !refreshToken) {
+      throw new OAuthCallbackError('oauth_exchange_failed', 'Zapier token response was incomplete');
+    }
 
-    // SECURITY: Store tokens in Vault
-    console.log('Storing tokens in Vault');
+    const expiresAt = new Date(Date.now() + expiresIn * 1000);
+
+    // SECURITY: Store tokens in Vault and persist only Vault references.
     const vaultAccessTokenName = `zapier_access_${user_id}_${app_id}`;
     const vaultRefreshTokenName = `zapier_refresh_${user_id}_${app_id}`;
 
     const { data: vaultAccessId, error: vaultAccessError } = await supabase
       .rpc('store_secret_in_vault', {
         secret_name: vaultAccessTokenName,
-        secret_value: access_token
+        secret_value: accessToken,
       });
 
-    if (vaultAccessError) {
-      console.error('Failed to store access token in Vault:', vaultAccessError);
-      throw new Error('Failed to secure access token');
+    if (vaultAccessError || !vaultAccessId) {
+      console.error(`[zapier-oauth-callback] vault_access_store_failed correlation_id=${correlationId}`);
+      throw new OAuthCallbackError('oauth_credential_store_failed', 'Failed to store access token securely');
     }
 
     const { data: vaultRefreshId, error: vaultRefreshError } = await supabase
       .rpc('store_secret_in_vault', {
         secret_name: vaultRefreshTokenName,
-        secret_value: refresh_token
+        secret_value: refreshToken,
       });
 
-    if (vaultRefreshError) {
-      console.error('Failed to store refresh token in Vault:', vaultRefreshError);
-      throw new Error('Failed to secure refresh token');
+    if (vaultRefreshError || !vaultRefreshId) {
+      console.error(`[zapier-oauth-callback] vault_refresh_store_failed correlation_id=${correlationId}`);
+      throw new OAuthCallbackError('oauth_credential_store_failed', 'Failed to store refresh token securely');
     }
 
-    // Store vault references (not plaintext tokens)
     const { error: upsertError } = await supabase
       .from('integrations_tokens')
       .upsert({
         user_id,
         app_id,
-        access_token: null, // No plaintext storage
-        refresh_token: null, // No plaintext storage
+        access_token: null,
+        refresh_token: null,
         vault_access_token_id: vaultAccessId,
         vault_refresh_token_id: vaultRefreshId,
         scope,
@@ -165,26 +186,27 @@ serve(async (req) => {
       });
 
     if (upsertError) {
-      console.error('Error storing token references:', upsertError);
-      throw upsertError;
+      console.error(`[zapier-oauth-callback] connection_store_failed correlation_id=${correlationId}`);
+      throw new OAuthCallbackError('oauth_connection_store_failed', 'Failed to store integration connection');
     }
 
-    // Log the connection
-    await supabase.from('integration_sync_logs').insert({
+    const { error: logError } = await supabase.from('integration_sync_logs').insert({
       user_id,
       app_id,
       sync_type: 'connect',
       status: 'success',
       records_synced: 0,
-      metadata: { system_id },
+      metadata: { system_id, correlation_id: correlationId },
     });
+    if (logError) {
+      // Connection success is authoritative; audit transport failure must not
+      // silently undo or expose credentials. Preserve diagnostics server-side.
+      console.error(`[zapier-oauth-callback] audit_log_failed correlation_id=${correlationId}`);
+    }
 
-    console.log('OAuth callback success:', { user_id, app_id });
-
-    // Redirect to builder
-    const redirectUrl = system_id 
-      ? `${APP_BASE_URL}/builder?id=${system_id}&step=4&connected=${app_id}`
-      : `${APP_BASE_URL}/integrations?connected=${app_id}`;
+    const redirectUrl = system_id
+      ? `${APP_BASE_URL}/builder?id=${encodeURIComponent(system_id)}&step=4&connected=${encodeURIComponent(app_id)}`
+      : `${APP_BASE_URL}/integrations?connected=${encodeURIComponent(app_id)}`;
 
     return new Response(null, {
       status: 302,
@@ -194,17 +216,13 @@ serve(async (req) => {
       },
     });
   } catch (error) {
-    console.error('OAuth callback error:', error);
-    
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
-    // Redirect to error page
-    return new Response(null, {
-      status: 302,
-      headers: {
-        ...corsHeaders,
-        'Location': `${APP_BASE_URL}/integrations?error=${encodeURIComponent(errorMessage)}`,
-      },
-    });
+    const safeCode = error instanceof OAuthCallbackError
+      ? error.safeCode
+      : 'oauth_connection_store_failed';
+    const internalReason = error instanceof Error ? error.message : 'unknown';
+    console.error(
+      `[zapier-oauth-callback] failure correlation_id=${correlationId} code=${safeCode} reason=${internalReason}`,
+    );
+    return redirectFailure(safeCode);
   }
 });

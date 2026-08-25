@@ -18,9 +18,10 @@ const history = read('src/pages/DeploymentHistory.tsx');
 const analytics = read('src/pages/IntelligenceDashboard.tsx');
 
 describe('Phase 8 AURA DC golden journey contract', () => {
-  it('starts with account authentication and keeps product setup behind approval', () => {
+  it('starts with account creation and keeps product setup behind approval', () => {
     expect(publicRoutes).toContain('<Route path="/auth"');
-    expect(publicRoutes).toContain('<Route path="/onboarding" element={<Navigate to="/auth" replace />} />');
+    expect(publicRoutes).toContain('<Route path="/sign-up" element={withPublicRouteFallback(<SignUp />)} />');
+    expect(publicRoutes).toContain('<Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />');
     expect(shell).toContain('<Route path="/builder"');
   });
 

@@ -14,8 +14,22 @@ const REQUIRED_VIEWPORTS = [
 const FORBIDDEN_VISIBLE_TERMS = /\b(?:lovable|zapier|mcp|supabase|openai|gemini|gpt(?:-?\d+)?)\b/i;
 
 function builderUrl(extra = ''): string {
-  const base = '/builder?new=true&goal=Finance%20compliance%20system&industry=Finance&department=Finance&type=agent';
-  return extra ? `${base}&${extra}` : base;
+  const params = new URLSearchParams({
+    new: 'true',
+    goal: 'Finance compliance system',
+    industry: 'Finance',
+    department: 'Finance',
+    type: 'agent',
+    step: '1',
+  });
+  for (const [key, value] of new URLSearchParams(extra)) params.set(key, value);
+  return `/builder?${params.toString()}`;
+}
+
+async function expectBuilderStep(page: Page, step: number, title: string) {
+  const current = page.locator('[aria-current="step"]:visible').first();
+  await expect(current).toBeVisible();
+  await expect(current).toHaveAccessibleName(new RegExp(`^${step}\\. ${title}`));
 }
 
 async function assertNoDocumentOverflow(page: Page, label: string) {
@@ -45,10 +59,10 @@ test.describe('PR13 automated persona acceptance', () => {
 
     await expect(page.locator('[data-builder-flow="standard"]')).toBeVisible();
     await expect(page.getByText('AI & Automation')).toBeVisible();
-    await expect(page.getByText(/Step 1 of 5.*Overview/)).toBeVisible();
+    await expectBuilderStep(page, 1, 'Overview');
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    await expect(page.getByText(/Step 2 of 5.*Intelligence/)).toBeVisible();
+    await expectBuilderStep(page, 2, 'Intelligence');
     await expect(page.getByText('AURA Intelligence')).toBeVisible();
     await expect(page.getByText('1. Intelligence profile')).toBeVisible();
     await expect(page.getByText('2. Knowledge')).toBeVisible();
@@ -59,16 +73,16 @@ test.describe('PR13 automated persona acceptance', () => {
     await expect(advanced.getByText(/policy starting points, not observed telemetry/i)).toBeVisible();
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    await expect(page.getByText(/Step 3 of 5.*Connections/)).toBeVisible();
+    await expectBuilderStep(page, 3, 'Connections');
     await expect(page.getByText('Recommended for this build')).toBeVisible();
     await expect(page.getByText(/does not mean the capability is authenticated, connected, healthy or moving data/i)).toBeVisible();
     await expect(page.getByText('Browse all approved capabilities')).toBeVisible();
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    await expect(page.getByText(/Step 4 of 5.*Workflow/)).toBeVisible();
+    await expectBuilderStep(page, 4, 'Workflow');
 
     await page.getByRole('button', { name: 'Next', exact: true }).click();
-    await expect(page.getByText(/Step 5 of 5.*Review & Deploy/)).toBeVisible();
+    await expectBuilderStep(page, 5, 'Review & Deploy');
     await page.getByRole('button', { name: 'Review & Deploy', exact: true }).click();
 
     const dialog = page.getByRole('dialog');
@@ -86,7 +100,7 @@ test.describe('PR13 automated persona acceptance', () => {
   test('manager failure journey: deployment failure remains failed and retry is a real second request', async ({ context, page }) => {
     const backend = await installAuraUxBackend(context, { role: 'manager', failFirstDeployment: true });
     await page.goto(builderUrl('step=5'), { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(/Step 5 of 5.*Review & Deploy/)).toBeVisible();
+    await expectBuilderStep(page, 5, 'Review & Deploy');
     await page.getByRole('button', { name: 'Review & Deploy', exact: true }).click();
 
     const dialog = page.getByRole('dialog');
@@ -116,10 +130,10 @@ test.describe('PR13 automated persona acceptance', () => {
     await systems.focus();
     await page.keyboard.press('Enter');
     await expect(systems).toHaveAttribute('data-state', 'active');
-    await expect(page.getByText('Facility telemetry')).toBeVisible();
-    await expect(page.getByText('Healthy').first()).toBeVisible();
 
-    const open = page.getByRole('button', { name: 'Open', exact: true }).first();
+    const open = page.getByRole('button', { name: 'Open Facility telemetry' });
+    await expect(open).toBeVisible();
+    await expect(page.getByText('Healthy').first()).toBeVisible();
     await open.focus();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('dialog')).toBeVisible();
@@ -149,7 +163,7 @@ test.describe('PR13 automated persona acceptance', () => {
       await expect(page.getByTestId('connections-page')).toBeVisible();
       await expect(page.getByRole('button', { name: 'Add connection' })).toBeDisabled();
       await page.getByRole('tab', { name: 'Systems', exact: true }).click();
-      await expect(page.getByText('Facility telemetry')).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Open Facility telemetry' })).toBeVisible();
       await page.getByRole('tab', { name: 'Activity', exact: true }).click();
       await expect(page.getByRole('tab', { name: 'Activity', exact: true })).toHaveAttribute('data-state', 'active');
     });
@@ -182,8 +196,9 @@ test.describe('PR13 automated visual, reflow and accessibility acceptance', () =
     await assertNoDocumentOverflow(page, 'Connections 400 percent reflow equivalent');
     await expect(page.getByRole('tab', { name: 'Overview', exact: true })).toBeVisible();
 
-    await page.goto(builderUrl(), { waitUntil: 'domcontentloaded' });
+    await page.goto(builderUrl('step=3'), { waitUntil: 'domcontentloaded' });
     await expect(page.locator('[data-builder-flow="standard"]')).toBeVisible();
+    await expectBuilderStep(page, 3, 'Connections');
     await assertNoDocumentOverflow(page, 'Builder 400 percent reflow equivalent');
     await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeVisible();
   });
@@ -194,8 +209,9 @@ test.describe('PR13 automated visual, reflow and accessibility acceptance', () =
     expect(await page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
 
     await page.goto(builderUrl(), { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[aria-current="step"]')).toBeVisible();
+    await expectBuilderStep(page, 1, 'Overview');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expectBuilderStep(page, 2, 'Intelligence');
     await expect(page.getByText('AURA Intelligence')).toBeVisible();
 
     await page.goto('/manage/integrations', { waitUntil: 'domcontentloaded' });
@@ -212,8 +228,9 @@ test.describe('PR13 automated visual, reflow and accessibility acceptance', () =
     await runAxe(page, 'Connections');
 
     await page.goto(builderUrl(), { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('[aria-current="step"]')).toBeVisible();
+    await expectBuilderStep(page, 1, 'Overview');
     await page.getByRole('button', { name: 'Next', exact: true }).click();
+    await expectBuilderStep(page, 2, 'Intelligence');
     await expect(page.getByText('AURA Intelligence')).toBeVisible();
     await runAxe(page, 'Builder Intelligence');
   });

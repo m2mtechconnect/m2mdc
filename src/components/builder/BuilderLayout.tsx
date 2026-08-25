@@ -214,27 +214,35 @@ export function BuilderLayout({
             </div>
           </div>
 
-          <div className="sticky bottom-0 left-0 right-0 border-t bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-            <div className="mx-auto flex max-w-[920px] items-center justify-between gap-4">
-              <Button variant="outline" onClick={onBack} disabled={activeStep === 1} className="min-w-[100px]">
+          <div className="sticky bottom-0 left-0 right-0 border-t bg-background/95 p-3 backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:p-4">
+            <div className="mx-auto flex max-w-[920px] min-w-0 items-center justify-between gap-2 sm:gap-4">
+              <Button variant="outline" onClick={onBack} disabled={activeStep === 1} className="min-w-20 sm:min-w-[100px]">
                 Back
               </Button>
 
-              <div className="flex-1 text-center text-sm text-muted-foreground">
-                Step {activeStep} of {steps.length} · {steps[activeStep - 1]?.title}
+              <div className="min-w-0 flex-1 text-center text-xs text-muted-foreground sm:text-sm">
+                Step {activeStep} of {steps.length}
+                <span className="hidden sm:inline"> · {steps[activeStep - 1]?.title}</span>
               </div>
 
               {isDeployStep && onDeploy ? (
                 <Button
                   onClick={() => void handleDeployClick()}
                   disabled={nextDisabled || launchingDeploy}
-                  className="min-w-[140px] gap-2"
+                  className="min-w-24 gap-2 sm:min-w-[140px]"
                 >
                   {launchingDeploy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : <Rocket className="h-4 w-4" aria-hidden />}
-                  {launchingDeploy ? 'Opening review…' : 'Review & Deploy'}
+                  {launchingDeploy ? (
+                    <span>Opening…</span>
+                  ) : (
+                    <>
+                      <span className="sm:hidden">Deploy</span>
+                      <span className="hidden sm:inline">Review & Deploy</span>
+                    </>
+                  )}
                 </Button>
               ) : (
-                <Button onClick={onNext} disabled={nextDisabled} className="min-w-[100px]">
+                <Button onClick={onNext} disabled={nextDisabled} className="min-w-20 sm:min-w-[100px]">
                   {nextLabel}
                 </Button>
               )}

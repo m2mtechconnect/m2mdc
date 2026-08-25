@@ -17,7 +17,7 @@ const config = read('supabase/config.toml');
 const aiConfigFn = read('supabase/functions/ai-config/index.ts');
 const copilotHealthFn = read('supabase/functions/copilot-health/index.ts');
 
-describe('final bounded remediation — route truth and RBAC', () => {
+describe('final bounded remediation - route truth and RBAC', () => {
   it('guards builder, deploy, deployments and system manage with the audited permissions', () => {
     expect(shell).toContain(
       '<Route path="/builder" element={<PermissionRouteGuard permission="twin.edit"><Builder /></PermissionRouteGuard>} />',
@@ -42,7 +42,7 @@ describe('final bounded remediation — route truth and RBAC', () => {
   });
 });
 
-describe('final bounded remediation — AI edge function boundary', () => {
+describe('final bounded remediation - AI edge function boundary', () => {
   it('requires an explicit JWT gate for ai-config and copilot-health', () => {
     expect(config).toContain('[functions.ai-config]');
     expect(config).toContain('[functions.copilot-health]');
@@ -59,34 +59,42 @@ describe('final bounded remediation — AI edge function boundary', () => {
     }
   });
 
-  it('returns provider-neutral capability keys only', () => {
+  it('returns only server-owned, provider-neutral runtime capability state', () => {
     for (const source of [aiConfigFn, copilotHealthFn]) {
+      expect(source).toContain("runtimeControl: 'server_owned'");
       expect(source).toContain('managedAi');
+      expect(source).toContain('groundingSearch');
       expect(source).not.toContain('active_provider');
       expect(source).not.toContain('external_google');
       expect(source).not.toContain("provider: 'lovable_managed'");
     }
-    expect(copilotHealthFn).toContain('groundingSearch');
-    expect(copilotHealthFn).toContain('residency');
-    expect(aiConfigFn).toContain('groundingSearch');
-    expect(aiConfigFn).toContain('residency');
-    // No project/location/model values echoed to the caller.
+
+    // Browser-visible contracts do not echo provider project, location,
+    // residency-region, raw model or credential authority.
     expect(aiConfigFn).not.toContain('projectId:');
     expect(aiConfigFn).not.toContain('location:');
     expect(aiConfigFn).not.toContain('model:');
+    expect(copilotHealthFn).not.toContain("Deno.env.get('GEMINI_MODEL')");
+    expect(copilotHealthFn).toContain("checkAIHealth({ model: 'primary' })");
   });
 
-  it('keeps the AI settings consumer on the neutral contract', () => {
+  it('keeps the AI settings consumer on the server-owned neutral contract', () => {
     const aiSettings = read('src/pages/AISettings.tsx');
-    expect(aiSettings).toContain('managedAi: HealthProbe;');
-    expect(aiSettings).toContain('groundingSearch: HealthProbe;');
-    expect(aiSettings).toContain('residency: string;');
+    expect(aiSettings).toContain("runtimeControl: 'server_owned';");
+    expect(aiSettings).toContain('managedAi: { available: boolean };');
+    expect(aiSettings).toContain('groundingSearch: { available: boolean; reason: string };');
+    expect(aiSettings).toContain('managedAi: ProbeResult;');
+    expect(aiSettings).toContain('groundingSearch: ProbeResult;');
+    expect(aiSettings).toContain("invokeEdgeFunction('ai-config', {})");
+    expect(aiSettings).toContain("invokeEdgeFunction('copilot-health', {})");
     expect(aiSettings).not.toContain('healthStatus.gemini');
     expect(aiSettings).not.toContain('healthStatus.vertexSearch');
+    expect(aiSettings).not.toContain('DEFAULT_EXTERNAL_MODEL');
+    expect(aiSettings).not.toContain('projectId');
   });
 });
 
-describe('final bounded remediation — rendered provider strings', () => {
+describe('final bounded remediation - rendered provider strings', () => {
   const cases: Array<[string, string]> = [
     ['src/pages/Deploy.tsx', 'Vertex AI for model serving'],
     ['src/lib/builderValidation.ts', 'Gemini or Vertex'],
@@ -124,7 +132,7 @@ describe('final bounded remediation — rendered provider strings', () => {
   });
 });
 
-describe('final bounded remediation — model catalogue', () => {
+describe('final bounded remediation - model catalogue', () => {
   it('removes the dead marketplace UI and keeps ModelPreview on the lightweight catalogue', () => {
     expect(exists('src/components/builder/ModelMarketplace.tsx')).toBe(false);
     expect(exists('src/lib/llm/modelCatalog.ts')).toBe(true);
@@ -156,7 +164,7 @@ describe('final bounded remediation — model catalogue', () => {
   });
 });
 
-describe('final bounded remediation — tenancy and RBAC hooks', () => {
+describe('final bounded remediation - tenancy and RBAC hooks', () => {
   it('resolves the active tenant through the canonical helper', () => {
     expect(read('src/connections/api.ts')).toContain('active_org_id');
     expect(read('src/pages/account/Settings.tsx')).toContain('active_org_id');

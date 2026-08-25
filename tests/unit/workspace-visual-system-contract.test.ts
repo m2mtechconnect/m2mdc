@@ -65,7 +65,7 @@ describe('AURA shared workspace visual system', () => {
     for (const file of NEUTRAL_MODEL_SURFACES) {
       const source = read(file);
       expect(source).toContain('modelDisplayLabel');
-      // The raw model identifier may exist as a stored default, but it must
+      // The raw model identifier may exist as stored configuration, but it must
       // never be rendered directly: every display path goes through the label.
       expect(source).not.toContain('value={summary?.model}');
       expect(source).not.toContain('>{summary?.model}<');
@@ -180,28 +180,29 @@ describe('backend-to-UI capability parity', () => {
     }
   });
 
-  it('surfaces deployment evidence on /deploy and deep-links to Runtime History', () => {
+  it('surfaces activation evidence on /deploy and deep-links to Activation History', () => {
     const deploy = read('src/pages/Deploy.tsx');
     expect(deploy).toContain('DeploymentEvidenceCard');
 
     const card = read('src/components/deploy/DeploymentEvidenceCard.tsx');
-    expect(card).toContain('Deployment evidence');
+    expect(card).toContain('Activation evidence');
     expect(card).toContain('to="/deployments"');
     // Summary only: the card must never write deployment records.
     expect(card).not.toContain('.insert(');
     expect(card).not.toContain('.update(');
   });
 
-  it('keeps Runtime History as the canonical deployment evidence surface', () => {
+  it('keeps Activation History as the canonical activation and runtime evidence surface', () => {
     const history = read('src/pages/DeploymentHistory.tsx');
     expect(history).toContain('<WorkspaceHeader');
-    expect(history).toContain('deployment');
+    expect(history).toContain('Activation & Runtime Evidence');
+    expect(history).toContain('classifyDeploymentTruth');
   });
 
-  it('renders lifecycle order Configuration -> Readiness -> Execution -> Evidence on /deploy', () => {
+  it('renders lifecycle order Readiness -> Activation -> Evidence on /deploy', () => {
     const deploy = read('src/pages/Deploy.tsx');
-    const readiness = deploy.indexOf('Deployment readiness');
-    const execution = deploy.indexOf('title="Execution"');
+    const readiness = deploy.indexOf('Activation readiness');
+    const execution = deploy.indexOf('title="Configuration activation"');
     const evidence = deploy.indexOf('DeploymentEvidenceCard systemId');
     expect(readiness).toBeGreaterThan(-1);
     expect(execution).toBeGreaterThan(readiness);
@@ -225,4 +226,3 @@ describe('backend-to-UI capability parity', () => {
     expect(read('src/components/deploy/DeploymentEvidenceCard.tsx')).toContain('NOT YET RECORDED');
   });
 });
-

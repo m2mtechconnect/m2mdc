@@ -1,5 +1,4 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -10,23 +9,23 @@ import type { DeployedSystem } from '@/types/system';
 import { describeDataError, isNotFoundError } from '@/lib/queryRetry';
 
 /**
- * System Management Page
- * Displays detailed information about a deployed system using the unified layout
- * that is shared with marketplace template previews
+ * System Management Page.
+ *
+ * Truth contract: fields are populated only from persisted records queried on
+ * this page. Missing runtime/configuration evidence remains unavailable. The
+ * page does not infer an LLM provider, temperature, MCP support, cloud
+ * readiness, enterprise-security certification, integrations, or ROI.
  */
 export default function SystemManage() {
-  const { t } = useTranslation();
   const { systemId } = useParams<{ systemId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Fetch system details
   const { data: systemData, isLoading, error } = useQuery({
     queryKey: ['system-manage', systemId],
     queryFn: async () => {
       if (!systemId) throw new Error('System ID is required');
 
-      // Fetch system from agents table
       const { data: agent, error: agentError } = await supabase
         .from('agents')
         .select('*')
@@ -36,118 +35,95 @@ export default function SystemManage() {
       if (agentError) throw agentError;
       if (!agent) throw new Error('System not found');
 
-      // Fetch recent runs
-      const { data: runs } = await supabase
+      const runsResult = await supabase
         .from('agent_runs')
         .select('*')
         .eq('agent_id', systemId)
         .order('created_at', { ascending: false })
         .limit(10);
 
-      // Fetch intelligence settings
-      const { data: intelligence } = await supabase
+      const intelligenceResult = await supabase
         .from('intelligence_settings')
         .select('*')
         .eq('system_id', systemId)
-        .single();
+        .maybeSingle();
 
-      // Transform to DeployedSystem format
+      if (runsResult.error) {
+        console.warn('SystemManage: recent run evidence unavailable:', runsResult.error.message);
+      }
+      if (intelligenceResult.error) {
+        console.warn('SystemManage: intelligence configuration unavailable:', intelligenceResult.error.message);
+      }
+
+      const runs = runsResult.error ? undefined : runsResult.data ?? [];
+      const intelligence = intelligenceResult.error ? undefined : intelligenceResult.data ?? undefined;
+
       const system: DeployedSystem = {
         id: agent.id,
         name: agent.name,
-        description: agent.description || '',
-        department: null, // not modelled on the agent record
-        category: 'Digital Twin',
+        description: agent.description ?? '',
+        department: null,
+        category: 'Managed system',
         type: 'system',
-        status: agent.status as 'active' | 'draft' | 'paused' | 'archived',
+        status: agent.status as DeployedSystem['status'],
         version: agent.version,
-        templateId: agent.template_id,
+        templateId: agent.template_id ?? undefined,
         createdAt: agent.created_at,
         updatedAt: agent.updated_at,
-        deployedAt: agent.deployed_at,
-        roi: null, // no measured ROI source bound
-        successRate: agent.success_rate || 0,
-        totalRuns: agent.total_runs || 0,
-        avgDuration: undefined,
-        connectedAppsCount: 0,
-        lastRun: runs && runs.length > 0 ? {
+        deployedAt: agent.deployed_at ?? undefined,
+        roi: null,
+        successRate: typeof agent.success_rate === 'number' ? agent.success_rate : null,
+        totalRuns: typeof agent.total_runs === 'number' ? agent.total_runs : null,
+        lastRun: runs?.length ? {
           timestamp: runs[0].created_at,
-          channel: 'API',
+          channel: null,
           status: runs[0].status,
         } : undefined,
-        recentActivity: [],
         intelligence: intelligence ? {
           modelId: intelligence.model_id ?? null,
-          temperature: 0.7,
-          knowledgeSources: [],
         } : undefined,
-        tools: [],
-        workflows: [],
-        recentRuns: runs?.map(run => ({
+        recentRuns: runs?.map((run) => ({
           id: run.id,
           timestamp: run.created_at,
-          status: run.status as 'success' | 'error',
-          duration: run.duration_ms || 0,
-          channel: 'API',
-          user: run.user_id,
-          error: run.error,
-        })) || [],
-        versions: [
+          status: run.status,
+          duration: typeof run.duration_ms === 'number' ? run.duration_ms : null,
+          channel: null,
+          user: run.user_id ?? undefined,
+          error: run.error ?? undefined,
+        })),
+        versions: agent.version && agent.owner_id ? [
           {
             version: agent.version,
-            publishedAt: agent.deployed_at || agent.created_at,
+            publishedAt: agent.deployed_at ?? agent.created_at,
             publishedBy: agent.owner_id,
-          }
-        ],
+          },
+        ] : undefined,
       };
 
       return system;
     },
-    enabled: !!systemId,
+    enabled: Boolean(systemId),
   });
 
-  const handleRun = () => {
-    if (systemData) {
-      navigate(`/agents/${systemData.id}/chat`);
-    }
-  };
-
   const handleEdit = () => {
-    if (systemData) {
-      navigate(`/builder?systemId=${systemData.id}`);
-    }
-  };
-
-  const handleClone = async () => {
-    if (systemData) {
-      toast({
-        title: 'Clone functionality',
-        description: 'System cloning will be available soon',
-      });
-    }
+    if (systemData) navigate(`/builder?systemId=${systemData.id}`);
   };
 
   const handleArchive = async () => {
-    if (systemData) {
-      const { error } = await supabase
-        .from('agents')
-        .update({ status: 'archived' })
-        .eq('id', systemData.id);
+    if (!systemData) return;
 
-      if (error) {
-        toast({
-          title: 'Error',
-          description: 'Failed to archive system',
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Success',
-          description: 'System archived successfully',
-        });
-        navigate('/dashboard');
-      }
+    const { error: archiveError } = await supabase
+      .from('agents')
+      .update({ status: 'archived' })
+      .eq('id', systemData.id);
+
+    if (archiveError) {
+      toast({ title: 'Error', description: 'Failed to archive system', variant: 'destructive' });
+      return;
     }
+
+    toast({ title: 'Success', description: 'System archived successfully' });
+    navigate('/dashboard');
   };
 
   if (isLoading) {
@@ -172,9 +148,7 @@ export default function SystemManage() {
             <h1 className="text-lg font-semibold mb-2">
               {notFound ? 'System not found' : 'System could not be loaded'}
             </h1>
-            <p className="text-muted-foreground mb-4">
-              {describeDataError(error)}
-            </p>
+            <p className="text-muted-foreground mb-4">{describeDataError(error)}</p>
             <Button onClick={() => navigate('/app/agents')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to systems
@@ -185,53 +159,32 @@ export default function SystemManage() {
     );
   }
 
+  const featureEvidence = [
+    ...(typeof systemData.totalRuns === 'number' ? [`${systemData.totalRuns} recorded runs`] : []),
+    ...(typeof systemData.successRate === 'number' ? [`${Math.round(systemData.successRate)}% stored success rate`] : []),
+    ...(typeof systemData.roi === 'number' ? [`${systemData.roi}% measured ROI`] : []),
+  ];
+
   return (
     <div className="container mx-auto py-8 max-w-7xl">
-      {/* Header */}
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/dashboard')}
-          className="mb-4"
-        >
+        <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
         <h1 className="text-h1 font-display mb-2">System Management</h1>
-        <p className="text-muted-foreground">
-          View and manage your deployed digital twin or agent
-        </p>
+        <p className="text-muted-foreground">Persisted configuration and available runtime evidence for this system.</p>
       </div>
 
-      {/* Unified Layout with System Mode */}
       <TwinDetailsLayout
         mode="system"
         agentName={systemData.name}
         description={systemData.description}
-        llmModel={systemData.intelligence?.modelId}
-        llmProvider="Google"
-        temperature={systemData.intelligence?.temperature}
-        mcpServers={[]}
-        toolsCount={systemData.tools?.length || 0}
-        resourcesCount={systemData.intelligence?.knowledgeSources?.length || 0}
-        promptsCount={0}
-        features={[
-          `${systemData.totalRuns} total runs`,
-          `${Math.round(systemData.successRate)}% success rate`,
-          ...(typeof systemData.roi === 'number' ? [`${systemData.roi}% ROI`] : []),
-        ]}
-        setupInstructions={[]}
-        compatibility={{
-          mcpEnabled: true,
-          llmCompatible: ['Managed AI'],
-          cloudReady: true,
-          enterpriseSecure: true,
-        }}
+        llmModel={systemData.intelligence?.modelId ?? undefined}
+        temperature={systemData.intelligence?.temperature ?? undefined}
+        features={featureEvidence}
         system={systemData}
-        onRun={handleRun}
         onEdit={handleEdit}
-        onClone={handleClone}
         onArchive={handleArchive}
       />
     </div>

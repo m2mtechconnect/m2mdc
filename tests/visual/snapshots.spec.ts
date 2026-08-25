@@ -15,6 +15,9 @@ import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
  */
 
 const VISUAL_BUILDER_ID = '00000000-0000-4000-8000-000000000099';
+const MOBILE_WIDTH = 375;
+const MOBILE_HEIGHT = 667;
+
 const visualBuilder = {
   id: VISUAL_BUILDER_ID,
   name: 'Visual Regression Data Centre Twin',
@@ -84,13 +87,50 @@ async function installBuilderVisualMock(context: BrowserContext) {
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
+  const dimensions = await page.evaluate(() => {
+    const innerWidth = window.innerWidth;
+    const offenders = Array.from(document.querySelectorAll<HTMLElement>('body *'))
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          testId: element.dataset.testid ?? null,
+          className: typeof element.className === 'string' ? element.className.slice(0, 180) : '',
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+          width: Math.round(rect.width),
+          scrollWidth: element.scrollWidth,
+        };
+      })
+      .filter((item) => item.right > innerWidth + 1 || item.left < -1 || item.scrollWidth > innerWidth + 1)
+      .sort((a, b) => Math.max(b.right, b.scrollWidth) - Math.max(a.right, a.scrollWidth))
+      .slice(0, 12);
+
+    return {
+      innerWidth,
+      documentScrollWidth: document.documentElement.scrollWidth,
+      bodyScrollWidth: document.body.scrollWidth,
+      offenders,
+    };
+  });
+  expect(
+    dimensions.documentScrollWidth,
+    `document overflow: ${JSON.stringify(dimensions)}`,
+  ).toBeLessThanOrEqual(dimensions.innerWidth);
+  expect(
+    dimensions.bodyScrollWidth,
+    `body overflow: ${JSON.stringify(dimensions)}`,
+  ).toBeLessThanOrEqual(dimensions.innerWidth);
+}
+
+async function expectPinnedMobileViewport(page: Page) {
   const dimensions = await page.evaluate(() => ({
     innerWidth: window.innerWidth,
-    documentScrollWidth: document.documentElement.scrollWidth,
-    bodyScrollWidth: document.body.scrollWidth,
+    outerWidth: window.outerWidth,
+    devicePixelRatio: window.devicePixelRatio,
   }));
-  expect(dimensions.documentScrollWidth, `document overflow: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.innerWidth);
-  expect(dimensions.bodyScrollWidth, `body overflow: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.innerWidth);
+  expect(dimensions.innerWidth, `mobile visual viewport drifted: ${JSON.stringify(dimensions)}`).toBe(MOBILE_WIDTH);
+  expect(dimensions.devicePixelRatio, `mobile visual device scale drifted: ${JSON.stringify(dimensions)}`).toBe(1);
 }
 
 test.use({ colorScheme: 'light' });
@@ -164,12 +204,19 @@ test.describe('Visual Regression - Supported Global Light Surfaces', () => {
 });
 
 test.describe('Visual Regression - Mobile', () => {
-  test.use({ viewport: { width: 375, height: 667 }, isMobile: true });
+  test.use({
+    viewport: { width: MOBILE_WIDTH, height: MOBILE_HEIGHT },
+    screen: { width: MOBILE_WIDTH, height: MOBILE_HEIGHT },
+    deviceScaleFactor: 1,
+    isMobile: false,
+    hasTouch: true,
+  });
 
   test('Dashboard mobile', async ({ page }) => {
     await page.goto('/dashboard');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot('dashboard-mobile.png', { maxDiffPixels: 100, fullPage: true });
   });
@@ -179,16 +226,16 @@ test.describe('Visual Regression - Mobile', () => {
     await page.goto('/builder?new=true&step=1');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
-    // Capture before enforcing width so CI still uploads exact evidence when
-    // this responsive invariant fails.
-    await expect(page).toHaveScreenshot('builder-mobile.png', { maxDiffPixels: 100, fullPage: true });
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
+    await expect(page).toHaveScreenshot('builder-mobile.png', { maxDiffPixels: 100, fullPage: true });
   });
 
   test('Operations and telemetry mobile', async ({ page }) => {
     await page.goto('/analytics');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expectPinnedMobileViewport(page);
     await expectNoHorizontalOverflow(page);
     await expect(page).toHaveScreenshot('analytics-mobile.png', { maxDiffPixels: 150, fullPage: true });
   });

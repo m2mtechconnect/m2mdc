@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
+import { useRBAC } from "@/contexts/RBACContext";
 
 interface OrganizationData {
   id: string;
@@ -49,9 +50,9 @@ const defaultRoles = [
 
 export default function Settings() {
   const navigate = useNavigate();
+  const { can } = useRBAC();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -59,6 +60,11 @@ export default function Settings() {
     industry: '',
     default_role: 'engineer',
   });
+
+  // Workspace mutation authority comes from the canonical effective-permission
+  // resolver, which combines the platform and active-organization planes
+  // without treating a legacy role label as the authorization decision.
+  const isAdmin = can('tenant.manage_members');
 
   useEffect(() => {
     loadSettings();
@@ -84,16 +90,6 @@ export default function Settings() {
         navigate('/auth');
         return;
       }
-
-      // Check if user is admin/executive
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .single();
-
-      const isExec = roleData?.role === 'executive';
-      setIsAdmin(isExec);
 
       // Resolve the tenant through the canonical server authority
       // (active_org_id() over org_memberships). No active org means fail closed.

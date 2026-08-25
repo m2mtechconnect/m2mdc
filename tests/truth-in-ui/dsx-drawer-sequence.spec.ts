@@ -22,7 +22,19 @@ const ROOT = '/evidence';
 
 async function open(page: Page) {
   await page.goto(ROOT, { waitUntil: 'domcontentloaded' });
+
+  // `/evidence` is now the neutral canonical family root and redirects to the
+  // overview workspace. The shell title can paint before runtime-derived
+  // constraints are populated, so it is not a sufficient readiness signal for
+  // drawer tests. Wait for both the canonical destination and the constraint
+  // stack that these tests actually exercise.
+  await expect(page).toHaveURL(/\/evidence\/overview(?:[?#].*)?$/, { timeout: 15_000 });
   await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId('dsx-constraint-stack')).toBeVisible({ timeout: 15_000 });
+  await expect.poll(
+    () => page.locator('[data-testid^="dsx-constraint-open-"]').count(),
+    { timeout: 15_000, message: 'overview constraint stack must finish populating' },
+  ).toBeGreaterThan(1);
   await assertNoOnboardingOverlay(page);
 }
 

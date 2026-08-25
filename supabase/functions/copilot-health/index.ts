@@ -45,7 +45,7 @@ serve(async (req) => {
     const externalCredsJson = Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON');
     const finalProjectId = projectId || Deno.env.get('GOOGLE_PROJECT_ID');
     const finalRegion = region || Deno.env.get('GOOGLE_LOCATION') || 'northamerica-northeast1';
-    const finalModel = model || Deno.env.get('GEMINI_MODEL') || 'gemini-1.5-pro';
+    const finalModel = model || Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash';
     const finalDataStoreId = dataStoreId || Deno.env.get('VERTEX_DATA_STORE_ID');
     const managedApiKey = Deno.env.get('LOVABLE_API_KEY');
 
@@ -86,6 +86,9 @@ serve(async (req) => {
     } else if (managedApiKey) {
       try {
         const startTime = Date.now();
+        // This is the provider-managed gateway path. Its model catalogue is a
+        // separate runtime contract from the externally configured Vertex path,
+        // so do not couple it to the browser response-profile selector.
         const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
           method: 'POST',
           headers: {

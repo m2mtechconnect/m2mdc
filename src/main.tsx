@@ -3,6 +3,7 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/simulation-v2.css";
+import "./styles/recharts-containment.css";
 import "./i18n/config";
 import { stampBuildFingerprint } from "./lib/buildFingerprint";
 import { startRuntimeMonitoring } from "./monitoring/runtimeMonitoring";

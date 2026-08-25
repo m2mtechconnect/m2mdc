@@ -16,7 +16,6 @@ import {
   DCStep5Deploy,
 } from '@/components/builder/dc-steps';
 import { BuilderStarterLists } from '@/components/builder/BuilderStarterLists';
-import { DeploymentProgressModal } from '@/components/deployment/DeploymentProgressModal';
 import { Button } from '@/components/ui/button';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
@@ -46,7 +45,6 @@ export default function Builder() {
     goal,
     industry,
     department,
-    workflow,
     initializeBuilder,
     error,
     lastSaved,
@@ -63,7 +61,6 @@ export default function Builder() {
   } = useActiveTwin();
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [showDeploymentProgress, setShowDeploymentProgress] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
 
   const requestedTwinId = searchParams.get('twin');
@@ -98,10 +95,7 @@ export default function Builder() {
     {
       id: 1,
       component: DCStep1Summary,
-      validate: () => {
-        const state = useDCTwinBuilderStore.getState();
-        return !!state.overview.twinName?.trim();
-      },
+      validate: () => !!useDCTwinBuilderStore.getState().overview.twinName?.trim(),
     },
     {
       id: 2,
@@ -125,17 +119,9 @@ export default function Builder() {
     const getFreshState = () => useWizardBuilderStore.getState();
     return [
       { id: 1, component: Step1Summary, validate: () => true },
-      {
-        id: 2,
-        component: Step2Intelligence,
-        validate: () => !!getFreshState().modelConfig?.model,
-      },
+      { id: 2, component: Step2Intelligence, validate: () => !!getFreshState().modelConfig?.model },
       { id: 3, component: Step3Tools, validate: () => true },
-      {
-        id: 4,
-        component: Step4Workflow,
-        validate: () => !!getFreshState().workflow?.actions?.length,
-      },
+      { id: 4, component: Step4Workflow, validate: () => !!getFreshState().workflow?.actions?.length },
       {
         id: 5,
         component: Step5Deploy,
@@ -167,8 +153,6 @@ export default function Builder() {
     void checkAuth();
   }, [navigate]);
 
-  // Facility handoff is explicit. The active-twin context is synchronized to
-  // the routed twin when that twin is actually visible to this user.
   useEffect(() => {
     if (!authChecked || !requestedTwinId || twinLoading) return;
     const requested = twins.find((candidate) => candidate.id === requestedTwinId);
@@ -176,9 +160,7 @@ export default function Builder() {
       setInitError('The selected facility is not available to this workspace.');
       return;
     }
-    if (activeTwinId !== requested.id) {
-      void setActiveTwin(requested.id);
-    }
+    if (activeTwinId !== requested.id) void setActiveTwin(requested.id);
   }, [authChecked, requestedTwinId, twinLoading, twins, activeTwinId, setActiveTwin]);
 
   useEffect(() => {
@@ -188,17 +170,16 @@ export default function Builder() {
       return;
     }
 
-    const geminiAnalysis = (location.state as { geminiAnalysis?: unknown } | null)?.geminiAnalysis;
-    const prefilled = (location.state as { prefilled?: unknown } | null)?.prefilled;
-    const blueprint = (location.state as { blueprint?: unknown } | null)?.blueprint;
+    const state = (location.state ?? {}) as {
+      geminiAnalysis?: unknown;
+      prefilled?: unknown;
+      blueprint?: unknown;
+    };
 
-    initializeBuilder(searchParams, geminiAnalysis, prefilled, blueprint as never)
+    initializeBuilder(searchParams, state.geminiAnalysis, state.prefilled, state.blueprint as never)
       .then(() => {
         const createdId = useWizardBuilderStore.getState().builderId;
         setIsInitialized(true);
-
-        // Consume `new=true` exactly once. Refresh now reloads the same draft,
-        // and the facility identity remains in the URL for transparent handoff.
         if (searchParams.get('new') === 'true' && createdId) {
           const next = new URLSearchParams();
           next.set('draft', createdId);
@@ -223,7 +204,6 @@ export default function Builder() {
     initializeBuilder,
     isInitialized,
     authChecked,
-    navigate,
     toast,
     hasIntent,
     t,
@@ -232,8 +212,7 @@ export default function Builder() {
   ]);
 
   useEffect(() => {
-    if (!error) return;
-    toast({ title: 'Error', description: error, variant: 'destructive' });
+    if (error) toast({ title: 'Error', description: error, variant: 'destructive' });
   }, [error, toast]);
 
   const CurrentStepComponent = steps[effectiveCurrentStep - 1].component;
@@ -262,12 +241,8 @@ export default function Builder() {
       });
       return;
     }
-
-    trackBuilderStep(effectiveCurrentStep, {
-      sessionId: searchParams.get('session') || undefined,
-    });
+    trackBuilderStep(effectiveCurrentStep, { sessionId: searchParams.get('session') || undefined });
     effectiveMarkStepComplete(effectiveCurrentStep);
-
     if (effectiveCurrentStep < steps.length) {
       effectiveSetCurrentStep(effectiveCurrentStep + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -298,8 +273,6 @@ export default function Builder() {
     );
   }
 
-  // AURA DC builds require a facility identity before configuration begins.
-  // This is the canonical first-run setup gate, not a phantom draft creator.
   if (!fromScanner && twins.length === 0) {
     return (
       <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="facility-required-heading">
@@ -395,28 +368,16 @@ export default function Builder() {
   };
 
   return (
-    <>
-      <BuilderLayout
-        onNext={handleNext}
-        onBack={handleBack}
-        nextDisabled={!isValid}
-        nextLabel={effectiveCurrentStep === 5 ? 'Activate configuration' : undefined}
-        lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
-        onDeploy={effectiveCurrentStep === 5 ? async () => {
-          setShowDeploymentProgress(true);
-          return { success: true };
-        } : undefined}
-        currentStep={effectiveCurrentStep}
-      >
-        <CurrentStepComponent />
-      </BuilderLayout>
-
-      <DeploymentProgressModal
-        open={showDeploymentProgress}
-        onOpenChange={setShowDeploymentProgress}
-        agentName={goal || 'Facility build'}
-        onDeploy={handleDeploy}
-      />
-    </>
+    <BuilderLayout
+      onNext={handleNext}
+      onBack={handleBack}
+      nextDisabled={!isValid}
+      nextLabel={effectiveCurrentStep === 5 ? 'Activate configuration' : undefined}
+      lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
+      onDeploy={effectiveCurrentStep === 5 && !fromScanner ? handleDeploy : undefined}
+      currentStep={effectiveCurrentStep}
+    >
+      <CurrentStepComponent />
+    </BuilderLayout>
   );
 }

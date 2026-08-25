@@ -1,27 +1,21 @@
 /**
- * AURA platform rebuild - Phase 9.
+ * Canonical AURA activation / deployment evidence model.
  *
- * Canonical deployment read/write model.
- *
- * Before this module the deployment UI advanced a stage list on `setTimeout`
- * timers: the progress a user saw was scripted, not observed, and the only
- * durable trace was a single terminal row written after the animation. Two
- * overlapping tables (`deployments`, `deployment_tracking`) recorded partly
- * the same facts.
- *
- * Canonical model from Phase 9 onward:
- *   - `public.deployments`        - current deployment state (mutable row)
- *   - `public.deployment_events`  - immutable, append-only step log
- *
- * `deployment_tracking` is deprecated and has no client grants.
- *
- * Every stage reported in the UI must correspond to a real operation whose
- * outcome is appended here. No stage may be advanced by a timer.
+ * `public.deployments` stores the current recorded state and
+ * `public.deployment_events` stores immutable step evidence. An `active`
+ * database row means the AURA configuration was activated. It does not prove
+ * that an external runtime was provisioned or is healthy.
  */
 
 import { supabase } from '@/integrations/supabase/client';
 
 export type DeploymentEventStatus = 'started' | 'succeeded' | 'failed' | 'skipped';
+export type DeploymentTruthState =
+  | 'in_progress'
+  | 'configuration_active'
+  | 'runtime_connected'
+  | 'runtime_verified'
+  | 'failed';
 
 export interface DeploymentEventRecord {
   id: string;
@@ -60,7 +54,36 @@ export interface OpenDeploymentInput {
   grounding?: boolean | null;
 }
 
-/** Opens a deployment in `pending`. The row exists before any stage runs. */
+const VERIFIED_HEALTH = new Set(['OK', 'HEALTHY']);
+
+/**
+ * Derives what AURA can truthfully claim from persisted evidence.
+ * Runtime verification requires both a concrete runtime URL and positive
+ * health evidence. A configuration-only activation is never promoted.
+ */
+export function classifyDeploymentTruth(record: Pick<DeploymentRecord, 'status' | 'runtime_url' | 'health'>): DeploymentTruthState {
+  if (record.status === 'failed') return 'failed';
+  if (record.status !== 'active') return 'in_progress';
+
+  const hasRuntime = typeof record.runtime_url === 'string' && record.runtime_url.trim().length > 0;
+  const health = record.health?.trim().toUpperCase() ?? '';
+
+  if (hasRuntime && VERIFIED_HEALTH.has(health)) return 'runtime_verified';
+  if (hasRuntime && health.length > 0) return 'runtime_connected';
+  return 'configuration_active';
+}
+
+export function deploymentTruthLabel(state: DeploymentTruthState): string {
+  switch (state) {
+    case 'configuration_active': return 'Configuration active';
+    case 'runtime_connected': return 'Runtime connected';
+    case 'runtime_verified': return 'Runtime verified';
+    case 'failed': return 'Failed';
+    default: return 'In progress';
+  }
+}
+
+/** Opens an activation/deployment evidence record in `pending`. */
 export async function openDeployment(input: OpenDeploymentInput): Promise<DeploymentRecord> {
   const { data, error } = await supabase
     .from('deployments')
@@ -68,7 +91,9 @@ export async function openDeployment(input: OpenDeploymentInput): Promise<Deploy
       system_id: input.systemId,
       version: input.version ?? 'v1',
       status: 'pending',
-      region: input.region ?? 'northamerica-northeast1',
+      // Region is an optional evidence field. Do not fabricate a cloud runtime
+      // region for configuration-only activation.
+      region: input.region ?? 'not-applicable',
       model: input.model ?? null,
       grounding: input.grounding ?? null,
       deployed_by: input.actorId,
@@ -80,10 +105,7 @@ export async function openDeployment(input: OpenDeploymentInput): Promise<Deploy
   return data as DeploymentRecord;
 }
 
-/**
- * Appends one immutable step outcome. `sequence` is caller-assigned and unique
- * per deployment, so a replayed log always reconstructs the same order.
- */
+/** Appends one immutable stage outcome. */
 export async function appendDeploymentEvent(params: {
   deploymentId: string;
   systemId: string;
@@ -103,12 +125,10 @@ export async function appendDeploymentEvent(params: {
     detail: (params.detail ?? {}) as never,
   }]);
 
-  // Evidence loss must be visible, but it must not abort a deployment that
-  // otherwise succeeded; the terminal state below is still recorded.
   if (error) console.error('[deploymentRecords] event append failed', error.message);
 }
 
-/** Records the terminal state of a deployment. */
+/** Records the terminal database state without inferring runtime evidence. */
 export async function closeDeployment(params: {
   deploymentId: string;
   status: 'active' | 'failed';
@@ -130,7 +150,7 @@ export async function closeDeployment(params: {
   if (error) throw error;
 }
 
-/** Reads the immutable step log for one deployment, in recorded order. */
+/** Reads immutable stage evidence in recorded sequence. */
 export async function listDeploymentEvents(deploymentId: string): Promise<DeploymentEventRecord[]> {
   const { data, error } = await supabase
     .from('deployment_events')

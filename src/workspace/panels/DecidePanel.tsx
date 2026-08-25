@@ -117,7 +117,7 @@ export function DecidePanel() {
                     size="sm"
                     variant={decision === 'accepted' ? 'secondary' : 'outline'}
                     aria-pressed={decision === 'accepted'}
-                    className="h-7 px-2.5 text-[11px]"
+                    className="h-7 px-2.5 text-xs"
                     disabled={!durable || !canRecord || rationale.trim().length < 10 || saving !== null}
                     onClick={() => { void submit(rec.id, 'approved'); }}
                   >
@@ -128,7 +128,7 @@ export function DecidePanel() {
                   size="sm"
                   variant={decision === 'rejected' ? 'secondary' : 'outline'}
                   aria-pressed={decision === 'rejected'}
-                  className="h-7 px-2.5 text-[11px]"
+                  className="h-7 px-2.5 text-xs"
                   disabled={!durable || !canRecord || rationale.trim().length < 10 || saving !== null}
                   onClick={() => { void submit(rec.id, 'rejected'); }}
                 >
@@ -138,7 +138,7 @@ export function DecidePanel() {
                   size="sm"
                   variant={decision === 'deferred' ? 'secondary' : 'outline'}
                   aria-pressed={decision === 'deferred'}
-                  className="h-7 px-2.5 text-[11px]"
+                  className="h-7 px-2.5 text-xs"
                   disabled={!durable || !canRecord || rationale.trim().length < 10 || saving !== null}
                   onClick={() => { void submit(rec.id, 'escalated'); }}
                 >

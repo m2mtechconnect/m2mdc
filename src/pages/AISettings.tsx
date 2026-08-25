@@ -197,7 +197,7 @@ function AISettingsPage() {
               <div key={profile.id} className="rounded-lg border border-border p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-medium text-foreground">{profile.label}</p>
-                  <Badge variant="outline" className="text-[11px]">{profile.available ? 'Available' : 'Unavailable'}</Badge>
+                  <Badge variant="outline" className="text-xs">{profile.available ? 'Available' : 'Unavailable'}</Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{profile.description}</p>
               </div>

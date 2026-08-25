@@ -1,9 +1,9 @@
 /**
  * Canonical AURA DC information architecture.
  *
- * Four persistent workspaces stay in the global header. Operational management
- * and governance are separate enterprise navigation groups, while creation and
- * record-detail flows remain contextual actions.
+ * The primary navigation follows the product lifecycle instead of exposing
+ * implementation routes. Build and Operate are first-class workspaces so a
+ * user can move from configuration to runtime without discovering hidden URLs.
  */
 import {
   BarChart3,
@@ -48,7 +48,7 @@ export type NavGroupId = 'overview' | 'design' | 'simulate' | 'operate' | 'gover
 
 export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
   overview: 'Overview',
-  design: 'Design',
+  design: 'Build',
   simulate: 'Simulate',
   operate: 'Operate',
   govern: 'Govern',
@@ -58,12 +58,11 @@ export const NAV_GROUP_LABEL: Record<NavGroupId, string> = {
 export const NAV_GROUP_ORDER: NavGroupId[] = [
   'overview',
   'design',
-  'simulate',
   'operate',
+  'simulate',
   'govern',
   'support',
 ];
-
 
 export const WORKSPACE_NAV: AppNavItem[] = [
   {
@@ -76,13 +75,35 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     description: `Facility status, priority actions and recent runs. ${stackDescription('platform.command')}`,
   },
   {
-    name: 'Blueprint',
-    fullName: 'Facility Blueprint',
-    href: '/blueprint',
+    name: 'Build',
+    fullName: 'Build & Configure',
+    href: '/builder',
     icon: Boxes,
-    matches: ['/blueprint'],
+    matches: [
+      '/builder',
+      '/blueprint',
+      '/data-centre-twin',
+      '/manage/facilities',
+    ],
     group: 'design',
-    description: stackDescription('twin.openusd'),
+    description: 'Create the facility, configure the twin, define the blueprint and prepare deployment inputs.',
+  },
+  {
+    name: 'Operate',
+    fullName: 'Operate',
+    href: '/analytics',
+    icon: BarChart3,
+    matches: [
+      '/analytics',
+      '/operations',
+      '/intelligence',
+      '/deployments',
+      '/app/agents',
+      '/agent',
+      '/agents',
+    ],
+    group: 'operate',
+    description: 'Runtime health, telemetry, deployed systems, agents and operational status.',
   },
   {
     name: 'Simulation',
@@ -96,9 +117,6 @@ export const WORKSPACE_NAV: AppNavItem[] = [
   {
     name: 'Evidence',
     fullName: 'Evidence',
-    // Neutral canonical Evidence URL. The retired implementation-named family
-    // is still matched for active-state highlighting on inbound deep links,
-    // but is never emitted as an href.
     href: `${EVIDENCE_ROOT}/overview`,
     icon: FileSearch,
     matches: [EVIDENCE_ROOT, LEGACY_EVIDENCE_ROOT, '/compliance'],
@@ -119,14 +137,34 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: 'Sites, halls, capacity, infrastructure scope and lifecycle state.',
   },
   {
+    name: 'Blueprint',
+    fullName: 'Facility Blueprint',
+    href: '/blueprint',
+    icon: Boxes,
+    matches: ['/blueprint', '/data-centre-twin'],
+    permission: 'twin.edit',
+    group: 'design',
+    description: stackDescription('twin.openusd'),
+  },
+  {
     name: 'Connections',
     fullName: 'Connections',
     href: '/manage/integrations',
     icon: Cable,
     matches: ['/manage/integrations', '/manage/connections', '/integrations', '/settings/integrations', '/connect'],
     permission: 'twin.edit',
-    group: 'operate',
+    group: 'design',
     description: `${stackDescription('connections.enterprise')} ${stackDescription('data.storage')}`,
+  },
+  {
+    name: 'AI Runtime',
+    fullName: 'AI Runtime & Policies',
+    href: '/settings/ai',
+    icon: Sparkles,
+    matches: ['/settings/ai'],
+    permission: 'agent.administer',
+    group: 'design',
+    description: `${stackDescription('ai.managed')} Runtime selection, grounding boundaries, health and safety settings.`,
   },
   {
     name: 'Agents',
@@ -139,21 +177,8 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: 'Agent scopes, recommendations, execution state, configuration and audit history.',
   },
   {
-    name: 'Operations',
-    // Matches the page heading exactly; the destination previously advertised
-    // three different names (nav "Operations", route /analytics, component
-    // IntelligenceDashboard, heading "Operations & Telemetry").
-    fullName: 'Operations & Telemetry',
-    href: '/analytics',
-    icon: BarChart3,
-    matches: ['/intelligence', '/analytics', '/operations'],
-    permission: 'analytics.view',
-    group: 'operate',
-    description: 'Aggregate operational status, alerts, trends and data availability.',
-  },
-  {
     name: 'Runtime',
-    fullName: 'Runtime',
+    fullName: 'Runtime & Deployments',
     href: '/deployments',
     icon: Rocket,
     matches: ['/deployments', '/deploy'],
@@ -176,18 +201,6 @@ export const MANAGE_NAV: AppNavItem[] = [
     permission: 'tenant.view_members',
     group: 'govern',
     description: 'Members, invitations, approvals, roles and access administration.',
-  },
-  {
-    name: 'Agent Policies',
-    fullName: 'Agent Policies',
-    href: '/settings/ai',
-    icon: Sparkles,
-    matches: ['/settings/ai'],
-    permission: 'agent.administer',
-    group: 'govern',
-    // Model providers are AURA-managed, not customer configuration, so this
-    // reads as managed-AI and grounding governance rather than provider choice.
-    description: `${stackDescription('ai.managed')} Grounding boundaries, safety settings and agent governance.`,
   },
   {
     name: 'Platform Admin',
@@ -311,7 +324,7 @@ export function visibleGovernNav(can: (permission: Permission) => boolean): AppN
 }
 
 export function navGroups(can: (permission: Permission) => boolean): NavGroup[] {
-  return (Object.keys(NAV_GROUP_LABEL) as NavGroupId[]).map((id) => ({
+  return NAV_GROUP_ORDER.map((id) => ({
     id,
     label: NAV_GROUP_LABEL[id],
     items: [
@@ -322,11 +335,6 @@ export function navGroups(can: (permission: Permission) => boolean): NavGroup[] 
   })).filter((group) => group.items.length > 0);
 }
 
-/**
- * Children carry their own optional permission (Customers requires
- * `platform.manage_customers`, which not every admin-console user holds).
- * Nav rendering must filter them the same way top-level items are filtered.
- */
 export function visibleNavChildren(
   item: AppNavItem,
   can: (permission: Permission) => boolean,

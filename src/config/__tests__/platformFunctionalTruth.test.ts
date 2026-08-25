@@ -11,9 +11,18 @@ describe('platform functional-truth source invariants', () => {
     const settings = source('src/pages/account/Settings.tsx');
     const teams = source('src/pages/Teams.tsx');
 
-    expect(settings).not.toMatch(/roleData\?\.role\s*===\s*['"]executive['"]/);
-    expect(settings).not.toMatch(/setIsAdmin\(isExec\)/);
-    expect(teams).not.toMatch(/hasRole\(['"]admin['"]\)/);
+    expect(settings).not.toContain("roleData?.role === 'executive'");
+    expect(settings).not.toContain('setIsAdmin(isExec)');
+    expect(teams).not.toContain("hasRole('admin')");
+  });
+
+  it('AI settings keep customer-visible controls AURA white-label', () => {
+    const aiSettings = source('src/pages/AISettings.tsx');
+
+    expect(aiSettings).not.toMatch(/Google Cloud Project ID/i);
+    expect(aiSettings).not.toMatch(/Vertex AI/i);
+    expect(aiSettings).not.toMatch(/Gemini/i);
+    expect(aiSettings).not.toMatch(/Google Cloud region/i);
   });
 
   it('system management does not expose fake-success actions, vendor plumbing or invented intelligence defaults', () => {

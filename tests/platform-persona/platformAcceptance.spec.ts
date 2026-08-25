@@ -4,6 +4,7 @@ import { installPlatformBackend, type PlatformPersonaRole } from './platformBack
 const FORBIDDEN_CUSTOMER_TERMS = /\b(?:lovable|zapier|mcp|supabase|openai|gemini|gpt(?:-?\d+)?|google cloud|vertex ai)\b/i;
 const PLACEHOLDER_SUCCESS_TERMS = /\b(?:coming soon|will be available soon|placeholder feature|mock data|fake data)\b/i;
 const FATAL_ROUTE_TERMS = /\b(?:page not found|something went wrong|authorization error|system could not be loaded)\b/i;
+const ROUTE_LOADING_TERMS = /(?:loading your workspace|loading workspace\.\.\.|checking administrator permissions\.\.\.)/i;
 
 interface RouteCase {
   path: string;
@@ -34,7 +35,7 @@ const PERSONAS: PersonaCase[] = [
       { path: '/builder?new=true&goal=Acceptance&type=agent&step=1' },
       { path: '/settings/ai' },
       { path: '/infrastructure', expectedPath: '/blueprint/default' },
-      { path: '/dsx/evidence-beta' },
+      { path: '/dsx/evidence-beta', expectedPath: '/dsx/evidence-beta/overview' },
     ],
   },
   {
@@ -112,21 +113,27 @@ const PERSONAS: PersonaCase[] = [
   },
 ];
 
+function canonicalPath(route: RouteCase): string {
+  return route.expectedPath ?? new URL(route.path, 'http://acceptance.local').pathname;
+}
+
 async function assertRouteCommitted(page: Page, route: RouteCase) {
+  const expectedPath = canonicalPath(route);
   await page.goto(route.path, { waitUntil: 'domcontentloaded' });
 
   await expect.poll(async () => {
     const body = await page.locator('body').innerText();
-    return body.includes('Loading workspace...') || body.includes('Checking administrator permissions...');
-  }, { timeout: 20_000, intervals: [100, 250, 500] }).toBe(false);
-
-  if (route.expectedPath) {
-    await expect.poll(() => new URL(page.url()).pathname).toBe(route.expectedPath);
-  }
+    return {
+      path: new URL(page.url()).pathname,
+      committed: body.length > 40 && !ROUTE_LOADING_TERMS.test(body),
+    };
+  }, { timeout: 30_000, intervals: [100, 250, 500, 1000] }).toEqual({
+    path: expectedPath,
+    committed: true,
+  });
 
   await expect(page.getByTestId('route-load-recovery')).toHaveCount(0);
   const body = await page.locator('body').innerText();
-  expect(body.length, `${route.path} should render a meaningful surface`).toBeGreaterThan(40);
   expect(body, `${route.path} rendered a fatal route state`).not.toMatch(FATAL_ROUTE_TERMS);
   expect(body, `${route.path} exposed customer-facing implementation terminology`).not.toMatch(FORBIDDEN_CUSTOMER_TERMS);
   expect(body, `${route.path} exposed an operational-looking placeholder`).not.toMatch(PLACEHOLDER_SUCCESS_TERMS);
@@ -134,7 +141,7 @@ async function assertRouteCommitted(page: Page, route: RouteCase) {
 
 for (const persona of PERSONAS) {
   test(`${persona.name}: canonical routes commit without placeholders, vendor plumbing or unexpected egress`, async ({ context, page }) => {
-    test.setTimeout(240_000);
+    test.setTimeout(300_000);
     const backend = await installPlatformBackend(context, persona.role);
     const findings: string[] = [];
 

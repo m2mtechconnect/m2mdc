@@ -119,7 +119,7 @@ export default function DsxCapabilityRegistryPage() {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center justify-between gap-2 text-sm">
                 <span>{capability.name}</span>
-                <Badge variant="outline" className="text-[11px]">
+                <Badge variant="outline" className="text-xs">
                   {DSX_STATUS_LABEL[capability.status]}
                 </Badge>
               </CardTitle>

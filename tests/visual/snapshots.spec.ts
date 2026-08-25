@@ -15,8 +15,37 @@ import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
  */
 
 const VISUAL_BUILDER_ID = '00000000-0000-4000-8000-000000000099';
+const VISUAL_TWIN_ID = '00000000-0000-4000-8000-000000000199';
 const MOBILE_WIDTH = 375;
 const MOBILE_HEIGHT = 667;
+
+const visualTwin = {
+  id: VISUAL_TWIN_ID,
+  location_id: null,
+  name: 'Visual Regression Facility',
+  city: 'Toronto',
+  region_code: 'canada-central',
+  tier: 'Tier III',
+  capacity_kw: 4200,
+  industry: 'data_centre',
+  sovereignty_level: null,
+  pue_target: null,
+  renewable_target_pct: null,
+  carbon_intensity: null,
+  metadata: {
+    created_from: 'visual-regression',
+    evidence_state: 'operator_supplied_design_inputs',
+    facility_inputs: {
+      region_code: 'canada-central',
+      tier: 'Tier III',
+      capacity_kw: 4200,
+    },
+  },
+  blueprint_id: null,
+  created_by_user: '00000000-0000-4000-8000-000000000001',
+  created_at: '2026-01-01T00:00:00.000Z',
+  updated_at: '2026-01-01T00:00:00.000Z',
+};
 
 const visualBuilder = {
   id: VISUAL_BUILDER_ID,
@@ -24,11 +53,13 @@ const visualBuilder = {
   description: 'Deterministic visual-regression fixture',
   status: 'draft',
   config: {
+    source: 'facility',
     goal: 'Optimize sovereign data-centre operations',
     industry: 'Data Centre',
     department: 'Operations',
     type: '3d_twin',
     template_id: 'visual-regression-template',
+    twin_id: VISUAL_TWIN_ID,
     workflow: {
       triggers: ['Telemetry threshold exceeded'],
       actions: ['Analyze thermal anomaly', 'Recommend cooling adjustment'],
@@ -79,6 +110,46 @@ async function expectLifecycleNavigation(page: Page) {
 }
 
 async function installBuilderVisualMock(context: BrowserContext) {
+  // The shared Supabase mock intentionally returns an empty array for unknown
+  // REST resources. Builder Phase 2 now requires a real facility identity, so
+  // visual tests that exercise wizard steps must explicitly provide one
+  // deterministic, non-placeholder facility. This is test-only fixture data.
+  await context.route('**/rest/v1/data_centre_twins*', async (route) => {
+    const method = route.request().method().toUpperCase();
+    const headers = {
+      'access-control-allow-origin': '*',
+      'access-control-expose-headers': 'content-range,content-profile',
+      'content-type': 'application/json',
+    };
+    if (method === 'OPTIONS') {
+      await route.fulfill({
+        status: 204,
+        headers: {
+          ...headers,
+          'access-control-allow-methods': 'GET,HEAD,OPTIONS',
+          'access-control-allow-headers': 'authorization,apikey,content-type,accept,prefer,x-client-info',
+        },
+        body: '',
+      });
+      return;
+    }
+    if (method === 'HEAD') {
+      await route.fulfill({ status: 200, headers, body: '' });
+      return;
+    }
+
+    const accept = (route.request().headers()['accept'] ?? '').toLowerCase();
+    const wantsSingle = accept.includes('pgrst.object');
+    await route.fulfill({
+      status: 200,
+      headers: {
+        ...headers,
+        'content-type': wantsSingle ? 'application/vnd.pgrst.object+json' : 'application/json',
+      },
+      body: JSON.stringify(wantsSingle ? visualTwin : [visualTwin]),
+    });
+  });
+
   await context.route('**/functions/v1/builders-*', async (route) => {
     const method = route.request().method().toUpperCase();
     const headers = {
@@ -98,6 +169,10 @@ async function installBuilderVisualMock(context: BrowserContext) {
       : { data: { builder: visualBuilder } };
     await route.fulfill({ status: 200, headers, body: JSON.stringify(payload) });
   });
+}
+
+function builderVisualUrl(step: number): string {
+  return `/builder?new=true&step=${step}&twin=${VISUAL_TWIN_ID}&source=facility&type=3d_twin`;
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
@@ -164,17 +239,26 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await expect(page).toHaveScreenshot('dashboard-hero-light.png', { maxDiffPixels: 100 });
   });
 
-  test('Builder Step 1', async ({ page, context }) => {
-    await installBuilderVisualMock(context);
-    await page.goto('/builder?new=true&step=1');
+  test('Builder first-run facility gate', async ({ page }) => {
+    await page.goto('/builder');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expect(page.getByRole('heading', { name: /create your first facility/i })).toBeVisible();
+    await expect(page).toHaveScreenshot('builder-first-run-light.png', { maxDiffPixels: 100 });
+  });
+
+  test('Builder Step 1', async ({ page, context }) => {
+    await installBuilderVisualMock(context);
+    await page.goto(builderVisualUrl(1));
+    await page.waitForLoadState('networkidle');
+    await expectGlobalLightTheme(page);
+    await expect(page.getByRole('heading', { name: /summary/i }).first()).toBeVisible();
     await expect(page).toHaveScreenshot('builder-step1-light.png', { maxDiffPixels: 100 });
   });
 
   test('Builder Step 2', async ({ page, context }) => {
     await installBuilderVisualMock(context);
-    await page.goto('/builder?new=true&step=2');
+    await page.goto(builderVisualUrl(2));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expect(page).toHaveScreenshot('builder-step2-light.png', { maxDiffPixels: 100 });
@@ -182,7 +266,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
 
   test('Builder Step 5', async ({ page, context }) => {
     await installBuilderVisualMock(context);
-    await page.goto('/builder?new=true&step=5');
+    await page.goto(builderVisualUrl(5));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expect(page).toHaveScreenshot('builder-step5-light.png', { maxDiffPixels: 150 });
@@ -275,7 +359,7 @@ test.describe('Visual Regression - Mobile', () => {
 
   test('Builder mobile has no horizontal overflow', async ({ page, context }) => {
     await installBuilderVisualMock(context);
-    await page.goto('/builder?new=true&step=1');
+    await page.goto(builderVisualUrl(1));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expectPinnedMobileViewport(page);

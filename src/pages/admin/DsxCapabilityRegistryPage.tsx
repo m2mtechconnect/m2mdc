@@ -73,7 +73,7 @@ export default function DsxCapabilityRegistryPage() {
         <CardHeader className="pb-2">
           <CardTitle className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <span>NVIDIA Nemotron reference validation</span>
-            <Badge variant="outline" className="text-[11px]">
+            <Badge variant="outline" className="text-xs">
               AURA runtime not connected
             </Badge>
           </CardTitle>

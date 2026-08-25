@@ -2,12 +2,8 @@
  * Connections — the operational control plane for customer-facing hybrid-stack
  * systems. Canonical route: /manage/integrations
  * Alias: /manage/connections
- *
- * Internal platform capability assessment lives at /admin/platform-readiness.
- * This workspace is for configured systems, data flows and connectors that
- * exchange facility, twin, storage or enterprise-workflow data with AURA.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Cable, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -40,22 +36,23 @@ import {
   useTwinMappings,
 } from '@/connections/api';
 
-// Demo UI is a separate compile-time artifact profile. Production browser
-// builds never receive a feature flag that could enable it at runtime.
+// The demo experience is a distinct compiled artifact profile. Normal
+// production builds cannot turn it on with a browser-readable feature flag.
 const DEMO_INTEGRATIONS_ENABLED = import.meta.env.MODE === 'demo';
 
 const TABS = [
   { value: 'overview', label: 'Overview' },
-  { value: 'connections', label: 'Connected systems' },
+  { value: 'connections', label: 'Systems' },
   { value: 'data-flows', label: 'Data flows' },
-  { value: 'catalogue', label: 'Available connectors' },
-  ...(DEMO_INTEGRATIONS_ENABLED ? [{ value: 'demo', label: 'Demo integrations' }] : []),
-  { value: 'activity', label: 'Health & audit' },
-];
+  { value: 'catalogue', label: 'Connectors' },
+  { value: 'activity', label: 'Activity' },
+] as const;
 
 export default function Connections() {
   const [params, setParams] = useSearchParams();
-  const tab = TABS.some((t) => t.value === params.get('tab')) ? (params.get('tab') as string) : 'overview';
+  const requestedTab = params.get('tab');
+  const normalizedRequestedTab = requestedTab === 'demo' && DEMO_INTEGRATIONS_ENABLED ? 'catalogue' : requestedTab;
+  const tab = TABS.some((t) => t.value === normalizedRequestedTab) ? (normalizedRequestedTab as string) : 'overview';
   const { toast } = useToast();
   const { role, can } = useRBAC();
   const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
@@ -77,10 +74,21 @@ export default function Connections() {
   const [credentialFor, setCredentialFor] = useState<string | null>(null);
   const [mapRequestFor, setMapRequestFor] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
+  const detailTriggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     document.title = 'Connections | AURA DC';
   }, []);
+
+  useEffect(() => {
+    if (requestedTab === 'demo' && DEMO_INTEGRATIONS_ENABLED) {
+      setParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('tab', 'catalogue');
+        return next;
+      }, { replace: true });
+    }
+  }, [requestedTab, setParams]);
 
   const setTab = useCallback((value: string) => {
     setParams((prev) => {
@@ -100,6 +108,30 @@ export default function Connections() {
     eventCount.refetch();
     setLastRefreshedAt(Date.now());
   }, [connections, healthChecks, ingestRuns, auditEvents, mappings, credentials, eventCount]);
+
+  const openDetail = useCallback((connectionId: string) => {
+    const active = document.activeElement;
+    detailTriggerRef.current = active instanceof HTMLElement ? active : null;
+    setDetailId(connectionId);
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    const trigger = detailTriggerRef.current;
+    detailTriggerRef.current = null;
+    setDetailId(null);
+    if (!trigger || !trigger.isConnected) return;
+
+    let attempts = 0;
+    const restoreFocus = () => {
+      attempts += 1;
+      if (!trigger.isConnected) return;
+      trigger.focus();
+      if (document.activeElement !== trigger && attempts < 8) {
+        requestAnimationFrame(restoreFocus);
+      }
+    };
+    requestAnimationFrame(restoreFocus);
+  }, []);
 
   const rows = useMemo(
     () => buildConnectionRows(
@@ -138,6 +170,7 @@ export default function Connections() {
   }
 
   function handleMap(connectionId: string) {
+    detailTriggerRef.current = null;
     setDetailId(null);
     setMapRequestFor(connectionId);
     setTab('data-flows');
@@ -157,7 +190,7 @@ export default function Connections() {
         }
         subtitle={
           <>
-            Runtime status is evidence-derived; internal platform dependencies and capability assessment live on{' '}
+            Connect systems, govern data flows and verify runtime health. Internal platform readiness remains available to administrators on{' '}
             <Link className="underline underline-offset-4" to="/admin/platform-readiness">
               platform readiness
             </Link>
@@ -186,7 +219,7 @@ export default function Connections() {
               <TabsTrigger
                 key={t.value}
                 value={t.value}
-                className="min-h-[40px] rounded-none border-b-2 border-transparent px-4 text-[13px] uppercase tracking-[0.06em] data-[state=active]:border-[hsl(var(--v2-simulated))] data-[state=active]:bg-transparent data-[state=active]:shadow-none"
+                className="min-h-[40px] rounded-none border-b-2 border-transparent px-4 text-[13px] uppercase tracking-[0.06em] data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
               >
                 {t.label}
               </TabsTrigger>
@@ -203,7 +236,7 @@ export default function Connections() {
             eventCount={eventCount.data ?? 0}
             loading={loading}
             lastRefreshedAt={lastRefreshedAt}
-            onOpenConnection={setDetailId}
+            onOpenConnection={openDetail}
             onGoToTab={setTab}
           />
         </TabsContent>
@@ -213,7 +246,7 @@ export default function Connections() {
             rows={rows}
             loading={loading}
             isAdmin={isAdmin}
-            onOpen={setDetailId}
+            onOpen={openDetail}
             onAdd={() => setWizardOpen(true)}
             onTest={handleTest}
             onMap={handleMap}
@@ -232,21 +265,28 @@ export default function Connections() {
         </TabsContent>
 
         <TabsContent value="catalogue" className="mt-4 min-w-0">
-          <CatalogueTab
-            definitions={definitions.data ?? []}
-            connections={connections.data ?? []}
-            onRefresh={refresh}
-          />
-        </TabsContent>
-
-        {DEMO_INTEGRATIONS_ENABLED && (
-          <TabsContent value="demo" className="mt-4 min-w-0">
-            <DemoIntegrationsTab
+          <div className="space-y-8">
+            {DEMO_INTEGRATIONS_ENABLED && (
+              <section aria-labelledby="featured-integrations-heading" className="space-y-3">
+                <div>
+                  <h2 id="featured-integrations-heading" className="text-base font-semibold tracking-tight">Featured integrations</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Demonstration-ready integration experiences. Account and data status are shown separately so authorization is never confused with live data.
+                  </p>
+                </div>
+                <DemoIntegrationsTab
+                  definitions={definitions.data ?? []}
+                  connections={connections.data ?? []}
+                />
+              </section>
+            )}
+            <CatalogueTab
               definitions={definitions.data ?? []}
               connections={connections.data ?? []}
+              onRefresh={refresh}
             />
-          </TabsContent>
-        )}
+          </div>
+        </TabsContent>
 
         <TabsContent value="activity" className="mt-4 min-w-0">
           <ActivityTab
@@ -261,7 +301,7 @@ export default function Connections() {
       <ConnectionDetailDrawer
         row={detailRow}
         open={detailRow !== null}
-        onOpenChange={(open) => { if (!open) setDetailId(null); }}
+        onOpenChange={(open) => { if (!open) closeDetail(); }}
         isAdmin={isAdmin}
         credential={(credentials.data ?? []).find((c) => c.connection_id === detailRow?.connection.id) ?? null}
         contracts={(contracts.data ?? []).filter((c) => c.connection_id === detailRow?.connection.id)}

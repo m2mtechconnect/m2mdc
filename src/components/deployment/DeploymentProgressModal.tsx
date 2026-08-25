@@ -1,22 +1,10 @@
-/**
- * Deployment Progress Modal
- * Animated deployment progress with status steps
- * Shows real-time deployment status and auto-redirects on success
- */
-
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle2, Loader2, Rocket, ShieldCheck } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { CheckCircle2, Loader2, AlertCircle, Rocket } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { trackDeployment } from '@/lib/analytics/analyticsService';
-
-interface DeploymentStep {
-  id: string;
-  label: string;
-  status: 'pending' | 'in-progress' | 'complete' | 'error';
-}
 
 interface DeploymentProgressModalProps {
   open: boolean;
@@ -25,6 +13,8 @@ interface DeploymentProgressModalProps {
   onDeploy: () => Promise<{ success: boolean; agentUrl?: string; message?: string }>;
 }
 
+type DeploymentState = 'review' | 'deploying' | 'success' | 'error';
+
 export function DeploymentProgressModal({
   open,
   onOpenChange,
@@ -32,181 +22,151 @@ export function DeploymentProgressModal({
   onDeploy,
 }: DeploymentProgressModalProps) {
   const navigate = useNavigate();
-  const [steps, setSteps] = useState<DeploymentStep[]>([
-    { id: 'validate', label: 'Validating Blueprint', status: 'pending' },
-    { id: 'provision', label: 'Provisioning Agent Runtime', status: 'pending' },
-    { id: 'register', label: 'Registering Integrations', status: 'pending' },
-    { id: 'generate', label: 'Generating API Key & Endpoint', status: 'pending' },
-    { id: 'deploy', label: 'Deploying to Workspace', status: 'pending' },
-  ]);
-  const [overallStatus, setOverallStatus] = useState<'deploying' | 'success' | 'error'>('deploying');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [agentUrl, setAgentUrl] = useState<string | null>(null);
-  const [progress, setProgress] = useState(0);
+  const [state, setState] = useState<DeploymentState>('review');
+  const [message, setMessage] = useState<string | null>(null);
+  const [resultUrl, setResultUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open) {
-      startDeployment();
-    }
+    if (!open) return;
+    setState('review');
+    setMessage(null);
+    setResultUrl(null);
   }, [open]);
 
-  const updateStep = (stepId: string, status: DeploymentStep['status']) => {
-    setSteps(prev => prev.map(step => 
-      step.id === stepId ? { ...step, status } : step
-    ));
-  };
-
   const startDeployment = async () => {
+    if (state === 'deploying') return;
+    setState('deploying');
+    setMessage(null);
+    setResultUrl(null);
+
     try {
-      // Step 1: Validate
-      setProgress(10);
-      updateStep('validate', 'in-progress');
-      await delay(800);
-      updateStep('validate', 'complete');
-
-      // Step 2: Provision
-      setProgress(30);
-      updateStep('provision', 'in-progress');
-      await delay(1200);
-      updateStep('provision', 'complete');
-
-      // Step 3: Register
-      setProgress(50);
-      updateStep('register', 'in-progress');
-      await delay(1000);
-      updateStep('register', 'complete');
-
-      // Step 4: Generate
-      setProgress(70);
-      updateStep('generate', 'in-progress');
-      
-      // Actual deployment call
       const result = await onDeploy();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Deployment failed');
-      }
+      if (!result.success) throw new Error(result.message || 'Deployment failed');
 
-      updateStep('generate', 'complete');
-
-      // Step 5: Deploy
-      setProgress(90);
-      updateStep('deploy', 'in-progress');
-      await delay(800);
-      updateStep('deploy', 'complete');
-
-      // Success!
-      setProgress(100);
-      setOverallStatus('success');
-      setAgentUrl(result.agentUrl || '/dashboard');
-
-      // Track successful deployment
+      setResultUrl(result.agentUrl ?? null);
+      setMessage(result.message ?? 'AURA recorded a successful deployment result.');
+      setState('success');
       trackDeployment('deployed', true);
-
-      // Auto-redirect after 2.5 seconds
-      setTimeout(() => {
-        navigate('/dashboard');
-        onOpenChange(false);
-      }, 2500);
-
     } catch (error) {
-      console.error('[Deployment] Error:', error);
-      setOverallStatus('error');
-      const errorMsg = error instanceof Error ? error.message : 'Deployment failed';
-      setErrorMessage(errorMsg);
-      
-      // Track failed deployment
-      trackDeployment('unknown', false, errorMsg);
-      
-      // Mark current in-progress step as error
-      setSteps(prev => prev.map(step => 
-        step.status === 'in-progress' ? { ...step, status: 'error' } : step
-      ));
+      const errorMessage = error instanceof Error ? error.message : 'Deployment failed';
+      setMessage(errorMessage);
+      setState('error');
+      trackDeployment('unknown', false, errorMessage);
     }
   };
 
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  const getStepIcon = (status: DeploymentStep['status']) => {
-    switch (status) {
-      case 'complete':
-        return <CheckCircle2 className="h-5 w-5 text-primary" />;
-      case 'in-progress':
-        return <Loader2 className="h-5 w-5 animate-spin text-primary" />;
-      case 'error':
-        return <AlertCircle className="h-5 w-5 text-destructive" />;
-      default:
-        return <div className="h-5 w-5 rounded-full border-2 border-muted" />;
-    }
-  };
+  const close = () => onOpenChange(false);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              {overallStatus === 'deploying' && <Rocket className="h-8 w-8 text-primary animate-bounce" />}
-              {overallStatus === 'success' && <CheckCircle2 className="h-8 w-8 text-primary" />}
-              {overallStatus === 'error' && <AlertCircle className="h-8 w-8 text-destructive" />}
-            </div>
-            <h2 className="text-2xl font-bold mb-2">
-              {overallStatus === 'deploying' && 'Deploying Agent'}
-              {overallStatus === 'success' && 'Deployment Successful!'}
-              {overallStatus === 'error' && 'Deployment Failed'}
-            </h2>
-            <p className="text-muted-foreground">
-              {overallStatus === 'deploying' && `Deploying ${agentName} to production...`}
-              {overallStatus === 'success' && 'Your agent is now live and ready to use'}
-              {overallStatus === 'error' && errorMessage}
-            </p>
+    <Dialog open={open} onOpenChange={(nextOpen) => {
+      if (state === 'deploying' && !nextOpen) return;
+      onOpenChange(nextOpen);
+    }}>
+      <DialogContent className="max-w-lg" aria-describedby="deployment-dialog-description">
+        <DialogHeader className="text-left">
+          <div className="mb-2 flex items-center gap-2">
+            <Badge variant="outline">Review & Deploy</Badge>
+            {state === 'success' && <Badge variant="outline" className="v2-surface-verified v2-text-verified">Completed</Badge>}
+            {state === 'error' && <Badge variant="destructive">Failed</Badge>}
           </div>
+          <DialogTitle>
+            {state === 'review' && 'Review deployment'}
+            {state === 'deploying' && 'Deployment in progress'}
+            {state === 'success' && 'Deployment result'}
+            {state === 'error' && 'Deployment could not complete'}
+          </DialogTitle>
+          <DialogDescription id="deployment-dialog-description">
+            {state === 'review' && 'Confirm the current build before AURA starts the real deployment operation.'}
+            {state === 'deploying' && 'AURA is waiting for the deployment service to return a result. No simulated progress is shown.'}
+            {state === 'success' && 'The deployment service returned success. This result remains visible until you choose what to do next.'}
+            {state === 'error' && 'The deployment service returned an error. Nothing is represented as deployed until the operation succeeds.'}
+          </DialogDescription>
+        </DialogHeader>
 
-          {/* Progress Bar */}
-          <Progress value={progress} className="h-2" />
-
-          {/* Steps */}
-          <div className="space-y-3">
-            {steps.map((step) => (
-              <div key={step.id} className="flex items-center gap-3">
-                {getStepIcon(step.status)}
-                <span className={`flex-1 ${
-                  step.status === 'complete' ? 'text-muted-foreground line-through' :
-                  step.status === 'in-progress' ? 'font-medium' :
-                  step.status === 'error' ? 'text-destructive' :
-                  'text-muted-foreground'
-                }`}>
-                  {step.label}
-                </span>
+        <div className="space-y-5">
+          <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <dl className="grid gap-3 text-sm">
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Build</dt>
+                <dd className="max-w-[65%] truncate font-medium">{agentName}</dd>
               </div>
-            ))}
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Action</dt>
+                <dd>Deploy current approved configuration</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt className="text-muted-foreground">Truth policy</dt>
+                <dd className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4" aria-hidden />
+                  Result-driven
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          {/* Actions */}
-          {overallStatus === 'success' && (
-            <div className="pt-4 border-t">
-              <Button onClick={() => navigate('/dashboard')} className="w-full">
-                Go to Dashboard
-              </Button>
+          {state === 'deploying' && (
+            <div className="flex items-start gap-3 rounded-lg border border-border p-4" role="status" aria-live="polite">
+              <Loader2 className="mt-0.5 h-5 w-5 shrink-0 animate-spin text-primary" aria-hidden />
+              <div>
+                <p className="text-sm font-medium">Waiting for deployment result</p>
+                <p className="mt-1 text-sm text-muted-foreground">This indicator reflects only that the real request is in flight.</p>
+              </div>
             </div>
           )}
 
-          {overallStatus === 'error' && (
-            <div className="pt-4 border-t flex gap-2">
-              <Button onClick={() => onOpenChange(false)} variant="outline" className="flex-1">
-                Close
-              </Button>
-              <Button onClick={() => {
-                setOverallStatus('deploying');
-                setSteps(prev => prev.map(s => ({ ...s, status: 'pending' })));
-                setProgress(0);
-                startDeployment();
-              }} className="flex-1">
-                Retry
-              </Button>
+          {state === 'success' && (
+            <div className="rounded-lg border border-border bg-muted/20 p-4" role="status" aria-live="polite">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">Deployment completed</p>
+                  <p className="mt-1 text-sm text-muted-foreground">{message}</p>
+                  {resultUrl && <p className="mt-2 truncate font-mono text-xs text-muted-foreground">Result route: {resultUrl}</p>}
+                </div>
+              </div>
             </div>
           )}
+
+          {state === 'error' && (
+            <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4" role="alert">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" aria-hidden />
+                <div>
+                  <p className="text-sm font-semibold text-destructive">Deployment failed</p>
+                  <p className="mt-1 text-sm text-destructive/90">{message}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+            {state === 'review' && (
+              <>
+                <Button variant="outline" onClick={close}>Cancel</Button>
+                <Button onClick={() => void startDeployment()}>
+                  <Rocket className="mr-2 h-4 w-4" aria-hidden />
+                  Deploy
+                </Button>
+              </>
+            )}
+
+            {state === 'deploying' && <Button disabled>Deployment in progress…</Button>}
+
+            {state === 'success' && (
+              <>
+                <Button variant="outline" onClick={close}>Close</Button>
+                {resultUrl && <Button onClick={() => { close(); navigate(resultUrl); }}>Open result</Button>}
+                {!resultUrl && <Button onClick={() => { close(); navigate('/dashboard'); }}>Go to dashboard</Button>}
+              </>
+            )}
+
+            {state === 'error' && (
+              <>
+                <Button variant="outline" onClick={close}>Close</Button>
+                <Button onClick={() => void startDeployment()}>Retry deployment</Button>
+              </>
+            )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>

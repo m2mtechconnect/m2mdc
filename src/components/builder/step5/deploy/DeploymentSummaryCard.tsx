@@ -6,8 +6,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  FileText, Brain, Plug, GitBranch, Settings, Shield, User, Clock
+import {
+  FileText, Brain, Plug, GitBranch, Settings, Shield
 } from 'lucide-react';
 
 interface DeploymentSummaryCardProps {
@@ -21,6 +21,10 @@ export function DeploymentSummaryCard({
   governanceConfig,
   currentVersion
 }: DeploymentSummaryCardProps) {
+  const temperature = typeof builderState?.modelConfig?.rag?.temperature === 'number'
+    ? builderState.modelConfig.rag.temperature.toString()
+    : 'Not configured';
+
   const sections = [
     {
       title: 'Overview',
@@ -37,8 +41,8 @@ export function DeploymentSummaryCard({
       icon: Brain,
       items: [
         { label: 'Model', value: builderState?.modelConfig?.model || 'Not configured' },
-        { label: 'Provider', value: builderState?.modelConfig?.provider || 'google' },
-        { label: 'Temperature', value: builderState?.modelConfig?.temperature?.toString() || '0.7' },
+        { label: 'Provider', value: builderState?.modelConfig?.provider || 'Not configured' },
+        { label: 'Temperature', value: temperature },
         { label: 'RAG Enabled', value: builderState?.modelConfig?.rag?.enabled ? 'Yes' : 'No' },
       ]
     },
@@ -49,7 +53,7 @@ export function DeploymentSummaryCard({
         { label: 'API Tools', value: builderState?.workflow?.integrations?.length?.toString() || '0' },
         { label: 'Connectors', value: builderState?.connectors?.length?.toString() || '0' },
         { label: 'Webhooks', value: builderState?.webhooks?.length?.toString() || '0' },
-        { label: 'MCP Servers', value: builderState?.modelConfig?.mcp_servers?.length?.toString() || '0' },
+        { label: 'Managed capabilities', value: builderState?.modelConfig?.mcp_servers?.length?.toString() || '0' },
       ]
     },
     {

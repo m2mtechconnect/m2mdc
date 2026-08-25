@@ -55,8 +55,10 @@ for (const path of javascriptFiles) compiled += readFileSync(path, 'utf8');
 for (const forbidden of forbiddenCompiledHostnames) {
   if (forbidden.test(compiled)) fail(`compiled demo JavaScript contains forbidden implementation hostname ${String(forbidden)}`);
 }
-if (!compiled.includes('AURA demo integrations')) fail('compiled artifact does not contain the enabled AURA demo integrations surface');
+if (!compiled.includes('Featured connection experiences')) fail('compiled artifact does not contain the enabled featured integrations surface');
 if (!compiled.includes('Demo data')) fail('compiled artifact is missing explicit demo-data labeling');
+if (!compiled.includes('Connected · read only')) fail('compiled artifact is missing explicit account authorization state');
+if (!compiled.includes('Live · verified')) fail('compiled artifact is missing explicit verified data state');
 if (compiled.includes('lovable-tagger')) fail('development component tagger was bundled into the demo artifact');
 
 const manifest = {
@@ -72,6 +74,7 @@ const manifest = {
     noSourceMaps: true,
     noStaticImplementationBranding: true,
     noCompiledImplementationHostnames: true,
+    accountAndDataTruthSeparated: true,
     demoTruthLabelsPresent: true,
     devTaggerAbsent: true,
   },

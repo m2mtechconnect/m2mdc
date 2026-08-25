@@ -1,11 +1,12 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const CUSTOMER_SURFACES = [
-  new URL('../../components/builder/steps/Step2Intelligence.tsx', import.meta.url),
-  new URL('../../components/builder/steps/Step3Tools.tsx', import.meta.url),
-  new URL('../../components/connections/CatalogueTab.tsx', import.meta.url),
-  new URL('../../components/connections/DemoIntegrationsTab.tsx', import.meta.url),
+  'src/components/builder/steps/Step2Intelligence.tsx',
+  'src/components/builder/steps/Step3Tools.tsx',
+  'src/components/connections/CatalogueTab.tsx',
+  'src/components/connections/DemoIntegrationsTab.tsx',
 ] as const;
 
 const FORBIDDEN_CUSTOMER_TERMS = [
@@ -21,9 +22,9 @@ const FORBIDDEN_CUSTOMER_TERMS = [
 describe('AURA customer-facing white-label surfaces', () => {
   it('do not expose implementation vendors or protocol plumbing in Builder or Connections source', () => {
     for (const surface of CUSTOMER_SURFACES) {
-      const source = readFileSync(surface, 'utf8');
+      const source = readFileSync(resolve(process.cwd(), surface), 'utf8');
       for (const forbidden of FORBIDDEN_CUSTOMER_TERMS) {
-        expect(source, `${surface.pathname} contains ${forbidden}`).not.toMatch(forbidden);
+        expect(source, `${surface} contains ${forbidden}`).not.toMatch(forbidden);
       }
     }
   });

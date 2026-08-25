@@ -19,6 +19,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConnectionStatusBadge } from './ConnectionStatusBadge';
 import { formatRelative, type ConnectionRow } from '@/connections/presentation';
+import { STATUS_DESCRIPTORS, type ConnectionStatus } from '@/connections/model';
 
 interface Props {
   rows: ConnectionRow[];
@@ -29,6 +30,10 @@ interface Props {
   onTest: (id: string) => void;
   onMap: (id: string) => void;
   onCredential: (id: string) => void;
+}
+
+function statusLabel(status: ConnectionStatus): string {
+  return STATUS_DESCRIPTORS[status]?.label ?? 'Unknown';
 }
 
 export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, onMap, onCredential }: Props) {
@@ -49,7 +54,7 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
   }, [rows, query, status]);
 
   const statuses = useMemo(
-    () => Array.from(new Set(rows.map((r) => r.connection.status))).sort(),
+    () => Array.from(new Set(rows.map((r) => r.connection.status))).sort((a, b) => statusLabel(a).localeCompare(statusLabel(b))),
     [rows],
   );
 
@@ -57,12 +62,11 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" className="h-10 w-10" aria-label={`Actions for ${row.connection.display_name}`}>
+          <Button variant="ghost" size="icon" className="h-10 w-10" aria-label={`More actions for ${row.connection.display_name}`}>
             <MoreHorizontal className="h-4 w-4" aria-hidden />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onSelect={() => onOpen(row.connection.id)}>Open details</DropdownMenuItem>
           <DropdownMenuItem disabled={!isAdmin} onSelect={() => onTest(row.connection.id)}>Test connection</DropdownMenuItem>
           <DropdownMenuItem disabled={!isAdmin} onSelect={() => onCredential(row.connection.id)}>Credential vault</DropdownMenuItem>
           <DropdownMenuItem disabled={!isAdmin} onSelect={() => onMap(row.connection.id)}>Map data</DropdownMenuItem>
@@ -73,7 +77,7 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
 
   if (loading) {
     return (
-      <div className="space-y-3">
+      <div className="space-y-3" role="status" aria-label="Loading connected systems">
         {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
       </div>
     );
@@ -85,18 +89,18 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search connections"
-          aria-label="Search connections"
+          placeholder="Search systems"
+          aria-label="Search connected systems"
           className="h-10 w-full max-w-xs text-sm"
         />
         <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="h-10 w-[200px] text-sm" aria-label="Filter by status">
+          <SelectTrigger className="h-10 w-[220px] text-sm" aria-label="Filter by connection status">
             <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All statuses</SelectItem>
             {statuses.map((s) => (
-              <SelectItem key={s} value={s}>{s.replace(/_/g, ' ').toLowerCase()}</SelectItem>
+              <SelectItem key={s} value={s}>{statusLabel(s)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -107,12 +111,12 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
         <Panel className="p-8">
           <div className="space-y-3 text-center">
             <p className="text-sm font-semibold">
-              {rows.length === 0 ? 'No connection is configured yet' : 'No connection matches this filter'}
+              {rows.length === 0 ? 'No system is connected yet' : 'No system matches this filter'}
             </p>
             <p className="mx-auto max-w-md text-sm text-muted-foreground">
               {rows.length === 0
-                ? 'Add a connection to bind a facility, gateway or platform source to this tenant. Configuration alone never reports a healthy status: a server-side check must pass and data must arrive.'
-                : 'Clear the search or status filter to see all configured connections.'}
+                ? 'Add a connection to bind a facility, gateway or enterprise system to AURA. Configuration alone never reports a healthy status: a server-side check must pass and data must arrive.'
+                : 'Clear the search or status filter to see all configured systems.'}
             </p>
             {rows.length === 0 && (
               <Button className="h-10" disabled={!isAdmin} onClick={onAdd}>Add connection</Button>
@@ -121,12 +125,11 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
         </Panel>
       ) : (
         <>
-          {/* Desktop register */}
           <div className="v2-panel hidden min-w-0 overflow-x-auto p-0 lg:block">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs uppercase">Connection</TableHead>
+                  <TableHead className="text-xs uppercase">System</TableHead>
                   <TableHead className="text-xs uppercase">Environment</TableHead>
                   <TableHead className="text-xs uppercase">Direction</TableHead>
                   <TableHead className="text-xs uppercase">Status</TableHead>
@@ -139,29 +142,24 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
               </TableHeader>
               <TableBody>
                 {filtered.map((row) => (
-                  <TableRow
-                    key={row.connection.id}
-                    tabIndex={0}
-                    role="button"
-                    aria-label={`Open ${row.connection.display_name}`}
-                    className="cursor-pointer"
-                    onClick={() => onOpen(row.connection.id)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen(row.connection.id); }
-                    }}
-                  >
+                  <TableRow key={row.connection.id}>
                     <TableCell className="min-w-0">
-                      <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => onOpen(row.connection.id)}
+                        className="flex min-w-0 items-center gap-3 text-left"
+                        aria-label={`Open ${row.connection.display_name}`}
+                      >
                         <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-md text-xs font-semibold ${row.glyph.className}`} aria-hidden>
                           {row.glyph.mark}
                         </span>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-medium">{row.connection.display_name}</p>
-                          <p className="v2-mono truncate text-xs text-muted-foreground">
+                        <span className="min-w-0">
+                          <span className="block truncate text-sm font-medium">{row.connection.display_name}</span>
+                          <span className="v2-mono block truncate text-xs text-muted-foreground">
                             {row.definition?.name ?? row.connection.connector_id} · {row.glyph.label}
-                          </p>
-                        </div>
-                      </div>
+                          </span>
+                        </span>
+                      </button>
                     </TableCell>
                     <TableCell className="text-sm">{row.connection.environment}</TableCell>
                     <TableCell className="text-sm">{row.connection.data_direction}</TableCell>
@@ -170,8 +168,13 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                     <TableCell className="v2-mono text-sm tabular-nums">{row.throughput.label}</TableCell>
                     <TableCell className="v2-mono text-sm tabular-nums">{row.coverage.label}</TableCell>
                     <TableCell className="text-sm">{row.connection.is_system ? 'Platform' : row.connection.owner_id ? 'Tenant' : 'Unassigned'}</TableCell>
-                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                      <Actions row={row} />
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button size="sm" variant="outline" className="h-9" onClick={() => onOpen(row.connection.id)}>
+                          Open
+                        </Button>
+                        <Actions row={row} />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -179,7 +182,6 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
             </Table>
           </div>
 
-          {/* Tablet and mobile summary cards */}
           <ul className="space-y-3 lg:hidden">
             {filtered.map((row) => (
               <li key={row.connection.id}>
@@ -207,7 +209,7 @@ export function ConnectionsTab({ rows, loading, isAdmin, onOpen, onAdd, onTest, 
                     </dl>
                     <div className="flex flex-wrap items-center gap-2">
                       <Button size="sm" variant="outline" className="h-10" onClick={() => onOpen(row.connection.id)}>
-                        Open details
+                        Open
                       </Button>
                       <Actions row={row} />
                     </div>

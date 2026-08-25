@@ -23,10 +23,10 @@ interface DemoResult {
 
 const SEARCH_DEMO: DemoResult = {
   mode: 'DEMO_DATA',
-  title: 'Search performance demo',
+  title: 'Search performance example',
   summary: 'Example web-presence insight for an AURA demonstration property.',
   details: [
-    'Organic clicks: 12,480 over the selected demo period',
+    'Organic clicks: 12,480 over the selected example period',
     'Top-performing topic: sovereign AI infrastructure',
     'Highest-growth region: Canada',
   ],
@@ -34,7 +34,7 @@ const SEARCH_DEMO: DemoResult = {
 
 const DRIVE_DEMO: DemoResult = {
   mode: 'DEMO_DATA',
-  title: 'Workspace knowledge demo',
+  title: 'Workspace knowledge example',
   summary: 'Example approved-document retrieval for an AURA knowledge workflow.',
   details: [
     '3 approved runbooks found for the reference facility',
@@ -45,7 +45,7 @@ const DRIVE_DEMO: DemoResult = {
 
 const COLLAB_DEMO: DemoResult = {
   mode: 'DEMO_DATA',
-  title: 'Team collaboration demo',
+  title: 'Team collaboration example',
   summary: 'Example notification preview for an AURA operational workflow.',
   details: [
     'Channel: Data Centre Operations',
@@ -123,7 +123,7 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
         mode: 'UNAVAILABLE',
         title: 'Live read-only connection unavailable',
         summary: error instanceof Error ? error.message : 'The AURA managed connection is temporarily unavailable.',
-        details: ['No write was attempted and no demo result was represented as live data.'],
+        details: ['No write was attempted and no example result was represented as live data.'],
       });
     } finally {
       setRunning(false);
@@ -139,11 +139,11 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
       setSearchResult({
         mode: 'DEMO_DATA',
         title: 'Google account connected',
-        summary: 'AURA recorded a read-only managed user connection for this demo user.',
+        summary: 'AURA recorded a read-only managed user connection for this user.',
         details: [
-          'Connection: Connected · read only',
+          'Account: Connected · read only',
           'Scope: Google Drive read-only',
-          'Document results remain labeled Demo data until a live retrieval probe is separately verified.',
+          'Data: Demo data until a live retrieval probe is separately verified.',
         ],
       });
     } catch (error) {
@@ -167,8 +167,8 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
       setSearchResult({
         mode: 'DEMO_DATA',
         title: 'Google account disconnected',
-        summary: 'The managed user connection was revoked and AURA returned this card to demo-data mode.',
-        details: ['Connection: Revoked', 'Document preview: Demo data only'],
+        summary: 'The managed user connection was revoked and AURA returned this card to example-data mode.',
+        details: ['Account: Disconnected', 'Data: Demo data'],
       });
     } catch (error) {
       setSearchResult({
@@ -187,58 +187,62 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
       <Panel>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-3xl space-y-1">
-            <p className="text-sm font-semibold">AURA demo integrations</p>
+            <p className="text-sm font-semibold">Featured connection experiences</p>
             <p className="text-sm text-muted-foreground">
-              Demonstrate enterprise data and workflow capabilities without exposing implementation infrastructure.
-              Live status is server-derived; demo datasets are always labeled as demo data.
+              Account authorization and data verification are shown separately. A connected account is never presented as live data until AURA has runtime evidence.
             </p>
           </div>
           <Badge variant="outline" className="w-fit gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5" aria-hidden />
-            Read-only demo policy
+            Read-only demonstration policy
           </Badge>
         </div>
       </Panel>
 
       <div className="grid gap-4 xl:grid-cols-3">
-        <DemoCard
+        <IntegrationCard
           icon={<BarChart3 className="h-4 w-4" aria-hidden />}
           title={searchDefinition?.name ?? 'Search Analytics'}
           provider="Google Search Console"
-          mode={searchMode}
+          accountStatus={liveSearchReady ? 'Verified connection' : 'Not connected'}
+          accountTone={liveSearchReady ? 'verified' : 'neutral'}
+          dataMode={searchMode}
           description={liveSearchReady
-            ? 'Server evidence indicates the approved read-only demo path is selectable through the AURA gateway.'
-            : 'Uses a clearly labeled demo dataset until an approved read-only runtime connection is verified.'}
-          actionLabel={running ? 'Running…' : liveSearchReady ? 'Run live read-only demo' : 'Preview demo data'}
+            ? 'Server evidence permits an approved live read-only request through the AURA gateway.'
+            : 'Uses clearly labeled example data until an approved read-only runtime connection is verified.'}
+          actionLabel={running ? 'Running…' : liveSearchReady ? 'Run live read-only' : 'Preview example data'}
           disabled={running}
           onRun={() => void runSearchDemo()}
         />
 
-        <DemoCard
+        <IntegrationCard
           icon={<FileText className="h-4 w-4" aria-hidden />}
           title="Workspace Documents"
           provider="Google Drive"
-          mode="DEMO_DATA"
-          statusBadge={driveConnected ? <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Connected · read only</Badge> : undefined}
+          accountStatus={driveConnected ? 'Connected · read only' : 'Not connected'}
+          accountTone={driveConnected ? 'verified' : 'neutral'}
+          dataMode="DEMO_DATA"
           description={driveConnected
-            ? 'Your Google account is authorized read-only. This demo still labels document content as demo data until live retrieval is verified.'
+            ? 'Your Google account is authorized read-only. Document content stays explicitly example data until live retrieval is verified.'
             : driveCanConnect
-              ? 'Connect a Google account for read-only demo authorization. Runtime eligibility is confirmed by the AURA server policy.'
-              : 'Demonstrates approved-document retrieval. Interactive authorization is unavailable until the AURA server marks the demo OAuth path ready.'}
-          actionLabel={authorizing ? 'Working…' : driveCanConnect ? 'Connect Google' : 'Preview demo data'}
+              ? 'Connect a Google account for read-only authorization. AURA server policy has marked the demo OAuth path ready.'
+              : 'Shows an approved-document retrieval example. Interactive authorization stays unavailable until AURA server policy marks the demo OAuth path ready.'}
+          actionLabel={authorizing ? 'Working…' : driveCanConnect ? 'Connect Google' : 'Preview example data'}
           disabled={authorizing}
           onRun={() => driveCanConnect ? void connectDrive() : setSearchResult(DRIVE_DEMO)}
-          secondaryActionLabel={driveConnected ? 'Disconnect' : driveCanConnect ? 'Preview demo data' : undefined}
+          secondaryActionLabel={driveConnected ? 'Disconnect' : driveCanConnect ? 'Preview example data' : undefined}
           onSecondaryAction={driveConnected ? () => void disconnectDrive() : driveCanConnect ? () => setSearchResult(DRIVE_DEMO) : undefined}
         />
 
-        <DemoCard
+        <IntegrationCard
           icon={<MessageSquare className="h-4 w-4" aria-hidden />}
           title="Team Collaboration"
           provider="Slack"
-          mode="DEMO_DATA"
-          description="Demonstrates an operational notification workflow in preview-only mode. No external message is sent."
-          actionLabel="Preview demo data"
+          accountStatus="Preview only"
+          accountTone="neutral"
+          dataMode="DEMO_DATA"
+          description="Shows an operational notification preview. No external account is represented as connected and no message is sent."
+          actionLabel="Preview example data"
           onRun={() => setSearchResult(COLLAB_DEMO)}
         />
       </div>
@@ -251,7 +255,7 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
                 <p className="text-sm font-semibold">{searchResult.title}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{searchResult.summary}</p>
               </div>
-              <ModeBadge mode={searchResult.mode} />
+              <DataStatusBadge mode={searchResult.mode} />
             </div>
             <SubPanel>
               <ul className="space-y-2 text-sm">
@@ -268,12 +272,13 @@ export function DemoIntegrationsTab({ definitions, connections }: DemoIntegratio
   );
 }
 
-function DemoCard({
+function IntegrationCard({
   icon,
   title,
   provider,
-  mode,
-  statusBadge,
+  accountStatus,
+  accountTone,
+  dataMode,
   description,
   actionLabel,
   disabled = false,
@@ -284,8 +289,9 @@ function DemoCard({
   icon: ReactNode;
   title: string;
   provider: string;
-  mode: DemoIntegrationMode;
-  statusBadge?: ReactNode;
+  accountStatus: string;
+  accountTone: 'verified' | 'neutral';
+  dataMode: DemoIntegrationMode;
   description: string;
   actionLabel: string;
   disabled?: boolean;
@@ -302,10 +308,22 @@ function DemoCard({
           <p className="text-xs text-muted-foreground">{provider}</p>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <ModeBadge mode={mode} />
-        {statusBadge}
-      </div>
+
+      <dl className="grid gap-2 rounded-md border border-border bg-muted/20 p-3 text-xs">
+        <div className="flex items-center justify-between gap-3">
+          <dt className="font-medium text-muted-foreground">Account</dt>
+          <dd>
+            <Badge variant="outline" className={accountTone === 'verified' ? 'v2-surface-verified v2-text-verified' : ''}>
+              {accountStatus}
+            </Badge>
+          </dd>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <dt className="font-medium text-muted-foreground">Data</dt>
+          <dd><DataStatusBadge mode={dataMode} /></dd>
+        </div>
+      </dl>
+
       <p className="flex-1 text-sm text-muted-foreground">{description}</p>
       <div className="flex flex-wrap gap-2">
         <Button type="button" variant="outline" disabled={disabled} onClick={onRun}>
@@ -314,7 +332,7 @@ function DemoCard({
         </Button>
         {secondaryActionLabel && onSecondaryAction ? (
           <Button type="button" variant="ghost" disabled={disabled} onClick={onSecondaryAction}>
-            {driveDisconnectIcon(secondaryActionLabel)}
+            {secondaryActionLabel === 'Disconnect' ? <Unplug className="mr-2 h-4 w-4" aria-hidden /> : null}
             {secondaryActionLabel}
           </Button>
         ) : null}
@@ -323,13 +341,9 @@ function DemoCard({
   );
 }
 
-function driveDisconnectIcon(label: string) {
-  return label === 'Disconnect' ? <Unplug className="mr-2 h-4 w-4" aria-hidden /> : null;
-}
-
-function ModeBadge({ mode }: { mode: DemoIntegrationMode }) {
+function DataStatusBadge({ mode }: { mode: DemoIntegrationMode }) {
   if (mode === 'LIVE_READ_ONLY') {
-    return <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Live · read only</Badge>;
+    return <Badge variant="outline" className="w-fit v2-surface-verified v2-text-verified">Live · verified</Badge>;
   }
   if (mode === 'UNAVAILABLE') {
     return <Badge variant="outline" className="w-fit">Unavailable</Badge>;

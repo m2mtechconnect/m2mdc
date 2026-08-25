@@ -38,7 +38,7 @@ describe('canonical navigation', () => {
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
     expect(manage['Facility Blueprint']).toBe('/blueprint');
     expect(manage['Agents']).toBe('/app/agents');
-    expect(manage['Runtime & Deployments']).toBe('/deployments');
+    expect(manage['Activation & Runtime Evidence']).toBe('/deployments');
     expect(manage['AI Runtime & Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');

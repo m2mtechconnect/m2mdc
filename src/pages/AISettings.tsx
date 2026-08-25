@@ -35,6 +35,68 @@ interface HealthStatus {
   groundingSearch: ProbeResult;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function normalizeRuntimeConfig(value: unknown): RuntimeConfig {
+  const payload = asRecord(value);
+  const managedAi = asRecord(payload.managedAi);
+  const groundingSearch = asRecord(payload.groundingSearch);
+  const profiles = Array.isArray(payload.profiles)
+    ? payload.profiles.flatMap((entry) => {
+        const profile = asRecord(entry);
+        return typeof profile.id === 'string' && typeof profile.label === 'string' && typeof profile.description === 'string'
+          ? [{
+              id: profile.id,
+              label: profile.label,
+              description: profile.description,
+              available: profile.available === true,
+            }]
+          : [];
+      })
+    : [];
+
+  return {
+    runtimeControl: 'server_owned',
+    ready: payload.ready === true && managedAi.available === true,
+    managedAi: { available: managedAi.available === true },
+    groundingSearch: {
+      available: groundingSearch.available === true,
+      reason: typeof groundingSearch.reason === 'string'
+        ? groundingSearch.reason
+        : 'Grounding readiness is not available from the server-owned runtime.',
+    },
+    profiles,
+  };
+}
+
+function normalizeProbe(value: unknown, fallbackStatus: ProbeResult['status'], fallbackError: string): ProbeResult {
+  const payload = asRecord(value);
+  const status = payload.status;
+  const validStatus = status === 'ok' || status === 'error' || status === 'disabled' || status === 'not_applicable';
+  return {
+    status: validStatus ? status : fallbackStatus,
+    ...(typeof payload.latency === 'number' ? { latency: payload.latency } : {}),
+    ...(typeof payload.error === 'string' ? { error: payload.error } : { error: fallbackError }),
+  };
+}
+
+function normalizeHealthStatus(value: unknown): HealthStatus {
+  const payload = asRecord(value);
+  return {
+    runtimeControl: 'server_owned',
+    managedAi: normalizeProbe(payload.managedAi, 'error', 'Managed AI health evidence was incomplete.'),
+    groundingSearch: normalizeProbe(
+      payload.groundingSearch,
+      'disabled',
+      'Grounding is not exposed by the current server-owned AURA runtime contract.',
+    ),
+  };
+}
+
 function RequirePermission({ permission, children }: { permission: Permission; children: ReactNode }) {
   const { resolution, can } = useRBAC();
   if (resolution.status === 'loading') return null;
@@ -55,9 +117,9 @@ function AISettingsPage() {
     setError(null);
     try {
       const data = await invokeEdgeFunction('ai-config', {});
-      setRuntime(data as RuntimeConfig);
+      setRuntime(normalizeRuntimeConfig(data));
     } catch (cause) {
-      setRuntime(null);
+      setRuntime(normalizeRuntimeConfig(null));
       setError(cause instanceof Error ? cause.message : 'Managed AI readiness could not be loaded.');
     } finally {
       setLoading(false);
@@ -75,9 +137,9 @@ function AISettingsPage() {
     setError(null);
     try {
       const data = await invokeEdgeFunction('copilot-health', {});
-      setHealth(data as HealthStatus);
+      setHealth(normalizeHealthStatus(data));
     } catch (cause) {
-      setHealth(null);
+      setHealth(normalizeHealthStatus(null));
       setError(cause instanceof Error ? cause.message : 'Managed AI health check failed.');
     } finally {
       setChecking(false);
@@ -96,6 +158,7 @@ function AISettingsPage() {
   }
 
   const managedOk = health?.managedAi.status === 'ok';
+  const runtimeAvailable = runtime?.managedAi.available === true;
 
   return (
     <div className="w-full min-w-0 space-y-6 py-8" data-testid="ai-settings-workspace">
@@ -118,12 +181,12 @@ function AISettingsPage() {
         </div>
       )}
 
-      <DCCard title="Managed AI runtime" icon={<Sparkles className="h-5 w-5 text-primary" />} status={runtime?.ready ? 'operational' : 'critical'}>
+      <DCCard title="Managed AI runtime" icon={<Sparkles className="h-5 w-5 text-primary" />} status={runtimeAvailable ? 'operational' : 'critical'}>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Server-owned runtime</Badge>
-            <Badge variant={runtime?.managedAi.available ? 'default' : 'destructive'}>
-              {runtime?.managedAi.available ? 'Runtime configured' : 'Runtime unavailable'}
+            <Badge variant={runtimeAvailable ? 'default' : 'destructive'}>
+              {runtimeAvailable ? 'Runtime configured' : 'Runtime unavailable'}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -140,7 +203,7 @@ function AISettingsPage() {
               </div>
             ))}
           </div>
-          <Button onClick={runHealthCheck} variant="outline" disabled={checking || !runtime?.managedAi.available} aria-busy={checking}>
+          <Button onClick={runHealthCheck} variant="outline" disabled={checking || !runtimeAvailable} aria-busy={checking}>
             {checking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
             Run runtime health check
           </Button>
@@ -150,7 +213,7 @@ function AISettingsPage() {
       <DCCard title="Grounding and retrieval" icon={<Database className="h-5 w-5 text-primary" />} status="neutral">
         <div className="space-y-2 text-sm">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline">{runtime?.groundingSearch.available ? 'Available' : 'Not exposed'}</Badge>
+            <Badge variant="outline">{runtime?.groundingSearch.available === true ? 'Available' : 'Not exposed'}</Badge>
           </div>
           <p className="text-muted-foreground">
             {runtime?.groundingSearch.reason ?? 'Grounding readiness is not available.'}

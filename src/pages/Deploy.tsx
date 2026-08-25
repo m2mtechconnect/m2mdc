@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Activity, ArrowLeft, CheckCircle2, CircleAlert, Loader2, Rocket, Server, Wrench } from 'lucide-react';
+import { Activity, ArrowLeft, CheckCircle2, CircleAlert, Cpu, Loader2, Rocket, Server, Wrench } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useRBAC } from '@/contexts/RBACContext';
@@ -11,6 +11,8 @@ import { DCCard } from '@/components/dc-ui/DCCard';
 import { DCKPITile } from '@/components/dc-ui/DCKPITile';
 import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 import { DeploymentEvidenceCard } from '@/components/deploy/DeploymentEvidenceCard';
+import { stackLabel } from '@/config/auraStackManifest';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
 import {
   appendDeploymentEvent,
   closeDeployment,
@@ -328,8 +330,9 @@ export default function Deploy() {
           icon={Activity}
           className="mb-6"
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <DCKPITile label="System" value={summary?.name ?? 'Unavailable'} sublabel={summary?.status ?? 'unknown'} status="info" icon={<Server className="h-4 w-4" />} />
+            <DCKPITile label={stackLabel('ai.managed')} value={summary?.model ? modelDisplayLabel(summary.model) : 'Not configured'} sublabel={summary?.grounding ? 'Grounding requested' : 'Standard configuration'} status={summary?.model ? 'normal' : 'info'} icon={<Cpu className="h-4 w-4" />} />
             <DCKPITile label="Workflow" value={summary?.workflowId ? 'Configured' : 'Not configured'} sublabel="Saved workflow record" status={summary?.workflowId ? 'normal' : 'info'} icon={<Wrench className="h-4 w-4" />} />
             <DCKPITile label="Connections" value={(summary?.connectorCount ?? 0).toString()} sublabel="Configured connector references" status="info" icon={<Activity className="h-4 w-4" />} />
             <DCKPITile label="Runtime evidence" value="Not provided" sublabel="No URL or health evidence" status="warning" icon={<CircleAlert className="h-4 w-4" />} />

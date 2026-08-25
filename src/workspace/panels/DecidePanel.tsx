@@ -95,9 +95,9 @@ export function DecidePanel() {
                 <h4 className="text-xs font-semibold text-foreground">{rec.title}</h4>
                 <Badge variant="outline" className="shrink-0 text-xs">{rec.signal}</Badge>
               </div>
-              <p className="mb-3 text-[11px] text-muted-foreground">{rec.rationale}</p>
+              <p className="mb-3 text-xs text-muted-foreground">{rec.rationale}</p>
 
-              <label className="mb-1 block text-[11px] font-medium text-foreground" htmlFor={`decision-rationale-${rec.id}`}>
+              <label className="mb-1 block text-xs font-medium text-foreground" htmlFor={`decision-rationale-${rec.id}`}>
                 Review rationale
               </label>
               <Textarea
@@ -109,7 +109,7 @@ export function DecidePanel() {
                 className="mb-2 min-h-[64px] text-xs"
                 disabled={!durable || !canRecord || saving === rec.id}
               />
-              {error && <p role="alert" className="mb-2 text-[11px] text-destructive">{error}</p>}
+              {error && <p role="alert" className="mb-2 text-xs text-destructive">{error}</p>}
 
               <div className="flex flex-wrap items-center gap-1.5">
                 {canApprove && (

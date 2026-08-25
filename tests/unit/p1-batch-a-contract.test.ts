@@ -6,6 +6,7 @@ const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8'
 
 const settings = read('src/pages/account/Settings.tsx');
 const aiSettings = read('src/pages/AISettings.tsx');
+const aiConfig = read('supabase/functions/ai-config/index.ts');
 const copilotHealth = read('supabase/functions/copilot-health/index.ts');
 
 describe('P1 Batch A workspace settings authorization', () => {
@@ -26,29 +27,40 @@ describe('P1 Batch A workspace settings authorization', () => {
   });
 });
 
-describe('P1 Batch A managed AI configuration truth contract', () => {
-  it('uses supported external response profiles rather than retired Gemini 1.5 defaults', () => {
-    expect(aiSettings).toContain("const DEFAULT_EXTERNAL_MODEL = 'gemini-3.5-flash';");
-    expect(aiSettings).toContain("const FAST_EXTERNAL_MODEL = 'gemini-3.5-flash-lite';");
-    expect(aiSettings).toContain('setModel(normalizeExternalModel(settings.model))');
-    expect(aiSettings).not.toMatch(/<SelectItem[^>]+gemini-1\.5-/);
+describe('P1 Batch A managed AI runtime truth contract', () => {
+  it('keeps provider, model, project and credential authority out of the browser', () => {
+    expect(aiSettings).toContain("runtimeControl: 'server_owned';");
+    expect(aiSettings).toContain('This browser does not configure the AI provider');
+    expect(aiSettings).toContain("invokeEdgeFunction('ai-config', {})");
+    expect(aiSettings).not.toContain('DEFAULT_EXTERNAL_MODEL');
+    expect(aiSettings).not.toContain('FAST_EXTERNAL_MODEL');
+    expect(aiSettings).not.toContain('normalizeExternalModel');
+    expect(aiSettings).not.toContain('gemini-1.5');
+    expect(aiSettings).not.toContain('localStorage');
   });
 
-  it('migrates stale browser-saved response profiles instead of resubmitting them', () => {
-    expect(aiSettings).toContain('normalizeExternalModel');
-    expect(aiSettings).toContain("'gemini-1.5-flash-002'");
-    expect(aiSettings).toContain('SUPPORTED_EXTERNAL_MODELS.has(value)');
+  it('reports readiness instead of presenting browser configuration as runtime evidence', () => {
+    expect(aiSettings).toContain('title="Managed AI runtime"');
+    expect(aiSettings).toContain("status={runtimeAvailable ? 'operational' : 'critical'}");
+    expect(aiSettings).toContain("runtime?.groundingSearch.available === true ? 'Available' : 'Not exposed'");
+    expect(aiSettings).toContain('Runtime health evidence');
+    expect(aiSettings).toContain("health?.managedAi.status === 'ok'");
   });
 
-  it('does not present an unprobed configuration form as operational runtime evidence', () => {
-    expect(aiSettings).toMatch(/title="Managed AI configuration"[\s\S]*?status="neutral"/);
-    expect(aiSettings).toMatch(/title="Generation Parameters"[\s\S]*?status="neutral"/);
-    expect(aiSettings).toContain('The selected profile is validated only when you run the health check.');
-    expect(aiSettings).toMatch(/title="Health Check Results"[\s\S]*?status=\{healthStatus\.managedAi\.status === 'ok' \? 'operational' : 'critical'\}/);
+  it('makes the server configuration contract explicitly server-owned and provider-neutral', () => {
+    expect(aiConfig).toContain("runtimeControl: 'server_owned'");
+    expect(aiConfig).toContain('managedAi');
+    expect(aiConfig).toContain('groundingSearch');
+    expect(aiConfig).not.toContain('projectId:');
+    expect(aiConfig).not.toContain('location:');
+    expect(aiConfig).not.toContain('active_provider');
   });
 
-  it('uses the supported external model fallback on the server health probe', () => {
-    expect(copilotHealth).toContain("Deno.env.get('GEMINI_MODEL') || 'gemini-3.5-flash'");
+  it('probes the same server-owned runtime used by execution', () => {
+    expect(copilotHealth).toContain("checkAIHealth({ model: 'primary' })");
+    expect(copilotHealth).toContain("runtimeControl: 'server_owned'");
+    expect(copilotHealth).not.toContain("Deno.env.get('GEMINI_MODEL')");
+    expect(copilotHealth).not.toContain('req.json()');
   });
 
   it('preserves the authenticated health-check perimeter', () => {
@@ -56,8 +68,9 @@ describe('P1 Batch A managed AI configuration truth contract', () => {
     expect(copilotHealth).toContain('callerRejectedResponse(error, req)');
   });
 
-  it('keeps the provider-managed gateway model separate from the external profile selector', () => {
-    expect(copilotHealth).toContain('provider-managed gateway path');
-    expect(copilotHealth).toContain("model: 'google/gemini-2.5-flash'");
+  it('does not expose provider-managed gateway implementation details as a customer setting', () => {
+    expect(aiSettings).not.toContain('provider-managed gateway path');
+    expect(aiSettings).not.toContain('google/gemini-2.5-flash');
+    expect(aiSettings).not.toContain('GEMINI_MODEL');
   });
 });

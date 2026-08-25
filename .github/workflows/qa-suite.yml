@@ -203,17 +203,23 @@ jobs:
       - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run current release E2E gate
+      - name: Run current release lifecycle E2E gate
         # Global setup performs a bounded real-login canary, verifies the exact
-        # disposable user id and writes storage state only under /tmp. The
-        # blocking browser gate then exercises the canonical facility-bound
-        # lifecycle, durable acceptance behavior and auth/security contract.
-        # Retired pre-lifecycle suites remain in tests/e2e for later reconciliation
-        # but are intentionally not release-authoritative.
+        # disposable user id and writes storage state only under /tmp. Lifecycle
+        # acceptance runs before destructive auth/logout coverage so the golden
+        # journey cannot inherit a revoked shared session.
         run: |
           bunx playwright test \
             tests/e2e/acceptance-final.spec.ts \
             tests/e2e/golden-user-journey.spec.ts \
+            --project=${{ matrix.browser }} \
+            --workers=1
+
+      - name: Run auth and security E2E gate
+        # Auth coverage intentionally uses its own empty browser storage state
+        # and may revoke the disposable session during logout validation.
+        run: |
+          bunx playwright test \
             tests/e2e/auth-security.spec.ts \
             --project=${{ matrix.browser }} \
             --workers=1

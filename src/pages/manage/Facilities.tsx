@@ -53,10 +53,11 @@ type RpcResult = {
   error: { message: string } | null;
 };
 
-const callRpc = supabase.rpc as unknown as (
+const callRpc = (
   fn: string,
   args?: Record<string, unknown>,
-) => Promise<RpcResult>;
+): Promise<RpcResult> =>
+  supabase.rpc(fn as never, args as never) as unknown as Promise<RpcResult>;
 
 export default function ManageFacilities() {
   const navigate = useNavigate();
@@ -195,7 +196,7 @@ export default function ManageFacilities() {
         <CardContent className="space-y-2 p-0">
           {isLoading && (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> Loading facilities…
+              <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden /> Loading facilities…
             </p>
           )}
           {!isLoading && configuredTwins.length === 0 && (

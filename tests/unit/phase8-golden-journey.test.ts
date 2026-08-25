@@ -26,6 +26,8 @@ describe('Phase 8 AURA golden journey', () => {
 
   it('creates one explicit tenant-bound facility identity before Build begins', () => {
     expect(facilities).toContain("callRpc('create_facility_setup'");
+    expect(facilities).toContain('supabase.rpc(fn as never, args as never)');
+    expect(facilities).not.toContain('const callRpc = supabase.rpc as unknown as');
     expect(facilities).toContain("toast.error('Enter a facility name.')");
     expect(facilities).toContain("toast.error('Select the facility region.')");
     expect(facilities).toContain("toast.error('Select the facility tier.')");

@@ -1,21 +1,17 @@
 /**
- * Durable server persistence for workspace simulation runs
- * (deep page-wiring finding #1: runs existed only in browser localStorage).
+ * Durable server persistence for workspace simulation runs.
  *
- * Rules enforced here:
+ * Authority rules:
  *  - The database row is the authoritative record of a completed run.
- *  - The scenario engine executes in the browser, so every row is written
- *    with `execution_origin = 'client-browser'` and
- *    `validation_status = 'client-produced-unverified'`. We never claim a
- *    result was server-validated.
- *  - Ownership fields come from the authenticated session, never from
- *    caller-supplied data.
- *  - A duplicate submission resolves to the original row via the
- *    idempotency key unique index.
+ *  - The browser deterministic engine is always persisted as preview evidence,
+ *    never as an authoritative or server-validated result.
+ *  - User identity and tenant come from the authenticated session and the
+ *    server-evaluated active_org_id() RPC. Caller-supplied tenant ids are never used.
+ *  - A duplicate submission resolves to the original row via its idempotency key.
  */
 import { supabase } from '@/integrations/supabase/client';
 import type { ConfigOverrides, KpiValues } from './facilityModel';
-import type { WorkspaceRun } from './scenarioEngine';
+import type { DecisionState, WorkspaceRun } from './scenarioEngine';
 
 export const RUN_ENGINE_VERSION = 'aura-workspace-scenario-engine@1.0.0';
 export const RUN_SCHEMA_VERSION = '2.0.0';
@@ -26,7 +22,6 @@ export function isUuid(value: string | null | undefined): value is string {
   return typeof value === 'string' && UUID_RE.test(value);
 }
 
-/** Deterministic FNV-1a checksum of the immutable run payload. */
 export function runChecksum(input: unknown): string {
   const text = JSON.stringify(input);
   let hash = 0x811c9dc5;
@@ -37,7 +32,6 @@ export function runChecksum(input: unknown): string {
   return `fnv1a-${hash.toString(16).padStart(8, '0')}`;
 }
 
-/** Stable idempotency key: same facility + scenario + inputs + start instant. */
 export function idempotencyKeyFor(params: {
   facilityId: string;
   scenarioId: string;
@@ -54,7 +48,6 @@ export type PersistOutcome =
 
 interface PersistParams {
   run: WorkspaceRun;
-  /** Facility (twin) row the run belongs to. Must be a real twin id. */
   twinId: string;
   blueprintId?: string | null;
   blueprintVersion?: string | null;
@@ -80,7 +73,6 @@ function snapshotOf(run: WorkspaceRun) {
   };
 }
 
-/** Per-metric provenance block written alongside the result. */
 export function metricProvenanceFor(result: KpiValues): Record<string, unknown> {
   const entries = Object.keys(result).map((key) => [
     key,
@@ -94,14 +86,20 @@ export function metricProvenanceFor(result: KpiValues): Record<string, unknown> 
   return Object.fromEntries(entries);
 }
 
+async function activeOrganizationId(): Promise<string | null> {
+  const { data, error } = await (supabase as unknown as {
+    rpc: (name: string) => Promise<{ data: unknown; error: { message?: string } | null }>;
+  }).rpc('active_org_id');
+  return !error && typeof data === 'string' && isUuid(data) ? data : null;
+}
+
 export async function persistRun(params: PersistParams): Promise<PersistOutcome> {
   const { run, twinId, idempotencyKey } = params;
 
   if (!isUuid(twinId)) {
     return {
       status: 'unsaved',
-      reason:
-        'This facility is not a stored record, so the run cannot be saved as a durable operational record.',
+      reason: 'This facility is not a stored record, so the run cannot be saved as a durable operational record.',
     };
   }
 
@@ -109,17 +107,25 @@ export async function persistRun(params: PersistParams): Promise<PersistOutcome>
   if (authError || !auth?.user) {
     return { status: 'unsaved', reason: 'You are not signed in, so the run could not be saved.' };
   }
+  const tenantId = await activeOrganizationId();
+  if (!tenantId) {
+    return { status: 'unsaved', reason: 'Select an active organization before recording a simulation run.' };
+  }
 
   const snap = snapshotOf(run);
   const row = {
     twin_id: twinId,
     user_id: auth.user.id,
+    tenant_id: tenantId,
     scenario_key: run.scenarioId,
     scenario_name: run.scenarioLabel,
     scenario_type: params.scenarioType ?? 'operational',
     run_label: run.id,
     run_key: run.id,
     status: 'completed' as const,
+    lifecycle_status: 'succeeded',
+    run_intent: 'preview',
+    verification_level: 'client-produced-unverified',
     started_at: run.startedAt,
     finished_at: run.completedAt,
     duration_ms: Math.max(0, new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime()),
@@ -147,12 +153,11 @@ export async function persistRun(params: PersistParams): Promise<PersistOutcome>
     .single();
 
   if (error) {
-    // 23505 = unique violation on (user_id, idempotency_key): the identical
-    // submission already produced a record, so resolve to the original.
     if ((error as { code?: string }).code === '23505') {
       const { data: existing } = await supabase
         .from('simulation_runs')
         .select('id, run_key')
+        .eq('tenant_id', tenantId)
         .eq('idempotency_key', idempotencyKey)
         .maybeSingle();
       if (existing) {
@@ -188,9 +193,22 @@ interface RunRow {
   output_snapshot: unknown;
   execution_origin: string;
   validation_status: string;
+  verification_level: string | null;
 }
 
-/** Maps a durable row back into the workspace run shape. */
+interface DecisionRow {
+  run_id: string | null;
+  recommendation_id: string;
+  outcome: string;
+}
+
+function decisionState(outcome: string): DecisionState | null {
+  if (outcome === 'approved') return 'accepted';
+  if (outcome === 'rejected') return 'rejected';
+  if (outcome === 'escalated') return 'deferred';
+  return null;
+}
+
 export function rowToRun(row: RunRow): WorkspaceRun {
   const input = (row.input_snapshot ?? {}) as Record<string, unknown>;
   const output = (row.output_snapshot ?? {}) as Record<string, unknown>;
@@ -199,7 +217,7 @@ export function rowToRun(row: RunRow): WorkspaceRun {
     serverId: row.id,
     persistence: 'server',
     executionOrigin: row.execution_origin as WorkspaceRun['executionOrigin'],
-    validationStatus: row.validation_status as WorkspaceRun['validationStatus'],
+    validationStatus: (row.verification_level ?? row.validation_status) as WorkspaceRun['validationStatus'],
     scenarioId: row.scenario_key,
     scenarioLabel: row.scenario_name ?? row.scenario_key,
     facilityId: (input.facilityId as string) ?? row.twin_id,
@@ -215,13 +233,16 @@ export function rowToRun(row: RunRow): WorkspaceRun {
   };
 }
 
-/** Loads the authoritative runs visible to the current session. */
 export async function loadServerRuns(twinId?: string | null): Promise<WorkspaceRun[]> {
+  const tenantId = await activeOrganizationId();
+  if (!tenantId) return [];
+
   let query = supabase
     .from('simulation_runs')
     .select(
-      'id, run_key, run_label, scenario_key, scenario_name, twin_id, started_at, finished_at, baseline_kpis, final_kpis, events, input_snapshot, output_snapshot, execution_origin, validation_status',
+      'id, run_key, run_label, scenario_key, scenario_name, twin_id, started_at, finished_at, baseline_kpis, final_kpis, events, input_snapshot, output_snapshot, execution_origin, validation_status, verification_level',
     )
+    .eq('tenant_id', tenantId)
     .eq('status', 'completed')
     .order('created_at', { ascending: false })
     .limit(20);
@@ -230,5 +251,29 @@ export async function loadServerRuns(twinId?: string | null): Promise<WorkspaceR
 
   const { data, error } = await query;
   if (error || !data) return [];
-  return (data as unknown as RunRow[]).map(rowToRun);
+  const runs = (data as unknown as RunRow[]).map(rowToRun);
+  const runIds = runs.map((run) => run.serverId).filter((id): id is string => Boolean(id));
+  if (runIds.length === 0) return runs;
+
+  const { data: decisionData, error: decisionError } = await supabase
+    .from('decision_records')
+    .select('run_id, recommendation_id, outcome')
+    .eq('tenant_id', tenantId)
+    .in('run_id', runIds)
+    .order('decided_at', { ascending: true });
+  if (decisionError || !decisionData) return runs;
+
+  const byRun = new Map<string, Record<string, DecisionState>>();
+  for (const row of decisionData as unknown as DecisionRow[]) {
+    if (!row.run_id) continue;
+    const state = decisionState(row.outcome);
+    if (!state) continue;
+    const decisions = byRun.get(row.run_id) ?? {};
+    decisions[row.recommendation_id] = state;
+    byRun.set(row.run_id, decisions);
+  }
+  return runs.map((run) => ({
+    ...run,
+    decisions: run.serverId ? (byRun.get(run.serverId) ?? {}) : {},
+  }));
 }

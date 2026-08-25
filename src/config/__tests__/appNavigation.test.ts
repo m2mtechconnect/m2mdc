@@ -12,35 +12,37 @@ import { ROUTE_ALIASES } from '../routeAliases';
 import { PAGE_POSITIONING, positioningFor } from '../pagePositioning';
 
 describe('canonical navigation', () => {
-  it('exposes exactly four always-visible workspaces with DSX labels', () => {
+  it('exposes the five persistent lifecycle workspaces', () => {
     expect(WORKSPACE_NAV.map((i) => i.fullName)).toEqual([
       'Command Center',
-      'Facility Blueprint',
+      'Build & Configure',
+      'Operate',
       'Simulation',
       'Evidence',
     ]);
   });
 
-  it('preserves every canonical route while renaming labels', () => {
+  it('maps every persistent workspace to its canonical route', () => {
     expect(WORKSPACE_NAV.map((i) => i.href)).toEqual([
       '/dashboard',
-      '/blueprint',
+      '/builder',
+      '/analytics',
       '/simulation',
       '/evidence/overview',
     ]);
     const workspace = Object.fromEntries(WORKSPACE_NAV.map((i) => [i.fullName, i.href]));
-    expect(workspace['Facility Blueprint']).toBe('/blueprint');
+    expect(workspace['Build & Configure']).toBe('/builder');
+    expect(workspace['Operate']).toBe('/analytics');
     expect(workspace['Evidence']).toBe('/evidence/overview');
 
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
+    expect(manage['Facility Blueprint']).toBe('/blueprint');
     expect(manage['Agents']).toBe('/app/agents');
-    expect(manage['Operations & Telemetry']).toBe('/analytics');
-    expect(manage['Runtime']).toBe('/deployments');
-    expect(manage['Agent Policies']).toBe('/settings/ai');
+    expect(manage['Runtime & Deployments']).toBe('/deployments');
+    expect(manage['AI Runtime & Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');
   });
-
 
   it('keeps every legacy alias pointing at a live destination', () => {
     const aliases = Object.fromEntries(ROUTE_ALIASES.map((a) => [a.from, a.to]));
@@ -68,10 +70,16 @@ describe('canonical navigation', () => {
     expect(isNavItemActive(dashboard, '/blueprint')).toBe(false);
   });
 
-  it('matches nested workspace routes', () => {
-    const blueprint = WORKSPACE_NAV[1];
-    expect(isNavItemActive(blueprint, '/blueprint/abc')).toBe(true);
-    const evidence = WORKSPACE_NAV[3];
+  it('matches nested lifecycle workspace routes', () => {
+    const build = WORKSPACE_NAV[1];
+    expect(isNavItemActive(build, '/builder/session-abc')).toBe(true);
+    expect(isNavItemActive(build, '/blueprint/abc')).toBe(true);
+
+    const operate = WORKSPACE_NAV[2];
+    expect(isNavItemActive(operate, '/analytics/system/abc')).toBe(true);
+    expect(isNavItemActive(operate, '/deployments/abc')).toBe(true);
+
+    const evidence = WORKSPACE_NAV[4];
     expect(isNavItemActive(evidence, '/evidence/thermal')).toBe(true);
   });
 
@@ -79,22 +87,21 @@ describe('canonical navigation', () => {
     expect(visibleManageNav(() => false)).toHaveLength(0);
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Facilities',
+      'Blueprint',
       'Connections',
     ]);
     const designOrOperate = MANAGE_NAV.filter((i) => i.group === 'operate' || i.group === 'design');
     expect(visibleManageNav(() => true)).toHaveLength(designOrOperate.length);
   });
-
-
 });
 
 describe('DSX lifecycle grouping', () => {
-  it('orders the drawer around the AI-factory lifecycle', () => {
+  it('orders the drawer around the current lifecycle', () => {
     expect(NAV_GROUP_ORDER).toEqual([
       'overview',
       'design',
-      'simulate',
       'operate',
+      'simulate',
       'govern',
       'support',
     ]);
@@ -116,10 +123,19 @@ describe('DSX lifecycle grouping', () => {
 
   it('drops restricted destinations while retaining governed evidence', () => {
     const viewer = navGroups((p) => p === 'twin.view');
-    expect(viewer.map((g) => g.id)).toEqual(['overview', 'design', 'simulate', 'govern', 'support']);
+    expect(viewer.map((g) => g.id)).toEqual([
+      'overview',
+      'design',
+      'operate',
+      'simulate',
+      'govern',
+      'support',
+    ]);
     const hrefs = viewer.flatMap((g) => g.items.map((i) => i.href));
     expect(hrefs).toContain('/evidence/overview');
+    expect(hrefs).toContain('/analytics');
     expect(hrefs).not.toContain('/settings/ai');
+    expect(hrefs).not.toContain('/manage/integrations');
   });
 
   it('exposes the admin capability registry only under Govern > Platform Admin', () => {
@@ -127,7 +143,6 @@ describe('DSX lifecycle grouping', () => {
     expect(admin.group).toBe('govern');
     expect(admin.children?.map((c) => c.href)).toContain('/admin/accelerated-ai-capabilities');
   });
-
 });
 
 describe('page positioning', () => {

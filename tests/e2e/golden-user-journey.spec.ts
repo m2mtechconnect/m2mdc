@@ -67,9 +67,12 @@ test.describe('Golden AURA DC user journey', () => {
     await expect(page.getByText(/server-owned runtime/i).first()).toBeVisible();
 
     // The retired preview URL must converge into the one canonical Simulation
-    // workspace instead of exposing a second simulation product.
+    // workspace. The compatibility source is preserved, while the canonical
+    // workspace owns its active workflow position through the `step` query.
     await page.goto('/simulation/preview?source=golden-journey');
-    await expect(page).toHaveURL(/\/simulation\?source=golden-journey$/, { timeout: 15_000 });
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 15_000 }).toBe('/simulation');
+    await expect.poll(() => new URL(page.url()).searchParams.get('source'), { timeout: 15_000 }).toBe('golden-journey');
+    await expect.poll(() => new URL(page.url()).searchParams.get('step'), { timeout: 15_000 }).toBe('inspect');
     await expect(page.locator('body')).not.toContainText(/authorization error|something went wrong/i);
 
     await page.goto('/deployments');

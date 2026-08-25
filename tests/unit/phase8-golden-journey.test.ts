@@ -36,7 +36,7 @@ describe('Phase 8 AURA golden journey', () => {
 
   it('keeps Builder bound to the same facility and fails closed when the binding is missing', () => {
     expect(builder).toContain('Create your first facility');
-    expect(builder).toContain("navigate('/manage/facilities?create=true&next=builder')");
+    expect(builder).toContain("window.location.assign('/manage/facilities?create=true&next=builder')");
     expect(builder).toContain('builder.config?.twin_id');
     expect(builder).toContain('This build is not bound to a facility');
     expect(builder).toContain('The bound facility is no longer available');

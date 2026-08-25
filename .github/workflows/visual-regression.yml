@@ -7,6 +7,7 @@ on:
       - 'src/**/*.tsx'
       - 'src/**/*.css'
       - 'src/index.css'
+      - 'src/config/appNavigation.ts'
       - 'tests/visual/**'
       - 'scripts/verify-visual-fingerprints.mjs'
       - 'playwright.visual.config.ts'

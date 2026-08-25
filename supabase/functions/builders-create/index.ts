@@ -1,33 +1,22 @@
 /**
  * /v1/builders-create
  *
- * PURPOSE: Create a new builder draft (agent/twin draft)
- * AUTH: user (requires valid JWT token)
- *
- * REQUEST:
- * - source: string (optional) - "file" | "questionnaire" | "template" | "url" | "manual" | "homepage" | "dashboard" | "imported" | "manage-agents" | "blank"
- * - goal: string (optional)
- * - industry: string (optional)
- * - department: string (optional)
- * - type: string (optional) - "agent" | "process_twin" | "3d_twin"
- * - template_id: string (optional)
- *
- * RESPONSE:
- * - id: Builder ID
- * - builder: Full builder object
+ * Creates an authenticated builder draft. Twin/process-twin drafts may bind to
+ * an existing facility twin. The server validates that the caller can read the
+ * requested twin through the caller's RLS-bound client before persisting it.
  */
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
 
 const InputSchema = z.object({
-  source: z.enum(['file', 'questionnaire', 'template', 'url', 'manual', 'homepage', 'dashboard', 'imported', 'manage-agents', 'blank']).nullish(),
+  source: z.enum(['file', 'questionnaire', 'template', 'url', 'manual', 'homepage', 'dashboard', 'imported', 'manage-agents', 'blank', 'facility']).nullish(),
   goal: z.string().nullish(),
   industry: z.string().nullish(),
   department: z.string().nullish(),
   type: z.enum(['agent', 'process_twin', '3d_twin']).nullish(),
-  template_id: z.string().nullish(), // Accept both UUID and slug strings
+  template_id: z.string().nullish(),
+  twin_id: z.string().uuid().nullish(),
 });
 
 serve(createHandler({
@@ -35,13 +24,11 @@ serve(createHandler({
   authLevel: "user",
   inputSchema: InputSchema,
   handler: async (input, context) => {
-    const { source, goal, industry, department, type, template_id } = input;
+    const { source, goal, industry, department, type, template_id, twin_id } = input;
     const { supabase, userId, log } = context;
 
-    log("Creating builder draft", { source, goal, industry, department, type });
+    log("Creating builder draft", { source, goal, industry, department, type, twinId: twin_id ?? null });
 
-    // Resolve tenant authority server-side. The request never supplies org_id.
-    // Users without an organization retain the legacy owner-only draft path.
     const { data: resolvedActiveOrgId, error: activeOrgError } = await supabase.rpc('active_org_id');
     if (activeOrgError) {
       log("Builder tenant resolution failed", { error: activeOrgError.message });
@@ -53,10 +40,30 @@ serve(createHandler({
     }
     const activeOrgId = typeof resolvedActiveOrgId === 'string' ? resolvedActiveOrgId : null;
 
+    // The user-level Supabase client is RLS-bound. An invisible facility must
+    // look exactly like a missing facility, so the browser cannot bind a draft
+    // to an arbitrary twin id.
+    if (twin_id) {
+      const { data: facility, error: facilityError } = await supabase
+        .from('data_centre_twins')
+        .select('id')
+        .eq('id', twin_id)
+        .maybeSingle();
+
+      if (facilityError || !facility) {
+        log('Builder facility binding rejected', { twinId: twin_id, error: facilityError?.message });
+        throw {
+          code: 'NOT_FOUND',
+          message: 'Facility is not available to this user',
+          status: 404,
+        };
+      }
+    }
+
     const { data: draft, error: dbError } = await supabase
       .from('agents')
       .insert({
-        name: goal || 'Untitled Agent',
+        name: goal || 'Untitled Build',
         description: `Draft ${type || 'agent'} for ${department || 'unspecified department'}`,
         owner_id: userId,
         org_id: activeOrgId,
@@ -70,6 +77,7 @@ serve(createHandler({
           department: department || '',
           type: type || null,
           template_id: template_id || null,
+          twin_id: twin_id || null,
           workflow: {
             triggers: [],
             actions: [],
@@ -100,7 +108,7 @@ serve(createHandler({
       };
     }
 
-    log("Builder draft created", { builderId: draft.id });
+    log("Builder draft created", { builderId: draft.id, twinId: twin_id ?? null });
 
     return {
       id: draft.id,

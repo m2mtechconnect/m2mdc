@@ -30,10 +30,14 @@ export const withPublicRouteFallback = (element: ReactNode) => (
   <Suspense fallback={publicRouteFallback}>{element}</Suspense>
 );
 
-/** Public routes contain no eager auth, RBAC or active-twin imports. */
+/**
+ * Public entry routes.
+ *
+ * Account creation must never depend on a browser-local questionnaire flag.
+ * The optional /onboarding questionnaire is a discovery/lead surface; product
+ * setup begins only after an authenticated, approved user enters AURA.
+ */
 export default function PublicAppRoutes() {
-  const onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
-
   return (
     <Routes>
       <Route path="/" element={<DataCentreTwinLanding />} />
@@ -41,7 +45,7 @@ export default function PublicAppRoutes() {
       <Route path="/login" element={withPublicRouteFallback(<SignIn />)} />
       <Route path="/auth/callback" element={withPublicRouteFallback(<AuthCallback />)} />
       <Route path="/sign-in" element={<Navigate to="/login" replace />} />
-      <Route path="/sign-up" element={onboardingDone ? withPublicRouteFallback(<SignUp />) : <Navigate to="/onboarding" replace />} />
+      <Route path="/sign-up" element={withPublicRouteFallback(<SignUp />)} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
       <Route path="/mfa" element={withPublicRouteFallback(<MFA />)} />

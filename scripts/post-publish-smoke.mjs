@@ -38,7 +38,9 @@
  *   AURA_EXPECTED_SHA=<40-char sha> \
  *   node scripts/post-publish-smoke.mjs
  */
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
 import { chromium } from 'playwright';
 import { resolvePreviewSession, installPreviewSession, PreviewSessionUnavailableError } from './preview-session.mjs';
 
@@ -47,6 +49,47 @@ const EXPECTED_SHA = process.env.AURA_EXPECTED_SHA ?? null;
 const PUBLIC_ONLY = process.argv.includes('--unauthenticated-only');
 const EVIDENCE_DIR = new URL('../docs/evidence/post-publish-smoke/', import.meta.url);
 const AUTHENTICATED_ROUTES = ['/dashboard', '/analytics', '/evidence/overview'];
+const REGISTRY_FILE = fileURLToPath(new URL('../src/supervisor/postPublishSmokeRegistry.ts', import.meta.url));
+/** How the run was started. Read-only in every mode. */
+const TRIGGER = ['automatic-on-publish', 'scheduled', 'manual'].includes(process.env.AURA_SMOKE_TRIGGER ?? '')
+  ? process.env.AURA_SMOKE_TRIGGER
+  : 'manual';
+/** Publish-driven mode: exit cleanly when the live SHA has already been qualified. */
+const ONLY_IF_NEW_PUBLISH = process.argv.includes('--only-if-new-publish');
+/** SHA served by the live target, resolved during the fingerprint check. */
+let observedSha = null;
+
+/** Reads recorded evidence artifacts, newest first. Never invents a result. */
+function readRecordedReports() {
+  const dir = fileURLToPath(EVIDENCE_DIR);
+  let files = [];
+  try {
+    files = readdirSync(dir).filter((f) => f.startsWith('smoke-') && f.endsWith('.json'));
+  } catch {
+    return [];
+  }
+  return files
+    .map((file) => {
+      try {
+        return JSON.parse(readFileSync(path.join(dir, file), 'utf8'));
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .sort((a, b) => String(b.completedAt ?? '').localeCompare(String(a.completedAt ?? '')));
+}
+
+/** Regenerates the supervisor registry from the stored artifacts (latest 10). */
+function regenerateRegistry() {
+  const reports = readRecordedReports().slice(0, 10);
+  const header = readFileSync(REGISTRY_FILE, 'utf8').split('export const')[0];
+  writeFileSync(
+    REGISTRY_FILE,
+    `${header}export const POST_PUBLISH_SMOKE_REGISTRY: readonly unknown[] = ${JSON.stringify(reports, null, 2)};\n`,
+  );
+  return reports.length;
+}
 
 const results = [];
 const record = (id, plane, status, detail) => {
@@ -80,6 +123,7 @@ async function checkReleaseFingerprint() {
       if (!payload[field] || typeof payload[field] !== 'string') problems.push(`${field} empty`);
     }
     if (EXPECTED_SHA && payload.sha !== EXPECTED_SHA) problems.push(`sha mismatch: expected ${EXPECTED_SHA}, got ${payload.sha}`);
+    if (typeof payload.sha === 'string' && /^[0-9a-f]{40}$/.test(payload.sha)) observedSha = payload.sha;
     if (problems.length > 0) {
       record('release-fingerprint', 'public', 'FAIL', problems.join('; '));
     } else {
@@ -190,6 +234,20 @@ async function main() {
   if (EXPECTED_SHA) console.log(`Expected SHA: ${EXPECTED_SHA}`);
 
   await checkReleaseFingerprint();
+
+  // Publish-driven automation: a target whose live SHA already carries a
+  // passing recorded run is not re-qualified. Nothing is claimed either way.
+  if (ONLY_IF_NEW_PUBLISH) {
+    const already = readRecordedReports().find(
+      (r) => r.verdict === 'PASS' && r.target === TARGET && (r.observedSha ?? r.expectedSha) === observedSha,
+    );
+    if (observedSha && already) {
+      console.log(`No new publish detected: ${observedSha} already qualified by ${already.artifactRef}`);
+      regenerateRegistry();
+      process.exit(0);
+    }
+  }
+
   await checkPublicShell('/');
   await checkPublicShell('/login');
 
@@ -218,7 +276,11 @@ async function main() {
       {
         suite: 'aura.post-publish-smoke.v1',
         target: TARGET,
+        observedSha,
         expectedSha: EXPECTED_SHA,
+        completedAt: new Date().toISOString(),
+        trigger: TRIGGER,
+        artifactRef: `docs/evidence/post-publish-smoke/smoke-${stamp}.json`,
         plane: PUBLIC_ONLY ? 'public-only' : 'public+authenticated',
         session: PUBLIC_ONLY ? 'not-requested' : '<session-installed>',
         verdict,
@@ -228,7 +290,9 @@ async function main() {
       2,
     ),
   );
+  const registryCount = regenerateRegistry();
   console.log(`Evidence: ${evidencePath.pathname}`);
+  console.log(`Supervisor registry entries: ${registryCount}`);
   console.log(`Verdict: ${verdict} (${failed.length} failed, ${blocked.length} blocked)`);
   process.exit(verdict === 'PASS' ? 0 : 1);
 }

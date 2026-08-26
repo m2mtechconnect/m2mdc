@@ -33,7 +33,10 @@ import {
   AUTOMATIC_TRIGGERS,
   CONNECTOR_POLICIES,
   DR_TRUTH_NOTE,
+  SMOKE_TRUTH_NOTE,
   deriveDrExerciseStatus,
+  deriveSmokeQualification,
+  rejectedSmokeReports,
   deriveDrReadinessFields,
   rejectedDrExerciseRecords,
   KNOWLEDGE_SOURCES,
@@ -55,7 +58,11 @@ import {
   prioritizeFindings,
   resolveActivation,
   supervisorPersona,
+  isTruthCheck,
   type DrFieldState,
+  type SmokeCheckStatus,
+  type SmokeQualificationState,
+  type TruthCheckState,
   type FindingSeverity,
   type FindingStatus,
   type ObservabilitySignalStatus,
@@ -134,6 +141,40 @@ const DR_STATE_LABEL: Record<DrFieldState, string> = {
   'not-assessed': 'Not assessed',
 };
 
+const SMOKE_STATE_LABEL: Record<SmokeQualificationState, string> = {
+  'not-run': 'Not run',
+  passing: 'Passing',
+  failing: 'Failing',
+  stale: 'Stale (different release)',
+};
+
+const SMOKE_STATE_BADGE: Record<SmokeQualificationState, string> = {
+  'not-run': 'bg-muted text-muted-foreground border-transparent',
+  passing: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/40',
+  failing: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/40',
+  stale: 'bg-amber-500/10 text-amber-800 dark:text-amber-200 border-amber-500/40',
+};
+
+const SMOKE_TRUTH_LABEL: Record<TruthCheckState, string> = {
+  pass: 'Pass',
+  fail: 'Fail',
+  'not-assessed': 'Not assessed',
+};
+
+const SMOKE_TRUTH_BADGE: Record<TruthCheckState, string> = {
+  pass: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/40',
+  fail: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/40',
+  'not-assessed': 'bg-muted text-muted-foreground border-transparent',
+};
+
+const SMOKE_CHECK_BADGE: Record<SmokeCheckStatus, string> = {
+  PASS: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/40',
+  FAIL: 'bg-red-500/10 text-red-700 dark:text-red-300 border-red-500/40',
+  BLOCKED_BY_AUTH: 'bg-amber-500/10 text-amber-800 dark:text-amber-200 border-amber-500/40',
+  NOT_RUN: 'bg-muted text-muted-foreground border-transparent',
+  SKIPPED: 'bg-muted text-muted-foreground border-transparent',
+};
+
 export default function Supervisor() {
   const [personaId, setPersonaId] = useState<SupervisorPersonaId>('executive');
   const [categoryFilter, setCategoryFilter] = useState<'all' | ReadinessCategory>('all');
@@ -144,6 +185,10 @@ export default function Supervisor() {
   const drReadinessFields = useMemo(() => deriveDrReadinessFields(), []);
   const drExerciseStatus = useMemo(() => deriveDrExerciseStatus(), []);
   const drRejectedRecords = useMemo(() => rejectedDrExerciseRecords(), []);
+  // Post-publish smoke qualification is derived from stored read-only evidence
+  // artifacts only. With no artifact the surface reports "not run".
+  const smoke = useMemo(() => deriveSmokeQualification(), []);
+  const smokeRejected = useMemo(() => rejectedSmokeReports(), []);
   const findings = useMemo(() => prioritizeFindings(READINESS_FINDINGS, persona), [persona]);
   const visibleFindings = useMemo(
     () => (categoryFilter === 'all' ? findings : findings.filter((f) => f.category === categoryFilter)),
@@ -314,6 +359,70 @@ export default function Supervisor() {
             </li>
           ))}
         </ul>
+      </SectionCard>
+
+      {/* Post-publish smoke qualification */}
+      <SectionCard
+        title="Post-publish smoke qualification"
+        description={SMOKE_TRUTH_NOTE}
+        icon={ShieldCheck}
+      >
+        <div className="rounded-lg border border-border bg-card p-4" data-testid="smoke-qualification">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline" className={SMOKE_STATE_BADGE[smoke.state]}>
+              {SMOKE_STATE_LABEL[smoke.state]}
+            </Badge>
+            <Badge variant="outline" className={SMOKE_TRUTH_BADGE[smoke.truthState]}>
+              Truth and provenance: {SMOKE_TRUTH_LABEL[smoke.truthState]}
+            </Badge>
+            {smoke.latest ? (
+              <span className="text-xs text-muted-foreground">
+                {smoke.passed.length} passed / {smoke.failed.length} failed / {smoke.unresolved.length} unresolved
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">{smoke.note}</p>
+          {smoke.latest ? (
+            <p className="mt-1 text-xs text-muted-foreground">
+              Trigger: {smoke.latest.trigger} &middot; plane: {smoke.latest.plane} &middot; evidence{' '}
+              <code className="font-mono">{smoke.latest.artifactRef}</code>
+            </p>
+          ) : null}
+        </div>
+
+        {smoke.latest ? (
+          <ul className="mt-3 space-y-2" data-testid="smoke-checks">
+            {smoke.latest.checks.map((check) => (
+              <li
+                key={check.id}
+                className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3"
+              >
+                <Badge variant="outline" className={SMOKE_CHECK_BADGE[check.status]}>
+                  {check.status.replace(/_/g, ' ')}
+                </Badge>
+                <code className="font-mono text-xs">{check.id}</code>
+                {isTruthCheck(check) ? (
+                  <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
+                    truth/provenance
+                  </Badge>
+                ) : null}
+                <span className="text-xs text-muted-foreground">{check.detail}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
+        {smokeRejected.length > 0 ? (
+          <p className="mt-3 text-xs text-muted-foreground" data-testid="smoke-rejected-reports">
+            {smokeRejected.length} supplied smoke report(s) were rejected as evidence and do not affect qualification:{' '}
+            {smokeRejected.map((entry) => entry.reasons.join('; ')).join(' | ')}
+          </p>
+        ) : null}
+        <p className="mt-3 text-xs text-muted-foreground">
+          Runs automatically after a publish via the read-only{' '}
+          <code className="font-mono">post-publish-smoke</code> workflow, which re-checks the live release fingerprint
+          and only qualifies a release SHA it has not already qualified.
+        </p>
       </SectionCard>
 
       {/* Resilience and DR readiness */}

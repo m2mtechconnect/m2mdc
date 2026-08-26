@@ -604,7 +604,7 @@ export default function IntelligenceDashboard() {
                 grain="Facility"
                 window={windowLabel}
                 aggregation="Weighted avg"
-                source="DCIM · BMS"
+                source="AURA demonstration fixture (no DCIM feed)"
                 formula="Total facility power / IT equipment power"
                 status={pueStatus(pueValue)}
                 statusLabel={`Target ≤ ${pueTarget.toFixed(2)}`}
@@ -624,7 +624,7 @@ export default function IntelligenceDashboard() {
                 grain="Cluster"
                 window={windowLabel}
                 aggregation="Avg across selected"
-                source="IPMI · Workload scheduler"
+                source="AURA demonstration fixture (no IPMI feed)"
                 formula="mean(GPU_busy%) over filtered clusters"
                 status={gpuStatus(gpuValue)}
                 statusLabel="Target 70-90%"
@@ -644,7 +644,7 @@ export default function IntelligenceDashboard() {
                 grain="Event"
                 window={windowLabel}
                 aggregation="Count"
-                source="BMS · Thermal sensors"
+                source="AURA demonstration fixture (no BMS feed)"
                 formula="count(threshold_breach) in window"
                 status={thermalStatus(thermalValue)}
                 statusLabel="Target 0 critical"
@@ -682,7 +682,7 @@ export default function IntelligenceDashboard() {
                 grain="Policy"
                 window={windowLabel}
                 aggregation="Compliant ÷ in-scope"
-                source="Policy engine · Workload registry"
+                source="AURA demonstration fixture (no policy-engine feed)"
                 formula="compliant_workloads / in_scope_workloads"
                 status={sovereigntyStatus(sovereigntyValue)}
                 statusLabel="Target 100%"
@@ -702,7 +702,7 @@ export default function IntelligenceDashboard() {
                 grain="Service"
                 window={windowLabel}
                 aggregation="Uptime ÷ window"
-                source="Service monitor · DCIM"
+                source="AURA demonstration fixture (no service-monitor feed)"
                 formula="(window - downtime_minutes) / window"
                 status={uptimeStatus(uptimeValue)}
                 statusLabel="SLA Tier III 99.982%"
@@ -826,7 +826,7 @@ export default function IntelligenceDashboard() {
                       grain="Facility"
                       window="Last 24h"
                       aggregation="4-hour interval"
-                      source="DCIM"
+                      source="AURA demonstration fixture (no DCIM feed)"
                     />
                   </CardHeader>
                   <CardContent>
@@ -861,7 +861,7 @@ export default function IntelligenceDashboard() {
                     grain="Zone"
                     window={windowLabel}
                     aggregation="Cluster avg"
-                    source="IPMI · Scheduler"
+                    source="AURA demonstration fixture (no scheduler feed)"
                   />
                 </CardHeader>
                 <CardContent className="overflow-x-clip">
@@ -908,7 +908,7 @@ export default function IntelligenceDashboard() {
                     grain="Zone"
                     window="Current"
                     aggregation="Latest inlet temp"
-                    source="Thermal sensors"
+                    source="AURA demonstration fixture (no thermal-sensor feed)"
                   />
                 </CardHeader>
                 <CardContent>
@@ -940,7 +940,7 @@ export default function IntelligenceDashboard() {
                     grain="Event"
                     window={windowLabel}
                     aggregation="Sorted by severity, then age"
-                    source="Incident registry"
+                    source="AURA demonstration fixture (no incident-registry feed)"
                   />
                 </CardHeader>
                 <CardContent>
@@ -1016,7 +1016,7 @@ export default function IntelligenceDashboard() {
                       grain="Policy"
                       window={windowLabel}
                       aggregation="Compliant ÷ in-scope"
-                      source="Policy engine"
+                      source="AURA demonstration fixture (no policy-engine feed)"
                     />
                   </CardHeader>
                   <CardContent>

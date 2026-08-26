@@ -6,3 +6,7 @@ export * from './releaseGate';
 export * from './knowledgeRegistry';
 export * from './runtimeIntegration';
 export * from './permissionBroker';
+export * from './observability';
+export * from './drReadiness';
+export * from './portabilityMatrix';
+export * from './releaseProfiles';

@@ -1,0 +1,55 @@
+name: Post-Publish Smoke (read-only)
+
+# Manual dispatch only. This workflow never runs autonomously on push and
+# never mutates the production target. It executes the read-only smoke
+# qualification suite (scripts/post-publish-smoke.mjs) against the target a
+# human names, after a human-approved publish.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target origin (production URL)'
+        required: true
+        default: 'https://auradc.m2mtechconnect.com'
+      expected_sha:
+        description: 'Expected 40-char Git SHA bound to /release.json'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run read-only post-publish smoke
+        env:
+          AURA_SMOKE_TARGET: ${{ inputs.target }}
+          AURA_EXPECTED_SHA: ${{ inputs.expected_sha }}
+          # Optional authenticated plane. When these secrets are absent the
+          # suite fails closed and records BLOCKED_BY_AUTH.
+          AURA_PREVIEW_EMAIL: ${{ secrets.AURA_SMOKE_EMAIL }}
+          AURA_PREVIEW_PASSWORD: ${{ secrets.AURA_SMOKE_PASSWORD }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: node scripts/post-publish-smoke.mjs
+
+      - name: Upload smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-publish-smoke-evidence
+          path: docs/evidence/post-publish-smoke/
+          if-no-files-found: warn

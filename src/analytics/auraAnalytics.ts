@@ -111,10 +111,8 @@ export async function captureAuraEvent(
   const provider = configuredProvider(config);
   if (provider === 'disabled') return { provider, status: 'disabled' };
 
-  const apiKey = (config.posthogKey ?? '').trim();
-  const host = posthogHost(config);
   const organizationId = context.organizationId?.trim() ?? '';
-  if (!apiKey || !host || (TENANT_SCOPED_EVENTS.has(event) && !organizationId)) {
+  if (TENANT_SCOPED_EVENTS.has(event) && !organizationId) {
     return { provider, status: 'not_configured' };
   }
 
@@ -123,6 +121,32 @@ export async function captureAuraEvent(
     distinct_id: analyticsDistinctId(),
   };
   if (organizationId) properties.organization_id = organizationId;
+
+  // Relay path: the browser holds no provider credential. The governed edge
+  // function re-validates, injects the server-held key and delivers upstream.
+  const relay = relayEndpoint(config);
+  if (relay) {
+    try {
+      const response = await fetch(relay, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, properties }),
+        keepalive: true,
+        signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+      });
+      return { provider, status: response.ok ? 'queued' : 'failed' };
+    } catch {
+      return { provider, status: 'failed' };
+    }
+  }
+
+  // Direct path: explicit caller-supplied public capture key (self-hosted or
+  // white-label packaging without the governed relay).
+  const apiKey = (config.posthogKey ?? '').trim();
+  const host = posthogHost(config);
+  if (!apiKey || !host) {
+    return { provider, status: 'not_configured' };
+  }
 
   const payload = {
     api_key: apiKey,

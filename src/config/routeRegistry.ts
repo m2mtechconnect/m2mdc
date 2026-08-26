@@ -62,6 +62,12 @@ export const PUBLIC_ROUTES: RouteRecord[] = [
   { path: '/sign-in', shell: 'public', kind: 'canonical' },
   { path: '/sign-up', shell: 'public', kind: 'canonical' },
   { path: '/forgot-password', shell: 'public', kind: 'canonical' },
+  {
+    path: '/reset-password',
+    shell: 'public',
+    kind: 'canonical',
+    note: 'Recovery email target; deliberately has no session alias so the recovery session can set a new password.',
+  },
   { path: '/mfa', shell: 'public', kind: 'canonical' },
   {
     path: '/auth/callback',

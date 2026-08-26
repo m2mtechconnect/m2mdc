@@ -326,9 +326,7 @@ export default function Supervisor() {
                   className={
                     field.state === 'exercised'
                       ? 'bg-accent/15 text-accent-foreground border-transparent'
-                      : field.state === 'documented'
-                        ? 'bg-muted text-muted-foreground border-transparent'
-                        : 'bg-muted text-muted-foreground border-transparent'
+                      : 'bg-muted text-muted-foreground border-transparent'
                   }
                 >
                   {DR_STATE_LABEL[field.state]}

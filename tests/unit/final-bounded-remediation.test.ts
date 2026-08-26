@@ -33,12 +33,11 @@ describe('final bounded remediation - route truth and RBAC', () => {
     );
   });
 
-  it('keeps the legacy infrastructure page and funding demo development only', () => {
-    expect(shell).toContain('const InfrastructurePage = import.meta.env.DEV');
+  it('keeps the illustrative infrastructure page unmounted and the funding demo development only', () => {
+    expect(shell).not.toContain('InfrastructurePage');
+    expect(shell).not.toContain('path="/infrastructure"');
     expect(shell).toContain('const FundingIntakeDemo = import.meta.env.DEV');
-    expect(shell).toContain('{import.meta.env.DEV && InfrastructurePage && (');
     expect(shell).toContain('{import.meta.env.DEV && FundingIntakeDemo && (');
-    expect(shell).not.toContain('<Route path="/infrastructure" element={<InfrastructurePage />} />\n      <Route');
   });
 });
 

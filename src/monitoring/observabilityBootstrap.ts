@@ -26,6 +26,17 @@ export async function resolveRuntimeMonitoringConfig(): Promise<AuraAnalyticsCon
   const base = (import.meta.env.VITE_SUPABASE_URL as string | undefined)?.trim();
   if (!base) return {};
 
+  // Local production previews used by release qualification do not run the
+  // Supabase Edge runtime. Avoid issuing a guaranteed-failing request that
+  // would be reported as a browser console error by Lighthouse. Cloud origins
+  // still resolve configuration exclusively through the governed endpoint.
+  try {
+    const hostname = new URL(base).hostname;
+    if (hostname === '127.0.0.1' || hostname === 'localhost' || hostname === '::1') return {};
+  } catch {
+    return {};
+  }
+
   try {
     const response = await fetch(`${base}/functions/v1/observability-config`, {
       method: 'GET',

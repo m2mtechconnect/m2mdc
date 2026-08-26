@@ -41,9 +41,9 @@ describe('authenticated shell core', () => {
     expect(shell).toMatch(/const Dashboard = lazy\(/);
     expect(shell).toMatch(/const Compliance = lazy\(/);
     expect(shell).toMatch(/const DataCentreTwin = lazy\(/);
-    // Development-only surfaces are lazy behind an env gate so production
-    // never emits their chunks.
-    expect(shell).toMatch(/const InfrastructurePage = import\.meta\.env\.DEV\s*\n\s*\? lazy\(/);
+    // The remaining development-only surface is lazy behind an env gate so
+    // production never emits its chunk.
+    expect(shell).toMatch(/const FundingIntakeDemo = import\.meta\.env\.DEV\s*\n\s*\? lazy\(/);
   });
 
 });

@@ -44,7 +44,8 @@ export function VersionSnapshot({
 
   const generateAutoMessage = () => {
     const parts = [];
-    if (builderState?.modelConfig?.model) parts.push(`Model: ${builderState.modelConfig.model}`);
+    if (builderState?.modelConfig?.response_profile) parts.push(`Response profile: ${builderState.modelConfig.response_profile}`);
+    else if (builderState?.modelConfig?.model) parts.push('Response profile: legacy draft');
     if (builderState?.workflow?.actions?.length) parts.push(`${builderState.workflow.actions.length} workflows`);
     if (builderState?.workflow?.integrations?.length) parts.push(`${builderState.workflow.integrations.length} integrations`);
     return parts.length > 0 ? `Configure ${parts.join(', ')}` : 'Initial configuration';
@@ -138,8 +139,8 @@ export function VersionSnapshot({
           </div>
           <div className="grid grid-cols-3 gap-4 text-xs">
             <div>
-              <span className="text-muted-foreground">Model:</span>{' '}
-              <span className="font-medium">{builderState?.modelConfig?.model || 'Not set'}</span>
+              <span className="text-muted-foreground">Response profile:</span>{' '}
+              <span className="font-medium">{builderState?.modelConfig?.response_profile || (builderState?.modelConfig?.model ? 'Legacy draft' : 'Not set')}</span>
             </div>
             <div>
               <span className="text-muted-foreground">Workflows:</span>{' '}
@@ -196,7 +197,7 @@ export function VersionSnapshot({
                 <div>
                   <h4 className="text-sm font-medium mb-2">Current (v{currentVersion})</h4>
                   <div className="p-3 rounded-lg bg-muted/50 text-xs font-mono">
-                    <p className="text-success">+ Model: {builderState?.modelConfig?.model}</p>
+                    <p className="text-success">+ Response profile: {builderState?.modelConfig?.response_profile || 'legacy draft'}</p>
                     <p className="text-success">+ Workflows: {builderState?.workflow?.actions?.length || 0}</p>
                     <p className="text-success">+ Integrations: {builderState?.workflow?.integrations?.length || 0}</p>
                   </div>

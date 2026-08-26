@@ -82,8 +82,9 @@ export function builderStateToBlueprint(
     goals: [state.goal].filter(Boolean),
     
     model: {
-      provider: state.modelConfig?.provider || 'gemini',
-      modelName: state.modelConfig?.model || 'google/gemini-2.5-flash',
+      // Provider-neutral managed contract: persist only the stable response
+      // profile. Runtime provider/model resolution is server-owned.
+      responseProfile: state.modelConfig?.response_profile || 'balanced',
     },
     
     knowledge: {

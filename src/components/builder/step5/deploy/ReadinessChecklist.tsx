@@ -47,10 +47,12 @@ export function ReadinessChecklist({
       {
         id: 'intelligence',
         label: 'Intelligence configured',
-        status: builderState?.modelConfig?.model ? 'ok' : 'missing',
-        tooltip: builderState?.modelConfig?.model 
-          ? `Model: ${builderState.modelConfig.model}` 
-          : 'Select an AI model in Step 2',
+        status: (builderState?.modelConfig?.response_profile || builderState?.modelConfig?.model) ? 'ok' : 'missing',
+        tooltip: builderState?.modelConfig?.response_profile
+          ? `Response profile: ${builderState.modelConfig.response_profile}`
+          : builderState?.modelConfig?.model
+            ? 'Legacy draft: provider-specific configuration (readable until edited)'
+            : 'Select a response profile in Step 2',
         fixStep: 2,
         icon: Brain
       },

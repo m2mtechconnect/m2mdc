@@ -107,7 +107,7 @@ export function Step5Deploy() {
 
   const calculateReadinessScore = useCallback(() => {
     let score = 0;
-    if (modelConfig?.model) score += 20;
+    if (modelConfig?.response_profile || modelConfig?.model) score += 20;
     if (workflow?.actions?.length > 0) score += 25;
     if (workflow?.integrations?.length > 0 || tools.length > 0) score += 15;
     if (simulationHistory.length > 0) score += 15;

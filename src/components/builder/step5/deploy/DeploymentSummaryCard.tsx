@@ -36,8 +36,8 @@ export function DeploymentSummaryCard({
       title: 'Intelligence',
       icon: Brain,
       items: [
-        { label: 'Model', value: builderState?.modelConfig?.model || 'Not configured' },
-        { label: 'Provider', value: builderState?.modelConfig?.provider || 'google' },
+        { label: 'Response profile', value: builderState?.modelConfig?.response_profile || (builderState?.modelConfig?.model ? 'Legacy draft (provider-specific)' : 'Not configured') },
+        { label: 'Execution', value: 'Managed by AURA' },
         { label: 'Temperature', value: builderState?.modelConfig?.temperature?.toString() || '0.7' },
         { label: 'RAG Enabled', value: builderState?.modelConfig?.rag?.enabled ? 'Yes' : 'No' },
       ]

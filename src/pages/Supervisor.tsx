@@ -144,6 +144,10 @@ export default function Supervisor() {
     [findings, categoryFilter],
   );
   const gate = useMemo(() => evaluateReleaseGate(READINESS_FINDINGS), []);
+  const profileDecisions = useMemo(
+    () => RELEASE_PROFILES.map((profile) => evaluateReleaseGateForProfile(READINESS_FINDINGS, profile)),
+    [],
+  );
 
   const statusCounts = useMemo(() => {
     const counts: Record<FindingStatus, number> = { pass: 0, gap: 0, 'not-assessed': 0, unavailable: 0 };
@@ -240,6 +244,163 @@ export default function Supervisor() {
         ) : (
           <p className="mt-3 text-xs text-muted-foreground">No blocking findings.</p>
         )}
+      </SectionCard>
+
+      {/* Release qualification profiles */}
+      <SectionCard
+        title="Release qualification profiles"
+        description="Two governed profiles evaluate the same findings. The default is conservative and never downgrades blockers; the pilot profile may exempt the accelerated-runtime blocker only while that capability is visibly marked Unavailable and all truth/provenance controls pass. Exemptions are reported explicitly."
+        icon={ClipboardCheck}
+      >
+        <div className="grid gap-4 md:grid-cols-2" data-testid="release-profiles">
+          {profileDecisions.map((decision) => (
+            <article key={decision.profile} className="rounded-lg border border-border bg-card p-4" data-testid={`release-profile-${decision.profile}`}>
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold">{RELEASE_PROFILE_LABEL[decision.profile]}</h3>
+                <Badge
+                  variant="outline"
+                  className={
+                    decision.decision === 'go'
+                      ? 'bg-accent/15 text-accent-foreground border-transparent'
+                      : 'bg-destructive/10 text-destructive border-transparent'
+                  }
+                >
+                  {decision.decision === 'go' ? 'Go' : 'No-Go'}
+                </Badge>
+                {decision.profile === 'accelerated-runtime-enterprise' ? (
+                  <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">Default</Badge>
+                ) : null}
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">{RELEASE_PROFILE_DESCRIPTION[decision.profile]}</p>
+              {decision.exemptedFindings.length > 0 ? (
+                <ul className="mt-2 space-y-1 text-xs text-muted-foreground">
+                  {decision.exemptedFindings.map((exemption) => (
+                    <li key={exemption.id}>
+                      Exempted: <code className="font-mono text-xs">{exemption.id}</code> - {exemption.reason}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs text-muted-foreground">No exemptions applied.</p>
+              )}
+            </article>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* Observability readiness */}
+      <SectionCard
+        title="Observability readiness"
+        description="Monitoring, alerting, telemetry freshness and incident signals. A contract-tested client adapter is not live monitoring; nothing here is Verified without end-to-end evidence."
+        icon={Activity}
+      >
+        <ul className="space-y-2" data-testid="observability-readiness">
+          {OBSERVABILITY_SIGNALS.map((signal) => (
+            <li key={signal.id} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
+              <Badge variant="outline" className={OBSERVABILITY_STATUS_BADGE[signal.status]}>
+                {OBSERVABILITY_STATUS_LABEL[signal.status]}
+              </Badge>
+              <span className="text-sm font-medium">{signal.label}</span>
+              <span className="text-xs text-muted-foreground">{signal.note}</span>
+              {signal.evidenceRef ? (
+                <code className="font-mono text-xs text-muted-foreground">{signal.evidenceRef}</code>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+
+      {/* Resilience and DR readiness */}
+      <SectionCard
+        title="Resilience and DR readiness"
+        description={DR_TRUTH_NOTE}
+        icon={LifeBuoy}
+      >
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="dr-readiness">
+          {DR_READINESS_FIELDS.map((field) => (
+            <article key={field.id} className="rounded-lg border border-border bg-card p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-semibold">{field.label}</h3>
+                <Badge
+                  variant="outline"
+                  className={
+                    field.state === 'exercised'
+                      ? 'bg-accent/15 text-accent-foreground border-transparent'
+                      : field.state === 'documented'
+                        ? 'bg-muted text-muted-foreground border-transparent'
+                        : 'bg-muted text-muted-foreground border-transparent'
+                  }
+                >
+                  {DR_STATE_LABEL[field.state]}
+                </Badge>
+              </div>
+              <p className="mt-2 text-xs text-muted-foreground">{field.note}</p>
+              {field.evidenceRef ? (
+                <code className="mt-1 block font-mono text-xs text-muted-foreground">{field.evidenceRef}</code>
+              ) : null}
+            </article>
+          ))}
+          <article className="rounded-lg border border-border bg-card p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-sm font-semibold">Exercise status</h3>
+              <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
+                {DR_EXERCISE_STATUS.state === 'exercise-recorded' ? 'Exercise recorded' : 'Not exercised'}
+              </Badge>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">{DR_EXERCISE_STATUS.note}</p>
+          </article>
+        </div>
+      </SectionCard>
+
+      {/* Multicloud portability */}
+      <SectionCard
+        title="Multicloud portability"
+        description="Designed, configured, tested and verified are reported separately per target. Verified requires every lower stage to carry artifact evidence; deployment support is never implied without artifacts."
+        icon={CloudCog}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs" data-testid="portability-matrix">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th scope="col" className="py-2 pr-3 font-medium">Target</th>
+                {PORTABILITY_STAGES.map((stage) => (
+                  <th key={stage} scope="col" className="py-2 pr-3 font-medium capitalize">{stage}</th>
+                ))}
+                <th scope="col" className="py-2 font-medium">Current claim</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PORTABILITY_MATRIX.map((target) => (
+                <tr key={target.id} className="border-b border-border last:border-0" data-testid={`portability-${target.id}`}>
+                  <td className="py-2 pr-3 font-medium text-foreground">{target.label}</td>
+                  {PORTABILITY_STAGES.map((stageName) => {
+                    const evidence = target.stages.find((s) => s.stage === stageName);
+                    const evidenced = evidence?.state === 'evidenced';
+                    return (
+                      <td key={stageName} className="py-2 pr-3">
+                        <span
+                          className={
+                            evidenced
+                              ? 'inline-flex items-center rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent-foreground'
+                              : 'inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'
+                          }
+                          title={
+                            evidenced
+                              ? `Evidence: ${evidence?.evidenceRef}${evidence?.note ? ` - ${evidence.note}` : ''}`
+                              : `Not evidenced${evidence?.note ? ` - ${evidence.note}` : ''}`
+                          }
+                        >
+                          {evidenced ? 'Evidenced' : 'Not evidenced'}
+                        </span>
+                      </td>
+                    );
+                  })}
+                  <td className="py-2 text-muted-foreground">{target.currentClaim}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </SectionCard>
 
       {/* Activation modes */}

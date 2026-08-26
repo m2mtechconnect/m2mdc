@@ -12,6 +12,7 @@ const SignIn = lazy(() => loadAuthPages().then((module) => ({ default: module.Si
 const SignUp = lazy(() => loadAuthPages().then((module) => ({ default: module.SignUp })));
 const SignOut = lazy(() => loadAuthPages().then((module) => ({ default: module.SignOut })));
 const ForgotPassword = lazy(() => loadAuthPages().then((module) => ({ default: module.ForgotPassword })));
+const ResetPassword = lazy(() => loadAuthPages().then((module) => ({ default: module.ResetPassword })));
 const MFA = lazy(() => loadAuthPages().then((module) => ({ default: module.MFA })));
 const AuthCallback = lazy(() => loadAuthPages().then((module) => ({ default: module.AuthCallback })));
 const ManagedUserReturn = lazy(() => import('@/pages/oauth/ManagedUserReturn'));
@@ -49,6 +50,7 @@ export default function PublicAppRoutes() {
       <Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
+      <Route path="/reset-password" element={withPublicRouteFallback(<ResetPassword />)} />
       <Route path="/mfa" element={withPublicRouteFallback(<MFA />)} />
       <Route path="/twin-datacentre" element={<DataCentreTwinLanding />} />
       <Route path="/data-centre-twin" element={withPublicRouteFallback(<PublicDataCentreTwin />)} />

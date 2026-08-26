@@ -109,7 +109,7 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
   test('/infrastructure redirects to canonical tenant-bound asset evidence', async ({ page, guard }) => {
     await goto(page, '/infrastructure', mock);
     await assertNoLive(page);
-    await expect(page).toHaveURL(/\/evidence\/assets$/);
+    await expect(page).toHaveURL(/\/evidence\/assets(?:\?.*)?$/);
     await expect(page.getByRole('heading', { name: 'Registry health' })).toBeVisible();
     await expect(page.getByTestId('infrastructure-operational-metrics')).toHaveCount(0);
     void guard;

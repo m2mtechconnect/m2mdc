@@ -14,6 +14,19 @@ import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { useCarbonEngine } from '@/hooks/useCarbonEngine';
 import { useFinancialEngine } from '@/hooks/useFinancialEngine';
 import { generateSparklineData } from './SparklineChart';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
+
+/**
+ * KPI cockpit values are derived from the configured Blueprint model and the
+ * deterministic simulation engine. No validated production telemetry source is
+ * connected, so this surface must never claim LIVE.
+ */
+const KPI_COCKPIT_PROVENANCE = {
+  provenance: 'simulated',
+  source: 'aura-blueprint-model',
+  connection: 'demo',
+  note: 'Derived from the configured Blueprint. Not measured production telemetry.',
+} as const;
 
 interface EnhancedKPICockpitProps {
   facility: DataCentreFacility;
@@ -64,22 +77,13 @@ export function EnhancedKPICockpit({
   return (
     <CollapsibleSection 
       title="KPI Cockpit" 
-      badge="Real-time"
+      badge="Modelled"
       defaultOpen={true}
       icon={<Activity className="h-5 w-5 text-accent" />}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Badge variant="outline" className="font-mono text-xs text-success border-success/30">
-            <span className="relative flex h-2 w-2 mr-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
-            </span>
-            LIVE
-          </Badge>
-          <span className="text-xs text-muted-foreground font-mono">
-            {new Date().toLocaleTimeString()}
-          </span>
+          <ProvenanceBadge meta={KPI_COCKPIT_PROVENANCE} />
         </div>
         <Badge variant="outline" className="text-xs">
           {Object.keys(kpis).length} KPIs tracked

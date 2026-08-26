@@ -262,7 +262,7 @@ export function EnterpriseKPIChart({
 
               {isRunning && (
                 <Badge variant="outline" className="text-xs animate-pulse bg-success/10 text-success">
-                  LIVE
+                  SIMULATING
                 </Badge>
               )}
               

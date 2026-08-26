@@ -61,7 +61,7 @@ export function CompactEventTimeline({
   return (
     <CollapsibleSection
       title="Event Timeline"
-      badge="Live"
+      badge="Simulated"
       defaultOpen={false}
       icon={<Clock className="h-4 w-4 text-primary" />}
     >

@@ -89,6 +89,7 @@ describe('canonical navigation', () => {
       'Facilities',
       'Blueprint',
       'Connections',
+      'Marketplace',
     ]);
     const designOrOperate = MANAGE_NAV.filter((i) => i.group === 'operate' || i.group === 'design');
     expect(visibleManageNav(() => true)).toHaveLength(designOrOperate.length);

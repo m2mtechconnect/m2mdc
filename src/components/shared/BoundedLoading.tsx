@@ -14,16 +14,54 @@ import { Button } from '@/components/ui/button';
 /** Milliseconds a resolution step may spin before it is treated as stalled. */
 export const LOADING_BUDGET_MS = 12_000;
 
+/**
+ * The budget is anchored to the start of a *continuous* loading sequence, not
+ * to a single mount. Session -> approval -> authorization hands off between
+ * separate BoundedLoading instances (and Suspense boundaries remount them),
+ * so a per-mount timer restarted on every handoff and the "bounded" guarantee
+ * never actually fired. The anchor survives remounts and is released only once
+ * no BoundedLoading remains mounted.
+ */
+let budgetAnchor: number | null = null;
+let mountedInstances = 0;
+
+/** Test-only: clears the shared anchor between cases. */
+export function __resetLoadingBudgetAnchor(): void {
+  budgetAnchor = null;
+  mountedInstances = 0;
+}
+
 export function useLoadingTimedOut(active: boolean, budgetMs = LOADING_BUDGET_MS): boolean {
   const [timedOut, setTimedOut] = useState(false);
+
   useEffect(() => {
     if (!active) {
       setTimedOut(false);
       return;
     }
-    const id = window.setTimeout(() => setTimedOut(true), budgetMs);
-    return () => window.clearTimeout(id);
+
+    if (budgetAnchor === null) budgetAnchor = Date.now();
+    const anchor = budgetAnchor;
+    mountedInstances += 1;
+
+    const remaining = Math.max(0, budgetMs - (Date.now() - anchor));
+    if (remaining === 0) {
+      setTimedOut(true);
+    }
+    const id = window.setTimeout(() => setTimedOut(true), remaining);
+
+    return () => {
+      window.clearTimeout(id);
+      mountedInstances = Math.max(0, mountedInstances - 1);
+      // Release the anchor only when the loading sequence has genuinely
+      // ended. A Suspense handoff unmounts and remounts within the same tick,
+      // which must not reset the budget.
+      window.setTimeout(() => {
+        if (mountedInstances === 0) budgetAnchor = null;
+      }, 0);
+    };
   }, [active, budgetMs]);
+
   return timedOut;
 }
 

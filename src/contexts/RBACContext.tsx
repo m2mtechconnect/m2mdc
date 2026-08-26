@@ -27,6 +27,21 @@ import { clearTenantScopedClientState } from '@/auth/tenantStorageIsolation';
 export type AppRole = AnyRole;
 export type { Permission } from '@/auth/permissions';
 
+/**
+ * Maximum time the authorization chain (getUser + role/membership reads +
+ * active-org RPCs) may take before the provider fails closed into a
+ * recoverable error. `loading` is a transient state only: it must never be
+ * the state the UI settles in.
+ */
+export const AUTHORIZATION_BUDGET_MS = 15_000;
+
+export class AuthorizationTimeoutError extends Error {
+  constructor() {
+    super('Authorization did not resolve within the allowed budget.');
+    this.name = 'AuthorizationTimeoutError';
+  }
+}
+
 export type RoleResolution =
   | { status: 'loading' }
   | { status: 'internal'; role: AppRole }
@@ -38,6 +53,13 @@ export type RoleResolution =
    * guidance instead of guessing a tenant in browser state.
    */
   | { status: 'tenant-unresolved' }
+  /**
+   * The server rejected or no longer recognises the caller. A locally
+   * persisted session is NOT evidence of authentication: getUser() is the
+   * authority. This is terminal, not transient - surfaces must redirect to
+   * sign-in rather than continue spinning.
+   */
+  | { status: 'unauthenticated' }
   | { status: 'pilot' }
   | { status: 'error'; error: unknown };
 
@@ -120,6 +142,34 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let cancelled = false;
+    let budgetTimer: ReturnType<typeof setTimeout> | null = null;
+
+    // `loading` must always be time-boxed. If the authorization chain never
+    // settles (hung request, unreachable backend), fail closed into a
+    // recoverable error rather than spinning forever. No permissions are
+    // granted by this path.
+    const armBudget = () => {
+      if (budgetTimer) clearTimeout(budgetTimer);
+      budgetTimer = setTimeout(() => {
+        if (cancelled) return;
+        setResolution((current) =>
+          current.status === 'loading'
+            ? { status: 'error', error: new AuthorizationTimeoutError() }
+            : current,
+        );
+      }, AUTHORIZATION_BUDGET_MS);
+    };
+
+    const disarmBudget = () => {
+      if (budgetTimer) clearTimeout(budgetTimer);
+      budgetTimer = null;
+    };
+
+    const settle = (next: RoleResolution) => {
+      if (cancelled) return;
+      disarmBudget();
+      setResolution(next);
+    };
 
     const resetAuthorization = () => {
       setAuthorization(EMPTY_AUTHORIZATION);
@@ -136,18 +186,22 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         const { data: { user }, error: userError } = await supabase.auth.getUser();
 
         if (userError) {
-          if (!cancelled) setResolution({ status: 'error', error: userError });
+          if (!cancelled) settle({ status: 'error', error: userError });
           return;
         }
 
+        // getUser() is the server authority. A persisted browser session that
+        // the server no longer recognises is an authentication failure, not a
+        // pending load: settle terminally so the caller redirects to sign-in.
         if (!user) {
           if (!cancelled) {
             setUserId(null);
             resetAuthorization();
-            setResolution({ status: 'loading' });
+            settle({ status: 'unauthenticated' });
           }
           return;
         }
+
 
         if (!cancelled) setUserId(user.id);
 
@@ -159,7 +213,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         if (rolesError) {
           if (!cancelled) {
             resetAuthorization();
-            setResolution({ status: 'error', error: rolesError });
+            settle({ status: 'error', error: rolesError });
           }
           return;
         }
@@ -184,7 +238,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         if (membershipsError) {
           if (!cancelled) {
             resetAuthorization();
-            setResolution({ status: 'error', error: membershipsError });
+            settle({ status: 'error', error: membershipsError });
           }
           return;
         }
@@ -201,7 +255,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
           if (error) {
             if (!cancelled) {
               resetAuthorization();
-              setResolution({ status: 'error', error });
+              settle({ status: 'error', error });
             }
             return;
           }
@@ -226,7 +280,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
         if (activeOrgError) {
           if (!cancelled) {
             resetAuthorization();
-            setResolution({ status: 'error', error: activeOrgError });
+            settle({ status: 'error', error: activeOrgError });
           }
           return;
         }
@@ -282,9 +336,9 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
           setIsPlatformOwner(platformOwner);
 
           if (platformAuthorization.primaryRole) {
-            setResolution({ status: 'internal', role: platformAuthorization.primaryRole });
+            settle({ status: 'internal', role: platformAuthorization.primaryRole });
           } else if (activeMembership) {
-            setResolution({
+            settle({
               status: 'tenant',
               role: activeMembership.role,
               orgId: activeMembership.orgId,
@@ -293,36 +347,40 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
             // Memberships exist but none could be verified as the active
             // organization. Authenticated yet tenant-less: fail closed into a
             // dedicated state so surfaces render precise recovery guidance.
-            setResolution({ status: 'tenant-unresolved' });
+            settle({ status: 'tenant-unresolved' });
           } else {
-            setResolution({ status: 'pilot' });
+            settle({ status: 'pilot' });
           }
         }
       } catch (error) {
         console.error('Error resolving authorization:', error);
         if (!cancelled) {
           resetAuthorization();
-          setResolution({ status: 'error', error });
+          settle({ status: 'error', error });
         }
       }
     };
 
+    armBudget();
     void fetchAuthorization();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUserId(session.user.id);
         setResolution({ status: 'loading' });
+        armBudget();
         setTimeout(() => void fetchAuthorization(), 0);
       } else {
+        // No session is a terminal authentication outcome, not a pending one.
         setUserId(null);
         resetAuthorization();
-        setResolution({ status: 'loading' });
+        settle({ status: 'unauthenticated' });
       }
     });
 
     return () => {
       cancelled = true;
+      disarmBudget();
       subscription.unsubscribe();
     };
   }, [retryTick]);

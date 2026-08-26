@@ -60,25 +60,10 @@ function ManageAgentsPage() {
     });
   }, [updateContext]);
 
-  // Check authentication - redirect if not logged in
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error || !session) {
-        navigate('/auth', { replace: true });
-      }
-    };
-    
-    checkAuth();
-    
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        navigate('/auth', { replace: true });
-      }
-    });
-    
-    return () => subscription.unsubscribe();
-  }, [navigate]);
+  // Authentication is resolved by the session shell (AuthenticatedSessionApp)
+  // before this protected route renders. Re-running an independent
+  // getSession() here raced hydration and could bounce verified sessions to
+  // the login page, so no per-page auth check remains.
 
 
   // Delete mutation
@@ -215,7 +200,7 @@ function ManageAgentsPage() {
               <span className="text-xs text-muted-foreground uppercase">Active</span>
             </div>
             <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-            <div className="text-xs text-muted-foreground">Running systems</div>
+            <div className="text-xs text-muted-foreground">Registry entries marked active (stored value)</div>
           </Card>
           
           <Card className="p-4">
@@ -230,7 +215,7 @@ function ManageAgentsPage() {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Zap className="h-4 w-4 text-blue-500" />
-              <span className="text-xs text-muted-foreground uppercase">Fleet Health</span>
+              <span className="text-xs text-muted-foreground uppercase">Registry health share</span>
             </div>
             <div className="text-2xl font-bold">{healthPercentage}%</div>
             <div className="text-xs text-muted-foreground">Active ratio</div>
@@ -239,7 +224,7 @@ function ManageAgentsPage() {
           <Card className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="h-4 w-4 text-purple-500" />
-              <span className="text-xs text-muted-foreground uppercase">Avg ROI</span>
+              <span className="text-xs text-muted-foreground uppercase">Avg stored ROI</span>
             </div>
             <div className="text-2xl font-bold">{stats.avgRoi}%</div>
             <div className="text-xs text-muted-foreground">Performance index</div>
@@ -249,7 +234,11 @@ function ManageAgentsPage() {
         {/* DC-Specific Agent Types */}
         {stats.total === 0 && (
           <Card className="mb-8 p-6">
-            <h3 className="font-semibold mb-4">Recommended Subsystem Agents</h3>
+            <h3 className="font-semibold mb-2">Subsystem templates</h3>
+            <p className="text-xs text-muted-foreground mb-4">
+              These are subsystem templates from the Blueprint registry - not deployed or running agents.
+              Deploy a facility build before treating any entry as a live agent.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {dcAgentTypes.map((agent) => (
                 <Card key={agent.name} className="p-4 hover:border-primary/50 cursor-pointer transition-colors" onClick={() => navigate('/builder')}>

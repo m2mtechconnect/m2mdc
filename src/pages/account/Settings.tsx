@@ -50,7 +50,10 @@ const defaultRoles = [
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { can } = useRBAC();
+  // Account Settings waits for verified RBAC/session hydration and reuses the
+  // verified active organization from the shell instead of racing an
+  // independent active_org_id lookup.
+  const { can, loading: rbacLoading, activeOrgId } = useRBAC();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
@@ -67,8 +70,10 @@ export default function Settings() {
   const isAdmin = can('tenant.manage_members');
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    if (rbacLoading) return; // wait for verified RBAC/session hydration
+    void loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rbacLoading, activeOrgId]);
 
   const notifications = useNotificationPreferences();
 

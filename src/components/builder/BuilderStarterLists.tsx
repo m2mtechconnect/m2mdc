@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
+import { useRBAC } from '@/contexts/RBACContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,6 +28,9 @@ interface BuildRow {
   created_at: string | null;
 }
 
+/** Facility build types the Builder landing lists; unrelated agent records stay out. */
+const FACILITY_BUILD_TYPES = ['3d_twin', 'process_twin'];
+
 interface TemplateRow {
   id: string;
   name: string;
@@ -40,6 +44,9 @@ interface TemplateRow {
  * Every row links back into the wizard with explicit intent parameters.
  */
 export function BuilderStarterLists() {
+  // Listing and deletion are scoped to the server-verified active
+  // organization; no verified tenant means no tenant data access.
+  const { activeOrgId } = useRBAC();
   const [builds, setBuilds] = useState<BuildRow[] | null>(null);
   const [templates, setTemplates] = useState<TemplateRow[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,9 +54,10 @@ export function BuilderStarterLists() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const deleteBuild = async (build: BuildRow) => {
+    if (!activeOrgId) return;
     setDeletingId(build.id);
     try {
-      const { error } = await supabase.from('agents').delete().eq('id', build.id);
+      const { error } = await supabase.from('agents').delete().eq('id', build.id).eq('org_id', activeOrgId);
       if (error) throw error;
       setBuilds((prev) => (prev ? prev.filter((row) => row.id !== build.id) : prev));
       toast({ title: 'Draft deleted', description: `${build.name?.trim() || 'Untitled build'} was removed.` });
@@ -66,6 +74,12 @@ export function BuilderStarterLists() {
 
   useEffect(() => {
     let cancelled = false;
+    if (!activeOrgId) {
+      setBuilds([]);
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
+    setLoading(true);
 
     const load = async () => {
       try {
@@ -73,6 +87,8 @@ export function BuilderStarterLists() {
           supabase
             .from('agents')
             .select('id, name, status, updated_at, created_at')
+            .eq('org_id', activeOrgId)
+            .in('config->>type', FACILITY_BUILD_TYPES)
             .order('updated_at', { ascending: false, nullsFirst: false })
             .limit(8),
           supabase

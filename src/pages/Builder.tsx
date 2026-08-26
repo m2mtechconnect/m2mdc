@@ -325,7 +325,18 @@ export default function Builder() {
         return;
       }
       if (activeTwinId !== facilityId) await setActiveTwin(facilityId);
-      navigate(`/builder?new=true&twin=${encodeURIComponent(facilityId)}&source=facility&type=3d_twin`);
+
+      // The landing state can already be on this exact URL after a failed or
+      // incomplete initialization. Navigating to the same location is a no-op,
+      // so explicitly clear the terminal state and let the guarded effect retry.
+      const next = new URLSearchParams();
+      next.set('new', 'true');
+      next.set('twin', facilityId);
+      next.set('source', 'facility');
+      next.set('type', '3d_twin');
+      setInitError(null);
+      setIsInitialized(false);
+      setSearchParams(next, { replace: true });
     };
 
     return (

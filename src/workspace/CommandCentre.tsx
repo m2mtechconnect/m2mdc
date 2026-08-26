@@ -14,7 +14,20 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { LayoutDashboard } from 'lucide-react';
 import { CapabilityChips, WorkspaceHeader } from '@/components/workspace-system';
+import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
+
+/**
+ * The Command Centre reads the configured Blueprint model and deterministic
+ * scenario runs. No validated production telemetry source is connected, so the
+ * surface declares simulated provenance rather than implying a live feed.
+ */
+const COMMAND_CENTRE_PROVENANCE = {
+  provenance: 'simulated',
+  source: 'aura-blueprint-model',
+  connection: 'demo',
+  note: 'Deterministic scenario engine over the configured Blueprint. Not measured telemetry.',
+} as const;
 
 import { deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
 import { evidenceHrefForKpi } from './kpiDrilldown';
@@ -205,6 +218,7 @@ export default function CommandCentre() {
           capabilityId="platform.command"
           badges={
             <>
+              <ProvenanceBadge meta={COMMAND_CENTRE_PROVENANCE} />
               <span className="aura-ws-chip">
                 <span className="aura-ws-chip-dot" data-status="SIMULATED" aria-hidden="true" />
                 Operating mode: Simulated

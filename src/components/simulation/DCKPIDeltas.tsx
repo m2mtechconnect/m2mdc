@@ -185,7 +185,7 @@ const KPICard = memo(function KPICard({
           {isNeutral && isRunning && (
             <Badge variant="outline" className="text-xs h-5 animate-pulse bg-primary/10 text-primary border-primary/30">
               <Activity className="h-3 w-3 mr-1" />
-              LIVE
+              SIMULATING
             </Badge>
           )}
         </div>
@@ -265,7 +265,7 @@ export const DCKPIDeltas = memo(function DCKPIDeltas({
           </CardTitle>
           {isRunning && (
             <Badge variant="outline" className="text-xs animate-pulse bg-success/10 text-success">
-              LIVE
+              SIMULATING
             </Badge>
           )}
         </div>

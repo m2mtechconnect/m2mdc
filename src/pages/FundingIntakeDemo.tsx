@@ -310,15 +310,13 @@ export default function FundingIntakeDemo() {
                 })()}
               </DCCard>
 
-              {/* View Full Details */}
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => navigate("/digital-twins/funding-intake-triage")}
-              >
-                View Full Twin Details & Runs
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              {/*
+                The former "View Full Twin Details & Runs" control pointed at
+                /digital-twins/funding-intake-triage, which is not a route and
+                silently aliased to the dashboard. This demonstration surface
+                has no separate detail view, so no affordance is offered rather
+                than implying one exists.
+              */}
             </>
           ) : (
             <DCCard status="neutral">

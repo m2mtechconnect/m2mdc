@@ -186,6 +186,37 @@ export const MANAGE_NAV: AppNavItem[] = [
     permission: 'deployment.view',
     group: 'operate',
     description: `Configuration activation, external runtime evidence and immutable lifecycle events. ${stackDescription('governance.controls')}`,
+    children: [
+      {
+        name: 'Activation',
+        fullName: 'Configuration activation',
+        href: '/deploy',
+        icon: Rocket,
+        matches: ['/deploy'],
+        permission: 'deployment.execute',
+        description:
+          'Configuration, readiness, execution and evidence for activating a configuration. Previously reachable by URL only.',
+      },
+      {
+        name: 'History',
+        fullName: 'Runtime history',
+        href: '/deployments',
+        icon: Rocket,
+        matches: ['/deployments'],
+        permission: 'deployment.view',
+        description: 'Immutable lifecycle events and stored activation evidence.',
+      },
+    ],
+  },
+  {
+    name: 'Marketplace',
+    fullName: 'Agent & template marketplace',
+    href: '/marketplace',
+    icon: Boxes,
+    matches: ['/marketplace'],
+    permission: 'twin.edit',
+    group: 'design',
+    description: 'Reference agents, templates and integration blueprints available to configure.',
   },
   {
     name: 'Supervisor',

@@ -249,7 +249,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
             'overflow-hidden relative transition-all duration-300',
             isRunning && 'ring-2 ring-success/30 shadow-lg shadow-success/10'
           )}>
-            {/* Live Simulation Badge */}
+            {/* Simulation Run Badge */}
             {isRunning && (
               <div className="absolute top-4 left-4 z-10">
                 <Badge className="bg-success text-success-foreground gap-1.5 shadow-lg animate-pulse">
@@ -257,7 +257,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-foreground opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-success-foreground" />
                   </span>
-                  Live Simulation
+                  Simulation Run
                 </Badge>
               </div>
             )}
@@ -297,7 +297,7 @@ export function DCSimulationTab({ facility, twinId = 'default' }: DCSimulationTa
                 {isRunning && (
                   <Badge variant="outline" className="ml-auto text-xs bg-primary/10 text-primary animate-pulse">
                     <Activity className="h-3 w-3 mr-1" />
-                    LIVE
+                    SIMULATING
                   </Badge>
                 )}
               </CardTitle>

@@ -82,7 +82,7 @@ export function AnimatedKPIChart({
             <div className="flex items-center gap-2">
               {isRunning && (
                 <Badge variant="outline" className="text-xs animate-pulse bg-success/10 text-success">
-                  LIVE
+                  SIMULATING
                 </Badge>
               )}
               <motion.div

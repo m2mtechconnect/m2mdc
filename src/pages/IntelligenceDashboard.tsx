@@ -930,8 +930,8 @@ export default function IntelligenceDashboard() {
                 step={4}
                 question={t('telemetry.story.step4')}
                 description={t('telemetry.story.step4Desc')}
-                drillTabLabel="Open AOC"
-                onDrill={() => navigate('/aoc')}
+                drillTabLabel="Open Runtime"
+                onDrill={() => navigate('/deployments')}
               />
               <Card>
                 <CardHeader>

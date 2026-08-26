@@ -48,6 +48,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Validate canonical release contract
+        run: bun run verify:release-contract
+
       - name: Run unit tests with coverage
         run: bun run test:unit:coverage
 
@@ -208,19 +211,22 @@ jobs:
         # disposable user id and writes storage state only under /tmp. Lifecycle
         # acceptance runs before destructive auth/logout coverage so the golden
         # journey cannot inherit a revoked shared session.
+        shell: bash
         run: |
+          mapfile -t release_specs < <(node scripts/aura-release-contract.mjs list lifecycle)
           bunx playwright test \
-            tests/e2e/acceptance-final.spec.ts \
-            tests/e2e/golden-user-journey.spec.ts \
+            "${release_specs[@]}" \
             --project=${{ matrix.browser }} \
             --workers=1
 
       - name: Run auth and security E2E gate
         # Auth coverage intentionally uses its own empty browser storage state
         # and may revoke the disposable session during logout validation.
+        shell: bash
         run: |
+          mapfile -t auth_specs < <(node scripts/aura-release-contract.mjs list auth-security)
           bunx playwright test \
-            tests/e2e/auth-security.spec.ts \
+            "${auth_specs[@]}" \
             --project=${{ matrix.browser }} \
             --workers=1
 

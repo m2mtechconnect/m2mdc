@@ -105,14 +105,14 @@ export function validateDrExerciseRecord(record: unknown): DrRecordValidation {
 }
 
 /** Records supplied through the evidence registry, filtered to valid entries. */
-export function loadDrExerciseRecords(source: unknown = registry): DrExerciseRecord[] {
+export function loadDrExerciseRecords(source: unknown = DR_EXERCISE_REGISTRY): DrExerciseRecord[] {
   const raw = Array.isArray(source) ? source : [];
   return raw.filter((entry) => validateDrExerciseRecord(entry).valid) as DrExerciseRecord[];
 }
 
 /** Records supplied but rejected, with reasons. Surfaced rather than hidden. */
 export function rejectedDrExerciseRecords(
-  source: unknown = registry,
+  source: unknown = DR_EXERCISE_REGISTRY,
 ): Array<{ record: unknown; reasons: string[] }> {
   const raw = Array.isArray(source) ? source : [];
   return raw

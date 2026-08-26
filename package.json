@@ -42,7 +42,8 @@
     "test:e2e:legacy": "playwright test",
     "verify:release:smoke": "bun run verify && bun run test:e2e:golden",
     "verify:release-contract": "node scripts/aura-release-contract.mjs validate",
-    "db:seed:enterprise-qa": "tsx scripts/seed-enterprise-qa-org.ts"
+    "db:seed:enterprise-qa": "tsx scripts/seed-enterprise-qa-org.ts",
+    "auth:bootstrap-owner": "tsx scripts/bootstrap-platform-owner.ts"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",

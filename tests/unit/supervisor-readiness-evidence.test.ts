@@ -183,7 +183,7 @@ describe('release qualification profiles', () => {
 
   it('pilot profile fails closed when any truth/provenance control has a gap', () => {
     const findings = withFinding({
-      id: 'data-provenance-simulated-labels',
+      id: 'data-provenance-model',
       status: 'gap',
       severity: 'high',
     });
@@ -193,10 +193,10 @@ describe('release qualification profiles', () => {
   });
 
   it('other mandatory blockers are never silently downgraded by the pilot profile', () => {
-    const findings = withFinding({ id: 'security-rls-grants', status: 'gap', severity: 'blocker' });
+    const findings = withFinding({ id: 'security-rls-tenancy', status: 'gap', severity: 'blocker' });
     const decision = evaluateReleaseGateForProfile(findings, 'enterprise-pilot-simulated');
     expect(decision.decision).toBe('no-go');
-    expect(decision.blockers.some((b) => b.includes('security-rls-grants'))).toBe(true);
+    expect(decision.blockers.some((b) => b.includes('security-rls-tenancy'))).toBe(true);
   });
 });
 

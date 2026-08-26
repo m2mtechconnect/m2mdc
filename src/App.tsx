@@ -42,6 +42,7 @@ const PUBLIC_PATHS = new Set([
   '/sign-up',
   '/sign-out',
   '/forgot-password',
+  '/reset-password',
   '/mfa',
   '/twin-datacentre',
   '/data-centre-twin',

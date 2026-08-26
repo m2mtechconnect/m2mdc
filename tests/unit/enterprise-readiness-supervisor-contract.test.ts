@@ -306,6 +306,10 @@ describe('runtime boundary truth', () => {
       'src/supervisor/personas.ts',
       'src/supervisor/runtimeIntegration.ts',
       'src/supervisor/permissionBroker.ts',
+      'src/supervisor/observability.ts',
+      'src/supervisor/drReadiness.ts',
+      'src/supervisor/portabilityMatrix.ts',
+      'src/supervisor/releaseProfiles.ts',
       'src/pages/Supervisor.tsx',
     ]) {
       const source = read(file);

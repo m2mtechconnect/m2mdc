@@ -12,3 +12,4 @@ export * from './drExerciseLog';
 export * from './portabilityMatrix';
 export * from './releaseProfiles';
 export * from './smokeQualification';
+export * from './multicloudEvidence';

@@ -263,6 +263,6 @@ describe('supervisor UI surfaces the new evidence', () => {
     expect(page).toContain('evaluateReleaseGateForProfile');
     expect(page).toContain('OBSERVABILITY_SIGNALS');
     expect(page).toContain('deriveDrReadinessFields');
-    expect(page).toContain('PORTABILITY_MATRIX');
+    expect(page).toContain('deriveMulticloudPortabilityMatrix');
   });
 });

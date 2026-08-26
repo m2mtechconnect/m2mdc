@@ -41,8 +41,10 @@ import {
   rejectedDrExerciseRecords,
   KNOWLEDGE_SOURCES,
   OBSERVABILITY_SIGNALS,
-  PORTABILITY_MATRIX,
   PORTABILITY_STAGES,
+  deriveMulticloudPortabilityMatrix,
+  rejectedMulticloudEvidenceRecords,
+  summariseMulticloudIngestion,
   READINESS_CATEGORIES,
   READINESS_CATEGORY_LABEL,
   READINESS_FINDINGS,
@@ -185,6 +187,9 @@ export default function Supervisor() {
   const drReadinessFields = useMemo(() => deriveDrReadinessFields(), []);
   const drExerciseStatus = useMemo(() => deriveDrExerciseStatus(), []);
   const drRejectedRecords = useMemo(() => rejectedDrExerciseRecords(), []);
+  const portabilityMatrix = useMemo(() => deriveMulticloudPortabilityMatrix(), []);
+  const multicloudIngestion = useMemo(() => summariseMulticloudIngestion(), []);
+  const multicloudRejected = useMemo(() => rejectedMulticloudEvidenceRecords(), []);
   // Post-publish smoke qualification is derived from stored read-only evidence
   // artifacts only. With no artifact the surface reports "not run".
   const smoke = useMemo(() => deriveSmokeQualification(), []);
@@ -493,7 +498,7 @@ export default function Supervisor() {
               </tr>
             </thead>
             <tbody>
-              {PORTABILITY_MATRIX.map((target) => (
+              {portabilityMatrix.map((target) => (
                 <tr key={target.id} className="border-b border-border last:border-0" data-testid={`portability-${target.id}`}>
                   <td className="py-2 pr-3 font-medium text-foreground">{target.label}</td>
                   {PORTABILITY_STAGES.map((stageName) => {
@@ -523,6 +528,52 @@ export default function Supervisor() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="mt-4 rounded-lg border border-border bg-card p-4" data-testid="multicloud-ingestion">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-sm font-semibold">Artifact ingestion</h3>
+            <Badge
+              variant="outline"
+              className={
+                multicloudIngestion.state === 'evidence-ingested'
+                  ? 'bg-accent/15 text-accent-foreground border-transparent'
+                  : 'bg-muted text-muted-foreground border-transparent'
+              }
+            >
+              {multicloudIngestion.state === 'evidence-ingested' ? 'Evidence ingested' : 'No evidence ingested'}
+            </Badge>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">{multicloudIngestion.note}</p>
+          <dl className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-4">
+            <div>
+              <dt className="font-medium text-foreground">Accepted records</dt>
+              <dd>{multicloudIngestion.acceptedRecords}</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground">Validation not passed</dt>
+              <dd>{multicloudIngestion.nonUpgradingRecords}</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground">Rejected records</dt>
+              <dd>{multicloudIngestion.rejectedRecords}</dd>
+            </div>
+            <div>
+              <dt className="font-medium text-foreground">Targets with evidence</dt>
+              <dd>{multicloudIngestion.targetsWithEvidence}</dd>
+            </div>
+          </dl>
+          {multicloudRejected.length > 0 ? (
+            <p className="mt-3 text-xs text-muted-foreground" data-testid="multicloud-rejected-records">
+              {multicloudRejected.length} supplied artifact record(s) were rejected as evidence and do not affect the
+              matrix: {multicloudRejected.map((entry) => entry.reasons.join('; ')).join(' | ')}
+            </p>
+          ) : null}
+          <p className="mt-3 text-xs text-muted-foreground">
+            Ingest artifacts with <code className="font-mono">node scripts/log-multicloud-evidence.mjs</code>. Each
+            IaC or manifest file must exist on disk and is recorded by SHA-256; only a passed validation upgrades a
+            stage, templates alone can never prove tested or verified, and verified is withheld until every lower
+            stage carries artifacts.
+          </p>
         </div>
       </SectionCard>
 

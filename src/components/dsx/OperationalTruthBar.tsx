@@ -9,6 +9,7 @@ import { ConnectionState, DataModeBadge, FreshnessIndicator, SafetyChip } from '
 import { EvidenceQualityBar } from './EvidenceQualityBar';
 import { capability } from '@/dsx/workspaces/availability';
 import { EVIDENCE_BETA_SITE } from '@/dsx/fixtures/evidenceBetaFacility';
+import { FIXTURE_DEMONSTRATION_NOTICE } from '@/dsx/runtime/evidenceFixturePolicy';
 
 function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
@@ -52,10 +53,17 @@ export function OperationalTruthBar() {
       data-mode={rt.snapshot.data_mode}
       className="v2-mono relative w-full min-w-0 max-w-full border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
+      <div
+        role="alert"
+        data-testid="evidence-demonstration-boundary"
+        className="border-b border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs font-medium text-amber-950 dark:text-amber-100 sm:px-4"
+      >
+        Demonstration workspace — not linked to your active facility. {FIXTURE_DEMONSTRATION_NOTICE}
+      </div>
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 px-3 py-2.5 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
         {/* Facility identity and the trust level of what is displayed. */}
         <Cluster label="Facility context">
-          <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
+          <Field label="Demonstration facility" value={EVIDENCE_BETA_SITE.name} />
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Chip label="Data mode">
               <DataModeBadge mode={rt.snapshot.data_mode} />

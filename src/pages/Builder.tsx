@@ -162,7 +162,9 @@ export default function Builder() {
   }, [authChecked, requestedTwinId, twinLoading, configuredTwins, activeTwinId, setActiveTwin]);
 
   useEffect(() => {
-    if (!authChecked || isInitialized) return;
+    // Builder creation fails closed before any data access when the
+    // server-verified active organization is absent.
+    if (!tenantVerified || isInitialized) return;
     if (!hasIntent) {
       setIsInitialized(true);
       return;
@@ -257,7 +259,7 @@ export default function Builder() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [effectiveCurrentStep]);
 
-  if (!authChecked || !isInitialized || twinLoading) {
+  if (rbacLoading || !authChecked || !isInitialized || twinLoading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background" role="status" aria-live="polite">
         <div className="space-y-4 text-center">
@@ -268,6 +270,28 @@ export default function Builder() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (!activeOrgId) {
+    return (
+      <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="tenant-required-heading">
+        <div className="mx-auto max-w-2xl space-y-6 text-center">
+          <Building2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+          <div className="space-y-2">
+            <h1 id="tenant-required-heading" className="text-2xl font-semibold">No active organization</h1>
+            <p className="text-sm text-muted-foreground">
+              The Builder requires a verified active organization before any facility data is loaded.
+              Your account has organization memberships, but none could be verified as active. An
+              administrator can set your active organization under People and Access.
+            </p>
+          </div>
+          <Button size="lg" onClick={() => navigate('/teams/access-control')}>
+            <Building2 className="mr-2 h-4 w-4" aria-hidden="true" />
+            Open People and Access
+          </Button>
+        </div>
+      </section>
     );
   }
 

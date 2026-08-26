@@ -9,7 +9,7 @@ import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
 
-const OUT = 'docs/remediation/hybrid-nvidia-runtime/evidence/reference-facility-ui/suspense-retry';
+const OUT = 'docs/remediation/evidence/route-stress';
 const COLD = Number(process.env.AURA_STRESS_COLD ?? 30);
 const WARM = Number(process.env.AURA_STRESS_WARM ?? 50);
 const BUDGET = Number(process.env.AURA_STRESS_BUDGET ?? 25_000);
@@ -69,7 +69,6 @@ async function settle(page: Page): Promise<Omit<Row, 'id' | 'mode' | 'url' | 'na
 }
 
 test('route-commit stress', async ({ browser }) => {
-  test.setTimeout(0);
   const rows: Row[] = [];
   const urls = (process.env.AURA_STRESS_URLS ?? '/data-centre-twin?geometry=aura,/data-centre-twin?geometry=nvidia-reference').split(',');
 

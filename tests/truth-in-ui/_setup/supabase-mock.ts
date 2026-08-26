@@ -31,7 +31,6 @@ import type { BrowserContext, Page, Route } from '@playwright/test';
 // `AURA_TRUTH_SUPABASE_URL`, or the ambient value when the suite is pointed at
 // an externally started server via `PLAYWRIGHT_BASE_URL`.
 export const SUPABASE_REF = 'psfvrskpnwcshvajzeix';
-export const TEST_ORG_ID = '00000000-0000-4000-8000-000000000010';
 const SUPABASE_HOST = `${SUPABASE_REF}.supabase.co`;
 const DEFAULT_TEST_SUPABASE_URL = 'http://127.0.0.1:54321';
 const AMBIENT_SUPABASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim()
@@ -264,37 +263,6 @@ export async function installSupabaseMock(
           },
         ]),
       );
-    }
-
-    // ---- Tenant authority -----------------------------------------
-    // Authenticated visual/truth fixtures represent one unambiguous tenant.
-    // This keeps Builder tests behind the same server-owned active-org contract
-    // as production instead of bypassing RBAC in the browser.
-    if (pathname.startsWith('/rest/v1/org_memberships')) {
-      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
-      return fulfillJson(JSON.stringify([{
-        org_id: TEST_ORG_ID,
-        role: 'owner',
-        status: 'active',
-        is_default: true,
-      }]));
-    }
-
-    if (pathname.startsWith('/rest/v1/organizations')) {
-      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
-      return fulfillJson(JSON.stringify([{
-        id: TEST_ORG_ID,
-        name: 'AURA Qualification Organization',
-        domain: 'aura.local',
-      }]));
-    }
-
-    if (pathname.startsWith('/rest/v1/rpc/active_org_id')) {
-      return fulfillJson(JSON.stringify(TEST_ORG_ID));
-    }
-
-    if (pathname.startsWith('/rest/v1/rpc/set_active_org')) {
-      return fulfillJson(JSON.stringify(TEST_ORG_ID));
     }
 
     // ---- RPC / other REST --------------------------------------

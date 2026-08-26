@@ -17,6 +17,12 @@ export interface AuraAnalyticsConfig {
   provider?: AuraAnalyticsProvider;
   posthogKey?: string;
   posthogHost?: string;
+  /**
+   * Governed server-side relay (observability-capture edge function). When
+   * set, the browser holds no provider key: events are posted to the relay,
+   * which re-validates and injects the server-held credential.
+   */
+  relayUrl?: string;
 }
 
 export interface AuraAnalyticsResult {
@@ -41,6 +47,10 @@ function configuredProvider(config: AuraAnalyticsConfig): AuraAnalyticsProvider 
 
 function posthogHost(config: AuraAnalyticsConfig): string | null {
   const raw = (config.posthogHost ?? 'https://us.i.posthog.com').trim();
+  return httpsOrLocalUrl(raw);
+}
+
+function httpsOrLocalUrl(raw: string): string | null {
   try {
     const url = new URL(raw);
     const allowed = url.protocol === 'https:'
@@ -50,6 +60,12 @@ function posthogHost(config: AuraAnalyticsConfig): string | null {
   } catch {
     return null;
   }
+}
+
+function relayEndpoint(config: AuraAnalyticsConfig): string | null {
+  const raw = config.relayUrl?.trim();
+  if (!raw) return null;
+  return httpsOrLocalUrl(raw);
 }
 
 export function sanitizeAnalyticsProperties(

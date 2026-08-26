@@ -317,6 +317,9 @@ export default function Builder() {
   }
 
   if (!hasIntent || initError || (!isLoading && !builderId)) {
+    const buildTarget = (facilityId: string) =>
+      `/builder?new=true&twin=${encodeURIComponent(facilityId)}&source=facility&type=3d_twin`;
+
     const startFacilityBuild = async () => {
       const activeConfiguredTwin = configuredTwins.find((candidate) => candidate.id === activeTwinId);
       const facilityId = activeConfiguredTwin?.id ?? configuredTwins[0]?.id;
@@ -325,7 +328,21 @@ export default function Builder() {
         return;
       }
       if (activeTwinId !== facilityId) await setActiveTwin(facilityId);
-      navigate(`/builder?new=true&twin=${encodeURIComponent(facilityId)}&source=facility&type=3d_twin`);
+
+      const target = buildTarget(facilityId);
+      const current = `${location.pathname}${location.search}`;
+      if (target === current) {
+        // Already on the canonical build URL. Navigating to an identical
+        // location is a router no-op, which made this control dead after a
+        // failed initialization. Retry in place instead, preserving every
+        // query parameter exactly as routed.
+        setInitError(null);
+        useWizardBuilderStore.getState().reset();
+        setIsInitialized(false);
+        return;
+      }
+
+      navigate(target);
     };
 
     return (
@@ -347,7 +364,7 @@ export default function Builder() {
             <div className="flex flex-wrap justify-center gap-3">
               <Button size="lg" onClick={() => void startFacilityBuild()}>
                 <Sparkles className="mr-2 h-4 w-4" aria-hidden="true" />
-                Start build
+                {initError ? 'Retry build' : 'Start build'}
               </Button>
               <Button variant="outline" size="lg" onClick={() => window.location.assign('/manage/facilities')}>
                 Change facility

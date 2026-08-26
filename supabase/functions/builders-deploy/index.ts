@@ -53,8 +53,8 @@ serve(createHandler({
     const hasDCWorkflows = Array.isArray(config.workflows) && config.workflows.length > 0;
     if (!hasStandardWorkflow && !hasDCWorkflows) errors.push('Workflow configuration is required');
 
-    const hasModelConfig = config.model_config?.model || config.intelligence?.modelId;
-    if (!hasModelConfig) errors.push('Model configuration is required');
+    const hasModelConfig = config.model_config?.response_profile || config.model_config?.model || config.intelligence?.modelId;
+    if (!hasModelConfig) errors.push('Response profile is required');
 
     let boundTwinId: string | null = null;
     if (effectiveType === '3d_twin' || effectiveType === 'process_twin') {
@@ -103,10 +103,13 @@ serve(createHandler({
       type: effectiveType,
       configuration_activated_at: nowIso,
       runtime_provisioned: false,
-      model_config: config.model_config || {
-        model: config.intelligence?.modelId || 'google/gemini-2.5-flash',
-        provider: config.intelligence?.modelProvider || 'google',
-      },
+      model_config: config.model_config || (
+        config.intelligence?.modelId
+          // Legacy drafts keep their stored identifiers readable until edited.
+          ? { model: config.intelligence.modelId, provider: config.intelligence?.modelProvider }
+          // New drafts persist only the provider-neutral response profile.
+          : { response_profile: 'balanced' }
+      ),
     };
 
     const { data: activatedAgent, error: activationError } = await supabase

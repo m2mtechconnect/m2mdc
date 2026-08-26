@@ -4,6 +4,7 @@
  */
 
 import { AgentBlueprint } from '@/types/agentBlueprint';
+import { DEFAULT_RESPONSE_PROFILE } from '@/lib/llm/responseProfiles';
 
 export type QuestionnaireAnswers = {
   // Step 1: Business Context
@@ -75,8 +76,9 @@ export function questionnaireToBlueprint(answers: QuestionnaireAnswers): AgentBl
 
     // Step 2: Intelligence Setup
     model: {
-      provider: 'gemini',
-      modelName: 'google/gemini-2.5-flash',
+      // Managed AI contract: persist only the stable response profile.
+      // Runtime provider/model resolution is server-owned.
+      responseProfile: DEFAULT_RESPONSE_PROFILE,
       temperature: answers.agentType === 'agent' ? 0.7 : 0.3, // More creative for agents
       topK: 20,
       topP: 0.95,

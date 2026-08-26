@@ -16,6 +16,7 @@ import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { useNavigate } from 'react-router-dom';
 import { WizardBuilderState } from '@/stores/wizardBuilderStore';
+import { DEFAULT_RESPONSE_PROFILE } from '@/lib/llm/responseProfiles';
 import { trackEvent } from '@/lib/telemetry';
 
 /**
@@ -44,9 +45,10 @@ export function blueprintToBuilderState(blueprint: AgentBlueprint): Partial<Wiza
     },
     
     modelConfig: {
-      provider: blueprint.model.provider || 'google',
-      model: blueprint.model.modelName || 'google/gemini-2.5-flash',
-      rag: blueprint.knowledge.documents?.length || blueprint.knowledge.urls?.length 
+      // Managed AI contract: hydrate only the stable response profile.
+      // Legacy raw provider/model keys are never written for new drafts.
+      response_profile: blueprint.model.responseProfile || DEFAULT_RESPONSE_PROFILE,
+      rag: blueprint.knowledge.documents?.length || blueprint.knowledge.urls?.length
         ? {
             enabled: true,
             sources: [

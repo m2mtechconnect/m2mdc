@@ -12,7 +12,7 @@ const copilotHealth = read('supabase/functions/copilot-health/index.ts');
 describe('P1 Batch A workspace settings authorization', () => {
   it('uses canonical effective permissions for workspace mutation authority', () => {
     expect(settings).toContain('useRBAC');
-    expect(settings).toContain("const { can } = useRBAC();");
+    expect(settings).toContain("const { can, loading: rbacLoading, activeOrgId } = useRBAC();");
     expect(settings).toContain("const isAdmin = can('tenant.manage_members');");
   });
 
@@ -22,7 +22,12 @@ describe('P1 Batch A workspace settings authorization', () => {
   });
 
   it('keeps active organization resolution server-authoritative', () => {
-    expect(settings).toContain("supabase.rpc('active_org_id')");
+    // The verified active organization comes from the hydrated RBAC shell,
+    // which resolves it through the server RPC. The page must not race an
+    // independent browser-side lookup.
+    expect(settings).toContain('activeOrgId');
+    expect(settings).toContain('if (rbacLoading) return; // wait for verified RBAC/session hydration');
+    expect(settings).not.toContain("supabase.rpc('active_org_id')");
     expect(settings).toContain("if (!organization || !isAdmin)");
   });
 });

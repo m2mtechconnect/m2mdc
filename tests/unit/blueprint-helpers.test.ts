@@ -55,7 +55,11 @@ describe('blueprintToBuilderState', () => {
     const builderState = blueprintToBuilderState(minimalBlueprint as any);
 
     expect(builderState.goal).toBe('Test description');
-    expect(builderState.modelConfig?.provider).toBe('gemini');
+    // Managed AI contract: only the stable response profile is hydrated;
+    // legacy raw provider/model keys are never written for new drafts.
+    expect(builderState.modelConfig?.response_profile).toBe('balanced');
+    expect(builderState.modelConfig?.provider).toBeUndefined();
+    expect(builderState.modelConfig?.model).toBeUndefined();
   });
 
   it('should map all required fields', () => {
@@ -81,8 +85,7 @@ describe('builderStateToBlueprint', () => {
       department: 'IT',
       type: 'agent' as const,
       modelConfig: {
-        provider: 'gemini',
-        model: 'google/gemini-2.5-flash',
+        response_profile: 'fast',
       },
       workflow: {
         triggers: [],
@@ -96,15 +99,34 @@ describe('builderStateToBlueprint', () => {
       lastSaved: null,
     };
 
-    const blueprint = builderStateToBlueprint(builderState, 'manual');
+    const blueprint = builderStateToBlueprint(builderState as any, 'manual');
 
     expect(blueprint.source).toBe('manual');
     expect(blueprint.description).toBe('Test goal');
     expect(blueprint.industry).toBe('Technology');
     expect(blueprint.department).toBe('IT');
     expect(blueprint.type).toBe('agent');
-    expect(blueprint.model.provider).toBe('gemini');
-    expect(blueprint.model.modelName).toBe('google/gemini-2.5-flash');
+    // Managed AI contract: only the stable response profile round-trips.
+    expect(blueprint.model.responseProfile).toBe('fast');
+    expect(blueprint.model.provider).toBeUndefined();
+    expect(blueprint.model.modelName).toBeUndefined();
+  });
+
+  it('never persists legacy raw provider or model identifiers', () => {
+    const builderState = {
+      builderId: 'legacy-id',
+      goal: 'Legacy draft',
+      // Legacy readable draft keys must not be re-emitted on save.
+      modelConfig: {
+        provider: 'legacy-provider',
+        model: 'legacy-model-id',
+      },
+    };
+
+    const blueprint = builderStateToBlueprint(builderState as any, 'manual');
+    expect(blueprint.model.responseProfile).toBe('balanced');
+    expect(blueprint.model.provider).toBeUndefined();
+    expect(blueprint.model.modelName).toBeUndefined();
   });
 
   it('should preserve source field', () => {
@@ -143,7 +165,7 @@ describe('Round-trip conversion', () => {
     expect(reconstructedBlueprint.industry).toBe(originalBlueprint.industry);
     expect(reconstructedBlueprint.department).toBe(originalBlueprint.department);
     expect(reconstructedBlueprint.type).toBe(originalBlueprint.type);
-    expect(reconstructedBlueprint.model.provider).toBe(originalBlueprint.model.provider);
-    expect(reconstructedBlueprint.model.modelName).toBe(originalBlueprint.model.modelName);
+    // The stable response profile is the only model selection that round-trips.
+    expect(reconstructedBlueprint.model.responseProfile).toBe(originalBlueprint.model.responseProfile);
   });
 });

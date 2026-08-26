@@ -38,7 +38,11 @@ describe('platform customer console boundary', () => {
   });
 
   it('admits tenant members to the normal shell without making them internal platform users', () => {
-    expect(router).toContain("resolution.status === 'internal' || resolution.status === 'tenant'");
+    // Internal, tenant and tenant-unresolved resolutions all keep the normal
+    // shell; only the internal plane gains platform privileges.
+    expect(router).toContain("resolution.status === 'internal'");
+    expect(router).toContain("resolution.status === 'tenant'");
+    expect(router).toContain("resolution.status === 'tenant-unresolved'");
     expect(rbac).toContain("| { status: 'tenant'; role: OrganizationRole; orgId: string }");
     expect(rbac).toContain("const isInternal = resolution.status === 'internal'");
   });

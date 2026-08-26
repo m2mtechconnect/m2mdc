@@ -2,22 +2,28 @@
  * Server-side provisioning for the AURA Connections control plane.
  *
  * Rules (do not relax without review):
- *   - Caller must present a valid session JWT and hold admin or owner.
+ *   - Caller must present a valid session JWT, an active organization and an
+ *     organization-scoped owner/admin grant.
+ *   - Tenant identity is derived server-side from active_org_id(). A caller
+ *     supplied tenant id is ignored and never confers authority.
  *   - Only connectors with IMPLEMENTED status and a runtime adapter may be
- *     instantiated. Everything else is refused with a named reason.
- *   - No credential material is accepted, stored or echoed here. Secret-bearing
- *     methods are provisioned unconfigured; the credential is submitted
- *     separately to the connection-credential vault function.
+ *     instantiated.
+ *   - No credential material is accepted, stored or echoed here.
  *   - Endpoint targets are server-owned; the caller never supplies a URL.
  *   - Activation requires a persisted PASSED health check.
- *   - Every transition writes a connection_audit_events row.
+ *   - Every transition writes a tenant-scoped audit event.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { resolveCallerTenant, tenantVisible, TENANT_FORBIDDEN } from '../_shared/connectionTenant.ts';
+import {
+  callerHasOrgRole,
+  CONNECTION_ADMIN_ROLES,
+  resolveCallerTenant,
+  tenantVisible,
+  TENANT_FORBIDDEN,
+  TENANT_REQUIRED,
+} from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -38,23 +44,34 @@ Deno.serve(async (req) => {
   if (req.method !== 'POST') return json(405, { error_code: 'method_not_allowed' });
 
   const correlationId = crypto.randomUUID();
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
-
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const authHeader = req.headers.get('Authorization') ?? '';
-  if (!authHeader.startsWith('Bearer ')) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
-  const { data: userData } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-  const user = userData?.user;
-  if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
-
-  const { data: roles } = await admin.from('user_roles').select('role').eq('user_id', user.id);
-  const isAdmin = (roles ?? []).some((r: { role: string }) => r.role === 'admin' || r.role === 'owner');
-  if (!isAdmin) {
-    return json(403, { error_code: 'forbidden', safe_message: 'Administrator role required.', correlation_id: correlationId });
+  if (!authHeader.startsWith('Bearer ')) {
+    return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
   }
 
-  // Tenant scope of the caller. The service-role client bypasses RLS, so this
-  // is the only thing standing between an admin and another tenant's records.
-  const callerTenantId = await resolveCallerTenant(admin, user.id);
+  const caller = createClient(
+    supabaseUrl,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+  const { data: authData, error: authError } = await caller.auth.getUser();
+  const user = authData?.user;
+  if (authError || !user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const callerTenantId = await resolveCallerTenant(caller);
+  if (!callerTenantId) return json(403, { ...TENANT_REQUIRED, correlation_id: correlationId });
+
+  const canManage = await callerHasOrgRole(caller, user.id, callerTenantId, CONNECTION_ADMIN_ROLES);
+  if (!canManage) {
+    return json(403, {
+      error_code: 'forbidden',
+      safe_message: 'Organization owner or administrator permission is required.',
+      correlation_id: correlationId,
+    });
+  }
+
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   let body: Record<string, unknown>;
   try {
@@ -66,9 +83,10 @@ Deno.serve(async (req) => {
 
   async function audit(fields: Record<string, unknown>) {
     await admin.from('connection_audit_events').insert({
-      actor_id: user!.id,
+      actor_id: user.id,
       correlation_id: correlationId,
       ...fields,
+      tenant_id: callerTenantId,
     });
   }
 
@@ -78,15 +96,22 @@ Deno.serve(async (req) => {
     const environment = String(body.environment ?? '');
     const direction = String(body.data_direction ?? 'READ');
     const authMethod = String(body.auth_method ?? '');
-    const tenantId = (body.tenant_id as string | null) || null;
-    const facilityId = (body.facility_id as string | null) || null;
-    const dataClasses = Array.isArray(body.data_classes) ? (body.data_classes as string[]).map(String) : [];
+    const facilityId = typeof body.facility_id === 'string' && body.facility_id ? body.facility_id : null;
+    const dataClasses = Array.isArray(body.data_classes) ? (body.data_classes as unknown[]).map(String) : [];
 
     if (!connectorId || displayName.length < 3 || !ENVIRONMENTS.has(environment) || !DIRECTIONS.has(direction)) {
-      return json(400, { error_code: 'invalid_request', safe_message: 'Connector, name, environment and direction are required.', correlation_id: correlationId });
+      return json(400, {
+        error_code: 'invalid_request',
+        safe_message: 'Connector, name, environment and direction are required.',
+        correlation_id: correlationId,
+      });
     }
     if ('credential' in body || 'secret' in body || 'password' in body || 'api_key' in body) {
-      return json(400, { error_code: 'credential_not_accepted', safe_message: 'Credential material is never accepted by this endpoint.', correlation_id: correlationId });
+      return json(400, {
+        error_code: 'credential_not_accepted',
+        safe_message: 'Credential material is never accepted by this endpoint.',
+        correlation_id: correlationId,
+      });
     }
 
     const { data: definition } = await admin
@@ -96,31 +121,61 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!definition) return json(404, { error_code: 'connector_not_found', correlation_id: correlationId });
     if (definition.implementation_status !== 'IMPLEMENTED' || !definition.runtime_adapter) {
-      return json(400, { error_code: 'connector_not_instantiable', safe_message: 'This connector has no runtime adapter, so no connection can be created.', correlation_id: correlationId });
+      return json(400, {
+        error_code: 'connector_not_instantiable',
+        safe_message: 'This connector has no runtime adapter, so no connection can be created.',
+        correlation_id: correlationId,
+      });
     }
     if (!definition.supported_auth_methods?.includes(authMethod)) {
-      return json(400, { error_code: 'unsupported_auth_method', safe_message: 'This connector does not support the selected authentication method.', correlation_id: correlationId });
+      return json(400, {
+        error_code: 'unsupported_auth_method',
+        safe_message: 'This connector does not support the selected authentication method.',
+        correlation_id: correlationId,
+      });
     }
     if (!(definition.supported_directions ?? []).some((d: string) => direction.includes(d))) {
-      return json(400, { error_code: 'unsupported_direction', safe_message: 'This connector does not support the selected direction.', correlation_id: correlationId });
+      return json(400, {
+        error_code: 'unsupported_direction',
+        safe_message: 'This connector does not support the selected direction.',
+        correlation_id: correlationId,
+      });
     }
-    if (tenantId) {
-      const { data: tenant } = await admin.from('organizations').select('id').eq('id', tenantId).maybeSingle();
-      if (!tenant) return json(400, { error_code: 'tenant_not_found', safe_message: 'The selected tenant does not exist.', correlation_id: correlationId });
-    }
-    if (!tenantVisible(tenantId, callerTenantId)) {
-      return json(403, { ...TENANT_FORBIDDEN, safe_message: 'A connection can only be created inside your own tenant.', correlation_id: correlationId });
-    }
+
     if (facilityId) {
-      const { data: facility } = await admin.from('data_centre_twins').select('id').eq('id', facilityId).maybeSingle();
-      if (!facility) return json(400, { error_code: 'facility_not_found', safe_message: 'The selected facility does not exist.', correlation_id: correlationId });
+      const { data: facility } = await admin
+        .from('data_centre_twins')
+        .select('id, org_id, metadata')
+        .eq('id', facilityId)
+        .maybeSingle();
+      if (!facility) {
+        return json(400, {
+          error_code: 'facility_not_found',
+          safe_message: 'The selected facility does not exist.',
+          correlation_id: correlationId,
+        });
+      }
+      if (facility.org_id !== callerTenantId) {
+        return json(403, {
+          error_code: 'facility_scope_violation',
+          safe_message: 'A connection can only target a facility in your active organization.',
+          correlation_id: correlationId,
+        });
+      }
+      if (facility.metadata?.provisioned === 'default_starter_twin') {
+        return json(400, {
+          error_code: 'placeholder_facility_not_allowed',
+          safe_message: 'Legacy starter facilities cannot be used for a connection.',
+          correlation_id: correlationId,
+        });
+      }
     }
 
     const { data: created, error } = await admin
       .from('connection_instances')
       .insert({
         connector_id: connectorId,
-        tenant_id: tenantId,
+        tenant_id: callerTenantId,
         facility_id: facilityId,
         environment,
         display_name: displayName,
@@ -157,7 +212,6 @@ Deno.serve(async (req) => {
       previous_state: null,
       new_state: 'READY_TO_TEST',
       facility_id: facilityId,
-      tenant_id: tenantId,
       evidence: { connector_id: connectorId, environment, direction, auth_method: authMethod, data_classes: dataClasses },
     });
 
@@ -177,7 +231,7 @@ Deno.serve(async (req) => {
       await admin.from('connection_instances').update({
         enabled: false,
         status: 'DISABLED',
-        status_reason: 'Disabled by an administrator.',
+        status_reason: 'Disabled by an organization administrator.',
       }).eq('id', connectionId);
       await audit({
         action: 'connection.deactivated',
@@ -213,8 +267,8 @@ Deno.serve(async (req) => {
       enabled: true,
       status: newStatus,
       status_reason: dataObserved
-        ? 'Last health check passed and data was observed.'
-        : 'Endpoint reachable and authorised. No data received yet.',
+        ? 'Last health check passed and connection-scoped data was observed.'
+        : 'Endpoint reachable and authorized. No connection-scoped data has been proven yet.',
     }).eq('id', connectionId);
 
     await audit({
@@ -237,7 +291,11 @@ Deno.serve(async (req) => {
       return json(403, { ...TENANT_FORBIDDEN, correlation_id: correlationId });
     }
     if (connection.is_system) {
-      return json(403, { error_code: 'system_connection', safe_message: 'System connections cannot be removed.', correlation_id: correlationId });
+      return json(403, {
+        error_code: 'system_connection',
+        safe_message: 'System connections cannot be removed.',
+        correlation_id: correlationId,
+      });
     }
     await audit({
       action: 'connection.deleted',

@@ -1,11 +1,7 @@
 /**
- * Connections — the operational control plane for customer-facing hybrid-stack
+ * Connections: operational control plane for customer-facing hybrid-stack
  * systems. Canonical route: /manage/integrations
  * Alias: /manage/connections
- *
- * Internal platform capability assessment lives at /admin/platform-readiness.
- * This workspace is for configured systems, data flows and connectors that
- * exchange facility, twin, storage or enterprise-workflow data with AURA.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -22,7 +18,6 @@ import { ConnectionsTab } from '@/components/connections/ConnectionsTab';
 import { CatalogueTab } from '@/components/connections/CatalogueTab';
 import { DataFlowsTab } from '@/components/connections/DataFlowsTab';
 import { DataStorageTab } from '@/components/connections/DataStorageTab';
-
 import { ActivityTab } from '@/components/connections/ActivityTab';
 import { ConnectionDetailDrawer } from '@/components/connections/ConnectionDetailDrawer';
 import { ConnectionSetupWizard } from '@/components/connections/ConnectionSetupWizard';
@@ -52,7 +47,6 @@ const TABS = [
   { value: 'activity', label: 'Health & audit' },
 ];
 
-
 function errorMessage(error: unknown): string | null {
   return error instanceof Error && error.message ? error.message : null;
 }
@@ -61,8 +55,10 @@ export default function Connections() {
   const [params, setParams] = useSearchParams();
   const tab = TABS.some((t) => t.value === params.get('tab')) ? (params.get('tab') as string) : 'overview';
   const { toast } = useToast();
-  const { role, can } = useRBAC();
-  const isAdmin = role === 'admin' || role === 'owner' || can('twin.edit');
+  const { can } = useRBAC();
+  // Credential and provisioning operations remain intentionally stricter than
+  // generic twin editing. The server independently enforces owner/admin org roles.
+  const isAdmin = can('tenant.manage_members');
 
   const definitions = useConnectorDefinitions();
   const connections = useConnectionInstances();
@@ -198,7 +194,7 @@ export default function Connections() {
 
   const loading = connections.isLoading || definitions.isLoading;
   const addConnectionReason = !isAdmin
-    ? 'Requires permission to edit the twin and manage connection configuration.'
+    ? 'Requires organization owner or administrator permission.'
     : primaryFailed
       ? 'Reload connection data before adding a connection.'
       : undefined;
@@ -223,7 +219,6 @@ export default function Connections() {
           ))}
         </TabsList>
       </div>
-
 
       <TabsContent value="overview" className="mt-4 min-w-0">
         <OverviewTab
@@ -274,7 +269,6 @@ export default function Connections() {
         />
       </TabsContent>
 
-
       <TabsContent value="catalogue" className="mt-4 min-w-0">
         <CatalogueTab
           definitions={definitions.data ?? []}
@@ -312,7 +306,6 @@ export default function Connections() {
           </>
         }
         meta={<CapabilityChips surface="connections" limit={4} />}
-
         actions={
           <>
             <Button variant="outline" className="h-10" onClick={() => { void refresh(); }} disabled={refreshing} aria-busy={refreshing}>

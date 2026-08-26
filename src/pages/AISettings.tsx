@@ -1,79 +1,102 @@
-import { useTranslation } from "react-i18next";
-import { Navigate } from "react-router-dom";
-import { useRBAC } from "@/contexts/RBACContext";
-import type { Permission } from "@/auth/permissions";
-import type { ReactNode } from "react";
-import { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { invokeEdgeFunction } from "@/hooks/useEdgeFunction";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, Shield, Database, CheckCircle, XCircle, Loader, Settings, Loader2, AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-import { DCCard, DCSectionHeader } from "@/components/dc-ui";
-import { KnowledgeSourceReadiness } from "@/components/agent/KnowledgeSourceReadiness";
+import { useEffect, useState, type ReactNode } from 'react';
+import { Link, Navigate } from 'react-router-dom';
+import { AlertTriangle, CheckCircle, Database, Loader2, Settings, Sparkles, XCircle } from 'lucide-react';
+import type { Permission } from '@/auth/permissions';
+import { useRBAC } from '@/contexts/RBACContext';
+import { invokeEdgeFunction } from '@/hooks/useEdgeFunction';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 
-const DEFAULT_SYSTEM_PROMPT = `You are AURA Assistant inside an enterprise control center.
-Be concise and business-ready.
-Always cite sources when grounding is enabled.
-If you are unsure, say so and suggest a next step.
-Respect user role (Executive | Manager | Engineer).
-Never expose secrets or internal IDs.`;
-
-const DEFAULT_EXTERNAL_MODEL = 'gemini-3.5-flash';
-const FAST_EXTERNAL_MODEL = 'gemini-3.5-flash-lite';
-const SUPPORTED_EXTERNAL_MODELS = new Set([
-  DEFAULT_EXTERNAL_MODEL,
-  FAST_EXTERNAL_MODEL,
-]);
-const LEGACY_FAST_MODELS = new Set([
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-001',
-  'gemini-1.5-flash-002',
-]);
-
-/**
- * Browser-saved AI settings can outlive a provider model. Migrate the model
- * choice onto the supported response profiles instead of silently submitting a
- * retired identifier to the external managed-AI health probe.
- */
-function normalizeExternalModel(value: unknown): string {
-  if (typeof value !== 'string') return DEFAULT_EXTERNAL_MODEL;
-  if (SUPPORTED_EXTERNAL_MODELS.has(value)) return value;
-  if (LEGACY_FAST_MODELS.has(value)) return FAST_EXTERNAL_MODEL;
-  return DEFAULT_EXTERNAL_MODEL;
+interface RuntimeProfile {
+  id: string;
+  label: string;
+  description: string;
+  available: boolean;
 }
 
-const RESIDENCY_LABELS: Record<string, string> = {
-  'northamerica-northeast1': 'Canada',
-  'us-central1': 'United States',
-  'europe-west1': 'Europe',
-};
+interface RuntimeConfig {
+  runtimeControl: 'server_owned';
+  ready: boolean;
+  managedAi: { available: boolean };
+  groundingSearch: { available: boolean; reason: string };
+  profiles: RuntimeProfile[];
+}
 
-interface HealthProbe {
+interface ProbeResult {
   status: 'ok' | 'error' | 'disabled' | 'not_applicable';
   latency?: number;
   error?: string;
 }
 
-/** Provider-neutral contract returned by the managed AI health probe. */
 interface HealthStatus {
-  managedAi: HealthProbe;
-  groundingSearch: HealthProbe;
-  residency: string;
+  runtimeControl: 'server_owned';
+  managedAi: ProbeResult;
+  groundingSearch: ProbeResult;
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
 
-/**
- * Defense in depth for P1-1. The route is wrapped in PermissionRouteGuard, but
- * this page governs agent grounding and safety configuration and previously
- * carried no authorization check of its own.
- */
+function normalizeRuntimeConfig(value: unknown): RuntimeConfig {
+  const payload = asRecord(value);
+  const managedAi = asRecord(payload.managedAi);
+  const groundingSearch = asRecord(payload.groundingSearch);
+  const profiles = Array.isArray(payload.profiles)
+    ? payload.profiles.flatMap((entry) => {
+        const profile = asRecord(entry);
+        return typeof profile.id === 'string' && typeof profile.label === 'string' && typeof profile.description === 'string'
+          ? [{
+              id: profile.id,
+              label: profile.label,
+              description: profile.description,
+              available: profile.available === true,
+            }]
+          : [];
+      })
+    : [];
+
+  return {
+    runtimeControl: 'server_owned',
+    ready: payload.ready === true && managedAi.available === true,
+    managedAi: { available: managedAi.available === true },
+    groundingSearch: {
+      available: groundingSearch.available === true,
+      reason: typeof groundingSearch.reason === 'string'
+        ? groundingSearch.reason
+        : 'Grounding readiness is not available from the server-owned runtime.',
+    },
+    profiles,
+  };
+}
+
+function normalizeProbe(value: unknown, fallbackStatus: ProbeResult['status'], fallbackError: string): ProbeResult {
+  const payload = asRecord(value);
+  const status = payload.status;
+  const validStatus = status === 'ok' || status === 'error' || status === 'disabled' || status === 'not_applicable';
+  return {
+    status: validStatus ? status : fallbackStatus,
+    ...(typeof payload.latency === 'number' ? { latency: payload.latency } : {}),
+    ...(typeof payload.error === 'string' ? { error: payload.error } : { error: fallbackError }),
+  };
+}
+
+function normalizeHealthStatus(value: unknown): HealthStatus {
+  const payload = asRecord(value);
+  return {
+    runtimeControl: 'server_owned',
+    managedAi: normalizeProbe(payload.managedAi, 'error', 'Managed AI health evidence was incomplete.'),
+    groundingSearch: normalizeProbe(
+      payload.groundingSearch,
+      'disabled',
+      'Grounding is not exposed by the current server-owned AURA runtime contract.',
+    ),
+  };
+}
+
 function RequirePermission({ permission, children }: { permission: Permission; children: ReactNode }) {
   const { resolution, can } = useRBAC();
   if (resolution.status === 'loading') return null;
@@ -82,409 +105,151 @@ function RequirePermission({ permission, children }: { permission: Permission; c
 }
 
 function AISettingsPage() {
-  const { t } = useTranslation();
-  const [projectId, setProjectId] = useState("");
-  const [region, setRegion] = useState("northamerica-northeast1");
-  const [model, setModel] = useState(DEFAULT_EXTERNAL_MODEL);
-  const [groundingEnabled, setGroundingEnabled] = useState(false);
-  const [dataStoreId, setDataStoreId] = useState("");
-  const [topK, setTopK] = useState(20);
-  const [topN, setTopN] = useState(6);
-  const [maxTokens, setMaxTokens] = useState(1024);
-  const [temperature, setTemperature] = useState(0.3);
-  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_SYSTEM_PROMPT);
-  const [safetySettings, setSafetySettings] = useState({
-    hate: true,
-    harassment: true,
-    sexual: true,
-    dangerous: true
-  });
-  const [isChecking, setIsChecking] = useState(false);
-  const [healthStatus, setHealthStatus] = useState<HealthStatus | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ projectId?: string; dataStoreId?: string }>({});
+  const { can } = useRBAC();
+  const [runtime, setRuntime] = useState<RuntimeConfig | null>(null);
+  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load saved settings on mount
-  useEffect(() => {
+  async function loadRuntime() {
+    setLoading(true);
+    setError(null);
     try {
-      const stored = localStorage.getItem('copilot_settings');
-      if (stored) {
-        const settings = JSON.parse(stored);
-        if (settings.projectId) setProjectId(settings.projectId);
-        if (settings.region) setRegion(settings.region);
-        setModel(normalizeExternalModel(settings.model));
-        if (typeof settings.groundingEnabled === 'boolean') setGroundingEnabled(settings.groundingEnabled);
-        if (settings.dataStoreId) setDataStoreId(settings.dataStoreId);
-        if (typeof settings.topK === 'number') setTopK(settings.topK);
-        if (typeof settings.topN === 'number') setTopN(settings.topN);
-        if (typeof settings.maxTokens === 'number') setMaxTokens(settings.maxTokens);
-        if (typeof settings.temperature === 'number') setTemperature(settings.temperature);
-        if (settings.systemPrompt) setSystemPrompt(settings.systemPrompt);
-        if (settings.safetySettings) setSafetySettings(settings.safetySettings);
-      }
-    } catch (error) {
-      console.error('Failed to load AI settings:', error);
-      setLoadError('Stored configuration was unreadable and has been reset.');
-      localStorage.removeItem('copilot_settings');
+      const data = await invokeEdgeFunction('ai-config', {});
+      setRuntime(normalizeRuntimeConfig(data));
+    } catch (cause) {
+      setRuntime(normalizeRuntimeConfig(null));
+      setError(cause instanceof Error ? cause.message : 'Managed AI readiness could not be loaded.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    document.title = 'AI Runtime & Policies | AURA DC';
+    void loadRuntime();
   }, []);
 
-  const validate = (): boolean => {
-    const errs: { projectId?: string; dataStoreId?: string } = {};
-    if (!projectId.trim()) errs.projectId = 'Project ID is required';
-    if (groundingEnabled && !dataStoreId.trim()) {
-      errs.dataStoreId = 'Data Store ID is required when grounding is enabled';
-    }
-    setFieldErrors(errs);
-    return Object.keys(errs).length === 0;
-  };
-
-  const handleSave = async () => {
-    if (isSaving) return;
-    setSaveError(null);
-    if (!validate()) {
-      toast.error('Please fix validation errors before saving');
-      return;
-    }
-    setIsSaving(true);
+  async function runHealthCheck() {
+    if (checking) return;
+    setChecking(true);
+    setError(null);
     try {
-      const settings = {
-        projectId,
-        region,
-        model,
-        groundingEnabled,
-        dataStoreId,
-        topK,
-        topN,
-        maxTokens,
-        temperature,
-        systemPrompt,
-        safetySettings
-      };
-      localStorage.setItem('copilot_settings', JSON.stringify(settings));
-      toast.success('AI settings saved successfully');
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to save settings';
-      setSaveError(msg);
-      toast.error(msg);
+      const data = await invokeEdgeFunction('copilot-health', {});
+      setHealth(normalizeHealthStatus(data));
+    } catch (cause) {
+      setHealth(normalizeHealthStatus(null));
+      setError(cause instanceof Error ? cause.message : 'Managed AI health check failed.');
     } finally {
-      setIsSaving(false);
+      setChecking(false);
     }
-  };
+  }
 
-  if (isLoading) {
+  if (loading) {
     return (
-      <main
-          className="flex items-center justify-center min-h-[60vh]"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <div className="text-center space-y-3">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" aria-hidden="true" />
-            <p className="text-sm text-muted-foreground">Loading AI configuration…</p>
-          </div>
+      <main className="flex min-h-[60vh] items-center justify-center" role="status" aria-live="polite" aria-busy="true">
+        <div className="space-y-3 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+          <p className="text-sm text-muted-foreground">Loading AI runtime readiness...</p>
+        </div>
       </main>
     );
   }
 
-  const handleHealthCheck = async () => {
-    setIsChecking(true);
-    try {
-      const data = await invokeEdgeFunction('copilot-health', {
-        projectId, region, model, groundingEnabled, dataStoreId
-      });
-
-      setHealthStatus(data as HealthStatus);
-      
-      if (data?.managedAi?.status === 'ok' && (!groundingEnabled || data?.groundingSearch?.status === 'ok')) {
-        toast.success("Health check passed!");
-      } else {
-        toast.error("Health check failed. Check the results below.");
-      }
-    } catch (error) {
-      toast.error("Health check failed");
-      console.error(error);
-    } finally {
-      setIsChecking(false);
-    }
-  };
+  const managedOk = health?.managedAi.status === 'ok';
+  const runtimeAvailable = runtime?.managedAi.available === true;
 
   return (
-    <div className="w-full min-w-0 py-8 space-y-8" data-testid="ai-settings-workspace">
-        <DCSectionHeader
-          as="h1"
-          title={t("aiSettings.title")}
-          subtitle={t("aiSettings.subtitle")}
-          icon={<Settings className="h-5 w-5 text-primary" />}
-        />
+    <div className="w-full min-w-0 space-y-6 py-8" data-testid="ai-settings-workspace">
+      <DCSectionHeader
+        as="h1"
+        title="AI Runtime & Policies"
+        subtitle="Readiness and policy for AURA-managed intelligence. Provider, model, project and credential authority remains server-owned."
+        icon={<Settings className="h-5 w-5 text-primary" />}
+      />
 
-        <div
-          role="note"
-          className="rounded-md border border-border bg-muted/30 p-3 text-xs text-muted-foreground"
-        >
-          These settings are stored in your current browser only. They are
-          not synced to a server, are not shared with other users, and
-          clearing browser storage removes them. No credentials or API
-          keys are stored here.
+      <div role="note" className="rounded-md border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+        This browser does not configure the AI provider, raw model identifier, cloud project, residency region or provider credentials.
+        Those runtime decisions are controlled by trusted server configuration. This page reports what AURA can actually execute.
+      </div>
+
+      {error && (
+        <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+          <span>{error}</span>
         </div>
+      )}
 
-        {loadError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{loadError}</span>
+      <DCCard title="Managed AI runtime" icon={<Sparkles className="h-5 w-5 text-primary" />} status={runtimeAvailable ? 'operational' : 'critical'}>
+        <div className="space-y-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">Server-owned runtime</Badge>
+            <Badge variant={runtimeAvailable ? 'default' : 'destructive'}>
+              {runtimeAvailable ? 'Runtime configured' : 'Runtime unavailable'}
+            </Badge>
           </div>
-        )}
-
-        <DCCard
-          title="Managed AI configuration"
-          icon={<Sparkles className="h-5 w-5 text-primary" />}
-          status="neutral"
-        >
-          <div className="grid gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="ai-project-id">Managed AI Workspace ID</Label>
-              <Input 
-                id="ai-project-id"
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(e.target.value);
-                  if (fieldErrors.projectId) setFieldErrors((p) => ({ ...p, projectId: undefined }));
-                }}
-                placeholder="your-workspace-id"
-                aria-invalid={!!fieldErrors.projectId}
-                aria-describedby={fieldErrors.projectId ? 'ai-project-id-error' : undefined}
-              />
-              {fieldErrors.projectId && (
-                <p id="ai-project-id-error" role="alert" className="text-xs text-destructive">
-                  {fieldErrors.projectId}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Data residency</Label>
-              <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger aria-label="Data residency">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value="northamerica-northeast1">Canada</SelectItem>
-                  <SelectItem value="us-central1">United States</SelectItem>
-                  <SelectItem value="europe-west1">Europe</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Response profile</Label>
-              <Select value={model} onValueChange={setModel}>
-                <SelectTrigger aria-label="Response profile">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-card z-50">
-                  <SelectItem value={DEFAULT_EXTERNAL_MODEL}>Balanced (recommended)</SelectItem>
-                  <SelectItem value={FAST_EXTERNAL_MODEL}>Fast</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                The selected profile is validated only when you run the health check.
-              </p>
-            </div>
-          </div>
-        </DCCard>
-
-        <DCCard
-          title="Grounding search"
-          icon={<Database className="h-5 w-5 text-primary" />}
-          status="info"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <div className="space-y-0.5">
-              <Label>Enable Grounding</Label>
-              <p className="text-xs text-muted-foreground">Connect to your approved grounding search index</p>
-            </div>
-            <Switch
-              checked={groundingEnabled}
-              onCheckedChange={setGroundingEnabled}
-              aria-label="Enable grounding search"
-            />
-          </div>
-
-          {groundingEnabled && (
-            <div className="space-y-6 pl-4 border-l-2 border-primary/20">
-              <div className="space-y-2">
-                <Label htmlFor="ai-datastore-id">Data Store / Index ID</Label>
-                <Input 
-                  id="ai-datastore-id"
-                  value={dataStoreId}
-                  onChange={(e) => {
-                    setDataStoreId(e.target.value);
-                    if (fieldErrors.dataStoreId) setFieldErrors((p) => ({ ...p, dataStoreId: undefined }));
-                  }}
-                  placeholder="your-data-store-id"
-                  aria-invalid={!!fieldErrors.dataStoreId}
-                  aria-describedby={fieldErrors.dataStoreId ? 'ai-datastore-id-error' : undefined}
-                />
-                {fieldErrors.dataStoreId && (
-                  <p id="ai-datastore-id-error" role="alert" className="text-xs text-destructive">
-                    {fieldErrors.dataStoreId}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Top-K Documents</Label>
-                  <span className="text-sm font-mono text-primary">{topK}</span>
+          <p className="text-sm text-muted-foreground">
+            AURA exposes stable response profiles to product workflows. A profile is available only when the server-owned managed runtime is configured.
+          </p>
+          <div className="grid gap-3 md:grid-cols-3">
+            {(runtime?.profiles ?? []).map((profile) => (
+              <div key={profile.id} className="rounded-lg border border-border p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-foreground">{profile.label}</p>
+                  <Badge variant="outline" className="text-xs">{profile.available ? 'Available' : 'Unavailable'}</Badge>
                 </div>
-                <Slider value={[topK]} onValueChange={([v]) => setTopK(v)} min={5} max={50} step={5} aria-label="Top-K documents" />
-                <p className="text-xs text-muted-foreground">Initial documents to retrieve</p>
+                <p className="mt-1 text-xs text-muted-foreground">{profile.description}</p>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <Label>Rerank to Top-N</Label>
-                  <span className="text-sm font-mono text-primary">{topN}</span>
-                </div>
-                <Slider value={[topN]} onValueChange={([v]) => setTopN(v)} min={1} max={10} step={1} aria-label="Rerank to top-N" />
-                <p className="text-xs text-muted-foreground">Final snippets for generation</p>
-              </div>
-            </div>
-          )}
-        </DCCard>
-
-        <KnowledgeSourceReadiness />
-
-        <DCCard
-          title="Generation Parameters"
-          icon={<Shield className="h-5 w-5 text-primary" />}
-          status="neutral"
-        >
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Max Tokens</Label>
-                <span className="text-sm font-mono">{maxTokens}</span>
-              </div>
-              <Slider value={[maxTokens]} onValueChange={([v]) => setMaxTokens(v)} min={256} max={8192} step={256} aria-label="Maximum tokens" />
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <Label>Temperature</Label>
-                <span className="text-sm font-mono">{temperature.toFixed(1)}</span>
-              </div>
-              <Slider value={[temperature * 10]} onValueChange={([v]) => setTemperature(v / 10)} min={0} max={10} step={1} aria-label="Temperature" />
-              <p className="text-xs text-muted-foreground">Lower = more factual, Higher = more creative</p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>System Prompt</Label>
-              <Textarea 
-                value={systemPrompt}
-                onChange={(e) => setSystemPrompt(e.target.value)}
-                rows={8}
-                className="font-mono text-sm"
-              />
-            </div>
+            ))}
           </div>
-        </DCCard>
-
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <Button
-            onClick={handleSave}
-            size="lg"
-            className="flex-1"
-            disabled={isSaving}
-            aria-busy={isSaving}
-          >
-            {isSaving ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
-                Saving…
-              </>
-            ) : (
-              'Save Configuration'
-            )}
-          </Button>
-          <Button onClick={handleHealthCheck} size="lg" variant="outline" disabled={isChecking}>
-            {isChecking ? <Loader className="h-4 w-4 animate-spin mr-2" aria-hidden="true" /> : null}
-            Run Health Check
+          <Button onClick={runHealthCheck} variant="outline" disabled={checking || !runtimeAvailable} aria-busy={checking}>
+            {checking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : null}
+            Run runtime health check
           </Button>
         </div>
+      </DCCard>
 
-        {saveError && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
-          >
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
-            <span>{saveError}</span>
+      <DCCard title="Grounding and retrieval" icon={<Database className="h-5 w-5 text-primary" />} status="neutral">
+        <div className="space-y-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="outline">{runtime?.groundingSearch.available === true ? 'Available' : 'Not exposed'}</Badge>
           </div>
-        )}
+          <p className="text-muted-foreground">
+            {runtime?.groundingSearch.reason ?? 'Grounding readiness is not available.'}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            A browser-local index identifier is not treated as proof that a grounding service is configured or reachable.
+          </p>
+        </div>
+      </DCCard>
 
-        {healthStatus && (
-          <DCCard
-            title="Health Check Results"
-            status={healthStatus.managedAi.status === 'ok' ? 'operational' : 'critical'}
-          >
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex items-center gap-3">
-                  {healthStatus.managedAi.status === 'ok' ? (
-                    <CheckCircle className="h-5 w-5 text-green-500" />
-                  ) : (
-                    <XCircle className="h-5 w-5 text-red-500" />
-                  )}
-                  <div>
-                    <p className="font-medium">Managed AI</p>
-                    {healthStatus.managedAi.error && (
-                      <p className="text-xs text-red-500">{healthStatus.managedAi.error}</p>
-                    )}
-                  </div>
+      {health && (
+        <DCCard title="Runtime health evidence" status={managedOk ? 'operational' : 'critical'}>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/30 p-3">
+              <div className="flex items-center gap-3">
+                {managedOk ? <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" /> : <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />}
+                <div>
+                  <p className="font-medium">Managed AI</p>
+                  <p className="text-xs text-muted-foreground">{health.managedAi.error ?? 'Server-owned execution path responded successfully.'}</p>
                 </div>
-                {healthStatus.managedAi.latency && (
-                  <Badge variant="outline">{healthStatus.managedAi.latency}ms</Badge>
-                )}
               </div>
-
-              {groundingEnabled && (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                  <div className="flex items-center gap-3">
-                    {healthStatus.groundingSearch.status === 'ok' ? (
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500" />
-                    )}
-                    <div>
-                      <p className="font-medium">Grounding Search</p>
-                      {healthStatus.groundingSearch.error && (
-                        <p className="text-xs text-red-500">{healthStatus.groundingSearch.error}</p>
-                      )}
-                    </div>
-                  </div>
-                  {healthStatus.groundingSearch.latency && (
-                    <Badge variant="outline">{healthStatus.groundingSearch.latency}ms</Badge>
-                  )}
-                </div>
-              )}
-
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <p className="font-medium">Data residency</p>
-                <Badge variant="secondary">{RESIDENCY_LABELS[healthStatus.residency] ?? healthStatus.residency}</Badge>
-              </div>
+              {typeof health.managedAi.latency === 'number' && <Badge variant="outline">{health.managedAi.latency} ms</Badge>}
             </div>
-          </DCCard>
-        )}
+            <div className="rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground">
+              Grounding: {health.groundingSearch.status}. {health.groundingSearch.error ?? ''}
+            </div>
+          </div>
+        </DCCard>
+      )}
+
+      {can('platform.view_admin_console') && (
+        <p className="text-xs text-muted-foreground">
+          Platform administrators can inspect named accelerated-AI reference evidence and runtime blockers in the{' '}
+          <Link to="/admin/accelerated-ai-capabilities" className="underline underline-offset-4">accelerated AI capability registry</Link>.
+        </p>
+      )}
     </div>
   );
 }

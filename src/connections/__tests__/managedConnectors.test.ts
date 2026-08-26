@@ -44,7 +44,7 @@ function ctx(overrides: Partial<AuthorizationContext> = {}): AuthorizationContex
 }
 
 describe('managed shared connector authorization', () => {
-  it('allows an authorized read', () => {
+  it('allows an authorized tenant-bound read', () => {
     expect(authorizeManagedOperation(ctx()).allowed).toBe(true);
   });
 
@@ -65,6 +65,16 @@ describe('managed shared connector authorization', () => {
 
   it('rejects cross-tenant access', () => {
     const d = authorizeManagedOperation(ctx({ actor_tenant_id: 'tenant-b' }));
+    expect(d.reason_code).toBe('tenant_scope_violation');
+  });
+
+  it('rejects a null connection tenant instead of treating it as global', () => {
+    const d = authorizeManagedOperation(ctx({ connection: { ...ctx().connection, tenant_id: null } }));
+    expect(d.reason_code).toBe('tenant_scope_violation');
+  });
+
+  it('rejects a caller with no active organization', () => {
+    const d = authorizeManagedOperation(ctx({ actor_tenant_id: null }));
     expect(d.reason_code).toBe('tenant_scope_violation');
   });
 

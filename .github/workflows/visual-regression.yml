@@ -7,6 +7,7 @@ on:
       - 'src/**/*.tsx'
       - 'src/**/*.css'
       - 'src/index.css'
+      - 'src/config/appNavigation.ts'
       - 'tests/visual/**'
       - 'scripts/verify-visual-fingerprints.mjs'
       - 'playwright.visual.config.ts'
@@ -67,9 +68,14 @@ jobs:
         env:
           AURA_CAPTURE_CURRENT_HEAD: '1'
         run: |
-          rm -rf tests/visual/snapshots.spec.ts-snapshots
+          rm -rf tests/visual/snapshots.spec.ts-snapshots tests/visual/activation.spec.ts-snapshots
           bunx playwright test --config=playwright.visual.config.ts
+          mkdir -p tests/visual/snapshots.spec.ts-snapshots
+          if compgen -G 'tests/visual/activation.spec.ts-snapshots/*.png' > /dev/null; then
+            cp tests/visual/activation.spec.ts-snapshots/*.png tests/visual/snapshots.spec.ts-snapshots/
+          fi
           echo "Fresh screenshots are review evidence only. This job never commits or pushes baselines." >> "$GITHUB_STEP_SUMMARY"
+          echo "Activation screenshots are consolidated into the same reviewed release artifact." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Enforce visual gate
         run: node scripts/verify-visual-fingerprints.mjs tests/visual/snapshots.spec.ts-snapshots tests/visual/approved-linux-visuals.json
@@ -88,4 +94,4 @@ jobs:
         run: |
           echo "Release source SHA: $AURA_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Global application contract: light theme. Scoped NOC dark styling is tested separately from global mode." >> "$GITHUB_STEP_SUMMARY"
-          echo "Screenshots are generated fresh, then checked against the approved SHA-256/dimension manifest. CI never updates the manifest." >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are generated fresh, activation evidence is consolidated into the lifecycle artifact, then all files are checked against the approved SHA-256/dimension manifest. CI never updates the manifest." >> "$GITHUB_STEP_SUMMARY"

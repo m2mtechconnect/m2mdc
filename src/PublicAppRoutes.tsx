@@ -14,7 +14,6 @@ const SignOut = lazy(() => loadAuthPages().then((module) => ({ default: module.S
 const ForgotPassword = lazy(() => loadAuthPages().then((module) => ({ default: module.ForgotPassword })));
 const MFA = lazy(() => loadAuthPages().then((module) => ({ default: module.MFA })));
 const AuthCallback = lazy(() => loadAuthPages().then((module) => ({ default: module.AuthCallback })));
-const Onboarding = lazy(() => import('./pages/Onboarding'));
 const ManagedUserReturn = lazy(() => import('@/pages/oauth/ManagedUserReturn'));
 const InviteSignInRedirect = lazy(() =>
   import('@/routing/InviteSignInRedirect').then((module) => ({ default: module.InviteSignInRedirect })),
@@ -30,10 +29,15 @@ export const withPublicRouteFallback = (element: ReactNode) => (
   <Suspense fallback={publicRouteFallback}>{element}</Suspense>
 );
 
-/** Public routes contain no eager auth, RBAC or active-twin imports. */
+/**
+ * Public entry routes.
+ *
+ * Account creation must never depend on a browser-local questionnaire flag.
+ * The retired anonymous questionnaire cannot satisfy the authenticated
+ * public-intake boundary, so /onboarding is a compatibility alias to account
+ * creation. Product setup begins after authentication and approval.
+ */
 export default function PublicAppRoutes() {
-  const onboardingDone = localStorage.getItem('onboarding_completed') === 'true';
-
   return (
     <Routes>
       <Route path="/" element={<DataCentreTwinLanding />} />
@@ -41,7 +45,8 @@ export default function PublicAppRoutes() {
       <Route path="/login" element={withPublicRouteFallback(<SignIn />)} />
       <Route path="/auth/callback" element={withPublicRouteFallback(<AuthCallback />)} />
       <Route path="/sign-in" element={<Navigate to="/login" replace />} />
-      <Route path="/sign-up" element={onboardingDone ? withPublicRouteFallback(<SignUp />) : <Navigate to="/onboarding" replace />} />
+      <Route path="/sign-up" element={withPublicRouteFallback(<SignUp />)} />
+      <Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
       <Route path="/mfa" element={withPublicRouteFallback(<MFA />)} />
@@ -49,7 +54,6 @@ export default function PublicAppRoutes() {
       <Route path="/data-centre-twin" element={withPublicRouteFallback(<PublicDataCentreTwin />)} />
       <Route path="/twin-preview" element={withPublicRouteFallback(<TwinPreview />)} />
       <Route path="/omniverse-scene" element={<Navigate to="/twin-preview" replace />} />
-      <Route path="/onboarding" element={withPublicRouteFallback(<Onboarding />)} />
       <Route path="/oauth/managed-user/return" element={withPublicRouteFallback(<ManagedUserReturn />)} />
       <Route path="/invite/accept" element={withPublicRouteFallback(<InviteSignInRedirect />)} />
       {import.meta.env.DEV && OverlayFixtures ? <Route path="/dev-overlays" element={<OverlayFixtures />} /> : null}

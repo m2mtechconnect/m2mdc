@@ -1,294 +1,153 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from 'react-i18next';
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useRBAC } from "@/contexts/RBACContext";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ModelPreview } from "@/components/builder/ModelPreview";
-import { ROICalculator } from "@/components/builder/ROICalculator";
-import { GroundedRecommendationsCard } from "@/components/builder/GroundedRecommendationsCard";
-import { DeployReadinessChecks } from "@/components/deploy/DeployReadinessChecks";
-import {
-  openDeployment,
-  appendDeploymentEvent,
-  closeDeployment,
-} from "@/workspace/deploymentRecords";
-import { SimulationChecklist } from "@/components/simulation/SimulationChecklist";
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertTriangle, 
-  Rocket,
-  ArrowLeft,
-  Server,
-  Cpu,
-  Zap,
-  Activity
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { DCCard } from "@/components/dc-ui/DCCard";
-import { DCKPITile } from "@/components/dc-ui/DCKPITile";
-import { stackLabel } from '@/config/auraStackManifest';
-import { modelDisplayLabel } from '@/lib/llm/modelLabels';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Activity, ArrowLeft, CheckCircle2, CircleAlert, Cpu, Loader2, Rocket, Server, Wrench } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useRBAC } from '@/contexts/RBACContext';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { DCCard } from '@/components/dc-ui/DCCard';
+import { DCKPITile } from '@/components/dc-ui/DCKPITile';
 import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 import { DeploymentEvidenceCard } from '@/components/deploy/DeploymentEvidenceCard';
-
+import { stackLabel } from '@/config/auraStackManifest';
+import { modelDisplayLabel } from '@/lib/llm/modelLabels';
+import {
+  appendDeploymentEvent,
+  closeDeployment,
+  openDeployment,
+} from '@/workspace/deploymentRecords';
 
 interface SystemSummary {
   name: string;
-  department: string;
-  outcome?: string;
-  successMetric?: string;
-  template: string;
-  model: string;
+  status: string;
+  model: string | null;
   grounding: boolean;
-  connectedTools: number;
+  workflowId: string | null;
+  connectorCount: number;
+  toolCount: number;
 }
 
-interface ValidationIssue {
-  field: string;
-  message: string;
-  fixStep: number;
-  severity: 'error' | 'warning';
-}
-
-interface DeploymentStage {
+interface ActivationStage {
   name: string;
   status: 'pending' | 'running' | 'complete' | 'failed';
 }
 
+const STAGE_NAMES = [
+  'Validate saved configuration',
+  'Inspect saved workflow',
+  'Activate configuration in AURA',
+  'Resolve configured connections',
+  'Record activation evidence',
+];
+
 export default function Deploy() {
-  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const systemId = searchParams.get('id');
   const { toast } = useToast();
-  const { role, hasAccess } = useRBAC();
+  const { can } = useRBAC();
 
   const [summary, setSummary] = useState<SystemSummary | null>(null);
-  const [validationIssues, setValidationIssues] = useState<ValidationIssue[]>([]);
-  const [isDeploying, setIsDeploying] = useState(false);
-  const [deploymentStages, setDeploymentStages] = useState<DeploymentStage[]>([]);
-  const [showProgressModal, setShowProgressModal] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [roiMetrics, setRoiMetrics] = useState<any>(null);
+  const [activating, setActivating] = useState(false);
+  const [stages, setStages] = useState<ActivationStage[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const canDeploy = hasAccess(['manager', 'executive']);
+  const canActivate = can('deployment.execute');
 
   useEffect(() => {
     if (!systemId) {
-      // PW-P3-01: /deploy is a contextual workflow route. Without a system it
-      // explains itself instead of bouncing the user to another page.
       setLoading(false);
       return;
     }
 
-    const initializeDeploy = async () => {
+    let cancelled = false;
+    void (async () => {
       try {
-        // Ensure user is authenticated
-        const { data: { session }, error } = await supabase.auth.getSession();
-        if (error || !session) {
-          toast({
-            title: t('auth.authRequired'),
-            description: t('auth.pleaseSignIn'),
-            variant: "destructive",
-          });
-          navigate('/auth');
-          return;
-        }
-        
-        await loadSystemSummary();
-      } catch (error) {
-        console.error('[Deploy] Initialization error:', error);
-      }
-    };
+        setLoading(true);
+        setError(null);
 
-    initializeDeploy();
+        const { data: agent, error: agentError } = await supabase
+          .from('agents')
+          .select('id, name, status, config, connector_ids')
+          .eq('id', systemId)
+          .maybeSingle();
+        if (agentError) throw agentError;
+        if (!agent) throw new Error('The selected system is not available in this organization.');
+
+        const { data: workflow, error: workflowError } = await supabase
+          .from('workflows')
+          .select('id')
+          .eq('system_id', systemId)
+          .maybeSingle();
+        if (workflowError) throw workflowError;
+
+        const { data: intelligence, error: intelligenceError } = await supabase
+          .from('intelligence_settings')
+          .select('mcp_servers')
+          .eq('system_id', systemId)
+          .maybeSingle();
+        if (intelligenceError) throw intelligenceError;
+
+        const config = agent.config && typeof agent.config === 'object' && !Array.isArray(agent.config)
+          ? agent.config as Record<string, unknown>
+          : {};
+        const selectedModel = typeof config.selectedModel === 'string'
+          ? config.selectedModel
+          : typeof config.model === 'string'
+            ? config.model
+            : null;
+        const grounding = config.grounding === true;
+        const tools = Array.isArray(intelligence?.mcp_servers) ? intelligence.mcp_servers.length : 0;
+
+        if (!cancelled) {
+          setSummary({
+            name: agent.name ?? 'Untitled system',
+            status: agent.status ?? 'draft',
+            model: selectedModel,
+            grounding,
+            workflowId: workflow?.id ?? null,
+            connectorCount: Array.isArray(agent.connector_ids) ? agent.connector_ids.length : 0,
+            toolCount: tools,
+          });
+        }
+      } catch (cause) {
+        if (!cancelled) setError(cause instanceof Error ? cause.message : 'System configuration could not be loaded.');
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
   }, [systemId]);
 
-  if (!systemId) {
-    return (
-      <div className="container mx-auto max-w-2xl py-16">
-        <DCCard title="No system selected">
-          <div className="space-y-3 p-1" role="status" aria-live="polite">
-            <p className="text-sm text-muted-foreground">
-              Deployment runs against one configured system. Open a system in the Builder and start the
-              deployment from there; this route needs an <code>?id=</code> system identifier.
-            </p>
-            <Button onClick={() => navigate('/builder')}>Open Builder</Button>
-          </div>
-        </DCCard>
-      </div>
-    );
+  function setStage(index: number, status: ActivationStage['status']) {
+    setStages((current) => current.map((stage, stageIndex) => stageIndex === index ? { ...stage, status } : stage));
   }
 
-  const loadSystemSummary = async () => {
-    try {
-      setLoading(true);
+  async function activateInAura() {
+    if (!systemId || !summary || activating || !canActivate) return;
 
-      // Load agents data (this has the system name and all config)
-      const { data: agent } = await supabase
-        .from('agents')
-        .select('name, config')
-        .eq('id', systemId)
-        .maybeSingle();
-
-      // Load workflow
-      const { data: workflow } = await supabase
-        .from('workflows')
-        .select('id, name, system_id')
-        .eq('system_id', systemId)
-        .maybeSingle();
-
-      // Load workflow nodes count (only if workflow exists)
-      let nodes = null;
-      if (workflow?.id) {
-        const { data: nodesData } = await supabase
-          .from('workflow_nodes')
-          .select('id')
-          .eq('workflow_id', workflow.id);
-        nodes = nodesData;
-      }
-
-      // Load integrations count
-      const { data: integrations } = await supabase
-        .from('integrations')
-        .select('id')
-        .eq('status', 'connected');
-
-      const agentConfig = agent?.config as Record<string, any> | null;
-      // Prioritize selectedModel (new format) over model (legacy format)
-      const modelId = agentConfig?.selectedModel || agentConfig?.model || 'google/gemini-2.5-flash';
-      const grounding = agentConfig?.grounding || false;
-      const department = agentConfig?.department || 'Operations';
-      // Prioritize templateId (new format) over template (legacy format)
-      const template = agentConfig?.templateId || agentConfig?.template || 'Custom Workflow';
-      const outcome = agentConfig?.outcome;
-      const successMetric = agentConfig?.successMetric;
-
-      setSummary({
-        name: agent?.name || 'Untitled System',
-        department,
-        outcome,
-        successMetric,
-        template,
-        model: modelId,
-        grounding,
-        connectedTools: integrations?.length || 0,
-      });
-
-      // Validate - separate critical errors from warnings
-      const issues: ValidationIssue[] = [];
-
-      // AI Model is required (CRITICAL)
-      if (!agentConfig?.model) {
-        issues.push({
-          field: 'AI Model',
-          message: 'No AI model selected',
-          fixStep: 3,
-          severity: 'error',
-        });
-      }
-
-      // System prompt is required (CRITICAL)
-      if (!agentConfig?.systemPrompt || agentConfig.systemPrompt.trim().length < 10) {
-        issues.push({
-          field: 'System Prompt',
-          message: 'System prompt is required and must be at least 10 characters',
-          fixStep: 3,
-          severity: 'error',
-        });
-      }
-
-      // Workflow and integrations are optional - show warning if grounding enabled but no sources
-      if (grounding && (!nodes || nodes.length === 0) && (!integrations || integrations.length === 0)) {
-        issues.push({
-          field: 'Knowledge Sources',
-          message: 'Grounding is enabled but no knowledge sources configured. Consider adding workflow nodes or integrations for better results.',
-          fixStep: 4,
-          severity: 'warning',
-        });
-      }
-
-      setValidationIssues(issues);
-    } catch (error: any) {
-      console.error('Error loading system summary:', error);
-      toast({
-        title: "Failed to load system",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeploy = async () => {
-    if (!canDeploy) {
-      toast({
-        title: t('deploy.permissionDenied'),
-        description: t('deploy.onlyManagersCanDeploy'),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Only block on critical errors, not warnings
-    const criticalErrors = validationIssues.filter(issue => issue.severity === 'error');
-    if (criticalErrors.length > 0) {
-      toast({
-        title: t('deploy.validation'),
-        description: t('deploy.criticalErrors'),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Phase 9: every stage below is a real operation. Stage state is set from
-    // the outcome of that operation and appended to the immutable
-    // deployment_events log - no stage is advanced by a timer.
-    const stageNames = [
-      t('deploy.stages.validateConfig'),
-      t('deploy.stages.packageWorkflow'),
-      t('deploy.stages.provisionRuntime'),
-      t('deploy.stages.registerWebhooks'),
-      t('deploy.stages.warmModel'),
-    ];
-    const stages: DeploymentStage[] = stageNames.map((name) => ({ name, status: 'pending' }));
-
-    const setStage = (index: number, status: DeploymentStage['status']) => {
-      const stage = stages[index];
-      if (stage) stage.status = status;
-      setDeploymentStages([...stages]);
-    };
-
-    setIsDeploying(true);
-    setShowProgressModal(true);
-    setDeploymentStages([...stages]);
+    setActivating(true);
+    setError(null);
+    setStages(STAGE_NAMES.map((name) => ({ name, status: 'pending' })));
 
     let deploymentId: string | null = null;
-    let userId: string | null = null;
+    let actorId: string | null = null;
     let currentStage = 0;
 
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) throw new Error('Authentication required');
-      userId = user.id;
+      if (userError || !user) throw new Error('Authentication required.');
+      actorId = user.id;
 
       const deployment = await openDeployment({
-        systemId: systemId!,
+        systemId,
         actorId: user.id,
-        model: summary?.model ?? null,
-        grounding: summary?.grounding ?? null,
+        model: summary.model,
+        grounding: summary.grounding,
       });
       deploymentId = deployment.id;
 
@@ -297,623 +156,226 @@ export default function Deploy() {
         stage: string,
         status: 'started' | 'succeeded' | 'failed' | 'skipped',
         detail?: Record<string, unknown>,
-      ) =>
-        appendDeploymentEvent({
-          deploymentId: deployment.id,
-          systemId: systemId!,
-          actorId: user.id,
-          sequence,
-          stage,
-          status,
-          detail,
-        });
+      ) => appendDeploymentEvent({
+        deploymentId: deployment.id,
+        systemId,
+        actorId: user.id,
+        sequence,
+        stage,
+        status,
+        detail,
+      });
 
-      // Stage 1 - configuration validation (already executed against the record)
       currentStage = 0;
       setStage(0, 'running');
       await record(1, 'validate-configuration', 'succeeded', {
-        errors: criticalErrors.length,
-        warnings: validationIssues.length - criticalErrors.length,
+        system_status_before: summary.status,
+        workflow_present: Boolean(summary.workflowId),
       });
       setStage(0, 'complete');
 
-      // Stage 2 - package workflow: read the workflow actually stored
       currentStage = 1;
       setStage(1, 'running');
-      const { data: workflowData } = await supabase
-        .from('workflows')
-        .select('id')
-        .eq('system_id', systemId)
-        .maybeSingle();
-
-      let workflowNodes: { id: string }[] | null = null;
-      if (workflowData?.id) {
-        const { data: nodesData } = await supabase
-          .from('workflow_nodes')
-          .select('id')
-          .eq('workflow_id', workflowData.id);
-        workflowNodes = nodesData ?? [];
-      }
-      await record(2, 'package-workflow', workflowData?.id ? 'succeeded' : 'skipped', {
-        workflow_id: workflowData?.id ?? null,
-        node_count: workflowNodes?.length ?? 0,
+      await record(2, 'inspect-workflow', summary.workflowId ? 'succeeded' : 'skipped', {
+        workflow_id: summary.workflowId,
       });
       setStage(1, 'complete');
 
-      // Stage 3 - activate the system record
       currentStage = 2;
       setStage(2, 'running');
-      const { error: updateError } = await supabase
+      const { error: activationError } = await supabase
         .from('agents')
-        .update({
-          status: 'active',
-          deployed_at: new Date().toISOString(),
-        })
+        .update({ status: 'active', deployed_at: new Date().toISOString() })
         .eq('id', systemId);
-
-      if (updateError) {
-        await record(3, 'activate-system', 'failed', { message: updateError.message });
-        throw updateError;
+      if (activationError) {
+        await record(3, 'activate-configuration', 'failed', { message: activationError.message });
+        throw activationError;
       }
-      await record(3, 'activate-system', 'succeeded');
+      await record(3, 'activate-configuration', 'succeeded', {
+        external_runtime_provisioned: false,
+      });
       setStage(2, 'complete');
 
-      // Stage 4 - resolve connected integrations and tools
       currentStage = 3;
       setStage(3, 'running');
-      const { data: agentData } = await supabase
-        .from('agents')
-        .select('connector_ids')
-        .eq('id', systemId)
-        .maybeSingle();
-
-      const { data: intelligenceData } = await supabase
-        .from('intelligence_settings')
-        .select('mcp_servers')
-        .eq('system_id', systemId)
-        .maybeSingle();
-
-      const connectorCount = agentData?.connector_ids?.length || 0;
-      const mcpServers = Array.isArray(intelligenceData?.mcp_servers) ? intelligenceData.mcp_servers : [];
-      const toolCount = mcpServers.length;
-
-      await record(4, 'resolve-integrations', 'succeeded', {
-        connector_count: connectorCount,
-        tool_count: toolCount,
+      await record(4, 'resolve-connections', 'succeeded', {
+        connector_count: summary.connectorCount,
+        tool_count: summary.toolCount,
+        data_flow_verified: false,
       });
       setStage(3, 'complete');
 
-      // Stage 5 - persist economics assumptions, when the operator supplied them
       currentStage = 4;
       setStage(4, 'running');
-      if (roiMetrics) {
-        const { data: existingRoi } = await supabase
-          .from('roi_assumptions')
-          .select('id')
-          .eq('system_id', systemId)
-          .maybeSingle();
-
-        if (existingRoi) {
-          await supabase
-            .from('roi_assumptions')
-            .update({
-              time_saved_per_run_min: roiMetrics.timeSavedPerWeek * 60 / 40,
-              runs_per_week: 40,
-              loaded_cost_per_hour: 75,
-              accuracy_improvement_pct: roiMetrics.accuracyImprovement,
-              cost_per_error: 500,
-            })
-            .eq('id', existingRoi.id);
-        } else {
-          await supabase.from('roi_assumptions').insert({
-            system_id: systemId,
-            time_saved_per_run_min: roiMetrics.timeSavedPerWeek * 60 / 40,
-            runs_per_week: 40,
-            loaded_cost_per_hour: 75,
-            accuracy_improvement_pct: roiMetrics.accuracyImprovement,
-            cost_per_error: 500,
-          });
-        }
-
-        await supabase.from('roi_snapshots').insert({
-          system_id: systemId,
-          roi_pct: roiMetrics.roi,
-          annual_savings: roiMetrics.annualSavings,
-          time_saved_week: roiMetrics.timeSavedPerWeek,
-          error_savings_year: 0,
-          assumptions_json: roiMetrics,
-        });
-
-        await record(5, 'record-economics', 'succeeded', {
-          roi_pct: roiMetrics.roi,
-          annual_savings: roiMetrics.annualSavings,
-        });
-      } else {
-        await record(5, 'record-economics', 'skipped', { reason: 'no economics assumptions supplied' });
-      }
-      setStage(4, 'complete');
-
       await closeDeployment({
         deploymentId: deployment.id,
         status: 'active',
         runtimeUrl: null,
         health: null,
       });
-
-      await record(6, 'deployment-complete', 'succeeded', {
-        workflow_node_count: workflowNodes?.length ?? 0,
-        connectors: agentData?.connector_ids ?? [],
-        mcp_servers: mcpServers.map((s: any) => s.server_id || s),
-        region: 'northamerica-northeast1',
-        grounding: summary?.grounding ?? null,
+      await record(5, 'activation-complete', 'succeeded', {
+        configuration_active: true,
+        runtime_url: null,
+        runtime_health: null,
+        runtime_verified: false,
       });
-
-      // Audit log
       await supabase.from('audit_logs').insert({
         user_id: user.id,
-        action: 'deploy',
+        action: 'activate_configuration',
         entity_type: 'system',
         entity_id: systemId,
         details: {
           deployment_id: deployment.id,
-          version: 'v1',
-          model: summary?.model,
-          grounding: summary?.grounding,
+          configuration_active: true,
+          external_runtime_provisioned: false,
+          runtime_verified: false,
         },
       });
+      setStage(4, 'complete');
 
       toast({
-        title: t('deploy.deploymentSuccessful'),
-        description: t('deploy.systemLive'),
+        title: 'Configuration active in AURA',
+        description: 'Activation evidence was recorded. No external cloud or model runtime was provisioned by this action.',
       });
-
-      setShowProgressModal(false);
       navigate('/deployments');
-
-    } catch (error: any) {
-      console.error('Deployment error:', error);
-
+    } catch (cause) {
       setStage(currentStage, 'failed');
+      const message = cause instanceof Error ? cause.message : 'Activation failed.';
+      setError(message);
 
-      if (deploymentId && userId) {
+      if (deploymentId && actorId && systemId) {
         await appendDeploymentEvent({
           deploymentId,
-          systemId: systemId!,
-          actorId: userId,
+          systemId,
+          actorId,
           sequence: 99,
-          stage: 'deployment-failed',
+          stage: 'activation-failed',
           status: 'failed',
-          detail: { message: error?.message ?? 'unknown error' },
+          detail: { message },
         });
         try {
-          await closeDeployment({
-            deploymentId,
-            status: 'failed',
-            errorMessage: error?.message ?? 'unknown error',
-          });
+          await closeDeployment({ deploymentId, status: 'failed', errorMessage: message });
         } catch (closeError) {
-          console.error('Failed to record deployment failure', closeError);
+          console.error('[Deploy] Failed to close activation record', closeError);
         }
       }
 
-      toast({
-        title: "Deployment failed",
-        description: error.message || "An error occurred during deployment",
-        variant: "destructive",
-      });
+      toast({ title: 'Activation failed', description: message, variant: 'destructive' });
     } finally {
-      setIsDeploying(false);
+      setActivating(false);
     }
-  };
+  }
 
-
-  const handleFixIssue = (step: number) => {
-    navigate(`/builder?id=${systemId}&step=${step}`);
-  };
+  if (!systemId) {
+    return (
+      <div className="container mx-auto max-w-2xl py-16">
+        <DCCard title="No system selected">
+          <div className="space-y-4 p-1">
+            <p className="text-sm text-muted-foreground">
+              Activation applies to one configured system. Open the Builder and select the system you want to activate in AURA.
+            </p>
+            <Button onClick={() => navigate('/builder')}>Open Builder</Button>
+          </div>
+        </DCCard>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
+      <main className="flex min-h-[60vh] items-center justify-center" role="status" aria-busy="true">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
+      </main>
     );
   }
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6 max-w-7xl">
-        {/* Configuration + identity: shared, manifest-backed workspace banner. */}
+      <div className="container mx-auto max-w-6xl p-6">
         <WorkspaceHeader
-          eyebrow="Runtime"
-          title={t('deploy.title')}
+          eyebrow="Operate"
+          title="Activate in AURA"
           icon={Rocket}
           capabilityId="governance.controls"
-          description={t('deploy.subtitle')}
-          badges={
-            <>
-              <span className="aura-ws-chip">{summary?.name ?? 'System not loaded'}</span>
-              <span className="aura-ws-chip">{role || 'user'}</span>
-            </>
-          }
+          description="Activate the saved AURA configuration and record immutable evidence. This transaction does not provision an external runtime."
+          badges={<Badge variant="outline">Configuration activation</Badge>}
           actions={
             <>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate(`/builder?id=${systemId}&step=6`)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                {t('nav.backToBuilder')}
+              <Button variant="ghost" size="sm" onClick={() => navigate(`/builder?id=${systemId}`)}>
+                <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
+                Back to Builder
               </Button>
-              <Button variant="outline" size="sm" onClick={() => navigate('/deployments')}>
-                View History
-              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate('/deployments')}>Activation history</Button>
             </>
           }
         />
 
-        {/* Readiness: configuration facts that gate execution. No invented metrics. */}
+        <Alert className="mb-6">
+          <CircleAlert className="h-4 w-4" aria-hidden="true" />
+          <AlertDescription>
+            <strong>Runtime boundary:</strong> this action does not provision AWS, Azure, GCP, Kubernetes, GPU capacity, NVIDIA NIM, Omniverse, webhooks, or model-serving infrastructure. Runtime verification requires separate URL and health evidence.
+          </AlertDescription>
+        </Alert>
+
+        {error && (
+          <Alert variant="destructive" className="mb-6">
+            <CircleAlert className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <SectionCard
-          title="Deployment readiness"
-          description="Configuration and validation state read from the saved system record."
+          title="Activation readiness"
+          description="Facts read from the saved AURA system configuration. Managed AI model serving is configured separately from runtime activation."
           icon={Activity}
           className="mb-6"
         >
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <DCKPITile
-              label="System"
-              value={summary?.name || 'Loading...'}
-              sublabel={summary?.department || 'Subsystem'}
-              status="info"
-              icon={<Server className="h-4 w-4" />}
-            />
-            <DCKPITile
-              label={stackLabel('ai.managed')}
-              value={summary?.model ? modelDisplayLabel(summary.model) : 'Not set'}
-              sublabel={summary?.grounding ? 'Grounded' : 'Standard'}
-              status={summary?.model ? 'normal' : 'warning'}
-              icon={<Cpu className="h-4 w-4" />}
-            />
-            <DCKPITile
-              label={stackLabel('connections.enterprise')}
-              value={summary?.connectedTools?.toString() || '0'}
-              sublabel="Configured connections"
-              status={summary?.connectedTools && summary.connectedTools > 0 ? 'normal' : 'info'}
-              icon={<Zap className="h-4 w-4" />}
-            />
-            <DCKPITile
-              label="Validation"
-              value={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'Passed' : 'Issues'}
-              sublabel={`${validationIssues.length} items`}
-              status={validationIssues.filter(i => i.severity === 'error').length === 0 ? 'normal' : 'critical'}
-              icon={<Activity className="h-4 w-4" />}
-            />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <DCKPITile label="System" value={summary?.name ?? 'Unavailable'} sublabel={summary?.status ?? 'unknown'} status="info" icon={<Server className="h-4 w-4" />} />
+            <DCKPITile label={stackLabel('ai.managed')} value={summary?.model ? modelDisplayLabel(summary.model) : 'Not configured'} sublabel={summary?.grounding ? 'Grounding requested' : 'Standard configuration'} status={summary?.model ? 'normal' : 'info'} icon={<Cpu className="h-4 w-4" />} />
+            <DCKPITile label="Workflow" value={summary?.workflowId ? 'Configured' : 'Not configured'} sublabel="Saved workflow record" status={summary?.workflowId ? 'normal' : 'info'} icon={<Wrench className="h-4 w-4" />} />
+            <DCKPITile label="Connections" value={(summary?.connectorCount ?? 0).toString()} sublabel="Configured connector references" status="info" icon={<Activity className="h-4 w-4" />} />
+            <DCKPITile label="Runtime evidence" value="Not provided" sublabel="No URL or health evidence" status="warning" icon={<CircleAlert className="h-4 w-4" />} />
           </div>
         </SectionCard>
 
-      {/* Validation Issues - Errors */}
-      {validationIssues.filter(i => i.severity === 'error').length > 0 && (
-        <Alert variant="destructive" className="mb-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            <div className="font-semibold mb-2">Critical errors must be fixed before deployment:</div>
-            <ul className="list-disc list-inside space-y-1">
-              {validationIssues.filter(i => i.severity === 'error').map((issue, idx) => (
-                <li key={idx} className="flex items-center justify-between">
-                  <span>{issue.field}: {issue.message}</span>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => handleFixIssue(issue.fixStep)}
-                    className="ml-2"
-                  >
-                    Fix
-                  </Button>
-                </li>
+        <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <DCCard title="Configuration activation" status="info" className="p-6">
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Activating marks this saved AURA configuration active, resolves its configured connection references, and writes an immutable activation event trail.
+              </p>
+              <div className="rounded-lg border border-border bg-muted/20 p-4 text-sm">
+                <p><span className="font-medium">System:</span> {summary?.name}</p>
+                <p><span className="font-medium">Grounding requested:</span> {summary?.grounding ? 'Yes' : 'No'}</p>
+                <p><span className="font-medium">External runtime:</span> Not provisioned by this action</p>
+                <p><span className="font-medium">Runtime health:</span> Not verified</p>
+              </div>
+              <Button className="w-full" size="lg" disabled={!canActivate || activating || !summary} onClick={() => { void activateInAura(); }}>
+                {activating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />}
+                {activating ? 'Activating...' : 'Activate in AURA'}
+              </Button>
+              {!canActivate && <p className="text-center text-sm text-muted-foreground">Your current role cannot activate configurations.</p>}
+            </div>
+          </DCCard>
+
+          <DCCard title="Observed activation stages" status="neutral" className="p-6">
+            <div className="space-y-3">
+              {(stages.length ? stages : STAGE_NAMES.map((name) => ({ name, status: 'pending' as const }))).map((stage) => (
+                <div key={stage.name} className="flex items-center justify-between gap-3 rounded-md border border-border p-3 text-sm">
+                  <span>{stage.name}</span>
+                  <Badge variant={stage.status === 'failed' ? 'destructive' : stage.status === 'complete' ? 'default' : 'outline'}>
+                    {stage.status}
+                  </Badge>
+                </div>
               ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Validation Issues - Warnings */}
-      {validationIssues.filter(i => i.severity === 'warning').length > 0 && (
-        <Alert className="mb-6 border-yellow-500/50 bg-yellow-500/10">
-          <AlertTriangle className="h-4 w-4 text-yellow-500" />
-          <AlertDescription>
-            <div className="font-semibold mb-2 text-yellow-700 dark:text-yellow-400">
-              Recommendations for better performance:
             </div>
-            <ul className="list-disc list-inside space-y-1">
-              {validationIssues.filter(i => i.severity === 'warning').map((issue, idx) => (
-                <li key={idx} className="flex items-center justify-between">
-                  <span>{issue.field}: {issue.message}</span>
-                  <Button
-                    variant="link"
-                    size="sm"
-                    onClick={() => handleFixIssue(issue.fixStep)}
-                    className="ml-2"
-                  >
-                    Improve
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Execution: configuration review and the controls that run a deployment. */}
-      <SectionCard
-        title="Execution"
-        description="Review the saved configuration and run the deployment."
-        icon={Rocket}
-        className="mb-6"
-      >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
-        {/* Left: Summary */}
-        <DCCard status="info" className="p-6">
-          <h2 className="text-xl font-semibold mb-4">System Configuration</h2>
-          
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">System Name</label>
-              <div className="text-lg font-medium">{summary?.name}</div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Department</label>
-              <div className="text-lg">{summary?.department}</div>
-            </div>
-
-            {summary?.outcome && (
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">AI Use Case</label>
-                <div className="text-lg">{summary.outcome}</div>
-              </div>
-            )}
-
-            {summary?.successMetric && (
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Success Metric</label>
-                <div className="text-lg">{summary.successMetric}</div>
-              </div>
-            )}
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Template</label>
-              <div className="text-lg">{summary?.template}</div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground mb-3 block">AI Model Configuration</label>
-              <ModelPreview 
-                selectedModelId={summary?.model || null}
-                onNavigateToConfig={() => navigate(`/builder?id=${systemId}&step=3`)}
-                showChangeButton={validationIssues.length === 0}
-              />
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Grounding</label>
-              <div className="flex items-center gap-2">
-                {summary?.grounding ? (
-                  <>
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <span>Enabled</span>
-                  </>
-                ) : (
-                  <>
-                    <XCircle className="h-4 w-4 text-muted-foreground" />
-                    <span>Disabled</span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Connected Tools</label>
-              <div className="text-lg">{summary?.connectedTools} integrations</div>
-            </div>
-          </div>
-
-          <Button
-            className="w-full mt-6"
-            size="lg"
-            onClick={handleDeploy}
-            disabled={!canDeploy || validationIssues.some(i => i.severity === 'error') || isDeploying}
-            aria-label="Deploy System"
-          >
-            <Rocket className="h-5 w-5 mr-2" />
-            {isDeploying ? 'Deploying to Production...' : 'Deploy to Production'}
-          </Button>
-
-          {!canDeploy && (
-            <p className="text-sm text-muted-foreground text-center mt-2">
-              Only managers and executives can deploy systems
-            </p>
-          )}
-        </DCCard>
-
-        {/* Right: ROI Calculator, Readiness Checks & Simulation Checklist */}
-        <div className="space-y-4">
-          {/* Carbon & Financial Readiness Checks */}
-          <DeployReadinessChecks 
-            onFixIssue={(checkId) => {
-              // Navigate to builder to fix issues
-              navigate(`/builder?id=${systemId}&step=2`);
-            }}
-          />
-          
-          {/* Simulation Checklist */}
-          <SimulationChecklist />
-          
-          <ROICalculator 
-            onChange={(metrics) => {
-              setRoiMetrics(metrics);
-            }}
-          />
+          </DCCard>
         </div>
-      </div>
-      </SectionCard>
 
-      {/* Evidence: recorded outcome of the latest execution. Canonical detail
-          lives on Runtime History; this is a deep-linked summary only. */}
-      <DeploymentEvidenceCard systemId={systemId!} />
-
-
-
-      {/* DC-Specific Deployment Recommendations */}
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        {/* AWS Recommendations */}
-        <DCCard 
-          title="AWS Recommendations" 
-          icon={<Server className="h-4 w-4" />}
-          status="info"
-        >
-          <div className="space-y-3">
-            <div className="text-sm space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span>EKS for container orchestration</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span>EC2 Trn1/Inf2 for GPU workloads</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span>CloudWatch for metrics collection</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                <span>Kinesis for real-time streaming</span>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-border">
-              <Badge className="bg-success/10 text-success border-success/30">
-                GPU Autoscaling Ready
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              ca-central-1 region recommended for Canadian data sovereignty
-            </p>
-          </div>
-        </DCCard>
-
-        {/* Azure Recommendations */}
-        <DCCard 
-          title="Azure Recommendations" 
-          icon={<Cpu className="h-4 w-4" />}
-          status="info"
-        >
-          <div className="space-y-3">
-            <div className="text-sm space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-info" />
-                <span>AKS for Kubernetes workloads</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-info" />
-                <span>Azure ML for model hosting</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-info" />
-                <span>Azure Monitor for telemetry</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-info" />
-                <span>NDv5 SKUs for AI/DC workloads</span>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-border">
-              <Badge className="bg-info/10 text-info border-info/30">
-                DC/AI Optimized SKUs
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Canada Central region for sovereignty compliance
-            </p>
-          </div>
-        </DCCard>
-
-        {/* GCP Recommendations */}
-        <DCCard 
-          title="GCP Recommendations" 
-          icon={<Zap className="h-4 w-4" />}
-          status="info"
-        >
-          <div className="space-y-3">
-            <div className="text-sm space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
-                <span>Managed AI model serving</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
-                <span>GKE for container workloads</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
-                <span>BigQuery for analytics</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-warning" />
-                <span>Cloud Functions for automation</span>
-              </div>
-            </div>
-            <div className="pt-3 border-t border-border">
-              <Badge className="bg-success/10 text-success border-success/30">
-                Carbon-Smart Regions
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              northamerica-northeast1 for low-carbon operations
-            </p>
-          </div>
-        </DCCard>
-      </div>
-
-      {/* AI Recommendations Section */}
-      <div className="mt-8">
-        <GroundedRecommendationsCard systemId={systemId!} />
-      </div>
-
-      {/* Deployment Progress Modal */}
-      <Dialog open={showProgressModal} onOpenChange={setShowProgressModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Deploying System</DialogTitle>
-            <DialogDescription>
-              Please wait while we deploy your AI system...
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-3">
-            {deploymentStages.map((stage, idx) => (
-              <div key={idx} className="flex items-center gap-3">
-                {stage.status === 'complete' && (
-                  <CheckCircle2 className="h-5 w-5 text-green-500 flex-shrink-0" />
-                )}
-                {stage.status === 'running' && (
-                  <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin flex-shrink-0" />
-                )}
-                {stage.status === 'failed' && (
-                  <XCircle className="h-5 w-5 text-destructive flex-shrink-0" />
-                )}
-                {stage.status === 'pending' && (
-                  <div className="h-5 w-5 rounded-full border-2 border-gray-300 flex-shrink-0" />
-                )}
-                <span className={stage.status === 'failed' ? 'text-destructive' : ''}>
-                  {stage.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+        <div className="mt-6">
+          <DeploymentEvidenceCard systemId={systemId} />
+        </div>
       </div>
     </div>
   );

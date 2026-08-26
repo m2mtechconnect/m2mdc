@@ -34,6 +34,42 @@ async function launchConfiguredBrowser(browserName: string) {
  */
 async function ensureLegacyQaTenantContext(userId: string) {
   const admin = createTestServiceSupabaseClient();
+
+  const bridgeProfile = async (organizationId: string) => {
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .update({
+        is_approved: true,
+        org_id: organizationId,
+        last_active_org_id: organizationId,
+      })
+      .eq('user_id', userId)
+      .select('user_id')
+      .single();
+
+    if (profileError || profile?.user_id !== userId) {
+      throw profileError ?? new Error('QA tenant fixture profile bridge was not established');
+    }
+  };
+
+  // Global setup may run more than once in a single QA job when suites are
+  // intentionally split into separate Playwright invocations. Reuse the
+  // disposable user's existing active default membership instead of weakening
+  // the one-default-membership database invariant or creating duplicate tenants.
+  const { data: existingMembership, error: existingMembershipError } = await admin
+    .from('org_memberships')
+    .select('org_id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .eq('is_default', true)
+    .maybeSingle();
+
+  if (existingMembershipError) throw existingMembershipError;
+  if (existingMembership?.org_id) {
+    await bridgeProfile(existingMembership.org_id);
+    return;
+  }
+
   const suffix = userId.replace(/-/g, '').slice(0, 16);
   const { data: organization, error: organizationError } = await admin
     .from('organizations')
@@ -59,20 +95,7 @@ async function ensureLegacyQaTenantContext(userId: string) {
   });
   if (membershipError) throw membershipError;
 
-  const { data: profile, error: profileError } = await admin
-    .from('profiles')
-    .update({
-      is_approved: true,
-      org_id: organization.id,
-      last_active_org_id: organization.id,
-    })
-    .eq('user_id', userId)
-    .select('user_id')
-    .single();
-
-  if (profileError || profile?.user_id !== userId) {
-    throw profileError ?? new Error('QA tenant fixture profile bridge was not established');
-  }
+  await bridgeProfile(organization.id);
 }
 
 /**

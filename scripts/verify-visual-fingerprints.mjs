@@ -43,6 +43,19 @@ const expectedFiles = expected.map((item) => item.file);
 
 if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) {
   fail(`screenshot set mismatch\nexpected: ${expectedFiles.join(', ')}\nactual:   ${actualFiles.join(', ')}`);
+
+  const expectedSet = new Set(expectedFiles);
+  for (const file of actualFiles.filter((name) => !expectedSet.has(name))) {
+    const path = resolve(outputDir, file);
+    try {
+      const buffer = readFileSync(path);
+      const dimensions = pngDimensions(buffer);
+      const digest = createHash('sha256').update(buffer).digest('hex');
+      console.log(`[visual-fingerprint] UNAPPROVED ${file} ${dimensions.width}x${dimensions.height} ${digest}`);
+    } catch (error) {
+      fail(`${file}: could not fingerprint unapproved screenshot: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
 }
 
 for (const item of expected) {

@@ -1,10 +1,10 @@
 /**
- * Latest deployment evidence for one system.
+ * Latest activation/runtime evidence for one system.
  *
- * Reads the canonical `deployments` row plus its immutable `deployment_events`
- * step log. This surface is a summary only: Runtime History (`/deployments`)
- * remains the canonical full evidence record. Nothing is written here and no
- * new evidence model is introduced.
+ * Reads the canonical `deployments` row plus its immutable event log. An
+ * `active` database row is not treated as proof that an external runtime was
+ * provisioned or is healthy. Runtime truth comes from runtime URL + health
+ * evidence through `classifyDeploymentTruth`.
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { SectionCard, WorkspaceEmptyState } from '@/components/workspace-system';
 import { supabase } from '@/integrations/supabase/client';
 import {
+  classifyDeploymentTruth,
+  deploymentTruthLabel,
   listDeploymentEvents,
   type DeploymentEventRecord,
   type DeploymentRecord,
@@ -32,7 +34,7 @@ export function DeploymentEvidenceCard({ systemId }: { systemId: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
+    void (async () => {
       setLoading(true);
       setFailed(false);
       try {
@@ -57,72 +59,73 @@ export function DeploymentEvidenceCard({ systemId }: { systemId: string }) {
         if (!cancelled) setLoading(false);
       }
     })();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [systemId]);
 
   const failedSteps = events.filter((event) => event.status === 'failed').length;
+  const truth = record ? classifyDeploymentTruth(record) : null;
 
   return (
     <SectionCard
-      title="Deployment evidence"
+      title="Activation evidence"
       icon={ShieldCheck}
-      description="Latest recorded execution for this system. Runtime History holds the complete evidence record."
+      description="Latest recorded AURA activation and runtime evidence. Activation History holds the complete event record."
       className="mb-6"
       data-testid="deployment-evidence"
       actions={
         <Button asChild variant="outline" size="sm">
           <Link to="/deployments">
-            Open Runtime History
+            Open Activation History
             <ExternalLink className="ml-2 h-4 w-4" aria-hidden />
           </Link>
         </Button>
       }
     >
       {loading ? (
-        <p className="text-[13px] text-muted-foreground">Loading recorded deployment evidence…</p>
+        <p className="text-[13px] text-muted-foreground">Loading recorded activation evidence...</p>
       ) : failed ? (
         <WorkspaceEmptyState
           icon={ShieldCheck}
-          title="Deployment evidence could not be read"
+          title="Activation evidence could not be read"
           status="UNAVAILABLE"
-          description="The deployment record could not be loaded. Retry before treating this system as never deployed."
+          description="The activation record could not be loaded. Retry before making any runtime claim."
         />
       ) : !record ? (
         <WorkspaceEmptyState
           icon={ShieldCheck}
-          title="No deployment recorded for this system"
+          title="No activation recorded for this system"
           status="NOT YET RECORDED"
-          description="Evidence appears here after the first deployment runs. Nothing has been executed for this system."
+          description="Evidence appears after the first Activate in AURA transaction."
         />
       ) : (
         <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div>
-            <dt className="text-xs font-medium text-muted-foreground">Outcome</dt>
-            <dd className="mt-1 text-sm font-semibold">{record.status}</dd>
+            <dt className="text-xs font-medium text-muted-foreground">Truth state</dt>
+            <dd className="mt-1 text-sm font-semibold">{truth ? deploymentTruthLabel(truth) : 'Unavailable'}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-muted-foreground">Executed</dt>
+            <dt className="text-xs font-medium text-muted-foreground">Recorded</dt>
             <dd className="mt-1 text-sm font-medium">{formatWhen(record.created_at)}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-muted-foreground">Deployment id</dt>
+            <dt className="text-xs font-medium text-muted-foreground">Runtime URL</dt>
+            <dd className="mt-1 text-sm font-medium">{record.runtime_url ? 'Recorded' : 'Not provided'}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground">Runtime health</dt>
+            <dd className="mt-1 text-sm font-medium">{record.health ?? 'Not measured'}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium text-muted-foreground">Activation id</dt>
             <dd className="mt-1 truncate font-mono text-[12px]" title={record.id}>{record.id}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium text-muted-foreground">Step evidence</dt>
+            <dt className="text-xs font-medium text-muted-foreground">Event evidence</dt>
             <dd className="mt-1 text-sm font-medium">
-              {events.length === 0
-                ? 'No steps recorded'
-                : `${events.length} steps · ${failedSteps} failed`}
+              {events.length === 0 ? 'No events recorded' : `${events.length} events, ${failedSteps} failed`}
             </dd>
           </div>
-          <div>
-            <dt className="text-xs font-medium text-muted-foreground">Recorded health</dt>
-            <dd className="mt-1 text-sm font-medium">{record.health ?? 'Not measured'}</dd>
-          </div>
-          <div className="lg:col-span-3">
+          <div className="col-span-2">
             <dt className="text-xs font-medium text-muted-foreground">Reported error</dt>
             <dd className="mt-1 break-words text-sm text-muted-foreground">
               {record.error_message ?? 'None recorded'}

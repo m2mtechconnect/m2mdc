@@ -1,84 +1,88 @@
 /**
- * /v1/record-decision - Phase 3 server-owned human decision append.
+ * /v1/record-decision - server-owned human decision append.
  *
- * The browser submits intent only. Every field that carries authority is
- * derived here: approver identity, tenant, timestamp, the canonical evidence
- * snapshot (read from the persisted run, not from the caller), the snapshot
- * hash, the decision record hash and the prior-record hash link.
- *
- * The append is rejected when the run does not exist, belongs to another
- * tenant, is an unpersisted preview receiving an authoritative approval, the
- * caller's expected hash is stale, or an idempotency key is reused for
- * different content.
+ * The browser submits intent only. Identity, active organization, canonical
+ * persisted run evidence, timestamps and hashes are derived on the server.
  */
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { createHandler } from "../_shared/handler.ts";
-import { EVIDENCE_SCHEMA_VERSION, canonicalHash } from "../_shared/canonicalHash.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { z } from 'https://deno.land/x/zod@v3.23.8/mod.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { createHandler } from '../_shared/handler.ts';
+import { EVIDENCE_SCHEMA_VERSION, canonicalHash } from '../_shared/canonicalHash.ts';
 
 const InputSchema = z.object({
   runId: z.string().uuid(),
   recommendationId: z.string().min(1).max(200),
-  outcome: z.enum(["approved", "rejected", "escalated"]),
+  outcome: z.enum(['approved', 'rejected', 'escalated']),
   rationale: z.string().min(10).max(4000),
   comment: z.string().max(4000).nullable().optional(),
   escalatedTo: z.string().max(200).nullable().optional(),
   idempotencyKey: z.string().min(8).max(200).optional(),
-  /** Conflict detection: the output hash the operator saw. */
   expectedOutputHash: z.string().max(200).nullable().optional(),
   supersedesDecisionId: z.string().uuid().nullable().optional(),
 });
 
+const DECISION_ROLES = ['owner', 'admin', 'operator', 'engineer', 'manager'];
+
 function admin() {
   return createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 }
 
 serve(
   createHandler({
-    name: "record-decision",
-    authLevel: "user",
+    name: 'record-decision',
+    authLevel: 'user',
     inputSchema: InputSchema,
     handler: async (input, context) => {
       const { userId, user, supabase, log } = context;
-      if (!userId) throw { code: "UNAUTHORIZED", message: "Sign-in required", status: 401 };
-      const svc = admin();
+      if (!userId) throw { code: 'UNAUTHORIZED', message: 'Sign-in required', status: 401 };
 
-      // Canonical run, read through the caller's RLS scope so cross-tenant
-      // ids fail closed before any privileged work happens.
+      const { data: activeOrgRaw, error: activeOrgError } = await supabase.rpc('active_org_id');
+      const activeOrgId = !activeOrgError && typeof activeOrgRaw === 'string' ? activeOrgRaw : null;
+      if (!activeOrgId) {
+        throw { code: 'FORBIDDEN', message: 'An active organization is required.', status: 403 };
+      }
+      const { data: canDecide, error: roleError } = await supabase.rpc('org_has_role', {
+        _org_id: activeOrgId,
+        _user_id: userId,
+        _roles: DECISION_ROLES,
+      });
+      if (roleError || canDecide !== true) {
+        throw { code: 'FORBIDDEN', message: 'Your organization role cannot record simulation decisions.', status: 403 };
+      }
+
+      const svc = admin();
       const { data: run, error: runError } = await supabase
-        .from("simulation_runs")
+        .from('simulation_runs')
         .select(
-          "id, user_id, tenant_id, twin_id, lifecycle_status, run_intent, verification_level, " +
-            "actual_provider, requested_provider, provider_version, outcome_execution_class, " +
-            "input_hash, configuration_hash, output_hash, telemetry_snapshot_id, " +
-            "telemetry_snapshot_hash, external_job_id, failure_code, failure_message, " +
-            "canonical_schema_version, final_kpis, metric_provenance, server_created_at, finished_at",
+          'id, user_id, tenant_id, twin_id, lifecycle_status, run_intent, verification_level, ' +
+            'actual_provider, requested_provider, provider_version, outcome_execution_class, ' +
+            'input_hash, configuration_hash, output_hash, telemetry_snapshot_id, ' +
+            'telemetry_snapshot_hash, external_job_id, failure_code, failure_message, ' +
+            'canonical_schema_version, final_kpis, metric_provenance, server_created_at, finished_at',
         )
-        .eq("id", input.runId)
+        .eq('id', input.runId)
         .maybeSingle();
       if (runError || !run) {
-        throw { code: "NOT_FOUND", message: "Run not found for this account", status: 404 };
+        throw { code: 'NOT_FOUND', message: 'Run not found for this organization', status: 404 };
       }
-      if (run.user_id !== userId) {
-        throw { code: "FORBIDDEN", message: "Run belongs to another tenant", status: 403 };
+      if (!run.tenant_id || run.tenant_id !== activeOrgId) {
+        throw { code: 'FORBIDDEN', message: 'Run belongs to another organization', status: 403 };
       }
-      if (run.lifecycle_status !== "succeeded") {
+      if (run.lifecycle_status !== 'succeeded') {
         throw {
-          code: "CONFLICT",
+          code: 'CONFLICT',
           message: `Run is ${run.lifecycle_status}; required evidence is missing.`,
           status: 409,
         };
       }
-      // An unverified preview may be annotated, never authoritatively approved.
-      if (input.outcome === "approved" && run.run_intent !== "authoritative") {
+      if (input.outcome === 'approved' && run.run_intent !== 'authoritative') {
         throw {
-          code: "FORBIDDEN",
-          message:
-            "This run is an unverified preview. It can be commented on or escalated, but not approved.",
+          code: 'FORBIDDEN',
+          message: 'This run is an unverified preview. It can be rejected or escalated, but not approved.',
           status: 403,
         };
       }
@@ -88,15 +92,15 @@ serve(
         input.expectedOutputHash !== run.output_hash
       ) {
         throw {
-          code: "CONFLICT",
-          message: "The evidence changed since it was displayed. Reload before deciding.",
+          code: 'CONFLICT',
+          message: 'The evidence changed since it was displayed. Reload before deciding.',
           status: 409,
         };
       }
 
-      // Server-authored evidence snapshot: taken from the persisted run.
       const snapshotBody = {
         evidence_schema_version: EVIDENCE_SCHEMA_VERSION,
+        tenant_id: activeOrgId,
         run_id: run.id,
         twin_id: run.twin_id,
         lifecycle_status: run.lifecycle_status,
@@ -124,10 +128,11 @@ serve(
 
       if (input.idempotencyKey) {
         const { data: prior } = await svc
-          .from("decision_records")
-          .select("id, snapshot_hash, outcome, rationale")
-          .eq("user_id", userId)
-          .eq("idempotency_key", input.idempotencyKey)
+          .from('decision_records')
+          .select('id, run_id, outcome, decided_at, snapshot_hash, decision_hash, rationale')
+          .eq('tenant_id', activeOrgId)
+          .eq('user_id', userId)
+          .eq('idempotency_key', input.idempotencyKey)
           .maybeSingle();
         if (prior) {
           const same =
@@ -135,26 +140,23 @@ serve(
             prior.outcome === input.outcome &&
             prior.rationale === input.rationale.trim();
           if (!same) {
-            throw {
-              code: "CONFLICT",
-              message: "Idempotency key reused for different decision content.",
-              status: 409,
-            };
+            throw { code: 'CONFLICT', message: 'Idempotency key reused for different decision content.', status: 409 };
           }
           return { decision: prior, idempotent: true };
         }
       }
 
-      // Hash chain: link to this operator's most recent record.
       const { data: last } = await svc
-        .from("decision_records")
-        .select("id, decision_hash")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
+        .from('decision_records')
+        .select('id, decision_hash')
+        .eq('tenant_id', activeOrgId)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle();
 
       const recordBody = {
+        tenant_id: activeOrgId,
         run_id: run.id,
         recommendation_id: input.recommendationId,
         outcome: input.outcome,
@@ -167,10 +169,10 @@ serve(
       const decisionHash = await canonicalHash(recordBody);
 
       const { data, error } = await svc
-        .from("decision_records")
+        .from('decision_records')
         .insert({
           user_id: userId,
-          tenant_id: userId,
+          tenant_id: activeOrgId,
           run_id: run.id,
           recommendation_id: input.recommendationId,
           outcome: input.outcome,
@@ -178,11 +180,10 @@ serve(
           approver: user?.email ?? userId,
           comment: input.comment ?? null,
           escalated_to: input.escalatedTo ?? null,
-          execution_status:
-            input.outcome === "approved" ? "manual_execution_pending" : "not_executed",
+          execution_status: input.outcome === 'approved' ? 'manual_execution_pending' : 'not_executed',
           decided_at: decidedAt,
           timeline_id: `run:${run.id}`,
-          data_mode: "SIMULATED",
+          data_mode: 'SIMULATED',
           observation_tick: 0,
           evidence_snapshot: snapshotBody,
           snapshot_hash: snapshotHash,
@@ -192,18 +193,18 @@ serve(
           supersedes_decision_id: input.supersedesDecisionId ?? null,
           idempotency_key: input.idempotencyKey ?? null,
           evidence_schema_version: EVIDENCE_SCHEMA_VERSION,
-          decision_status: "recorded",
-          authored_by: "record-decision@1",
+          decision_status: 'recorded',
+          authored_by: 'record-decision@2',
         })
-        .select("id, run_id, outcome, decided_at, snapshot_hash, decision_hash")
+        .select('id, run_id, outcome, decided_at, snapshot_hash, decision_hash')
         .single();
       if (error) {
-        if ((error as { code?: string }).code === "23505") {
-          throw { code: "CONFLICT", message: "Duplicate decision submission.", status: 409 };
+        if ((error as { code?: string }).code === '23505') {
+          throw { code: 'CONFLICT', message: 'Duplicate decision submission.', status: 409 };
         }
-        throw { code: "INTERNAL_ERROR", message: error.message, status: 500 };
+        throw { code: 'INTERNAL_ERROR', message: error.message, status: 500 };
       }
-      log("decision recorded", { decisionId: data.id, runId: run.id });
+      log('decision recorded', { decisionId: data.id, runId: run.id, tenantId: activeOrgId });
       return { decision: data, idempotent: false };
     },
   }),

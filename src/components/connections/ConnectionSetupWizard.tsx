@@ -1,9 +1,7 @@
 /**
- * Connection setup wizard. Drafts are non-destructive, cancellation discards
- * nothing already proven, and activation is only offered after a passing
- * server-side health check. Credential material, when the method needs one, is
- * held in component state, submitted once to the vault edge function, and
- * cleared immediately; it is never persisted or read back in the browser.
+ * Connection setup wizard. Tenant authority is resolved from the caller's
+ * active organization. The browser never chooses or submits a tenant id.
+ * Credentials are submitted once to the server-side vault and never read back.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Check, CircleAlert, Loader2 } from 'lucide-react';
@@ -27,8 +25,8 @@ import {
   createConnection,
   runHealthCheck,
   storeConnectionCredential,
+  useCurrentTenantId,
   useFacilityOptions,
-  useTenantOptions,
   type HealthCheckResult,
 } from '@/connections/api';
 import type { ConnectionInstance, ConnectorDefinition } from '@/connections/model';
@@ -69,7 +67,7 @@ export function ConnectionSetupWizard({
   onCompleted: () => void;
 }) {
   const { toast } = useToast();
-  const tenants = useTenantOptions();
+  const currentTenant = useCurrentTenantId();
   const facilities = useFacilityOptions();
   const capabilities = useManagedConnectorCapabilities();
 
@@ -84,7 +82,6 @@ export function ConnectionSetupWizard({
     () => definitions.find((d) => d.id === draft.connector_id),
     [definitions, draft.connector_id],
   );
-  // Implementation class for the selected connector, resolved server-side.
   const capability = useMemo(
     () => capabilities.data?.entries.find((e) => e.connector_definition_id === draft.connector_id) ?? null,
     [capabilities.data, draft.connector_id],
@@ -98,22 +95,30 @@ export function ConnectionSetupWizard({
     setDraft({ ...emptyWizardDraft(), connector_id: presetConnectorId ?? '' });
   }, [open, presetConnectorId]);
 
+  useEffect(() => {
+    if (!open || !currentTenant.data) return;
+    setDraft((previous) => previous.tenant_id
+      ? previous
+      : { ...previous, tenant_id: currentTenant.data ?? null });
+  }, [currentTenant.data, open]);
+
   const step = WIZARD_STEPS[stepIndex];
   const lastCheckPassed = check?.status === 'PASSED';
-  const validation = validateStep(step.id as WizardStepId, draft, definition, connections, lastCheckPassed);
+  const baseValidation = validateStep(step.id as WizardStepId, draft, definition, connections, lastCheckPassed);
+  const validation = step.id === 'scope' && !draft.tenant_id
+    ? { complete: false, reason: 'An active organization is required before a connection can be created.' }
+    : baseValidation;
 
   const set = <K extends keyof WizardDraft>(key: K, value: WizardDraft[K]) =>
     setDraft((prev) => ({ ...prev, [key]: value }));
 
   async function handleNext() {
     if (!validation.complete) return;
-    // Persist the draft when leaving the authentication step.
     if (step.id === 'authentication' && !created) {
       setBusy(true);
       try {
         const connection = await createConnection({
           connector_id: draft.connector_id,
-          tenant_id: draft.tenant_id,
           facility_id: draft.facility_id,
           environment: draft.environment,
           display_name: draft.display_name.trim(),
@@ -125,7 +130,6 @@ export function ConnectionSetupWizard({
           await storeConnectionCredential(connection.id, draft.credential_secret, {
             authMethod: draft.auth_method,
           });
-          // The plaintext never survives the submission.
           set('credential_secret', '');
         }
         setCreated(connection);
@@ -265,19 +269,14 @@ export function ConnectionSetupWizard({
           {step.id === 'scope' && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="wizard-tenant" className="text-xs">Tenant</Label>
-                <Select
-                  value={draft.tenant_id ?? NONE}
-                  onValueChange={(v) => set('tenant_id', v === NONE ? null : v)}
-                >
-                  <SelectTrigger id="wizard-tenant" className="h-9 text-sm"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE}>Platform-wide (no tenant)</SelectItem>
-                    {(tenants.data ?? []).map((t) => (
-                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label className="text-xs">Organization</Label>
+                <div className="flex h-9 items-center rounded-md border border-input bg-muted/30 px-3 text-sm text-muted-foreground">
+                  {currentTenant.isLoading
+                    ? 'Resolving current organization...'
+                    : draft.tenant_id
+                      ? 'Current organization verified'
+                      : 'No active organization'}
+                </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="wizard-facility" className="text-xs">Facility</Label>
@@ -304,9 +303,9 @@ export function ConnectionSetupWizard({
                 </Select>
               </div>
               <p className="text-xs text-muted-foreground sm:col-span-3">
-                Tenant scoping is enforced. Only tenants you belong to are listed, reads and writes are
-                restricted to your tenant by row-level security, and the server re-checks the scope on
-                every provisioning call. Platform-wide connections stay visible to all signed-in users.
+                The server binds this connection to your current organization from your authenticated session.
+                Cross-organization and platform-wide customer scopes are not available. Facility choices are limited
+                to canonical facilities in the same organization.
               </p>
             </div>
           )}
@@ -407,7 +406,7 @@ export function ConnectionSetupWizard({
                 <div className="rounded-md border border-border p-3 text-xs">
                   <p className="font-medium">{check.status}</p>
                   <p className="text-muted-foreground">
-                    network {check.network_result ?? 'n/a'} · auth {check.auth_result ?? 'n/a'} · data {check.data_availability ?? 'n/a'} · {check.latency_ms ?? '—'} ms
+                    network {check.network_result ?? 'n/a'} · auth {check.auth_result ?? 'n/a'} · data {check.data_availability ?? 'n/a'} · {check.latency_ms ?? 'n/a'} ms
                   </p>
                   <p className="text-muted-foreground">{check.safe_message}</p>
                   <p className="text-muted-foreground">Correlation {check.correlation_id}</p>
@@ -420,8 +419,8 @@ export function ConnectionSetupWizard({
             <div className="space-y-3 text-xs text-muted-foreground">
               <p>
                 Activation enables the connection and records an audit event. A passing check proves
-                reachability and authorisation, not data flow: the status becomes
-                &quot;Connected, no data&quot; until records are actually received.
+                reachability and authorization, not data flow: the status becomes
+                &quot;Connected, no data&quot; until connection-scoped records are actually proven.
               </p>
               <Button size="sm" className="min-h-[32px]" onClick={handleActivate} disabled={busy || !lastCheckPassed}>
                 {busy ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" aria-hidden /> : null}

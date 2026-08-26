@@ -1,12 +1,14 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export interface BuilderConfig {
-  source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank';
+  source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank' | 'facility';
   goal?: string;
   industry?: string;
   department?: string;
   type?: 'agent' | 'process_twin' | '3d_twin' | null;
   template_id?: string | null;
+  /** Durable facility identity for twin/process-twin builds. */
+  twin_id?: string | null;
   workflow?: {
     triggers: string[];
     actions: string[];
@@ -33,9 +35,17 @@ export interface Builder {
   updated_at: string;
 }
 
+function routedTwinId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  const value = new URL(window.location.href).searchParams.get('twin');
+  return value || undefined;
+}
+
 export const builderService = {
   /**
-   * Create a new builder draft
+   * Create a new builder draft. The canonical Build route carries the facility
+   * identity in `?twin=`; include it in the server request unless an explicit
+   * caller-supplied twin_id already exists.
    */
   async create(params: {
     source?: string;
@@ -44,10 +54,15 @@ export const builderService = {
     department?: string;
     type?: string;
     template_id?: string;
+    twin_id?: string;
   }): Promise<{ id: string; builder: Builder }> {
     try {
+      const request = {
+        ...params,
+        twin_id: params.twin_id ?? routedTwinId(),
+      };
       const { data, error } = await supabase.functions.invoke('builders-create', {
-        body: params
+        body: request
       });
 
       if (error) {
@@ -66,9 +81,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Get builder by ID
-   */
+  /** Get builder by ID. */
   async get(builderId: string): Promise<{ builder: Builder }> {
     try {
       const { data, error } = await supabase.functions.invoke('builders-get', {
@@ -91,9 +104,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Update builder (patch specific fields)
-   */
+  /** Update builder config fields. */
   async update(builderId: string, updates: Partial<BuilderConfig>): Promise<{ builder: Builder }> {
     try {
       const { data, error } = await supabase.functions.invoke('builders-update', {
@@ -116,9 +127,7 @@ export const builderService = {
     }
   },
 
-  /**
-   * Deploy builder as live agent/twin
-   */
+  /** Activate the configured builder record. Runtime provisioning is handled separately. */
   async deploy(builderId: string): Promise<{
     deployment_id: string;
     status: 'success' | 'error';

@@ -1,19 +1,17 @@
 /**
  * Revokes the caller's own AURA Managed User Connection: the gateway
  * connection is destroyed, the encrypted handle is deleted and the evidence
- * record is marked revoked. Fails closed.
+ * record is marked revoked. Fails closed without an active organization.
  */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { disconnectAppUser } from '../_shared/appUserConnector.ts';
 import { deleteConnectionKeyForUser, getConnectionKeyForUser } from '../_shared/appUserConnections.ts';
 import { managedUserBinding } from '../_shared/managedUserBindings.ts';
-import { resolveCallerTenant } from '../_shared/connectionTenant.ts';
+import { resolveCallerTenant, TENANT_REQUIRED } from '../_shared/connectionTenant.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 
 const GATEWAY_BASE_URL = 'https://connector-gateway.lovable.dev';
 
-// Scoped CORS: origin is resolved per request from the shared allowlist;
-// the method/header allowances below are specific to this function.
 const CORS_EXTRA: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -27,14 +25,24 @@ function json(status: number, body: Record<string, unknown>) {
 Deno.serve(async (req) => {
   CORS = { ...getCorsHeaders(req.headers.get('origin')), ...CORS_EXTRA };
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS });
+  if (req.method !== 'POST') return json(405, { error_code: 'method_not_allowed' });
   const correlationId = crypto.randomUUID();
 
-  const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const authHeader = req.headers.get('Authorization') ?? '';
   if (!authHeader.startsWith('Bearer ')) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
-  const { data: userData } = await admin.auth.getUser(authHeader.replace('Bearer ', ''));
-  const user = userData?.user;
-  if (!user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const caller = createClient(
+    supabaseUrl,
+    Deno.env.get('SUPABASE_ANON_KEY')!,
+    { global: { headers: { Authorization: authHeader } } },
+  );
+  const { data: authData, error: authError } = await caller.auth.getUser();
+  const user = authData?.user;
+  if (authError || !user) return json(401, { error_code: 'unauthorized', correlation_id: correlationId });
+
+  const tenantId = await resolveCallerTenant(caller);
+  if (!tenantId) return json(403, { ...TENANT_REQUIRED, correlation_id: correlationId });
 
   let body: { connector_definition_id?: unknown };
   try {
@@ -64,12 +72,13 @@ Deno.serve(async (req) => {
     await deleteConnectionKeyForUser(user.id, binding.gateway_connector_key);
   }
 
-  const tenantId = await resolveCallerTenant(admin, user.id);
+  const admin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
   const now = new Date().toISOString();
   await admin
     .from('managed_user_connections')
     .update({ status: 'REVOKED', revoked_at: now, granted_scopes: [], updated_at: now })
     .eq('user_id', user.id)
+    .eq('tenant_id', tenantId)
     .eq('connector_definition_id', definitionId);
 
   await admin.from('connection_audit_events').insert({

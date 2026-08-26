@@ -71,32 +71,27 @@ test.describe('Auth & Security', () => {
     await page.getByRole('button', { name: /^sign in$/i }).click();
     await expect(page).toHaveURL(/\/dashboard/i, { timeout: 10000 });
 
-    // Logout
-    const profileMenu = page.getByRole('button', { name: /profile|account|user/i });
-    if (await profileMenu.isVisible()) {
-      await profileMenu.click();
-      await page.getByRole('menuitem', { name: /logout|sign out/i }).click();
-    } else {
-      // Alternative: look for logout button directly
-      await page.getByRole('button', { name: /logout|sign out/i }).click();
-    }
+    // Exercise the canonical committed sign-out contract instead of relying on
+    // shell-specific profile menu affordances.
+    await page.goto('/sign-out');
+    await page.waitForURL((url) => url.pathname === '/', { timeout: 10_000 });
 
-    // The committed logout contract returns to the signed-out root route.
-    await page.waitForURL((url) => url.pathname === '/', { timeout: 5000 });
-
-    // Session should be cleared
+    // Session should be cleared.
     const session = await page.evaluate(storedSupabaseSession);
     expect(session).toBeNull();
+
+    // Protected navigation must require authentication again after logout.
+    await page.goto('/dashboard');
+    await expect(page).toHaveURL(/\/(?:login|auth)(?:\?|$)/i, { timeout: 10_000 });
   });
 
   test('should not expose service keys in browser', async ({ page }) => {
-    // Check that no environment variables are leaked to window object
+    // Browser globals must not expose server-only credential names. Network and
+    // build-perimeter checks cover raw secret material separately.
     const leakedKeys = await page.evaluate(() => {
-      const sensitive = ['SUPABASE_SERVICE_KEY', 'SERVICE_ROLE_KEY', 'ANON_KEY'];
-      return sensitive.filter(key =>
-        (window as any)[key] ||
-        (import.meta.env as any)[key]?.includes('service_role')
-      );
+      const sensitive = ['SUPABASE_SERVICE_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'SERVICE_ROLE_KEY'];
+      const browserWindow = window as unknown as Record<string, unknown>;
+      return sensitive.filter((key) => Boolean(browserWindow[key]));
     });
 
     expect(leakedKeys).toHaveLength(0);

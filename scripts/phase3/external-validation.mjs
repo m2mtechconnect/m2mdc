@@ -351,7 +351,7 @@ async function httpBoundary() {
     const row = JSON.parse(scalar(
       `SELECT row_to_json(r) FROM (SELECT tenant_id, user_id, run_intent, verification_level, server_created_at, lifecycle_status FROM public.simulation_runs WHERE id='${runId}') r`,
     ));
-    expect('client cannot set another tenant id', row.tenant_id === tenants.tenantA.id, 'tenant derived from session');
+    expect('client cannot set another tenant id', row.tenant_id === organization.tenantA, 'tenant derived from active organization');
     expect('client cannot author privileged provenance', row.verification_level !== 'server-verified', `verification_level=${row.verification_level}`);
     expect('preview cannot be promoted to authoritative by client input', row.run_intent === 'preview', `run_intent=${row.run_intent}`);
     expect('server-generated timestamps present', Boolean(row.server_created_at), 'server_created_at set');

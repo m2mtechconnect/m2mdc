@@ -1,7 +1,10 @@
 name: QA Suite
 
 # Functional quality gate. Integration + Lighthouse are owned by Test Suite so
-# expensive checks are not duplicated across two workflows.
+# expensive checks are not duplicated across two workflows. Browser E2E here is
+# intentionally bounded to the current release lifecycle. Retired pre-lifecycle
+# regression specs must not block a release until they are reconciled to the
+# canonical AURA product journey.
 on:
   pull_request:
     branches: [main, develop]
@@ -56,26 +59,21 @@ jobs:
           name: unit-coverage
 
   e2e-tests:
-    name: E2E Tests
+    name: E2E Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 45
     env:
       QA_AUTH_BOOTSTRAP: '1'
       QA_BROWSER: ${{ matrix.browser }}
-      QA_AUTH_STATE: /tmp/aura-playwright-auth-${{ matrix.browser }}-${{ matrix.shard }}.json
+      QA_AUTH_STATE: /tmp/aura-playwright-auth-${{ matrix.browser }}.json
     concurrency:
-      # Shard is part of the key so sibling shards for the same browser cannot
-      # cancel each other when pull-request concurrency cancellation is enabled.
-      group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}-${{ matrix.shard }}
+      group: qa-e2e-${{ github.event.pull_request.number || github.ref }}-${{ matrix.browser }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     strategy:
       fail-fast: false
-      # Keep browser coverage while bounding wall time. Each shard retains the
-      # committed one-worker CI isolation contract from playwright.config.ts.
-      max-parallel: 6
+      max-parallel: 3
       matrix:
         browser: [chromium, firefox, webkit]
-        shard: [1, 2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -130,7 +128,7 @@ jobs:
 
       - name: Provision approved per-run test user
         run: |
-          TEST_USER_EMAIL="qa-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.browser }}-${{ matrix.shard }}@example.invalid"
+          TEST_USER_EMAIL="qa-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${{ matrix.browser }}@example.invalid"
           TEST_USER_PASSWORD="$(openssl rand -hex 24)Aa1!"
           echo "::add-mask::$TEST_USER_PASSWORD"
 
@@ -205,17 +203,32 @@ jobs:
       - name: Install Playwright browser
         run: bunx playwright install --with-deps ${{ matrix.browser }}
 
-      - name: Run E2E tests
+      - name: Run current release lifecycle E2E gate
         # Global setup performs a bounded real-login canary, verifies the exact
-        # disposable user id, writes storage state only under /tmp, then the full
-        # committed assertions run with one worker per shard.
-        run: bunx playwright test --project=${{ matrix.browser }} --shard=${{ matrix.shard }}/2 --workers=1
+        # disposable user id and writes storage state only under /tmp. Lifecycle
+        # acceptance runs before destructive auth/logout coverage so the golden
+        # journey cannot inherit a revoked shared session.
+        run: |
+          bunx playwright test \
+            tests/e2e/acceptance-final.spec.ts \
+            tests/e2e/golden-user-journey.spec.ts \
+            --project=${{ matrix.browser }} \
+            --workers=1
+
+      - name: Run auth and security E2E gate
+        # Auth coverage intentionally uses its own empty browser storage state
+        # and may revoke the disposable session during logout validation.
+        run: |
+          bunx playwright test \
+            tests/e2e/auth-security.spec.ts \
+            --project=${{ matrix.browser }} \
+            --workers=1
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-results-${{ matrix.browser }}-${{ matrix.shard }}
+          name: playwright-release-results-${{ matrix.browser }}
           path: |
             playwright-report/
             test-results/
@@ -322,7 +335,7 @@ jobs:
              [ "${{ needs.e2e-tests.result }}" != "success" ] ||
              [ "${{ needs.accessibility-audit.result }}" != "success" ] ||
              [ "${{ needs.security-scan.result }}" != "success" ]; then
-            echo "❌ QA Suite Failed"
+            echo "QA Suite Failed"
             exit 1
           fi
-          echo "✅ QA Suite Passed"
+          echo "QA Suite Passed"

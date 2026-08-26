@@ -1,67 +1,67 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { getCorsHeaders } from "../_shared/cors.ts";
-import { requireCaller, callerRejectedResponse } from "../_shared/callerIdentity.ts";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { getCorsHeaders } from '../_shared/cors.ts';
+import { requireCaller, callerRejectedResponse } from '../_shared/callerIdentity.ts';
 
 /**
  * Provider-neutral managed AI capability probe.
- *
- * The response describes capability availability only. Provider names, model
- * identifiers, cloud project identifiers, regions and upstream URLs are never
- * echoed to the caller; they stay server side.
+ * Runtime authority is server-owned. Browser values never select a provider,
+ * project, raw model identifier, residency region or credential.
  */
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
-  // Defense in depth. Gateway JWT verification is enabled for this function in
-  // supabase/config.toml; the in-code check means the capability configuration
-  // is never disclosed even if the gateway setting is later relaxed.
   try {
     await requireCaller(req);
   } catch (error) {
     const rejected = callerRejectedResponse(error, req);
     if (rejected) return rejected;
-    return new Response(
-      JSON.stringify({ error: "Unauthorized" }),
-      { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
-  }
-
-  try {
-    const managedAiAvailable = !!Deno.env.get('LOVABLE_API_KEY');
-    const externalConfigured = !!(
-      Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON') &&
-      Deno.env.get('GOOGLE_PROJECT_ID')
-    );
-    const externalEnabled = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true' && externalConfigured;
-
-    const config = {
-      managedAi: {
-        available: managedAiAvailable || externalEnabled,
-      },
-      groundingSearch: {
-        available: externalEnabled && !!Deno.env.get('VERTEX_DATA_STORE_ID'),
-      },
-      residency: {
-        configured: externalEnabled,
-      },
-      ready: managedAiAvailable || externalEnabled,
-    };
-
-    return new Response(JSON.stringify(config), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-  } catch (error) {
-    const requestId = crypto.randomUUID();
-    console.error('[ai-config] configuration probe failed', requestId, error);
-    return new Response(JSON.stringify({
-      error: 'Unable to load AI capability configuration',
-      requestId,
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
+
+  const managedAiAvailable = Boolean(Deno.env.get('LOVABLE_API_KEY'));
+  const groundingAvailable = false;
+
+  return new Response(JSON.stringify({
+    runtimeControl: 'server_owned',
+    managedAi: { available: managedAiAvailable },
+    groundingSearch: {
+      available: groundingAvailable,
+      reason: groundingAvailable
+        ? 'Grounding is available through the server-owned runtime.'
+        : 'Grounding is not exposed by the current server-owned AURA runtime contract.',
+    },
+    profiles: [
+      {
+        id: 'balanced',
+        label: 'Balanced',
+        description: 'Default AURA profile for general analysis and operator assistance.',
+        available: managedAiAvailable,
+      },
+      {
+        id: 'fast',
+        label: 'Fast',
+        description: 'Lower-latency AURA profile for concise operational interactions.',
+        available: managedAiAvailable,
+      },
+      {
+        id: 'reasoning',
+        label: 'Reasoning',
+        description: 'Deeper AURA profile for complex analysis when the managed runtime supports it.',
+        available: managedAiAvailable,
+      },
+    ],
+    ready: managedAiAvailable,
+  }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
 });

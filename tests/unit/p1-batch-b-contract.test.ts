@@ -35,24 +35,24 @@ describe('P1 Batch B blueprint preview truth contract', () => {
 });
 
 describe('P1 Batch B simulation preview truth contract', () => {
-  it('uses recommendation scenario IDs and committed registry metadata', () => {
-    expect(simulationPreview).toContain('recommendation.scenarios ?? []');
-    expect(simulationPreview).toContain("PRESET_SCENARIOS");
-    expect(simulationPreview).toContain('const scenario = registry.get(scenarioId);');
+  it('retires the recommendation-only preview into the canonical Simulation workspace', () => {
+    expect(simulationPreview).toContain("import { Navigate, useLocation } from 'react-router-dom';");
+    expect(simulationPreview).toContain('const suffix = `${location.search}${location.hash}`;');
+    expect(simulationPreview).toContain('return <Navigate to={`/simulation${suffix}`} replace />;');
   });
 
   it('does not ship fabricated preview scenarios or simulated/live KPI claims', () => {
     expect(simulationPreview).not.toContain('const previewScenarios');
+    expect(simulationPreview).not.toContain('PRESET_SCENARIOS');
     expect(simulationPreview).not.toContain('~1.35');
     expect(simulationPreview).not.toContain('99.99%');
     expect(simulationPreview).not.toContain('real-time KPI tracking');
-    expect(simulationPreview).toContain('No simulation is running on this page.');
+    expect(simulationPreview).not.toContain('recommendation.scenarios ?? []');
   });
 
-  it('renders recommendation KPIs explicitly as planning targets', () => {
-    expect(simulationPreview).toContain('Planning targets from the recommendation.');
-    expect(simulationPreview).toContain('recommendation.kpiTargets.pueTarget');
-    expect(simulationPreview).toContain('recommendation.kpiTargets.uptimeTargetPct');
+  it('keeps recommendation planning targets on Blueprint instead of duplicating them in the retired preview', () => {
+    expect(blueprintPreview).toContain('Planning targets from the recommendation, not measured KPI values.');
+    expect(simulationPreview).not.toContain('recommendation.kpiTargets');
   });
 });
 

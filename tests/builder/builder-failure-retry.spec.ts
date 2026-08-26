@@ -1,11 +1,10 @@
 /**
- * Committed regression for the /builder "Start blank" failure → Retry
- * recovery path.
+ * Phase 2 failure recovery: canonical facility transaction -> retry -> Builder.
  *
- * Uses the real Lovable-sandbox-injected Supabase session so the
- * successful Retry hits the real `builders-create` edge function and
- * persists exactly one real draft. Only the FIRST create request is
- * intercepted (503) — subsequent requests pass through to the backend.
+ * The first create_facility_setup RPC is intercepted with a controlled 503.
+ * The second attempt reaches the real CI Supabase stack. Builder creation must
+ * not occur until facility identity exists, and only one real Builder draft may
+ * be created after recovery.
  */
 
 import { test, expect, type Request as PWRequest, type Route } from '@playwright/test';
@@ -14,35 +13,27 @@ import {
   RealAuthUnavailableError,
 } from '../_harness/realAuthInject';
 
-const UUID_V4 =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const CONSOLE_ERROR_ALLOWLIST: RegExp[] = [
   /Download the React DevTools/i,
   /\[vite\] connecting/i,
   /\[vite\] connected/i,
-  // The controlled 503 surfaces as a client-side console.error from
-  // the edge-function wrapper. That is the expected user-visible
-  // failure signal — allow it, but only from this one path.
-  /builders-create/i,
+  /Controlled facility failure/i,
   /503/,
-  /Failed to create/i,
-  /Failed to initialize/i,
-  /Draft was not created/i,
-  /Controlled failure/i,
-  /\[builderService\] Create failed/i,
-  /FunctionsHttpError/i,
-  /non-2xx status/i,
-  /Could not start build/i,
+  /create_facility_setup/i,
 ];
 
 function isBuildersCreateRequest(req: PWRequest): boolean {
-  const url = req.url();
-  return req.method() === 'POST' && /\/functions\/v1\/builders-create(\?|$)/.test(url);
+  return req.method() === 'POST' && /\/functions\/v1\/builders-create(\?|$)/.test(req.url());
 }
 
-test.describe('/builder failure-and-Retry regression (real backend recovery)', () => {
-  test('First create fails (503); Retry succeeds against real backend; single persisted draft', async ({
+function isFacilitySetupRequest(req: PWRequest): boolean {
+  return req.method() === 'POST' && /\/rest\/v1\/rpc\/create_facility_setup(\?|$)/.test(req.url());
+}
+
+test.describe('Phase 2 facility setup failure and retry', () => {
+  test('failed facility creation creates no draft; retry creates one facility and one bound draft', async ({
     context,
     page,
   }) => {
@@ -55,48 +46,38 @@ test.describe('/builder failure-and-Retry regression (real backend recovery)', (
       throw err;
     }
 
-    // ---- One-time interception. First matching request → 503. ----
-    let interceptsFired = 0;
-    let realCreateRequests = 0;
-    const failedRequests: string[] = [];
+    let interceptedFailures = 0;
+    let successfulFacilityResponses = 0;
+    const builderCreateRequests: PWRequest[] = [];
+    const consoleErrors: string[] = [];
+    const pageErrors: string[] = [];
 
-    await context.route('**/functions/v1/builders-create*', async (route: Route) => {
-      if (interceptsFired === 0) {
-        interceptsFired += 1;
-        failedRequests.push(route.request().url());
+    await context.route('**/rest/v1/rpc/create_facility_setup*', async (route: Route) => {
+      if (interceptedFailures === 0) {
+        interceptedFailures += 1;
         await route.fulfill({
           status: 503,
           contentType: 'application/json',
           headers: {
-            'access-control-allow-origin': '*',
-            'access-control-allow-headers': '*',
+            'access-control-allow-origin': 'http://localhost:8080',
+            'access-control-allow-headers': 'authorization, apikey, content-type, x-client-info',
           },
-          body: JSON.stringify({
-            error: {
-              code: 'SERVICE_UNAVAILABLE',
-              message: 'Controlled failure for regression test',
-            },
-          }),
+          body: JSON.stringify({ message: 'Controlled facility failure' }),
         });
         return;
       }
-      // Subsequent requests pass through to the real backend.
       await route.continue();
     });
 
-    // Track REAL (non-intercepted) create requests by watching for the
-    // response — an intercepted route.fulfill still fires request events,
-    // so we count real ones by response status.
-    page.on('response', (resp) => {
-      const req = resp.request();
-      if (!isBuildersCreateRequest(req)) return;
-      // Intercepted 503s are counted via `failedRequests` above.
-      if (resp.status() === 503) return;
-      realCreateRequests += 1;
+    page.on('response', (response) => {
+      const req = response.request();
+      if (isFacilitySetupRequest(req) && response.status() >= 200 && response.status() < 300) {
+        successfulFacilityResponses += 1;
+      }
     });
-
-    const consoleErrors: string[] = [];
-    const pageErrors: string[] = [];
+    page.on('request', (req) => {
+      if (isBuildersCreateRequest(req)) builderCreateRequests.push(req);
+    });
     page.on('console', (msg) => {
       if (msg.type() !== 'error') return;
       const text = msg.text();
@@ -105,83 +86,58 @@ test.describe('/builder failure-and-Retry regression (real backend recovery)', (
     });
     page.on('pageerror', (err) => pageErrors.push(err.message));
 
-    // ---- Navigate; starter must render, no auto-create. ----
     await page.goto('/builder', { waitUntil: 'domcontentloaded' });
-    await expect(page).toHaveURL(/\/builder(\?|$)/);
+    await expect(page.getByRole('heading', { name: /create your first facility/i })).toBeVisible({ timeout: 15_000 });
+    expect(builderCreateRequests, 'no Builder draft before facility setup').toHaveLength(0);
 
-    const starterHeading = page.getByRole('heading', { name: /start a new build/i });
-    await expect(starterHeading).toBeVisible();
+    await page.getByRole('button', { name: /^create facility$/i }).click();
+    await page.waitForURL(/\/manage\/facilities\?.*next=builder/, { timeout: 10_000 });
 
-    const startBlank = page.getByRole('button', { name: /^start blank$/i });
-    await expect(startBlank).toBeEnabled();
+    const dialog = page.getByRole('dialog', { name: /create facility/i });
+    await expect(dialog).toBeVisible();
+    await dialog.getByLabel('Facility name').fill('Phase 2 Retry Facility');
+    await dialog.getByRole('combobox', { name: 'Facility region' }).click();
+    await page.getByRole('option', { name: /Montreal, Quebec/i }).click();
+    await dialog.getByRole('combobox', { name: 'Facility tier' }).click();
+    await page.getByRole('option', { name: 'Tier II' }).click();
+    await dialog.getByLabel('Design capacity (kW)').fill('3100');
 
-    // ---- Click. First (intercepted) request must fail with 503. ----
-    await startBlank.click();
-    // Rapid follow-up clicks while the first request is in flight —
-    // must NOT queue additional requests.
-    for (let i = 0; i < 3; i++) {
-      try { await startBlank.click({ timeout: 200, trial: false }); }
-      catch { /* disabled/unmounted — expected */ }
-    }
+    const confirm = dialog.getByRole('button', { name: /create and continue to build/i });
+    await confirm.click();
 
-    // Wait for the visible error state to settle.
-    const errorAlert = page.getByRole('alert');
-    await expect(errorAlert).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/Controlled facility failure/i)).toBeVisible({ timeout: 10_000 });
+    await expect(dialog).toBeVisible();
+    expect(interceptedFailures, 'exactly one controlled failure').toBe(1);
+    expect(successfulFacilityResponses, 'no successful facility transaction yet').toBe(0);
+    expect(builderCreateRequests, 'failed facility setup must not create a Builder draft').toHaveLength(0);
+    expect(new URL(page.url()).pathname).toBe('/manage/facilities');
 
-    // No draft persisted; URL untouched.
-    expect(new URL(page.url()).searchParams.get('draft')).toBeNull();
+    // Inputs remain in the open dialog. Retry the same operator-authored facility.
+    await expect(dialog.getByLabel('Facility name')).toHaveValue('Phase 2 Retry Facility');
+    await expect(dialog.getByLabel('Design capacity (kW)')).toHaveValue('3100');
+    await confirm.click();
 
-    // Starter still mounted.
-    await expect(starterHeading).toBeVisible();
+    await page.waitForURL(/\/builder\?draft=[^&]+&twin=[^&]+/, { timeout: 20_000 });
+    await page.waitForTimeout(750);
 
-    // Primary action becomes Retry.
-    const retryButton = page.getByRole('button', { name: /^retry$/i });
-    await expect(retryButton).toBeVisible();
-    await expect(retryButton).toBeEnabled();
+    const recoveredUrl = new URL(page.url());
+    const draftId = recoveredUrl.searchParams.get('draft');
+    const twinId = recoveredUrl.searchParams.get('twin');
+    expect(draftId).toMatch(UUID);
+    expect(twinId).toMatch(UUID);
+    expect(successfulFacilityResponses, 'exactly one successful facility transaction').toBe(1);
+    expect(builderCreateRequests, 'exactly one Builder draft after recovery').toHaveLength(1);
 
-    // Exactly one failed request; zero real-backend requests so far.
-    expect(failedRequests.length, `one intercepted failure (saw ${failedRequests.length})`).toBe(1);
-    expect(realCreateRequests, `no real create yet (saw ${realCreateRequests})`).toBe(0);
+    const builderBody = builderCreateRequests[0].postDataJSON() as Record<string, unknown>;
+    expect(builderBody.twin_id).toBe(twinId);
+    expect(builderBody.source).toBe('facility');
 
-    // Wizard did not mount.
-    await expect(page.getByRole('progressbar')).toHaveCount(0);
-
-    // ---- Retry: real backend must succeed and persist. ----
-    await retryButton.click();
-
-    await page.waitForURL(/\/builder\?draft=/, { timeout: 15_000 });
-    const draftId = new URL(page.url()).searchParams.get('draft');
-    expect(draftId, 'draft id present after Retry').toBeTruthy();
-    expect(draftId!, 'draft id is a v4 UUID').toMatch(UUID_V4);
-
-    // Let stragglers settle.
-    await page.waitForTimeout(1_500);
-
-    // Exactly one real create request across the whole test.
-    expect(
-      realCreateRequests,
-      `exactly one real backend create after Retry (saw ${realCreateRequests})`,
-    ).toBe(1);
-    // Total intercepted failure count unchanged.
-    expect(failedRequests.length).toBe(1);
-
-    // Error state cleared; wizard mounted.
-    await expect(starterHeading).toBeHidden({ timeout: 15_000 });
-    await expect(errorAlert).toBeHidden();
-    await expect(page.locator('main').first()).toBeVisible();
-
-    // ---- Reload: same draft, no additional create. ----
-    const realBefore = realCreateRequests;
+    const builderCountBeforeReload = builderCreateRequests.length;
     await page.reload({ waitUntil: 'domcontentloaded' });
-    await page.waitForURL(/\/builder\?draft=/, { timeout: 15_000 });
-    await page.waitForTimeout(1_500);
-    expect(new URL(page.url()).searchParams.get('draft')).toBe(draftId);
-    expect(
-      realCreateRequests - realBefore,
-      `reload must not create additional drafts`,
-    ).toBe(0);
+    await page.waitForURL(/\/builder\?draft=[^&]+&twin=[^&]+/, { timeout: 15_000 });
+    await page.waitForTimeout(750);
+    expect(builderCreateRequests.length - builderCountBeforeReload, 'reload creates no additional draft').toBe(0);
 
-    // ---- Console/runtime hygiene. ----
     expect(consoleErrors, 'no unexpected console.error').toEqual([]);
     expect(pageErrors, 'no page exceptions').toEqual([]);
   });

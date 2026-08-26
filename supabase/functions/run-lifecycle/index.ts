@@ -1,15 +1,15 @@
 /**
- * /v1/run-lifecycle - Phase 3 trusted server write boundary for simulation runs.
+ * /v1/run-lifecycle - trusted server write boundary for simulation runs.
  *
  * The browser may never author an authoritative run or promote a preview.
  * This function derives every security- and lifecycle-critical field from the
- * authenticated session and the server clock:
- *   - authenticated creator, tenant membership, facility access
+ * authenticated session, active organization and server clock:
+ *   - authenticated creator, active tenant membership and facility access
  *   - server timestamps
  *   - legal lifecycle transitions (terminal runs cannot be reopened)
  *   - provider readiness -> preview / authoritative classification
  *   - canonical serialization version and hashes
- *   - idempotency
+ *   - tenant-scoped idempotency
  *
  * The AURA scenario engine still executes in the browser. This boundary does
  * NOT claim those results were server-executed: a browser-produced run is
@@ -44,6 +44,9 @@ const LEGAL: Record<Lifecycle, Lifecycle[]> = {
   failed: [],
   cancelled: [],
 };
+
+/** Organization roles allowed to create or advance simulation runs. */
+const RUN_ROLES = ["owner", "admin", "operator", "engineer", "manager"] as const;
 
 /**
  * Providers the server can itself verify. Empty until a real server-executed
@@ -106,24 +109,46 @@ serve(
     handler: async (input, context) => {
       const { userId, supabase, log } = context;
       if (!userId) throw { code: "UNAUTHORIZED", message: "Sign-in required", status: 401 };
+
+      // Tenant authority is always resolved from the caller-scoped client. A
+      // service-role client is never allowed to choose the active organization.
+      const { data: activeOrgRaw, error: activeOrgError } = await supabase.rpc("active_org_id");
+      const activeOrgId = !activeOrgError && typeof activeOrgRaw === "string" ? activeOrgRaw : null;
+      if (!activeOrgId) {
+        throw { code: "FORBIDDEN", message: "An active organization is required.", status: 403 };
+      }
+      const { data: canRun, error: roleError } = await supabase.rpc("org_has_role", {
+        _org_id: activeOrgId,
+        _user_id: userId,
+        _roles: [...RUN_ROLES],
+      });
+      if (roleError || canRun !== true) {
+        throw { code: "FORBIDDEN", message: "Your organization role cannot run simulations.", status: 403 };
+      }
+
       const svc = admin();
 
       if (input.op === "create") {
-        // Facility access is proven through the caller's own RLS-scoped client,
-        // never through the service role.
+        // Facility access and organization ownership are proven through the
+        // caller's RLS-scoped client, never through the service role.
         const { data: twin, error: twinError } = await supabase
           .from("data_centre_twins")
-          .select("id, created_by_user")
+          .select("id, org_id")
           .eq("id", input.twinId)
           .maybeSingle();
         if (twinError || !twin) {
-          throw { code: "FORBIDDEN", message: "Facility not accessible to this account", status: 403 };
+          throw { code: "FORBIDDEN", message: "Facility not accessible to this organization", status: 403 };
+        }
+        if (!twin.org_id || twin.org_id !== activeOrgId) {
+          throw { code: "FORBIDDEN", message: "Facility belongs to another organization", status: 403 };
         }
 
-        // Idempotency: an identical submission resolves to the original run.
+        // Idempotency is tenant + actor scoped. Reusing the same key in a
+        // different organization can never resolve to another tenant's run.
         const { data: existing } = await svc
           .from("simulation_runs")
           .select("id, lifecycle_status, run_intent, verification_level")
+          .eq("tenant_id", activeOrgId)
           .eq("user_id", userId)
           .eq("idempotency_key", input.idempotencyKey)
           .maybeSingle();
@@ -144,7 +169,7 @@ serve(
         const row = {
           twin_id: input.twinId,
           user_id: userId,
-          tenant_id: userId,
+          tenant_id: activeOrgId,
           scenario_key: input.scenarioKey,
           scenario_name: input.scenarioName ?? input.scenarioKey,
           scenario_type: input.scenarioType,
@@ -177,7 +202,8 @@ serve(
           retry_of_run_id: input.retryOfRunId ?? null,
           idempotency_key: input.idempotencyKey,
           provenance_envelope: {
-            boundary: "run-lifecycle@1",
+            boundary: "run-lifecycle@2",
+            tenantId: activeOrgId,
             requestedIntent: input.requestedIntent,
             grantedIntent: runIntent,
             providerVerifiable: verifiable,
@@ -187,11 +213,11 @@ serve(
         if (input.retryOfRunId) {
           const { data: prior } = await svc
             .from("simulation_runs")
-            .select("id, attempt, user_id")
+            .select("id, attempt, user_id, tenant_id")
             .eq("id", input.retryOfRunId)
             .maybeSingle();
-          if (!prior || prior.user_id !== userId) {
-            throw { code: "FORBIDDEN", message: "Retry target not accessible", status: 403 };
+          if (!prior || prior.user_id !== userId || prior.tenant_id !== activeOrgId) {
+            throw { code: "FORBIDDEN", message: "Retry target not accessible in this organization", status: 403 };
           }
           (row as Record<string, unknown>).attempt = (prior.attempt ?? 1) + 1;
         }
@@ -206,6 +232,7 @@ serve(
             const { data: dup } = await svc
               .from("simulation_runs")
               .select("id, lifecycle_status, run_intent, verification_level")
+              .eq("tenant_id", activeOrgId)
               .eq("user_id", userId)
               .eq("idempotency_key", input.idempotencyKey)
               .maybeSingle();
@@ -213,19 +240,23 @@ serve(
           }
           throw { code: "INTERNAL_ERROR", message: error.message, status: 500 };
         }
-        log("run created", { runId: data.id, runIntent });
+        log("run created", { runId: data.id, runIntent, tenantId: activeOrgId });
         return { run: data, idempotent: false };
       }
 
       // ---- transition ----
       const { data: current, error: readError } = await supabase
         .from("simulation_runs")
-        .select("id, user_id, lifecycle_status, started_at, run_intent, verification_level")
+        .select("id, user_id, tenant_id, lifecycle_status, started_at, run_intent, verification_level")
         .eq("id", input.runId)
         .maybeSingle();
       if (readError || !current) {
-        throw { code: "NOT_FOUND", message: "Run not visible to this account", status: 404 };
+        throw { code: "NOT_FOUND", message: "Run not visible to this organization", status: 404 };
       }
+      if (!current.tenant_id || current.tenant_id !== activeOrgId || current.user_id !== userId) {
+        throw { code: "FORBIDDEN", message: "Run belongs to another organization", status: 403 };
+      }
+
       const from = (current.lifecycle_status ?? "unavailable") as Lifecycle;
       if (TERMINAL.includes(from)) {
         throw {
@@ -269,11 +300,12 @@ serve(
         .from("simulation_runs")
         .update(patch)
         .eq("id", input.runId)
+        .eq("tenant_id", activeOrgId)
         .eq("user_id", userId)
         .select("id, lifecycle_status, run_intent, verification_level, output_hash")
         .single();
       if (error) throw { code: "INTERNAL_ERROR", message: error.message, status: 500 };
-      log("run transitioned", { runId: input.runId, from, to: input.to });
+      log("run transitioned", { runId: input.runId, from, to: input.to, tenantId: activeOrgId });
       return { run: data };
     },
   }),

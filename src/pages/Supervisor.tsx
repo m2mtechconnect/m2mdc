@@ -354,6 +354,16 @@ export default function Supervisor() {
             <p className="mt-2 text-xs text-muted-foreground">{drExerciseStatus.note}</p>
           </article>
         </div>
+        {drRejectedRecords.length > 0 ? (
+          <p className="mt-3 text-xs text-muted-foreground" data-testid="dr-rejected-records">
+            {drRejectedRecords.length} supplied exercise record(s) were rejected as evidence and do not affect
+            readiness: {drRejectedRecords.map((entry) => entry.reasons.join('; ')).join(' | ')}
+          </p>
+        ) : null}
+        <p className="mt-3 text-xs text-muted-foreground">
+          Record an exercise with <code className="font-mono">node scripts/log-dr-exercise.mjs</code>. A supplied test
+          artifact is mandatory; documentation alone never upgrades a field.
+        </p>
       </SectionCard>
 
       {/* Multicloud portability */}

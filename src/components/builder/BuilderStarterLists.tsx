@@ -116,7 +116,7 @@ export function BuilderStarterLists() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeOrgId]);
 
   if (loading) {
     return (

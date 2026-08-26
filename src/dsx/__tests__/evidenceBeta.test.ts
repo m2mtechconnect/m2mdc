@@ -8,6 +8,10 @@ import { evaluateScenario } from '../scenario/degradationEngine';
 import { PHYSICAL_CONTROL_ENABLED } from '../contracts/recommendation';
 import { LIVE_MODE_ENABLED, resolveMode } from '../modes';
 import { TIMELINE_START_ISO, TICK_MS } from '../fixtures/timelines';
+import {
+  FIXTURE_DEMONSTRATION_NOTICE,
+  FIXTURES_ALLOWED_AS_PRODUCTION_EVIDENCE,
+} from '../runtime/evidenceFixturePolicy';
 
 const START = '2026-03-02T08:00:00.000Z';
 const nowAt = (tick: number) => Date.parse(TIMELINE_START_ISO) + tick * TICK_MS + 2_000;
@@ -76,6 +80,14 @@ describe('metric truthfulness', () => {
     const b12 = computeKpiBundle(snap12, nowAt(12));
     expect(b12.racks.some((r) => r.inlet_c !== null)).toBe(true);
     expect(snap12.rejected.some((r) => r.reason === 'missing_value')).toBe(true);
+  });
+});
+
+describe('fixture production boundary', () => {
+  it('forbids fixture values as production evidence and discloses their demonstration-only status', () => {
+    expect(FIXTURES_ALLOWED_AS_PRODUCTION_EVIDENCE).toBe(false);
+    expect(FIXTURE_DEMONSTRATION_NOTICE).toContain('not measured or persisted production evidence');
+    expect(FIXTURE_DEMONSTRATION_NOTICE).toContain('cannot be approved as an authoritative decision');
   });
 });
 

@@ -57,3 +57,5 @@ Required inputs:
 The command exits without changes when an active global owner already exists. Otherwise it requires exactly one confirmed, non-deleted Auth user, writes the owner grant, writes the audit event, rolls the grant back if auditing fails, and verifies the grant by reading it back.
 
 After success, sign out and sign back in before provisioning the QA organization. Verify the global owner grant and `platform_owner_bootstrapped` audit event before running the seed.
+
+Clean database replays do not execute this command automatically; it is deliberately separate from migrations because bootstrap identity is environment-specific.

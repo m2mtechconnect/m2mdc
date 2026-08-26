@@ -35,6 +35,7 @@ const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
 const Help = lazy(() => import("./pages/Help"));
+const Supervisor = lazy(() => import("./pages/Supervisor"));
 const Search = lazy(() => import("./pages/Search"));
 const AISettings = lazy(() => import("./pages/AISettings"));
 const Connections = lazy(() => import("./pages/Connections"));
@@ -164,6 +165,10 @@ function ApprovedUserRoutes() {
       <Route path="/simulation" element={<AuraWorkspace />} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
+      {/* Read-only governance surface in the same family as /compliance and
+          /analytics, so it is gated on the same least-privileged read
+          permission. The persona selector never changes authorization. */}
+      <Route path="/readiness/supervisor" element={<PermissionRouteGuard permission="analytics.view"><Supervisor /></PermissionRouteGuard>} />
       <Route path="/search" element={<Search />} />
       <Route path="/settings/ai" element={<PermissionRouteGuard permission="agent.administer"><AISettings /></PermissionRouteGuard>} />
       <Route path="/sign-out" element={<SignOut />} />

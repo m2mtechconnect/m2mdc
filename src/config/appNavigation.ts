@@ -187,6 +187,17 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: `Configuration activation, external runtime evidence and immutable lifecycle events. ${stackDescription('governance.controls')}`,
   },
   {
+    name: 'Readiness',
+    fullName: 'Enterprise Readiness Supervisor',
+    href: '/readiness/supervisor',
+    icon: ClipboardCheck,
+    matches: ['/readiness/supervisor'],
+    permission: 'analytics.view',
+    group: 'govern',
+    description:
+      'Deterministic, evidence-backed production-readiness assessment, specialist domains and release gate. Read-only; absent evidence is shown as not assessed.',
+  },
+  {
     name: 'People & Access',
     fullName: 'People & Access',
     href: '/teams',

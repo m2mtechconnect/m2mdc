@@ -90,16 +90,10 @@ export default function Settings() {
 
   const loadSettings = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      // Resolve the tenant through the canonical server authority
-      // (active_org_id() over org_memberships). No active org means fail closed.
-      const { data: activeOrgId } = await supabase.rpc('active_org_id');
-      const resolvedOrgId = typeof activeOrgId === 'string' && activeOrgId.length > 0 ? activeOrgId : null;
+      // Reuse the verified active organization from the hydrated RBAC shell.
+      // No verified organization means fail closed with a recovery state -
+      // never an independent browser-side lookup or membership guess.
+      const resolvedOrgId = activeOrgId;
 
       if (resolvedOrgId) {
         // Load organization data

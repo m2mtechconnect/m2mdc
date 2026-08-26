@@ -34,9 +34,12 @@ describe('questionnaireToBlueprint', () => {
     expect(blueprint.name).toContain('Customer Success Assistant');
     expect(blueprint.goals).toContain('Automate customer support responses');
     
-    // Model configuration
-    expect(blueprint.model.provider).toBe('gemini');
-    expect(blueprint.model.modelName).toBe('google/gemini-2.5-flash');
+    // Model configuration: new questionnaire blueprints persist only the
+    // stable managed-AI response profile; raw provider/model keys are
+    // server-owned and never written by this converter.
+    expect(blueprint.model.responseProfile).toBe('balanced');
+    expect(blueprint.model.provider).toBeUndefined();
+    expect(blueprint.model.modelName).toBeUndefined();
     expect(blueprint.model.temperature).toBe(0.7); // Agents are more creative
     
     // Tools
@@ -342,19 +345,24 @@ describe('Blueprint validation', () => {
   });
 
   it('should have consistent model configuration structure', () => {
-    const blueprints = [
-      questionnaireToBlueprint(customerSupportAgentAnswers),
-      documentAnalysisToBlueprint(smallDocumentAnalysis),
-      templateToBlueprint(inventoryOptimizationTemplate),
-    ];
+    const questionnaire = questionnaireToBlueprint(customerSupportAgentAnswers);
+    const fromDocument = documentAnalysisToBlueprint(smallDocumentAnalysis);
+    const fromTemplate = templateToBlueprint(inventoryOptimizationTemplate);
 
-    blueprints.forEach(bp => {
-      expect(bp.model.provider).toBeDefined();
-      expect(bp.model.modelName).toBeDefined();
+    // Every converter emits a model object with numeric knobs in range.
+    [questionnaire, fromDocument, fromTemplate].forEach(bp => {
+      expect(bp.model).toBeDefined();
       expect(bp.model.temperature).toBeGreaterThanOrEqual(0);
       expect(bp.model.temperature).toBeLessThanOrEqual(1);
       expect(bp.model.topK).toBeDefined();
       expect(bp.model.topP).toBeDefined();
     });
+
+    // New writes persist only the stable response profile (managed AI
+    // contract). Legacy converters remain readable for existing records but
+    // the questionnaire path never emits raw provider/model identifiers.
+    expect(questionnaire.model.responseProfile).toBeDefined();
+    expect(questionnaire.model.provider).toBeUndefined();
+    expect(questionnaire.model.modelName).toBeUndefined();
   });
 });

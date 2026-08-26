@@ -33,7 +33,14 @@ function ApprovedUserRouterContent() {
     );
   }
 
-  if (resolution.status === 'internal' || resolution.status === 'tenant') {
+  // tenant-unresolved callers keep the normal shell so recovery surfaces
+  // (Account Settings, People & Access) can render precise guidance; every
+  // route-level guard still fails closed on their empty tenant permissions.
+  if (
+    resolution.status === 'internal'
+    || resolution.status === 'tenant'
+    || resolution.status === 'tenant-unresolved'
+  ) {
     return (
       <Routes>
         <Route path="/pilot/*" element={<PilotShell />} />

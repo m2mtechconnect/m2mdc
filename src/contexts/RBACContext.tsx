@@ -13,6 +13,7 @@ import {
   type OrganizationMembershipSummary,
   type OrganizationRole,
 } from '@/auth/organizationAuthorization';
+import { selectUnambiguousMembership } from '@/auth/activeOrgBootstrap';
 import { clearTenantScopedClientState } from '@/auth/tenantStorageIsolation';
 
 /**
@@ -30,6 +31,13 @@ export type RoleResolution =
   | { status: 'loading' }
   | { status: 'internal'; role: AppRole }
   | { status: 'tenant'; role: OrganizationRole; orgId: string }
+  /**
+   * Authenticated with organization memberships, but no membership could be
+   * verified as the active organization through server authority. Fail-closed:
+   * no tenant permissions are granted and surfaces must render recovery
+   * guidance instead of guessing a tenant in browser state.
+   */
+  | { status: 'tenant-unresolved' }
   | { status: 'pilot' }
   | { status: 'error'; error: unknown };
 
@@ -223,11 +231,37 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        const serverActiveOrgId = typeof resolvedActiveOrgId === 'string' ? resolvedActiveOrgId : null;
+        let serverActiveOrgId = typeof resolvedActiveOrgId === 'string' ? resolvedActiveOrgId : null;
+
+        // The server-owned active organization is authoritative. When it is
+        // missing, bootstrap it ONLY when membership selection is unambiguous
+        // (exactly one default membership, or exactly one membership total).
+        // The bootstrap goes through the server RPC and is read back; when
+        // verification fails the resolution fails closed. The browser never
+        // falls back to "the first" membership in local state.
+        if (!serverActiveOrgId && memberships.length > 0) {
+          const candidate = selectUnambiguousMembership(memberships);
+          if (candidate) {
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const { error: setActiveError } = await (tenantDb as any).rpc('set_active_org', { _org_id: candidate.orgId });
+              if (setActiveError) throw setActiveError;
+              const { data: verifiedActiveOrgId } = await tenantDb.rpc('active_org_id');
+              if (verifiedActiveOrgId === candidate.orgId) {
+                serverActiveOrgId = candidate.orgId;
+              } else {
+                console.warn('[RBAC] Active organization bootstrap verification failed; failing closed');
+              }
+            } catch (bootstrapError) {
+              console.warn('[RBAC] Active organization bootstrap failed; failing closed', bootstrapError);
+            }
+          }
+        }
+
+        // The active membership must come from the verified server authority.
+        // No browser-side fallback to a default or first membership.
         const activeMembership =
           memberships.find((membership) => membership.orgId === serverActiveOrgId)
-          ?? memberships.find((membership) => membership.isDefault)
-          ?? memberships[0]
           ?? null;
 
         const tenantPermissions = organizationPermissions(activeMembership?.role ?? null);
@@ -255,6 +289,11 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
               role: activeMembership.role,
               orgId: activeMembership.orgId,
             });
+          } else if (memberships.length > 0) {
+            // Memberships exist but none could be verified as the active
+            // organization. Authenticated yet tenant-less: fail closed into a
+            // dedicated state so surfaces render precise recovery guidance.
+            setResolution({ status: 'tenant-unresolved' });
           } else {
             setResolution({ status: 'pilot' });
           }

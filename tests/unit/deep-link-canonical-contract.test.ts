@@ -167,12 +167,12 @@ describe('alias integrity', () => {
 describe('route registry reflects production availability', () => {
   const shell = read('src/AuthenticatedShell.tsx');
 
-  it('classifies /infrastructure and the funding demo as DEV-only', () => {
-    for (const path of ['/infrastructure', '/digital-twins-demo/funding-intake']) {
-      expect(isProductionRoute(path), `${path} must not be a production route`).toBe(false);
-      const mount = shell.slice(shell.indexOf(`path="${path}"`) - 200, shell.indexOf(`path="${path}"`));
-      expect(mount).toContain('import.meta.env.DEV');
-    }
+  it('keeps the funding demo DEV-only and Infrastructure compatibility redirect-only', () => {
+    const demoPath = '/digital-twins-demo/funding-intake';
+    expect(isProductionRoute(demoPath), `${demoPath} must not be a production route`).toBe(false);
+    const mount = shell.slice(shell.indexOf(`path="${demoPath}"`) - 200, shell.indexOf(`path="${demoPath}"`));
+    expect(mount).toContain('import.meta.env.DEV');
+    expect(ROUTE_ALIASES).toContainEqual({ from: '/infrastructure', to: '/evidence/assets' });
   });
 
   it('keeps DEV-only classification and DEV-only mounting in sync', () => {

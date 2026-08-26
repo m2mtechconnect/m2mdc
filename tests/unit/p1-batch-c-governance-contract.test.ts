@@ -9,6 +9,7 @@ const allowlist = JSON.parse(read('docs/remediation/evidence/pr-0.1/route-allowl
   production_routes: string[];
   production_blocked_routes: string[];
   development_only_routes: string[];
+  redirect_only_routes: string[];
 };
 
 describe('P1 Batch C people and access authority separation', () => {
@@ -44,7 +45,8 @@ describe('P1 Batch C provider-neutral admin presentation', () => {
 describe('P1 route classification', () => {
   it('keeps the mock infrastructure surface out of production', () => {
     expect(allowlist.production_routes).not.toContain('/infrastructure');
-    expect(allowlist.development_only_routes).toContain('/infrastructure');
+    expect(allowlist.development_only_routes).not.toContain('/infrastructure');
+    expect(allowlist.redirect_only_routes).toContain('/infrastructure');
   });
 
   it('promotes the truth-remediated Batch B routes', () => {

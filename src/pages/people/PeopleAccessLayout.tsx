@@ -54,7 +54,13 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
   }
 
   // Tenant users do not enter platform authorization / onboarding pages by URL.
-  if (resolution.status === 'tenant') {
+  // tenant-unresolved callers (memberships exist, none verified active) are
+  // directed to the access-control surface their recovery state points at.
+  if (resolution.status === 'tenant-unresolved') {
+    if (location.pathname !== '/teams/access-control') {
+      return <Navigate to="/teams/access-control" replace />;
+    }
+  } else if (resolution.status === 'tenant') {
     return <Navigate to={can('tenant.view_members') ? '/teams' : '/dashboard'} replace />;
   }
 

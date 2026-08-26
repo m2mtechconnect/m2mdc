@@ -49,13 +49,37 @@ export default function AuthenticatedSessionApp({
   useAutoLogout(!!user);
 
   useEffect(() => {
+    // Protected routes must wait for auth/session hydration before any
+    // redirect decision. The initial getSession() call is the hydration
+    // boundary: until it resolves, no null-session event may tear down the
+    // session or trigger a /login redirect.
+    let hydrated = false;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
-      setLoading(false);
+      if (nextSession) {
+        setSession(nextSession);
+        setUser(nextSession.user);
+        if (hydrated) setLoading(false);
+        return;
+      }
+      if (!hydrated) return; // pre-hydration null events are not evidence
+      // A null event after hydration can be a transient token-refresh
+      // failure. Re-verify against the persisted store before tearing down;
+      // only a confirmed null session may fail closed into a redirect.
+      void supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          setSession(data.session);
+          setUser(data.session.user);
+        } else {
+          setSession(null);
+          setUser(null);
+        }
+        setLoading(false);
+      });
     });
 
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      hydrated = true;
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
       setLoading(false);

@@ -18,7 +18,7 @@ function blockingSpecs(group) {
   fail(`Unknown release E2E group: ${group}`);
 }
 
-function validateContract() {
+function validateContract({ quiet = false } = {}) {
   if (CONTRACT.schema !== 'aura.release-contract.v1') {
     fail(`Unexpected release contract schema: ${CONTRACT.schema}`);
   }
@@ -62,14 +62,16 @@ function validateContract() {
     fail('verify:release is intentionally reserved for full CI qualification. Use verify:release:smoke locally.');
   }
 
-  console.log(`Release contract valid: ${specs.length} blocking E2E specs, ${gateNames.length} workflow gates.`);
+  if (!quiet) {
+    console.log(`Release contract valid: ${specs.length} blocking E2E specs, ${gateNames.length} workflow gates.`);
+  }
 }
 
 function globToRegExp(pattern) {
   const doubleSlash = '__AURA_DOUBLE_SLASH__';
   const double = '__AURA_DOUBLE__';
   const single = '__AURA_SINGLE__';
-  let value = pattern
+  const value = pattern
     .replaceAll('**/', doubleSlash)
     .replaceAll('**', double)
     .replaceAll('*', single)
@@ -140,21 +142,21 @@ function writeQualificationSummary(payload) {
 
   if (process.env.GITHUB_STEP_SUMMARY) {
     const lines = [
-      `## AURA Release Qualification`,
-      ``,
+      '## AURA Release Qualification',
+      '',
       `- Source SHA: \`${payload.sha}\``,
       `- Status: **${payload.status}**`,
       `- Expected gates: ${payload.gates.length}`,
-      ``,
+      '',
       ...payload.gates.map((gate) => `- ${gate.name}: ${gate.status}${gate.conclusion ? ` (${gate.conclusion})` : ''}`),
-      ``,
+      '',
     ];
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
   }
 }
 
 async function qualify() {
-  validateContract();
+  validateContract({ quiet: true });
 
   const repo = process.env.GITHUB_REPOSITORY;
   const sha = process.env.AURA_SOURCE_SHA;
@@ -240,7 +242,7 @@ try {
   if (command === 'validate') {
     validateContract();
   } else if (command === 'list') {
-    validateContract();
+    validateContract({ quiet: true });
     for (const spec of blockingSpecs(arg)) console.log(spec);
   } else if (command === 'qualify') {
     await qualify();

@@ -21,18 +21,25 @@ BEGIN
     RETURN;
   END IF;
 
-  SELECT count(*), min(id)
-    INTO target_count, target_user_id
+  SELECT count(*)
+    INTO target_count
   FROM auth.users
   WHERE lower(email) = lower('edouard@m2mtechconnect.com')
     AND email_confirmed_at IS NOT NULL
     AND deleted_at IS NULL;
 
-  IF target_count <> 1 OR target_user_id IS NULL THEN
+  IF target_count <> 1 THEN
     RAISE EXCEPTION
       'Owner bootstrap requires exactly one confirmed, non-deleted auth user for the configured email; found %.',
       target_count;
   END IF;
+
+  SELECT id
+    INTO STRICT target_user_id
+  FROM auth.users
+  WHERE lower(email) = lower('edouard@m2mtechconnect.com')
+    AND email_confirmed_at IS NOT NULL
+    AND deleted_at IS NULL;
 
   IF NOT EXISTS (
     SELECT 1

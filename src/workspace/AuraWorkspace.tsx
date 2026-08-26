@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
@@ -307,6 +307,9 @@ export default function AuraWorkspace() {
               data-testid="workspace-inspector-drawer"
             >
               <SheetTitle className="sr-only">Workspace inspector</SheetTitle>
+              <SheetDescription className="sr-only">
+                Inspect the selected facility asset and move through the guided simulation workflow.
+              </SheetDescription>
               <ContextPanel facility={facility} assets={assets} overrides={overrides} onClose={closePanel} />
             </SheetContent>
           </Sheet>

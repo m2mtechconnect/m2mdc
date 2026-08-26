@@ -17,6 +17,12 @@ export interface AuraAnalyticsConfig {
   provider?: AuraAnalyticsProvider;
   posthogKey?: string;
   posthogHost?: string;
+  /**
+   * Governed server-side relay (observability-capture edge function). When
+   * set, the browser holds no provider key: events are posted to the relay,
+   * which re-validates and injects the server-held credential.
+   */
+  relayUrl?: string;
 }
 
 export interface AuraAnalyticsResult {
@@ -41,6 +47,10 @@ function configuredProvider(config: AuraAnalyticsConfig): AuraAnalyticsProvider 
 
 function posthogHost(config: AuraAnalyticsConfig): string | null {
   const raw = (config.posthogHost ?? 'https://us.i.posthog.com').trim();
+  return httpsOrLocalUrl(raw);
+}
+
+function httpsOrLocalUrl(raw: string): string | null {
   try {
     const url = new URL(raw);
     const allowed = url.protocol === 'https:'
@@ -50,6 +60,12 @@ function posthogHost(config: AuraAnalyticsConfig): string | null {
   } catch {
     return null;
   }
+}
+
+function relayEndpoint(config: AuraAnalyticsConfig): string | null {
+  const raw = config.relayUrl?.trim();
+  if (!raw) return null;
+  return httpsOrLocalUrl(raw);
 }
 
 export function sanitizeAnalyticsProperties(
@@ -95,10 +111,8 @@ export async function captureAuraEvent(
   const provider = configuredProvider(config);
   if (provider === 'disabled') return { provider, status: 'disabled' };
 
-  const apiKey = (config.posthogKey ?? '').trim();
-  const host = posthogHost(config);
   const organizationId = context.organizationId?.trim() ?? '';
-  if (!apiKey || !host || (TENANT_SCOPED_EVENTS.has(event) && !organizationId)) {
+  if (TENANT_SCOPED_EVENTS.has(event) && !organizationId) {
     return { provider, status: 'not_configured' };
   }
 
@@ -107,6 +121,32 @@ export async function captureAuraEvent(
     distinct_id: analyticsDistinctId(),
   };
   if (organizationId) properties.organization_id = organizationId;
+
+  // Relay path: the browser holds no provider credential. The governed edge
+  // function re-validates, injects the server-held key and delivers upstream.
+  const relay = relayEndpoint(config);
+  if (relay) {
+    try {
+      const response = await fetch(relay, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ event, properties }),
+        keepalive: true,
+        signal: AbortSignal.timeout(ANALYTICS_TIMEOUT_MS),
+      });
+      return { provider, status: response.ok ? 'queued' : 'failed' };
+    } catch {
+      return { provider, status: 'failed' };
+    }
+  }
+
+  // Direct path: explicit caller-supplied public capture key (self-hosted or
+  // white-label packaging without the governed relay).
+  const apiKey = (config.posthogKey ?? '').trim();
+  const host = posthogHost(config);
+  if (!apiKey || !host) {
+    return { provider, status: 'not_configured' };
+  }
 
   const payload = {
     api_key: apiKey,

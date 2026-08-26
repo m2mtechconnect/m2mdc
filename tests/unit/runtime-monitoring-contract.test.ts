@@ -14,7 +14,12 @@ describe('runtime monitoring contract', () => {
     expect(source).toContain("window.addEventListener('unhandledrejection', onUnhandledRejection)");
     expect(source).toContain("'runtime.client_error'");
     expect(source).toContain("'runtime.unhandled_rejection'");
-    expect(mainSource).toContain('startRuntimeMonitoring()');
+    // Activation is resolved through the governed backend config endpoint; the
+    // adapter is invoked with that resolved config and never with a literal key.
+    expect(mainSource).toContain('resolveRuntimeMonitoringConfig');
+    expect(mainSource).toContain('startRuntimeMonitoring(config)');
+    expect(mainSource).not.toContain('posthogKey');
+    expect(mainSource).not.toContain('phc_');
   });
 
   it('is fail-closed and does not read ambient browser environment configuration', () => {

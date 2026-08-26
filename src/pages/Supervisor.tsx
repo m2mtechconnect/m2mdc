@@ -32,9 +32,10 @@ import {
   ACTIVATION_TRIGGERS,
   AUTOMATIC_TRIGGERS,
   CONNECTOR_POLICIES,
-  DR_EXERCISE_STATUS,
-  DR_READINESS_FIELDS,
   DR_TRUTH_NOTE,
+  deriveDrExerciseStatus,
+  deriveDrReadinessFields,
+  rejectedDrExerciseRecords,
   KNOWLEDGE_SOURCES,
   OBSERVABILITY_SIGNALS,
   PORTABILITY_MATRIX,
@@ -138,6 +139,11 @@ export default function Supervisor() {
   const [categoryFilter, setCategoryFilter] = useState<'all' | ReadinessCategory>('all');
 
   const persona = supervisorPersona(personaId);
+  // DR readiness is derived from supplied exercise artifacts only. With no
+  // artifacts the baseline (documented / not-defined) is shown unchanged.
+  const drReadinessFields = useMemo(() => deriveDrReadinessFields(), []);
+  const drExerciseStatus = useMemo(() => deriveDrExerciseStatus(), []);
+  const drRejectedRecords = useMemo(() => rejectedDrExerciseRecords(), []);
   const findings = useMemo(() => prioritizeFindings(READINESS_FINDINGS, persona), [persona]);
   const visibleFindings = useMemo(
     () => (categoryFilter === 'all' ? findings : findings.filter((f) => f.category === categoryFilter)),
@@ -317,7 +323,7 @@ export default function Supervisor() {
         icon={LifeBuoy}
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-testid="dr-readiness">
-          {DR_READINESS_FIELDS.map((field) => (
+          {drReadinessFields.map((field) => (
             <article key={field.id} className="rounded-lg border border-border bg-card p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-sm font-semibold">{field.label}</h3>
@@ -342,12 +348,22 @@ export default function Supervisor() {
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-sm font-semibold">Exercise status</h3>
               <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
-                {DR_EXERCISE_STATUS.state === 'exercise-recorded' ? 'Exercise recorded' : 'Not exercised'}
+                {drExerciseStatus.state === 'exercise-recorded' ? 'Exercise recorded' : 'Not exercised'}
               </Badge>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground">{DR_EXERCISE_STATUS.note}</p>
+            <p className="mt-2 text-xs text-muted-foreground">{drExerciseStatus.note}</p>
           </article>
         </div>
+        {drRejectedRecords.length > 0 ? (
+          <p className="mt-3 text-xs text-muted-foreground" data-testid="dr-rejected-records">
+            {drRejectedRecords.length} supplied exercise record(s) were rejected as evidence and do not affect
+            readiness: {drRejectedRecords.map((entry) => entry.reasons.join('; ')).join(' | ')}
+          </p>
+        ) : null}
+        <p className="mt-3 text-xs text-muted-foreground">
+          Record an exercise with <code className="font-mono">node scripts/log-dr-exercise.mjs</code>. A supplied test
+          artifact is mandatory; documentation alone never upgrades a field.
+        </p>
       </SectionCard>
 
       {/* Multicloud portability */}

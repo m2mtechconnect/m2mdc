@@ -8,5 +8,6 @@ export * from './runtimeIntegration';
 export * from './permissionBroker';
 export * from './observability';
 export * from './drReadiness';
+export * from './drExerciseLog';
 export * from './portabilityMatrix';
 export * from './releaseProfiles';

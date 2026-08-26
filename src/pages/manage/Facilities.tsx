@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useRBAC } from '@/contexts/RBACContext';
-import { supabase } from '@/integrations/supabase/client';
+import { createFacilitySetup } from '@/facilities/api';
 import { toast } from 'sonner';
 
 const REGIONS = [
@@ -43,21 +43,6 @@ const EMPTY_FORM = {
   capacity_kw: 0,
 };
 
-type FacilitySetupRow = {
-  location_id: string;
-  twin_id: string;
-};
-
-type RpcResult = {
-  data: unknown;
-  error: { message: string } | null;
-};
-
-const callRpc = (
-  fn: string,
-  args?: Record<string, unknown>,
-): Promise<RpcResult> =>
-  supabase.rpc(fn as never, args as never) as unknown as Promise<RpcResult>;
 
 export default function ManageFacilities() {
   const navigate = useNavigate();
@@ -123,26 +108,16 @@ export default function ManageFacilities() {
 
     setCreating(true);
     try {
-      const { data, error } = await callRpc('create_facility_setup', {
-        _name: name,
-        _city: region.name,
-        _province: region.province,
-        _country: 'Canada',
-        _region_code: form.region_code,
-        _tier: form.tier,
-        _capacity_kw: form.capacity_kw,
-        _source: nextStep === 'builder' ? 'build-setup' : 'manage-facilities',
+      const row = await createFacilitySetup({
+        name,
+        city: region.name,
+        province: region.province,
+        country: 'Canada',
+        regionCode: form.region_code,
+        tier: form.tier,
+        capacityKw: form.capacity_kw,
+        source: nextStep === 'builder' ? 'build-setup' : 'manage-facilities',
       });
-
-      if (error) throw new Error(error.message);
-      if (!Array.isArray(data) || data.length !== 1) {
-        throw new Error('Facility transaction did not return a canonical facility');
-      }
-
-      const row = data[0] as Partial<FacilitySetupRow>;
-      if (typeof row.twin_id !== 'string' || typeof row.location_id !== 'string') {
-        throw new Error('Facility transaction returned an invalid identity');
-      }
 
       await Promise.all([refreshLocations(), refreshTwins()]);
       await setActiveTwin(row.twin_id);

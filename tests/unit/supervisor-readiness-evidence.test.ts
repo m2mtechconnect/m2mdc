@@ -262,7 +262,7 @@ describe('supervisor UI surfaces the new evidence', () => {
     expect(page).toContain('data-testid="portability-matrix"');
     expect(page).toContain('evaluateReleaseGateForProfile');
     expect(page).toContain('OBSERVABILITY_SIGNALS');
-    expect(page).toContain('DR_READINESS_FIELDS');
+    expect(page).toContain('deriveDrReadinessFields');
     expect(page).toContain('PORTABILITY_MATRIX');
   });
 });

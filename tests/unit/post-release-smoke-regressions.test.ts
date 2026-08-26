@@ -27,6 +27,6 @@ describe('post-release production smoke regressions', () => {
     expect(userMenu).toContain('organizations.length > 1 || !activeOrganization');
     expect(userMenu).toContain("activeOrganization?.orgName ?? 'Select organization'");
     expect(userMenu).toContain("activeOrganization ? 'Switch organization' : 'Select active organization'");
-    expect(userMenu).toContain('switchOrganization(organization.orgId)');
+    expect(userMenu).toContain('handleOrganizationSwitch(organization.orgId)');
   });
 });

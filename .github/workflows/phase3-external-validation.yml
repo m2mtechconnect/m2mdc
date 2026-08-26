@@ -56,7 +56,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Supabase CLI
         uses: supabase/setup-cli@v1
@@ -111,7 +111,7 @@ jobs:
         with:
           name: phase3-external-validation-${{ env.AURA_SOURCE_SHA }}
           path: phase3-external-validation.json
-          if-no-files-found: warn
+          if-no-files-found: error
 
       - name: Stop stack
         if: always()

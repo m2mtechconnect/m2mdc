@@ -139,6 +139,11 @@ export default function Supervisor() {
   const [categoryFilter, setCategoryFilter] = useState<'all' | ReadinessCategory>('all');
 
   const persona = supervisorPersona(personaId);
+  // DR readiness is derived from supplied exercise artifacts only. With no
+  // artifacts the baseline (documented / not-defined) is shown unchanged.
+  const drReadinessFields = useMemo(() => deriveDrReadinessFields(), []);
+  const drExerciseStatus = useMemo(() => deriveDrExerciseStatus(), []);
+  const drRejectedRecords = useMemo(() => rejectedDrExerciseRecords(), []);
   const findings = useMemo(() => prioritizeFindings(READINESS_FINDINGS, persona), [persona]);
   const visibleFindings = useMemo(
     () => (categoryFilter === 'all' ? findings : findings.filter((f) => f.category === categoryFilter)),

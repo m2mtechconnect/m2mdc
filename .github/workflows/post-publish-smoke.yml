@@ -1,10 +1,21 @@
 name: Post-Publish Smoke (read-only)
 
-# Manual dispatch only. This workflow never runs autonomously on push and
-# never mutates the production target. It executes the read-only smoke
-# qualification suite (scripts/post-publish-smoke.mjs) against the target a
-# human names, after a human-approved publish.
+# Read-only qualification. This workflow never mutates the production target,
+# never deploys and never publishes: it performs GET navigations only and
+# stores evidence artifacts.
+#
+# It runs automatically after a publish. Publishes happen outside GitHub, so
+# the trigger is a poll of the live release fingerprint: on a schedule and
+# after the production mirror completes, the suite runs with
+# `--only-if-new-publish` and exits without claiming anything when the live
+# SHA already carries a passing recorded run. Manual dispatch remains
+# available for a named target and SHA.
 on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_run:
+    workflows: ['Lovable Production Mirror']
+    types: [completed]
   workflow_dispatch:
     inputs:
       target:
@@ -16,7 +27,7 @@ on:
         required: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   smoke:
@@ -36,15 +47,21 @@ jobs:
 
       - name: Run read-only post-publish smoke
         env:
-          AURA_SMOKE_TARGET: ${{ inputs.target }}
+          AURA_SMOKE_TARGET: ${{ inputs.target || 'https://auradc.m2mtechconnect.com' }}
           AURA_EXPECTED_SHA: ${{ inputs.expected_sha }}
+          AURA_SMOKE_TRIGGER: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'schedule' && 'scheduled' || 'automatic-on-publish' }}
           # Optional authenticated plane. When these secrets are absent the
           # suite fails closed and records BLOCKED_BY_AUTH.
           AURA_PREVIEW_EMAIL: ${{ secrets.AURA_SMOKE_EMAIL }}
           AURA_PREVIEW_PASSWORD: ${{ secrets.AURA_SMOKE_PASSWORD }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
-        run: node scripts/post-publish-smoke.mjs
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            node scripts/post-publish-smoke.mjs
+          else
+            node scripts/post-publish-smoke.mjs --only-if-new-publish
+          fi
 
       - name: Upload smoke evidence
         if: always()
@@ -53,3 +70,22 @@ jobs:
           name: post-publish-smoke-evidence
           path: docs/evidence/post-publish-smoke/
           if-no-files-found: warn
+
+      # Evidence is preserved on a dedicated branch. `main` is never written
+      # to by this workflow, and no deployment or publish is performed.
+      - name: Preserve evidence on the evidence branch
+        if: always()
+        env:
+          GIT_AUTHOR_NAME: aura-smoke-bot
+          GIT_AUTHOR_EMAIL: aura-smoke-bot@users.noreply.github.com
+          GIT_COMMITTER_NAME: aura-smoke-bot
+          GIT_COMMITTER_EMAIL: aura-smoke-bot@users.noreply.github.com
+        run: |
+          if [ -z "$(git status --porcelain docs/evidence/post-publish-smoke src/supervisor/postPublishSmokeRegistry.ts)" ]; then
+            echo 'No new smoke evidence to preserve.'
+            exit 0
+          fi
+          git checkout -B evidence/post-publish-smoke
+          git add docs/evidence/post-publish-smoke src/supervisor/postPublishSmokeRegistry.ts
+          git commit -m "evidence: post-publish smoke run (${{ github.event_name }})"
+          git push --force-with-lease origin evidence/post-publish-smoke

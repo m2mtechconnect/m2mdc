@@ -42,3 +42,9 @@ The initial seed creates:
 - explicit negative states for DSX Exchange, NVIDIA runtime and SimReady validation.
 
 External connectors remain disabled or simulated. Real messages, paid workloads and live operational claims are outside this fixture.
+
+## Owner bootstrap
+
+The companion migration `20260826224000_bootstrap_initial_platform_owner.sql` resolves the initial platform-owner deadlock without exposing owner elevation to ordinary administrators. It runs only when no unexpired global owner exists, requires exactly one confirmed and non-deleted Auth record for the configured administrator, and writes `platform_owner_bootstrapped` to `audit_logs` in the same transaction.
+
+After the migration is applied, sign out and sign back in before provisioning the QA organization. Verify the global owner grant and audit event before running the seed. Reapplying the migration after an owner exists is a no-op.

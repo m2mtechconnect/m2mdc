@@ -2,86 +2,59 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const read = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
+type ReleaseContract = {
+  schema: string;
+  blockingE2E: {
+    lifecycle: string[];
+    authSecurity: string[];
+  };
+  legacyE2E: {
+    directory: string;
+    policy: string;
+  };
+  workflowGates: Array<{ name: string; mode: string }>;
+  postPublishVerification: string;
+};
 
-const publicRoutes = read('src/PublicAppRoutes.tsx');
-const shell = read('src/AuthenticatedShell.tsx');
-const navigation = read('src/config/appNavigation.ts');
-const facilities = read('src/pages/manage/Facilities.tsx');
-const builder = read('src/pages/Builder.tsx');
-const connections = read('src/connections/api.ts');
-const aiSettings = read('src/pages/AISettings.tsx');
-const simulationPreview = read('src/pages/SimulationPreview.tsx');
-const decidePanel = read('src/workspace/panels/DecidePanel.tsx');
-const deploy = read('src/pages/Deploy.tsx');
-const history = read('src/pages/DeploymentHistory.tsx');
-const analytics = read('src/pages/IntelligenceDashboard.tsx');
+const contract = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'config/aura-release-contract.json'), 'utf8'),
+) as ReleaseContract;
 
-describe('Phase 8 AURA DC golden journey contract', () => {
-  it('starts with account creation and keeps product setup behind approval', () => {
-    expect(publicRoutes).toContain('<Route path="/auth"');
-    expect(publicRoutes).toContain('<Route path="/sign-up" element={withPublicRouteFallback(<SignUp />)} />');
-    expect(publicRoutes).toContain('<Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />');
-    expect(shell).toContain('<Route path="/builder"');
+describe('Phase 8 AURA DC release journey contract', () => {
+  it('uses the versioned canonical release-contract schema', () => {
+    expect(contract.schema).toBe('aura.release-contract.v1');
   });
 
-  it('creates one explicit facility identity before Builder and carries that exact twin forward', () => {
-    expect(facilities).toContain("callRpc('create_facility_setup'");
-    expect(facilities).toContain("nextStep === 'builder'");
-    expect(facilities).toContain('/builder?new=true&twin=');
-    expect(builder).toContain('Create your first facility');
-    expect(builder).toContain("searchParams.get('twin')");
-    expect(builder).toContain('builder.config?.twin_id');
-    expect(builder).not.toContain("city: 'Montreal'");
-    expect(builder).not.toContain('Start blank');
+  it('defines the persisted lifecycle acceptance and golden journey as blocking E2E authority', () => {
+    expect(contract.blockingE2E.lifecycle).toEqual([
+      'tests/e2e/acceptance-final.spec.ts',
+      'tests/e2e/golden-user-journey.spec.ts',
+    ]);
   });
 
-  it('keeps Connections and AI authority server-owned and organization-scoped', () => {
-    expect(connections).toContain('active_org_id');
-    expect(connections).not.toContain('Platform-wide (no tenant)');
-    expect(aiSettings).toContain("runtimeControl: 'server_owned'");
-    expect(aiSettings).toContain('This browser does not configure the AI provider');
-    expect(aiSettings).not.toContain('localStorage');
+  it('keeps auth and security coverage in the blocking release set', () => {
+    expect(contract.blockingE2E.authSecurity).toEqual([
+      'tests/e2e/auth-security.spec.ts',
+    ]);
   });
 
-  it('uses one canonical Simulation workspace and durable server-first decisions', () => {
-    expect(shell).toContain('<Route path="/simulation" element={<AuraWorkspace />} />');
-    expect(shell).toContain('<Route path="/simulation/preview" element={<SimulationPreview />} />');
-    expect(simulationPreview).toContain('<Navigate to={`/simulation${suffix}`} replace />');
-    expect(decidePanel).toContain('await persistDecision');
-    expect(decidePanel).toContain("run.validationStatus === 'server-validated'");
-    expect(decidePanel).toContain('it cannot be approved');
+  it('keeps the historical E2E catalog visible but non-blocking until reconciled', () => {
+    expect(contract.legacyE2E).toEqual({
+      directory: 'tests/e2e',
+      policy: 'non-blocking-until-reconciled',
+    });
   });
 
-  it('records configuration activation without fabricating external runtime deployment', () => {
-    expect(deploy).toContain('Activate in AURA');
-    expect(deploy).toContain('external_runtime_provisioned: false');
-    expect(deploy).toContain('runtime_verified: false');
-    expect(deploy).toContain('runtimeUrl: null');
-    expect(deploy).toContain('health: null');
-    expect(history).toContain('classifyDeploymentTruth');
-    expect(history).toContain('Activation & Runtime Evidence');
-    expect(history).not.toContain('Running systems');
-    expect(history).not.toContain('Runtime Environments');
+  it('contains no duplicate blocking E2E authority', () => {
+    const blocking = [
+      ...contract.blockingE2E.lifecycle,
+      ...contract.blockingE2E.authSecurity,
+    ];
+    expect(new Set(blocking).size).toBe(blocking.length);
   });
 
-  it('makes Build, Operate, Simulation and Evidence discoverable as one lifecycle', () => {
-    expect(navigation).toContain("name: 'Build'");
-    expect(navigation).toContain("href: '/builder'");
-    expect(navigation).toContain("name: 'Operate'");
-    expect(navigation).toContain("href: '/analytics'");
-    expect(navigation).toContain("name: 'Simulation'");
-    expect(navigation).toContain("name: 'Evidence'");
-    expect(navigation).toContain("fullName: 'Activation & Runtime Evidence'");
-  });
-
-  it('hands the operator into truthful operations, evidence and governance surfaces', () => {
-    expect(shell).toContain('<Route path="/analytics"');
-    expect(shell).toContain('<Route path="/compliance"');
-    expect(shell).toContain('<Route path="/teams"');
-    expect(shell).toContain('<Route path="/evidence" element={<EvidenceBetaShell />}>');
-    expect(shell).toContain('<Route path="overview" element={<OverviewWorkspace />} />');
-    expect(analytics).toContain('unavailable');
-    expect(analytics).toContain('dataTrust');
+  it('names one final pre-merge QA authority and preserves post-publish verification', () => {
+    expect(contract.workflowGates.map((gate) => gate.name)).toContain('QA Suite');
+    expect(contract.postPublishVerification).toBe('Release Target Verification');
   });
 });

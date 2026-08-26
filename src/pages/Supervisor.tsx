@@ -1,0 +1,397 @@
+/**
+ * Enterprise Readiness Supervisor (Phase 1).
+ *
+ * One governed supervisor experience with explicit specialist-domain
+ * perspectives. Deterministic and read-only: the assessment is computed from
+ * existing repository and route metadata, the release gate defaults to No-Go
+ * until mandatory evidence is present, and absent evidence is rendered as
+ * "Not assessed" / "Unavailable" rather than a fabricated score.
+ *
+ * The persona selector re-prioritizes findings and changes explanations only;
+ * it never changes authorization.
+ */
+import { useMemo, useState } from 'react';
+import {
+  BookOpenText,
+  ClipboardCheck,
+  Cpu,
+  ShieldAlert,
+  ShieldCheck,
+  UserRound,
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
+import {
+  ACTIVE_RUNTIME,
+  KNOWLEDGE_SOURCES,
+  READINESS_CATEGORIES,
+  READINESS_CATEGORY_LABEL,
+  READINESS_FINDINGS,
+  REDACTION_POLICY,
+  RUNTIME_BOUNDARIES,
+  SPECIALIST_DOMAINS,
+  SUPERVISOR_PERSONAS,
+  evaluateReleaseGate,
+  prioritizeFindings,
+  supervisorPersona,
+  type FindingSeverity,
+  type FindingStatus,
+  type ReadinessCategory,
+  type SupervisorPersonaId,
+} from '@/supervisor';
+
+const STATUS_LABEL: Record<FindingStatus, string> = {
+  pass: 'Evidenced',
+  gap: 'Gap',
+  'not-assessed': 'Not assessed',
+  unavailable: 'Unavailable',
+};
+
+const STATUS_BADGE_CLASS: Record<FindingStatus, string> = {
+  pass: 'bg-accent/15 text-accent-foreground border-transparent',
+  gap: 'bg-destructive/10 text-destructive border-transparent',
+  'not-assessed': 'bg-muted text-muted-foreground border-transparent',
+  unavailable: 'bg-muted text-muted-foreground border-transparent',
+};
+
+const SEVERITY_LABEL: Record<FindingSeverity, string> = {
+  blocker: 'Blocker',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+  info: 'Info',
+};
+
+const DISPOSITION_LABEL = {
+  accepted: 'Accepted',
+  rejected: 'Rejected',
+  superseded: 'Superseded',
+  unresolved: 'Unresolved',
+} as const;
+
+const REDACTION_LABEL = {
+  'pending-review': 'Pending review',
+  'approved-redacted': 'Approved (redacted)',
+  'rejected-sensitive': 'Rejected (sensitive)',
+} as const;
+
+export default function Supervisor() {
+  const [personaId, setPersonaId] = useState<SupervisorPersonaId>('executive');
+  const [categoryFilter, setCategoryFilter] = useState<'all' | ReadinessCategory>('all');
+
+  const persona = supervisorPersona(personaId);
+  const findings = useMemo(() => prioritizeFindings(READINESS_FINDINGS, persona), [persona]);
+  const visibleFindings = useMemo(
+    () => (categoryFilter === 'all' ? findings : findings.filter((f) => f.category === categoryFilter)),
+    [findings, categoryFilter],
+  );
+  const gate = useMemo(() => evaluateReleaseGate(READINESS_FINDINGS), []);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<FindingStatus, number> = { pass: 0, gap: 0, 'not-assessed': 0, unavailable: 0 };
+    for (const finding of READINESS_FINDINGS) counts[finding.status] += 1;
+    return counts;
+  }, []);
+
+  return (
+    <div className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+      <WorkspaceHeader
+        eyebrow="Govern"
+        title="Enterprise Readiness Supervisor"
+        description="Deterministic, read-only production-readiness assessment for enterprise clients. Capability states are reported separately as architecture-aligned, configured, connected, tested, deployed and operationally verified. Nothing is claimed without evidence."
+        icon={ShieldCheck}
+        badges={
+          <>
+            <Badge
+              variant="outline"
+              className={
+                gate.decision === 'go'
+                  ? 'bg-accent/15 text-accent-foreground border-transparent'
+                  : 'bg-destructive/10 text-destructive border-transparent'
+              }
+            >
+              Release gate: {gate.decision === 'go' ? 'Go' : 'No-Go'}
+            </Badge>
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
+              {ACTIVE_RUNTIME.label}
+            </Badge>
+            <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
+              Read-only - no production mutation
+            </Badge>
+          </>
+        }
+        actions={
+          <div className="flex items-center gap-2">
+            <UserRound className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Select value={personaId} onValueChange={(v) => setPersonaId(v as SupervisorPersonaId)}>
+              <SelectTrigger className="h-8 w-[13rem] text-xs" aria-label="Supervisor persona">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-card">
+                {SUPERVISOR_PERSONAS.map((p) => (
+                  <SelectItem key={p.id} value={p.id} className="text-xs">
+                    {p.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        }
+        meta={
+          <p className="text-xs text-muted-foreground">
+            Persona changes priorities and explanations only. Authorization is unchanged and remains governed by route guards and RLS.
+          </p>
+        }
+      />
+
+      {/* Executive overview + release gate */}
+      <SectionCard
+        title="Executive overview"
+        description="Readiness posture across eleven evidence-backed categories. Counts are derived from recorded findings, never estimated."
+        icon={ClipboardCheck}
+      >
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {(Object.keys(STATUS_LABEL) as FindingStatus[]).map((status) => (
+            <div key={status} className="rounded-lg border border-border bg-card p-4">
+              <p className="text-xs text-muted-foreground">{STATUS_LABEL[status]}</p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums">{statusCounts[status]}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground">{persona.narrative}</p>
+      </SectionCard>
+
+      <SectionCard
+        tone="technical"
+        title="Release gate"
+        description="Defaults to No-Go until every mandatory category carries passing evidence and no blocker-severity finding is unresolved."
+        icon={gate.decision === 'go' ? ShieldCheck : ShieldAlert}
+      >
+        <p className="text-sm font-medium">
+          Decision: {gate.decision === 'go' ? 'Go' : 'No-Go'}
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Mandatory categories: {gate.mandatoryCategories.map((c) => READINESS_CATEGORY_LABEL[c]).join(', ')}.
+        </p>
+        {gate.blockers.length > 0 ? (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-muted-foreground" data-testid="release-gate-blockers">
+            {gate.blockers.map((blocker) => (
+              <li key={blocker}>{blocker}</li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-xs text-muted-foreground">No blocking findings.</p>
+        )}
+      </SectionCard>
+
+      {/* Specialist domains */}
+      <SectionCard
+        title="Specialist domains"
+        description="One supervisor experience backed by eight explicit specialist perspectives. Stage maturity is evidenced per stage; unproven stages are marked not evidenced."
+        icon={Cpu}
+      >
+        <div className="grid gap-4 md:grid-cols-2">
+          {SPECIALIST_DOMAINS.map((domain) => (
+            <article key={domain.id} className="rounded-lg border border-border bg-card p-4" data-testid={`domain-${domain.id}`}>
+              <h3 className="text-sm font-semibold">{domain.label}</h3>
+              <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
+                {domain.scope.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={`${domain.label} capability stages`}>
+                {domain.stages.map((stage) => (
+                  <li key={stage.stage}>
+                    <span
+                      className={
+                        stage.state === 'evidenced'
+                          ? 'inline-flex items-center rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent-foreground'
+                          : 'inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
+                      }
+                      title={
+                        stage.state === 'evidenced'
+                          ? `Evidence: ${stage.evidenceRef}${stage.note ? ` - ${stage.note}` : ''}`
+                          : `Not evidenced${stage.note ? ` - ${stage.note}` : ''}`
+                      }
+                    >
+                      {stage.stage}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-xs text-muted-foreground">{domain.currentClaim}</p>
+            </article>
+          ))}
+        </div>
+      </SectionCard>
+
+      {/* Readiness assessment */}
+      <SectionCard
+        title="Production-readiness assessment"
+        description="Each finding records status, severity, evidence source, affected routes/files, recommended action, owner and verification method."
+        icon={BookOpenText}
+        actions={
+          <Select value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as 'all' | ReadinessCategory)}>
+            <SelectTrigger className="h-8 w-[12rem] text-xs" aria-label="Filter by category">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-card">
+              <SelectItem value="all" className="text-xs">All categories</SelectItem>
+              {READINESS_CATEGORIES.map((category) => (
+                <SelectItem key={category} value={category} className="text-xs">
+                  {READINESS_CATEGORY_LABEL[category]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        }
+      >
+        <ul className="space-y-3" data-testid="readiness-findings">
+          {visibleFindings.map((finding) => (
+            <li key={finding.id} className="rounded-lg border border-border bg-card p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge variant="outline" className={STATUS_BADGE_CLASS[finding.status]}>
+                  {STATUS_LABEL[finding.status]}
+                </Badge>
+                <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
+                  {SEVERITY_LABEL[finding.severity]}
+                </Badge>
+                <span className="text-[11px] text-muted-foreground">{READINESS_CATEGORY_LABEL[finding.category]}</span>
+              </div>
+              <h3 className="mt-2 text-sm font-semibold">{finding.title}</h3>
+              <dl className="mt-2 grid gap-x-6 gap-y-1 text-xs text-muted-foreground sm:grid-cols-2">
+                <div>
+                  <dt className="font-medium text-foreground">Evidence</dt>
+                  <dd>
+                    {finding.evidenceSource}
+                    {finding.evidenceRef ? (
+                      <>
+                        {' '}
+                        <code className="font-mono text-[11px]">{finding.evidenceRef}</code>
+                      </>
+                    ) : null}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-foreground">Recommended action</dt>
+                  <dd>{finding.recommendedAction}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-foreground">Affected routes</dt>
+                  <dd>{finding.affectedRoutes.length > 0 ? finding.affectedRoutes.join(', ') : 'None route-scoped'}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-foreground">Affected files</dt>
+                  <dd className="font-mono text-[11px]">{finding.affectedFiles.join(', ')}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-foreground">Owner</dt>
+                  <dd>{supervisorPersona(finding.ownerPersona).label}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-foreground">Verification method</dt>
+                  <dd>{finding.verificationMethod}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+
+      {/* Knowledge source registry */}
+      <SectionCard
+        title="Knowledge source registry"
+        description={REDACTION_POLICY}
+        icon={BookOpenText}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th scope="col" className="py-2 pr-3 font-medium">Source</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Kind</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Disposition</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Redaction</th>
+                <th scope="col" className="py-2 font-medium">Regression case</th>
+              </tr>
+            </thead>
+            <tbody>
+              {KNOWLEDGE_SOURCES.map((source) => (
+                <tr key={source.id} className="border-b border-border last:border-0">
+                  <td className="py-2 pr-3">
+                    <span className="font-medium text-foreground">{source.title}</span>
+                    <br />
+                    <code className="font-mono text-[11px] text-muted-foreground">{source.ref}</code>
+                    {source.note ? (
+                      <>
+                        <br />
+                        <span className="text-muted-foreground">{source.note}</span>
+                      </>
+                    ) : null}
+                  </td>
+                  <td className="py-2 pr-3 text-muted-foreground">{source.kind}</td>
+                  <td className="py-2 pr-3">
+                    <Badge
+                      variant="outline"
+                      className={
+                        source.disposition === 'accepted'
+                          ? 'bg-accent/15 text-accent-foreground border-transparent'
+                          : 'bg-muted text-muted-foreground border-transparent'
+                      }
+                    >
+                      {DISPOSITION_LABEL[source.disposition]}
+                    </Badge>
+                  </td>
+                  <td className="py-2 pr-3">
+                    <Badge
+                      variant="outline"
+                      className={
+                        source.redactionState === 'approved-redacted'
+                          ? 'bg-accent/15 text-accent-foreground border-transparent'
+                          : source.redactionState === 'rejected-sensitive'
+                            ? 'bg-destructive/10 text-destructive border-transparent'
+                            : 'bg-muted text-muted-foreground border-transparent'
+                      }
+                    >
+                      {REDACTION_LABEL[source.redactionState]}
+                    </Badge>
+                  </td>
+                  <td className="py-2 font-mono text-[11px] text-muted-foreground">
+                    {source.regressionCaseRef ?? 'None'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </SectionCard>
+
+      {/* Runtime boundary */}
+      <SectionCard
+        title="Supervisor runtime"
+        description="Phase 1 runs a deterministic local assessment. Managed agent runtimes are integration boundaries only; none are deployed, connected or claimed."
+        icon={Cpu}
+      >
+        <ul className="space-y-2 text-xs">
+          {[ACTIVE_RUNTIME, ...RUNTIME_BOUNDARIES].map((runtime) => (
+            <li key={runtime.label} className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
+              <Badge
+                variant="outline"
+                className={
+                  runtime.state === 'active'
+                    ? 'bg-accent/15 text-accent-foreground border-transparent'
+                    : 'bg-muted text-muted-foreground border-transparent'
+                }
+              >
+                {runtime.state === 'active' ? 'Active' : 'Integration boundary only'}
+              </Badge>
+              <span className="font-medium">{runtime.label}</span>
+              <span className="text-muted-foreground">{runtime.note}</span>
+            </li>
+          ))}
+        </ul>
+      </SectionCard>
+    </div>
+  );
+}

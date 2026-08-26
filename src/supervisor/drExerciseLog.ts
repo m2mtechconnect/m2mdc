@@ -18,7 +18,7 @@ import {
   type DrExerciseStatus,
   type DrReadinessField,
 } from './drReadiness';
-import registry from '../../docs/evidence/dr-exercises/registry.json';
+import { DR_EXERCISE_REGISTRY } from './drExerciseRegistry';
 
 /** Scopes an exercise can prove. Mirrors the readiness field ids it can upgrade. */
 export const DR_EXERCISE_SCOPES = ['backup', 'restore', 'rollback'] as const;

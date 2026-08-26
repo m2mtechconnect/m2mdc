@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "fixtureId": "aura-enterprise-qa-v1",
+  "classification": "SIMULATED_TEST_DATA",
+  "provenance": {
+    "sourceType": "fixture",
+    "live": false,
+    "dsxExchangeDeployed": false,
+    "nvidiaRuntimeValidated": false,
+    "simReadyValidated": false,
+    "permittedLabel": "NVIDIA-aligned controlled demonstration using simulated DSX-shaped data"
+  },
+  "organization": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "name": "AURA Enterprise QA Lab",
+    "domain": "qa.aura.invalid",
+    "industry": "AI data centre validation",
+    "default_role": "viewer",
+    "sso_enabled": false,
+    "mfa_enabled": false
+  },
+  "personas": [
+    {
+      "key": "owner",
+      "role": "owner",
+      "required": true,
+      "purpose": "organization lifecycle and full tenant administration"
+    },
+    {
+      "key": "admin",
+      "role": "admin",
+      "required": false,
+      "purpose": "members, settings and integrations"
+    },
+    {
+      "key": "executive",
+      "role": "executive",
+      "required": false,
+      "purpose": "ROI, dashboards and approvals"
+    },
+    {
+      "key": "manager",
+      "role": "manager",
+      "required": false,
+      "purpose": "facility workflows and approvals"
+    },
+    {
+      "key": "engineer",
+      "role": "engineer",
+      "required": false,
+      "purpose": "builder, simulation and validation"
+    },
+    {
+      "key": "operator",
+      "role": "operator",
+      "required": false,
+      "purpose": "operations and incident workflows"
+    },
+    {
+      "key": "compliance",
+      "role": "compliance",
+      "required": false,
+      "purpose": "evidence, audit and export"
+    },
+    {
+      "key": "analyst",
+      "role": "data_analyst",
+      "required": false,
+      "purpose": "analytics and read-only reports"
+    },
+    {
+      "key": "viewer",
+      "role": "viewer",
+      "required": false,
+      "purpose": "least-privilege and denial-path validation"
+    }
+  ],
+  "facilities": [
+    {
+      "id": "10000000-0000-4000-8000-000000000101",
+      "name": "Montreal Sovereign AI DC — QA",
+      "city": "Montreal",
+      "region_code": "CA-QC",
+      "tier": "Tier III",
+      "capacity_kw": 10000,
+      "pue_target": 1.3,
+      "carbon_intensity": 28,
+      "renewable_target_pct": 85,
+      "sovereignty_level": "Canadian-controlled",
+      "industry": "AI factory",
+      "metadata": {
+        "fixture_id": "aura-enterprise-qa-v1",
+        "data_classification": "SIMULATED_TEST_DATA",
+        "geometry_coverage": {
+          "rendered_racks": 40,
+          "estimated_total_racks": 200,
+          "status": "partial"
+        },
+        "dsx_exchange": {
+          "status": "NOT_DEPLOYED"
+        },
+        "nvidia_runtime": {
+          "status": "NOT_VALIDATED"
+        },
+        "scenarios": [
+          {
+            "id": "cooling_degradation",
+            "state": "completed",
+            "quality": "simulated"
+          },
+          {
+            "id": "utility_failure",
+            "state": "draft",
+            "quality": "simulated"
+          },
+          {
+            "id": "capacity_expansion",
+            "state": "failed",
+            "quality": "simulated"
+          }
+        ],
+        "telemetry_states": [
+          "accepted",
+          "stale",
+          "missing",
+          "rejected",
+          "conflicting"
+        ],
+        "integration_states": [
+          "connected-simulated",
+          "disconnected",
+          "expired",
+          "misconfigured"
+        ]
+      }
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000102",
+      "name": "Toronto DR AI DC — QA",
+      "city": "Toronto",
+      "region_code": "CA-ON",
+      "tier": "Tier II",
+      "capacity_kw": 3000,
+      "pue_target": 1.38,
+      "carbon_intensity": 35,
+      "renewable_target_pct": 70,
+      "sovereignty_level": "Canadian-controlled",
+      "industry": "disaster recovery",
+      "metadata": {
+        "fixture_id": "aura-enterprise-qa-v1",
+        "data_classification": "SIMULATED_TEST_DATA",
+        "readiness": "design-only",
+        "dsx_exchange": {
+          "status": "NOT_DEPLOYED"
+        },
+        "nvidia_runtime": {
+          "status": "NOT_VALIDATED"
+        }
+      }
+    }
+  ]
+}

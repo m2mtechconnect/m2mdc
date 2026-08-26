@@ -21,10 +21,10 @@ import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useToast } from '@/hooks/use-toast';
 import { validateStep1 } from '@/lib/validation/builderValidation';
-import { supabase } from '@/integrations/supabase/client';
 import { trackBuilderStep } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useRBAC } from '@/contexts/RBACContext';
 import { builderService } from '@/services/builderService';
 
 export default function Builder() {
@@ -140,25 +140,19 @@ export default function Builder() {
 
   const steps = fromScanner ? dcSteps : wizardSteps;
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session) {
-          navigate('/auth', { replace: true });
-          return;
-        }
-        setAuthChecked(true);
-      } catch (authError) {
-        console.error('[Builder] Auth check failed', authError);
-        navigate('/auth', { replace: true });
-      }
-    };
-    void checkAuth();
-  }, [navigate]);
+  // Authentication is resolved once by the session shell (AuthenticatedSessionApp)
+  // before this route renders. Re-running an independent getSession() here raced
+  // hydration and could bounce verified sessions to /login. Tenant authority is
+  // the verified RBAC active organization - never browser-side membership guesses.
+  const { loading: rbacLoading, activeOrgId } = useRBAC();
+  const tenantVerified = !rbacLoading && !!activeOrgId;
 
   useEffect(() => {
-    if (!authChecked || !requestedTwinId || twinLoading) return;
+    if (!rbacLoading) setAuthChecked(true);
+  }, [rbacLoading]);
+
+  useEffect(() => {
+    if (!tenantVerified || !requestedTwinId || twinLoading) return;
     const requested = configuredTwins.find((candidate) => candidate.id === requestedTwinId);
     if (!requested) {
       setInitError('The selected facility is not available or still requires operator setup.');

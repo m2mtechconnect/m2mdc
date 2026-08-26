@@ -112,8 +112,7 @@ serve(createHandler({
               hitl: [],
             },
             model_config: {
-              provider: 'google',
-              model: 'google/gemini-3-pro-preview',
+              response_profile: 'balanced',
               rag: {},
               policies: {},
               mcp_servers: [],

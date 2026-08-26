@@ -21,10 +21,10 @@ import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { useToast } from '@/hooks/use-toast';
 import { validateStep1 } from '@/lib/validation/builderValidation';
-import { supabase } from '@/integrations/supabase/client';
 import { trackBuilderStep } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useRBAC } from '@/contexts/RBACContext';
 import { builderService } from '@/services/builderService';
 
 export default function Builder() {
@@ -123,7 +123,7 @@ export default function Builder() {
     const getFreshState = () => useWizardBuilderStore.getState();
     return [
       { id: 1, component: Step1Summary, validate: () => true },
-      { id: 2, component: Step2Intelligence, validate: () => !!getFreshState().modelConfig?.model },
+      { id: 2, component: Step2Intelligence, validate: () => !!(getFreshState().modelConfig?.response_profile || getFreshState().modelConfig?.model) },
       { id: 3, component: Step3Tools, validate: () => true },
       { id: 4, component: Step4Workflow, validate: () => !!getFreshState().workflow?.actions?.length },
       {
@@ -140,25 +140,19 @@ export default function Builder() {
 
   const steps = fromScanner ? dcSteps : wizardSteps;
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session) {
-          navigate('/auth', { replace: true });
-          return;
-        }
-        setAuthChecked(true);
-      } catch (authError) {
-        console.error('[Builder] Auth check failed', authError);
-        navigate('/auth', { replace: true });
-      }
-    };
-    void checkAuth();
-  }, [navigate]);
+  // Authentication is resolved once by the session shell (AuthenticatedSessionApp)
+  // before this route renders. Re-running an independent getSession() here raced
+  // hydration and could bounce verified sessions to /login. Tenant authority is
+  // the verified RBAC active organization - never browser-side membership guesses.
+  const { loading: rbacLoading, activeOrgId } = useRBAC();
+  const tenantVerified = !rbacLoading && !!activeOrgId;
 
   useEffect(() => {
-    if (!authChecked || !requestedTwinId || twinLoading) return;
+    if (!rbacLoading) setAuthChecked(true);
+  }, [rbacLoading]);
+
+  useEffect(() => {
+    if (!tenantVerified || !requestedTwinId || twinLoading) return;
     const requested = configuredTwins.find((candidate) => candidate.id === requestedTwinId);
     if (!requested) {
       setInitError('The selected facility is not available or still requires operator setup.');
@@ -168,7 +162,9 @@ export default function Builder() {
   }, [authChecked, requestedTwinId, twinLoading, configuredTwins, activeTwinId, setActiveTwin]);
 
   useEffect(() => {
-    if (!authChecked || isInitialized) return;
+    // Builder creation fails closed before any data access when the
+    // server-verified active organization is absent.
+    if (!tenantVerified || isInitialized) return;
     if (!hasIntent) {
       setIsInitialized(true);
       return;
@@ -263,7 +259,7 @@ export default function Builder() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [effectiveCurrentStep]);
 
-  if (!authChecked || !isInitialized || twinLoading) {
+  if (rbacLoading || !authChecked || !isInitialized || twinLoading) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background" role="status" aria-live="polite">
         <div className="space-y-4 text-center">
@@ -274,6 +270,28 @@ export default function Builder() {
           </div>
         </div>
       </div>
+    );
+  }
+
+  if (!activeOrgId) {
+    return (
+      <section className="min-h-dvh bg-background section-padding-lg" aria-labelledby="tenant-required-heading">
+        <div className="mx-auto max-w-2xl space-y-6 text-center">
+          <Building2 className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
+          <div className="space-y-2">
+            <h1 id="tenant-required-heading" className="text-2xl font-semibold">No active organization</h1>
+            <p className="text-sm text-muted-foreground">
+              The Builder requires a verified active organization before any facility data is loaded.
+              Your account has organization memberships, but none could be verified as active. An
+              administrator can set your active organization under People and Access.
+            </p>
+          </div>
+          <Button size="lg" onClick={() => navigate('/teams/access-control')}>
+            <Building2 className="mr-2 h-4 w-4" aria-hidden="true" />
+            Open People and Access
+          </Button>
+        </div>
+      </section>
     );
   }
 

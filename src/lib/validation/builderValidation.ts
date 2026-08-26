@@ -63,11 +63,11 @@ export const REQUIRED_FIELDS_FOR_DEPLOY: BuilderValidationField[] = [
     errorMessage: 'At least one workflow action is required'
   },
   {
-    field: 'model_config.model',
-    label: 'Model Configuration',
+    field: 'model_config.response_profile',
+    label: 'Response Profile',
     step: 4,
-    check: (state) => !!state.modelConfig?.model,
-    errorMessage: 'Model configuration is required'
+    check: (state) => !!(state.modelConfig?.response_profile || state.modelConfig?.model),
+    errorMessage: 'A response profile is required'
   }
 ];
 
@@ -157,8 +157,8 @@ export function validateStep4(workflow: any, modelConfig: any): { isValid: boole
     errors.push('At least one workflow action is required');
   }
   
-  if (!modelConfig?.model) {
-    errors.push('Model configuration is required');
+  if (!modelConfig?.response_profile && !modelConfig?.model) {
+    errors.push('A response profile is required');
   }
   
   return {

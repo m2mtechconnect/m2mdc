@@ -50,7 +50,10 @@ const defaultRoles = [
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { can } = useRBAC();
+  // Account Settings waits for verified RBAC/session hydration and reuses the
+  // verified active organization from the shell instead of racing an
+  // independent active_org_id lookup.
+  const { can, loading: rbacLoading, activeOrgId } = useRBAC();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
@@ -67,8 +70,10 @@ export default function Settings() {
   const isAdmin = can('tenant.manage_members');
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    if (rbacLoading) return; // wait for verified RBAC/session hydration
+    void loadSettings();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rbacLoading, activeOrgId]);
 
   const notifications = useNotificationPreferences();
 
@@ -85,16 +90,10 @@ export default function Settings() {
 
   const loadSettings = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/auth');
-        return;
-      }
-
-      // Resolve the tenant through the canonical server authority
-      // (active_org_id() over org_memberships). No active org means fail closed.
-      const { data: activeOrgId } = await supabase.rpc('active_org_id');
-      const resolvedOrgId = typeof activeOrgId === 'string' && activeOrgId.length > 0 ? activeOrgId : null;
+      // Reuse the verified active organization from the hydrated RBAC shell.
+      // No verified organization means fail closed with a recovery state -
+      // never an independent browser-side lookup or membership guess.
+      const resolvedOrgId = activeOrgId;
 
       if (resolvedOrgId) {
         // Load organization data
@@ -196,12 +195,14 @@ export default function Settings() {
             <div className="text-center space-y-4 py-8">
               <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">No Workspace Found</h3>
+                <h3 className="text-lg font-semibold mb-2">No active organization</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Your account is not associated with a workspace yet.
+                  Workspace settings require a verified active organization. Your account has
+                  organization memberships, but none could be verified as active. An administrator
+                  can set your active organization under People and Access.
                 </p>
-                <Button variant="outline" onClick={() => navigate('/teams')}>
-                  View Teams
+                <Button variant="outline" onClick={() => navigate('/teams/access-control')}>
+                  Open People and Access
                 </Button>
               </div>
             </div>

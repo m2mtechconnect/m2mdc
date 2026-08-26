@@ -16,8 +16,11 @@ export interface BuilderConfig {
     hitl: string[];
   };
   model_config?: {
-    provider: string;
-    model: string;
+    /** Stable managed-AI response profile (browser contract). */
+    response_profile?: string | null;
+    /** Legacy raw identifiers - readable for old drafts, never required. */
+    provider?: string;
+    model?: string;
     rag?: Record<string, any>;
     policies?: Record<string, any>;
     mcp_servers?: any[];

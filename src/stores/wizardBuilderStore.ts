@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
+import { DEFAULT_RESPONSE_PROFILE, isResponseProfile } from '@/lib/llm/responseProfiles';
 
 // Module-level request generation counters. Every call to a Builder read
 // (loadBuilder or a deploy-path readback) captures the counter at start;
@@ -47,8 +48,12 @@ export interface WizardBuilderState {
     hitl: string[];
   };
   modelConfig: {
-    provider: string;
-    model: string;
+    /** Stable managed-AI response profile. New drafts persist only this. */
+    response_profile?: string | null;
+    /** Legacy raw identifiers: readable for existing drafts, stripped when a
+     *  stable response profile is saved. Never written for new drafts. */
+    provider?: string;
+    model?: string;
     rag?: Record<string, any>;
     policies?: Record<string, any>;
     mcp_servers?: any[];
@@ -96,8 +101,9 @@ const initialState = {
     hitl: [],
   },
   modelConfig: {
-    provider: 'google',
-    model: 'google/gemini-2.5-flash',
+    // Managed AI contract: new drafts default to the balanced response
+    // profile. Raw provider/model identifiers are resolved server-side.
+    response_profile: DEFAULT_RESPONSE_PROFILE,
     rag: {},
     policies: {},
     mcp_servers: [],
@@ -744,6 +750,12 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
     }
 
     const newConfig = { ...modelConfig, ...configUpdate };
+    // When a stable response profile is saved, legacy raw provider/model keys
+    // are removed from the browser write; runtime resolution stays server-owned.
+    if (isResponseProfile(configUpdate.response_profile)) {
+      delete newConfig.provider;
+      delete newConfig.model;
+    }
     set({ modelConfig: newConfig, isLoading: true, error: null });
     
     try {

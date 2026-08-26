@@ -19,7 +19,13 @@ import { BuilderToolsPanel } from '@/components/dc-tools';
 import { SovereigntyConfigSection } from '@/components/builder/SovereigntyConfigSection';
 import { CarbonFinancialConfigSection } from '@/components/builder/CarbonFinancialConfigSection';
 import { stackDescription, stackLabel } from '@/config/auraStackManifest';
-import { modelDisplayLabel } from '@/lib/llm/modelLabels';
+import {
+  DEFAULT_RESPONSE_PROFILE,
+  RESPONSE_PROFILES,
+  RESPONSE_PROFILE_DESCRIPTIONS,
+  RESPONSE_PROFILE_LABELS,
+  isResponseProfile,
+} from '@/lib/llm/responseProfiles';
 
 export function Step2Intelligence() {
   const { modelConfig, setModelConfig, builderId } = useWizardBuilderStore();
@@ -107,11 +113,12 @@ export function Step2Intelligence() {
     }
   }, [modelConfig, setModelConfig, supervisorEnabled, deepResearchEnabled, hallucinationPrevention, knowledgeRestrictions, requireCitations]);
 
-  const handleModelChange = async (model: string) => {
-    // The stored value keeps its internal provider/model identifier; the
-    // customer only ever sees the approved capacity label.
-    await setModelConfig({ model, provider: model.split('/')[0] });
-    toast.success(`${stackLabel('ai.managed')} updated to ${modelDisplayLabel(model)}`);
+  const handleProfileChange = async (profile: string) => {
+    if (!isResponseProfile(profile)) return;
+    // The browser persists only the stable response profile. Raw provider and
+    // model identifiers are stripped by the store and resolved server-side.
+    await setModelConfig({ response_profile: profile });
+    toast.success(`${stackLabel('ai.managed')} response profile set to ${RESPONSE_PROFILE_LABELS[profile]}`);
   };
 
   const handleSystemPromptChange = (value: string) => {
@@ -428,32 +435,38 @@ export function Step2Intelligence() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label>Response profile</Label>
-                  <Select value={modelConfig.model} onValueChange={handleModelChange}>
+                  <Select
+                    value={isResponseProfile(modelConfig?.response_profile) ? modelConfig.response_profile : DEFAULT_RESPONSE_PROFILE}
+                    onValueChange={handleProfileChange}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a response profile" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="google/gemini-3-pro-preview">Advanced (preview)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-flash">Fast (default)</SelectItem>
-                      <SelectItem value="google/gemini-2.5-pro">Balanced</SelectItem>
-                      <SelectItem value="openai/gpt-5">Advanced</SelectItem>
-                      <SelectItem value="openai/gpt-5-mini">Fast (alternate)</SelectItem>
+                      {RESPONSE_PROFILES.map((profile) => (
+                        <SelectItem key={profile} value={profile}>
+                          {RESPONSE_PROFILE_LABELS[profile]}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {modelConfig?.model && (
+                    <p className="text-xs text-muted-foreground">
+                      Existing draft carries a legacy provider-specific configuration. Saving a
+                      response profile replaces it with the provider-neutral managed contract.
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid gap-3 p-4 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-sm text-muted-foreground">
+                    {RESPONSE_PROFILE_DESCRIPTIONS[
+                      isResponseProfile(modelConfig?.response_profile) ? modelConfig.response_profile : DEFAULT_RESPONSE_PROFILE
+                    ]}
+                  </p>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Context Window:</span>
-                    <span className="font-mono">128K tokens</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Pricing:</span>
-                    <span className="font-mono">$0.15 / 1M tokens</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Reasoning Mode:</span>
-                    <Badge className="bg-success/10 text-success border-success/30">Fast & Balanced</Badge>
+                    <span className="text-muted-foreground">Execution:</span>
+                    <span className="font-medium">Managed by AURA (provider-neutral)</span>
                   </div>
                 </div>
               </div>

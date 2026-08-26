@@ -40,6 +40,18 @@ serve(createHandler({
     }
     const activeOrgId = typeof resolvedActiveOrgId === 'string' ? resolvedActiveOrgId : null;
 
+    // Tenant boundary: creation fails closed BEFORE any data access when the
+    // server-verified active organization is absent. org_id is persisted only
+    // from this server authority, never from browser input.
+    if (!activeOrgId) {
+      log("Builder creation rejected: no verified active organization");
+      throw {
+        code: 'FORBIDDEN',
+        message: 'No active organization could be verified for this account',
+        status: 403,
+      };
+    }
+
     // The user-level Supabase client is RLS-bound. An invisible facility must
     // look exactly like a missing facility, so the browser cannot bind a draft
     // to an arbitrary twin id.
@@ -85,8 +97,10 @@ serve(createHandler({
             hitl: []
           },
           model_config: {
-            provider: 'google',
-            model: 'google/gemini-2.5-flash',
+            // Managed AI contract: new drafts persist only the stable,
+            // provider-neutral response profile. Runtime provider/model
+            // resolution stays server-owned.
+            response_profile: 'balanced',
             rag: {},
             policies: {},
             mcp_servers: []

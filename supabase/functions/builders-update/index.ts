@@ -57,9 +57,18 @@ serve(createHandler({
       workflow: updates.workflow 
         ? { ...(currentConfig.workflow || {}), ...updates.workflow }
         : currentConfig.workflow,
-      model_config: updates.model_config
-        ? { ...(currentConfig.model_config || {}), ...updates.model_config }
-        : currentConfig.model_config,
+      model_config: (() => {
+        if (!updates.model_config) return currentConfig.model_config;
+        const merged = { ...(currentConfig.model_config || {}), ...updates.model_config };
+        // Managed AI contract: when a stable response profile is saved, legacy
+        // raw provider/model keys are removed server-side. Runtime provider and
+        // model resolution remains server-owned.
+        if (typeof merged.response_profile === 'string' && merged.response_profile.length > 0) {
+          delete merged.provider;
+          delete merged.model;
+        }
+        return merged;
+      })(),
       updated_at: new Date().toISOString()
     };
 

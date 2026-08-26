@@ -123,7 +123,7 @@ export default function Builder() {
     const getFreshState = () => useWizardBuilderStore.getState();
     return [
       { id: 1, component: Step1Summary, validate: () => true },
-      { id: 2, component: Step2Intelligence, validate: () => !!getFreshState().modelConfig?.model },
+      { id: 2, component: Step2Intelligence, validate: () => !!(getFreshState().modelConfig?.response_profile || getFreshState().modelConfig?.model) },
       { id: 3, component: Step3Tools, validate: () => true },
       { id: 4, component: Step4Workflow, validate: () => !!getFreshState().workflow?.actions?.length },
       {

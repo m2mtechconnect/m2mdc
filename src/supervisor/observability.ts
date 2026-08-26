@@ -44,7 +44,7 @@ export const OBSERVABILITY_SIGNALS: readonly ObservabilitySignal[] = [
     label: 'Runtime monitoring client adapter',
     status: 'not-tested',
     evidenceRef: 'tests/unit/runtime-monitoring-contract.test.ts',
-    note: 'Fail-closed, deduplicated client adapter with a passing contract test. No event has been observed end-to-end in an observability backend, so live delivery is not claimed.',
+    note: 'Fail-closed, deduplicated client adapter with a passing contract test. Activation is resolved through the governed observability-config endpoint and delivery relays through the observability-capture edge function - no provider key exists in the browser. Upgrade to verified requires a passing synthetic probe artifact in docs/evidence/observability/ (scripts/verify-observability-e2e.mjs).',
     ownerPersona: 'engineer',
   },
   {
@@ -52,7 +52,7 @@ export const OBSERVABILITY_SIGNALS: readonly ObservabilitySignal[] = [
     label: 'Observability backend (metrics, logs, traces)',
     status: 'unavailable',
     evidenceRef: null,
-    note: 'No production observability backend is connected or evidenced. The client adapter ships events only when an explicit provider configuration exists.',
+    note: 'A governed capture relay (supabase/functions/observability-capture) is implemented and fail-closed: it reports not_configured until a server-held PostHog project key is present. No end-to-end delivery evidence exists yet; this signal upgrades only with a verified probe artifact, never by configuration alone.',
     ownerPersona: 'engineer',
   },
   {
@@ -60,7 +60,7 @@ export const OBSERVABILITY_SIGNALS: readonly ObservabilitySignal[] = [
     label: 'Alerting and on-call routing',
     status: 'not-assessed',
     evidenceRef: null,
-    note: 'No alert rules, escalation policy or on-call integration evidence exists in the repository.',
+    note: 'No alert rules, escalation policy or on-call integration evidence exists in the repository. Acceptable upgrade evidence: provider alert configuration export (e.g. threshold alerts on runtime.client_error) plus a recorded test-notification delivery.',
     ownerPersona: 'facility-operator',
   },
   {
@@ -68,7 +68,7 @@ export const OBSERVABILITY_SIGNALS: readonly ObservabilitySignal[] = [
     label: 'Telemetry freshness (facility DCIM/BMS)',
     status: 'unavailable',
     evidenceRef: null,
-    note: 'No measured production telemetry feed is connected. Rendered facility values are simulated or demonstration fixtures and are labelled as such.',
+    note: 'No measured production telemetry feed is connected. Rendered facility values are simulated or demonstration fixtures and are labelled as such. Upgrade requires an authorised production broker/DCIM feed classified MEASURED under src/runtime/mqtt/provenance.ts.',
     ownerPersona: 'facility-operator',
   },
   {
@@ -76,7 +76,7 @@ export const OBSERVABILITY_SIGNALS: readonly ObservabilitySignal[] = [
     label: 'Incident detection and status signals',
     status: 'not-assessed',
     evidenceRef: null,
-    note: 'No incident feed, status page or post-incident record is indexed as evidence.',
+    note: 'No incident feed, status page or post-incident record is indexed as evidence. Acceptable upgrade evidence: a connected incident-management source (e.g. status page or on-call platform) with at least one observed incident record.',
     ownerPersona: 'compliance-risk',
   },
 ];

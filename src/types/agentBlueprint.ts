@@ -20,8 +20,17 @@ export type TemplateSourceEntry = "dashboard" | "marketplace" | "builder";
 export type AgentBlueprintLevel = "Operational" | "Tactical" | "Strategic";
 
 export interface AgentBlueprintModel {
-  provider: "gemini" | "openai" | "claude" | string;
-  modelName: string;
+  /**
+   * Managed AI contract: the stable, customer-visible selection. Runtime
+   * provider/model resolution is server-owned; the legacy raw keys below are
+   * retained as optional read compatibility for pre-migration records only
+   * and must not be written by new code.
+   */
+  responseProfile?: string;
+  /** @deprecated Legacy raw provider key. New code writes responseProfile. */
+  provider?: "gemini" | "openai" | "claude" | string;
+  /** @deprecated Legacy raw model key. New code writes responseProfile. */
+  modelName?: string;
   temperature?: number;
   topK?: number;
   topP?: number;

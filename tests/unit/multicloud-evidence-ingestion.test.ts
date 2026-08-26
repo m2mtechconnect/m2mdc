@@ -5,7 +5,6 @@ import path from 'node:path';
 import {
   EXECUTION_ARTIFACT_KINDS,
   MULTICLOUD_ARTIFACT_KINDS,
-  MULTICLOUD_EVIDENCE_REGISTRY,
   STAGE_ARTIFACT_REQUIREMENTS,
   TEMPLATE_ARTIFACT_KINDS,
   deriveMulticloudPortabilityMatrix,
@@ -18,6 +17,7 @@ import {
   type MulticloudEvidenceRecord,
 } from '@/supervisor/multicloudEvidence';
 import { PORTABILITY_MATRIX, portabilityClaimIsSound } from '@/supervisor/portabilityMatrix';
+import { MULTICLOUD_EVIDENCE_REGISTRY } from '@/supervisor/multicloudEvidenceRegistry';
 
 const sha = 'a'.repeat(64);
 

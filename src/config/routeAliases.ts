@@ -22,6 +22,7 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/playbook', to: '/help' },
 
   { from: '/operations', to: '/analytics' },
+  { from: '/infrastructure', to: '/evidence/assets' },
   { from: '/intelligence', to: '/analytics' },
   { from: '/integrations', to: '/manage/integrations' },
   { from: '/marketplace/integrations', to: '/manage/integrations' },

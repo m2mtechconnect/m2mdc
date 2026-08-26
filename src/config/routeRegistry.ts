@@ -114,12 +114,6 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/agents/:id/chat', shell: 'internal', kind: 'canonical' },
   { path: '/analytics', shell: 'internal', kind: 'canonical' },
   { path: '/compliance', shell: 'internal', kind: 'canonical' },
-  {
-    path: '/infrastructure',
-    shell: 'internal',
-    kind: 'dev-only',
-    note: 'Legacy static reference page with illustrative figures only. Mounted under import.meta.env.DEV; production direct URLs fall through to NotFound.',
-  },
   { path: '/account/profile', shell: 'internal', kind: 'canonical' },
   { path: '/account/settings', shell: 'internal', kind: 'canonical' },
   { path: '/teams', shell: 'internal', kind: 'canonical' },

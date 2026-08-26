@@ -6,7 +6,6 @@ import { toast } from "sonner";
 // constant produced at check-in time; a future release-tag pipeline may
 // substitute it via a code-mod, but no `import.meta.env` read is permitted.
 const BUILD_VERSION = "pilot";
-const BUILD_TIMESTAMP = "1970-01-01T00:00:00.000Z";
 
 export function BuildVersion() {
   const [showRefreshPrompt, setShowRefreshPrompt] = useState(false);
@@ -36,10 +35,6 @@ export function BuildVersion() {
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
       <span>v{BUILD_VERSION}</span>
-      <span className="opacity-50">•</span>
-      <span className="hidden sm:inline">
-        {new Date(BUILD_TIMESTAMP).toLocaleDateString()}
-      </span>
       {showRefreshPrompt && (
         <button
           onClick={() => window.location.reload()}

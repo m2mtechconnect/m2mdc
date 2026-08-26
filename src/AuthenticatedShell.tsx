@@ -25,12 +25,6 @@ const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
 const Compliance = lazy(() => import("./pages/Compliance"));
-// Legacy static reference page. Its operational figures are illustrative mock
-// data with no navigation entry point, so it is compiled and routed in
-// development builds only; production direct URLs fall through to NotFound.
-const InfrastructurePage = import.meta.env.DEV
-  ? lazy(() => import("./pages/InfrastructurePage"))
-  : null;
 const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
 const Marketplace = lazy(() => import("./pages/Marketplace"));
@@ -126,9 +120,6 @@ function ApprovedUserRoutes() {
           mounted unguarded, which let any authenticated caller (including a
           pilot-plane caller) reach the page and its queries. */}
       <Route path="/compliance" element={<PermissionRouteGuard permission="analytics.view"><Compliance /></PermissionRouteGuard>} />
-      {import.meta.env.DEV && InfrastructurePage && (
-        <Route path="/infrastructure" element={<InfrastructurePage />} />
-      )}
       <Route path="/account/profile" element={<Profile />} />
       <Route path="/account/settings" element={<Settings />} />
 

@@ -137,18 +137,20 @@ export function UserMenu() {
           </div>
         </DropdownMenuLabel>
 
-        {activeOrganization && (
+        {organizations.length > 0 && (
           <>
             <DropdownMenuSeparator />
-            {organizations.length > 1 ? (
+            {organizations.length > 1 || !activeOrganization ? (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger disabled={switchingOrganization}>
                   <Building2 className="mr-2 h-4 w-4" aria-hidden="true" />
-                  <span className="min-w-0 flex-1 truncate">{activeOrganization.orgName}</span>
+                  <span className="min-w-0 flex-1 truncate">
+                    {activeOrganization?.orgName ?? 'Select organization'}
+                  </span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="w-64">
                   <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
-                    Switch organization
+                    {activeOrganization ? 'Switch organization' : 'Select active organization'}
                   </DropdownMenuLabel>
                   {organizations.map((organization) => (
                     <DropdownMenuItem
@@ -156,7 +158,7 @@ export function UserMenu() {
                       disabled={switchingOrganization}
                       onSelect={(event) => {
                         event.preventDefault();
-                        if (organization.orgId !== activeOrganization.orgId) {
+                        if (organization.orgId !== activeOrganization?.orgId) {
                           void handleOrganizationSwitch(organization.orgId);
                         }
                       }}
@@ -167,7 +169,7 @@ export function UserMenu() {
                           {organization.role}{organization.domain ? ` · ${organization.domain}` : ''}
                         </span>
                       </span>
-                      {organization.orgId === activeOrganization.orgId && (
+                      {organization.orgId === activeOrganization?.orgId && (
                         <Check className="ml-2 h-4 w-4" aria-label="Current organization" />
                       )}
                     </DropdownMenuItem>

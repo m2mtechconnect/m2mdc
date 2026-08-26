@@ -286,13 +286,14 @@ test.describe('Phase 1A.3.f — Auth-gated surfaces', () => {
     void guard;
   });
 
-  test('18 infrastructure operational metrics (demo)', async ({ context, page, guard }) => {
+  test('18 infrastructure legacy URL resolves to the tenant asset registry', async ({ context, page, guard }) => {
     const mock = await installSupabaseMock(context);
     await page.goto('/infrastructure', { waitUntil: 'domcontentloaded' });
     await expect.poll(() => mock.profileHits(), { timeout: 5_000 }).toBeGreaterThan(0);
-    const metrics = page.getByTestId('infrastructure-operational-metrics');
-    await metrics.scrollIntoViewIfNeeded();
-    await shot(page, '18-infrastructure-demo.png');
+    await expect(page).toHaveURL(/\/evidence\/assets(?:\?|$)/);
+    await expect(page.getByText('Registry health', { exact: true })).toBeVisible();
+    await expect(page.getByTestId('infrastructure-operational-metrics')).toHaveCount(0);
+    await shot(page, '18-infrastructure-asset-registry.png');
     void guard;
   });
 });

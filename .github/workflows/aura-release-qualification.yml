@@ -1,0 +1,56 @@
+name: AURA Release Qualification
+
+# Final pre-merge release authority. This check does not duplicate the underlying
+# test suites. It derives the applicable workflow gates from the canonical
+# release contract, waits for those exact-SHA runs, and fails closed if any gate
+# fails or never completes.
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: aura-release-qualification-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha }}
+
+jobs:
+  qualification:
+    name: Exact-SHA release decision
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate canonical release contract
+        run: node scripts/aura-release-contract.mjs validate
+
+      - name: Wait for applicable exact-SHA release gates
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AURA_PR_NUMBER: ${{ github.event.pull_request.number }}
+          AURA_QUALIFICATION_TIMEOUT_MS: 3000000
+          AURA_QUALIFICATION_POLL_MS: 20000
+        run: node scripts/aura-release-contract.mjs qualify
+
+      - name: Upload release qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-release-qualification-${{ env.AURA_SOURCE_SHA }}
+          path: release-qualification/summary.json
+          if-no-files-found: error
+          retention-days: 30

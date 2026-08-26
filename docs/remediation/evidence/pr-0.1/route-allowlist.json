@@ -11,7 +11,6 @@
     "write-deferred: it performs a supabase.from('onboarding_submissions')",
     "INSERT and therefore is not a read-only public-pilot route. Password",
     "recovery is split honestly: /forgot-password is a recovery-entry page,",
-    "/reset-password is absent, and the overall recovery workflow is NOT",
     "operable. Approved-user pilot capability is BLOCKED: no existing",
     "approved-user route can be loaded without either mounting Layout",
     "(which initializes Copilot, Zapier, health probes and search",
@@ -42,7 +41,8 @@
     "2026-08-24 enterprise edge promotion: teams-invite is promoted through edge-function-promotions.json. The perimeter overlays only explicit production-allowlisted promotions onto the historical inventory, rejects malformed/unknown/duplicate promotions, and independently re-verifies the actual caller-identity plus scoped-CORS source guard and gateway JWT setting.",
     "2026-08-24 neutral-route reconciliation: the shipped router now uses /evidence as the provider-neutral authenticated evidence workspace and /admin/accelerated-ai-capabilities as the canonical admin capability route. Flat /evidence compatibility paths and /dsx/evidence-beta/* are redirects only. /admin/dsx-capabilities is also redirect-only. This classification change promotes no Edge Function and preserves default-deny route enforcement.",
     "2026-08-24 P1 Batch B route promotion: /blueprint/preview and /simulation/preview are authenticated read-only recommendation previews whose displays are now restricted to recommendation-backed planning values and committed scenario metadata. /studio/systems/:systemId/manage remains protected by twin.edit and now preserves missing runtime/configuration evidence instead of fabricating capability or metric claims. No new Edge Function is promoted by this checkpoint.",
-    "2026-08-24 P1 Batch C governance: /infrastructure is compiled and routed only when import.meta.env.DEV is true, and its source remains a mock/reference page. It is therefore development-only rather than a production route. The canonical /admin/accelerated-ai-capabilities surface uses provider-neutral presentation while retaining source-controlled evidence mappings internally."
+    "2026-08-24 P1 Batch C governance: /infrastructure is compiled and routed only when import.meta.env.DEV is true, and its source remains a mock/reference page. It is therefore development-only rather than a production route. The canonical /admin/accelerated-ai-capabilities surface uses provider-neutral presentation while retaining source-controlled evidence mappings internally.",
+    "2026-08-26 release reconciliation: /reset-password is the shipped recovery-completion route and /readiness/supervisor is the authenticated supervisor-readiness route. Both are explicitly classified without changing their existing guards or the default-deny policy."
   ],
   "production_functions": [
     "agent-execute",
@@ -101,6 +101,8 @@
     "/onboarding",
     "/pilot",
     "/pilot/*",
+    "/readiness/supervisor",
+    "/reset-password",
     "/search",
     "/settings/ai",
     "/sign-out",
@@ -118,9 +120,7 @@
   "recovery_entry_only_routes": [
     "/forgot-password"
   ],
-  "recovery_broken_routes": [
-    "/reset-password"
-  ],
+  "recovery_broken_routes": [],
   "production_blocked_routes": [
     "*",
     "/*",

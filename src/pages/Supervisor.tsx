@@ -12,10 +12,13 @@
  */
 import { useMemo, useState } from 'react';
 import {
+  Activity,
   BookOpenText,
   ClipboardCheck,
+  CloudCog,
   Cpu,
   KeyRound,
+  LifeBuoy,
   Network,
   ShieldAlert,
   ShieldCheck,
@@ -29,20 +32,32 @@ import {
   ACTIVATION_TRIGGERS,
   AUTOMATIC_TRIGGERS,
   CONNECTOR_POLICIES,
+  DR_EXERCISE_STATUS,
+  DR_READINESS_FIELDS,
+  DR_TRUTH_NOTE,
   KNOWLEDGE_SOURCES,
+  OBSERVABILITY_SIGNALS,
+  PORTABILITY_MATRIX,
+  PORTABILITY_STAGES,
   READINESS_CATEGORIES,
   READINESS_CATEGORY_LABEL,
   READINESS_FINDINGS,
   REDACTION_POLICY,
+  RELEASE_PROFILES,
+  RELEASE_PROFILE_DESCRIPTION,
+  RELEASE_PROFILE_LABEL,
   RUNTIME_BOUNDARIES,
   SPECIALIST_DOMAINS,
   SUPERVISOR_PERSONAS,
   evaluateReleaseGate,
+  evaluateReleaseGateForProfile,
   prioritizeFindings,
   resolveActivation,
   supervisorPersona,
+  type DrFieldState,
   type FindingSeverity,
   type FindingStatus,
+  type ObservabilitySignalStatus,
   type ReadinessCategory,
   type SupervisorPersonaId,
 } from '@/supervisor';
@@ -96,6 +111,27 @@ const REDACTION_LABEL = {
   'approved-redacted': 'Approved (redacted)',
   'rejected-sensitive': 'Rejected (sensitive)',
 } as const;
+
+const OBSERVABILITY_STATUS_LABEL: Record<ObservabilitySignalStatus, string> = {
+  verified: 'Verified',
+  'not-tested': 'Not tested',
+  unavailable: 'Unavailable',
+  'not-assessed': 'Not assessed',
+};
+
+const OBSERVABILITY_STATUS_BADGE: Record<ObservabilitySignalStatus, string> = {
+  verified: 'bg-accent/15 text-accent-foreground border-transparent',
+  'not-tested': 'bg-muted text-muted-foreground border-transparent',
+  unavailable: 'bg-muted text-muted-foreground border-transparent',
+  'not-assessed': 'bg-muted text-muted-foreground border-transparent',
+};
+
+const DR_STATE_LABEL: Record<DrFieldState, string> = {
+  documented: 'Documented',
+  exercised: 'Exercised',
+  'not-defined': 'Not defined',
+  'not-assessed': 'Not assessed',
+};
 
 export default function Supervisor() {
   const [personaId, setPersonaId] = useState<SupervisorPersonaId>('executive');

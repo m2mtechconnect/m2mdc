@@ -13,6 +13,7 @@
     "test:truth": "playwright test --config=playwright.truth.config.ts",
     "test:route-stress": "playwright test --config=playwright.route-stress.config.ts",
     "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
+    "smoke:post-publish": "node scripts/post-publish-smoke.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:unit": "vitest run tests/unit src",

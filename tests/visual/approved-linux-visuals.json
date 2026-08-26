@@ -31,7 +31,7 @@
     {"file":"activation-light-chromium-linux.png","mode":"sha256","sha256":"cc597ee16468bdad687d2e35a582399937b7cbdabfe5b72f4fe38115ac0957fd","width":1280,"height":1682},
     {"file":"activation-mobile-chromium-linux.png","mode":"sha256","sha256":"ec342d87d3440ddf66ecce202af159dcbb16be42b2e98be17d999a1a52530aa5","width":375,"height":3053},
     {"file":"ai-runtime-light-chromium-linux.png","mode":"sha256","sha256":"0403792c028c481214e43b829e3812ed6c8e4ec331803481c074ab041b919aec","width":1280,"height":906},
-    {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"18f9dd5427eb80de2e48871e338d986d467fa02531116e49cfbf0eb88dcfbdbb","width":375,"height":5424},
+    {"file":"analytics-mobile-chromium-linux.png","mode":"sha256","sha256":"d85804e4dd3cdf18b7b7b849db906609ad397bc712629879a32526673bf2861d","width":375,"height":5530},
     {"file":"analytics-roi-light-chromium-linux.png","mode":"sha256","sha256":"7cdbde46b6377706db290ccb8241be71cc74beff08c62f8fc902705aa55ab9b7","width":1280,"height":720},
     {"file":"builder-first-run-light-chromium-linux.png","mode":"sha256","sha256":"cc6847fbbdb4694b0b44e27b6368dbd6c451a9b65e0b02c09f1bfad97f867cc4","width":1280,"height":720},
     {"file":"builder-mobile-chromium-linux.png","mode":"sha256","sha256":"ff61811b3c98307fd2d6d43096f4f80a72b8acf47bee071c8c16f4ce1c626008","width":375,"height":2476},

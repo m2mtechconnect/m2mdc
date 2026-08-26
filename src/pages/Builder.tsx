@@ -204,6 +204,7 @@ export default function Builder() {
     initializeBuilder,
     isInitialized,
     authChecked,
+    tenantVerified,
     toast,
     hasIntent,
     t,
@@ -259,7 +260,7 @@ export default function Builder() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [effectiveCurrentStep]);
 
-  if (rbacLoading || !authChecked || !isInitialized || twinLoading) {
+  if (rbacLoading || !authChecked || (!!activeOrgId && (!isInitialized || twinLoading))) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-background" role="status" aria-live="polite">
         <div className="space-y-4 text-center">

@@ -109,6 +109,42 @@ async function expectLifecycleNavigation(page: Page) {
   await expect(page.getByRole('link', { name: /^Evidence$/i }).first()).toBeVisible();
 }
 
+async function installBuilderTenantMock(context: BrowserContext) {
+  const organizationId = '00000000-0000-4000-8000-000000000010';
+  const headers = {
+    'access-control-allow-origin': '*',
+    'access-control-expose-headers': 'content-range,content-profile',
+    'content-type': 'application/json',
+  };
+
+  await context.route('**/rest/v1/org_memberships*', (route) =>
+    route.fulfill({
+      status: 200,
+      headers,
+      body: JSON.stringify([{
+        org_id: organizationId,
+        role: 'owner',
+        status: 'active',
+        is_default: true,
+      }]),
+    }),
+  );
+  await context.route('**/rest/v1/organizations*', (route) =>
+    route.fulfill({
+      status: 200,
+      headers,
+      body: JSON.stringify([{
+        id: organizationId,
+        name: 'AURA Qualification Organization',
+        domain: 'aura.local',
+      }]),
+    }),
+  );
+  await context.route('**/rest/v1/rpc/active_org_id*', (route) =>
+    route.fulfill({ status: 200, headers, body: JSON.stringify(organizationId) }),
+  );
+}
+
 async function installBuilderVisualMock(context: BrowserContext) {
   // The shared Supabase mock intentionally returns an empty array for unknown
   // REST resources. Builder Phase 2 now requires a real facility identity, so
@@ -239,7 +275,8 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await expect(page).toHaveScreenshot('dashboard-hero-light.png', { maxDiffPixels: 100 });
   });
 
-  test('Builder first-run facility gate', async ({ page }) => {
+  test('Builder first-run facility gate', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
     await page.goto('/builder');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
@@ -248,6 +285,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
   });
 
   test('Builder Step 1', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
     await installBuilderVisualMock(context);
     await page.goto(builderVisualUrl(1));
     await page.waitForLoadState('networkidle');
@@ -257,6 +295,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
   });
 
   test('Builder Step 2', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
     await installBuilderVisualMock(context);
     await page.goto(builderVisualUrl(2));
     await page.waitForLoadState('networkidle');
@@ -265,6 +304,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
   });
 
   test('Builder Step 5', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
     await installBuilderVisualMock(context);
     await page.goto(builderVisualUrl(5));
     await page.waitForLoadState('networkidle');
@@ -358,6 +398,7 @@ test.describe('Visual Regression - Mobile', () => {
   });
 
   test('Builder mobile has no horizontal overflow', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
     await installBuilderVisualMock(context);
     await page.goto(builderVisualUrl(1));
     await page.waitForLoadState('networkidle');

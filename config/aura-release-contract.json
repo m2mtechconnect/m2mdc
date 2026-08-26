@@ -1,0 +1,80 @@
+{
+  "schema": "aura.release-contract.v1",
+  "blockingE2E": {
+    "lifecycle": [
+      "tests/e2e/acceptance-final.spec.ts",
+      "tests/e2e/golden-user-journey.spec.ts"
+    ],
+    "authSecurity": [
+      "tests/e2e/auth-security.spec.ts"
+    ]
+  },
+  "legacyE2E": {
+    "directory": "tests/e2e",
+    "policy": "non-blocking-until-reconciled"
+  },
+  "workflowGates": [
+    {
+      "name": "Production Perimeter",
+      "mode": "always"
+    },
+    {
+      "name": "DSX Audit Chain",
+      "mode": "always"
+    },
+    {
+      "name": "DSX / Evidence Scoped Checks",
+      "mode": "always"
+    },
+    {
+      "name": "P1 Static Gate",
+      "mode": "always"
+    },
+    {
+      "name": "Test Suite",
+      "mode": "always"
+    },
+    {
+      "name": "QA Suite",
+      "mode": "always"
+    },
+    {
+      "name": "Phase 3 External Validation",
+      "mode": "paths",
+      "paths": [
+        "supabase/migrations/**",
+        "supabase/functions/**",
+        "scripts/phase3/**",
+        ".github/workflows/phase3-external-validation.yml"
+      ]
+    },
+    {
+      "name": "AURA Truth and Route Stress",
+      "mode": "paths",
+      "paths": [
+        "src/**",
+        "tests/truth-in-ui/**",
+        "tests/route-stress/**",
+        "playwright.truth.config.ts",
+        "playwright.route-stress.config.ts",
+        ".github/workflows/aura-truth-suite.yml"
+      ]
+    },
+    {
+      "name": "Visual Regression Tests",
+      "mode": "paths",
+      "paths": [
+        "src/**/*.tsx",
+        "src/**/*.css",
+        "src/index.css",
+        "src/config/appNavigation.ts",
+        "tests/visual/**",
+        "scripts/verify-visual-fingerprints.mjs",
+        "playwright.visual.config.ts",
+        "tailwind.config.ts",
+        ".github/workflows/visual-regression.yml"
+      ]
+    }
+  ],
+  "postPublishVerification": "Release Target Verification"
+}

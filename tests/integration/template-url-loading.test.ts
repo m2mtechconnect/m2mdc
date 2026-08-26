@@ -225,7 +225,7 @@ describe('Template URL Loading Integration', () => {
     expect(state.builderId).not.toBeNull();
     expect(state.goal).not.toBe('');
     expect(state.industry).not.toBe('');
-    expect(state.modelConfig.model).toBeTruthy();
+    expect(state.modelConfig.response_profile).toBeTruthy();
     expect(state.workflow).toBeDefined();
     
     // Verify blueprint matches store state

@@ -195,12 +195,14 @@ export default function Settings() {
             <div className="text-center space-y-4 py-8">
               <Building2 className="mx-auto h-12 w-12 text-muted-foreground" />
               <div>
-                <h3 className="text-lg font-semibold mb-2">No Workspace Found</h3>
+                <h3 className="text-lg font-semibold mb-2">No active organization</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Your account is not associated with a workspace yet.
+                  Workspace settings require a verified active organization. Your account has
+                  organization memberships, but none could be verified as active. An administrator
+                  can set your active organization under People and Access.
                 </p>
-                <Button variant="outline" onClick={() => navigate('/teams')}>
-                  View Teams
+                <Button variant="outline" onClick={() => navigate('/teams/access-control')}>
+                  Open People and Access
                 </Button>
               </div>
             </div>

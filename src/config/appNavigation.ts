@@ -9,6 +9,7 @@ import {
   BarChart3,
   Boxes,
   Building2,
+  ClipboardCheck,
   Cable,
   FileSearch,
   FlaskConical,

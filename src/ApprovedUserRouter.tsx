@@ -23,6 +23,18 @@ function ApprovedUserRouterContent() {
     return <BoundedLoading stage="authorization" />;
   }
 
+  // The server no longer recognises this caller. A stale browser session is
+  // not authentication: send them to sign-in instead of spinning forever.
+  if (resolution.status === 'unauthenticated') {
+    const returnTo = `${window.location.pathname}${window.location.search}`;
+    return (
+      <Navigate
+        to={`/login?returnTo=${encodeURIComponent(returnTo)}`}
+        replace
+      />
+    );
+  }
+
   // Lookup FAILURE must not silently downgrade to the pilot shell.
   if (resolution.status === 'error') {
     return (
@@ -32,6 +44,7 @@ function ApprovedUserRouterContent() {
       </Routes>
     );
   }
+
 
   // tenant-unresolved callers keep the normal shell so recovery surfaces
   // (Account Settings, People & Access) can render precise guidance; every

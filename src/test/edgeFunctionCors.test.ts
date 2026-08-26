@@ -61,8 +61,11 @@ describe('edge function CORS source guard', () => {
   it('covers every Edge Function entrypoint', () => {
     // Customer inventory/provisioning reuse guarded RPCs + teams-invite rather than
     // adding ad-hoc Edge Function directories to the production perimeter.
-    expect(functionEntrypoints()).toHaveLength(163);
+    // 165 = 163 + the governed observability relay pair (observability-config,
+    // observability-capture), both of which use the strict shared CORS allowlist.
+    expect(functionEntrypoints()).toHaveLength(165);
   });
+
 
   it('keeps browserless webhooks denying every browser origin', () => {
     for (const name of BROWSERLESS_ENTRYPOINTS) {

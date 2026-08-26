@@ -168,6 +168,12 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/simulation', shell: 'internal', kind: 'canonical' },
   { path: '/simulation/preview', shell: 'internal', kind: 'canonical' },
   { path: '/help', shell: 'internal', kind: 'canonical' },
+  {
+    path: '/readiness/supervisor',
+    shell: 'internal',
+    kind: 'canonical',
+    note: 'Enterprise Readiness Supervisor: deterministic, read-only readiness assessment and release gate.',
+  },
   { path: '/search', shell: 'internal', kind: 'canonical' },
   { path: '/settings/ai', shell: 'internal', kind: 'canonical' },
   { path: '/sign-out', shell: 'internal', kind: 'canonical' },

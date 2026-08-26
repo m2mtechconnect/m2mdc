@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
+import { DEFAULT_RESPONSE_PROFILE, isResponseProfile } from '@/lib/llm/responseProfiles';
 
 // Module-level request generation counters. Every call to a Builder read
 // (loadBuilder or a deploy-path readback) captures the counter at start;

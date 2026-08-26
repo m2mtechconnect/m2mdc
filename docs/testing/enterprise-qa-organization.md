@@ -45,6 +45,15 @@ External connectors remain disabled or simulated. Real messages, paid workloads 
 
 ## Owner bootstrap
 
-The companion migration `20260826224000_bootstrap_initial_platform_owner.sql` resolves the initial platform-owner deadlock without exposing owner elevation to ordinary administrators. It runs only when no unexpired global owner exists, requires exactly one confirmed and non-deleted Auth record for the configured administrator, and writes `platform_owner_bootstrapped` to `audit_logs` in the same transaction.
+Run the explicit `bun run auth:bootstrap-owner` command before provisioning the first QA organization. It resolves the initial platform-owner deadlock without exposing owner elevation to ordinary administrators.
 
-After the migration is applied, sign out and sign back in before provisioning the QA organization. Verify the global owner grant and audit event before running the seed. Reapplying the migration after an owner exists is a no-op.
+Required inputs:
+
+- `AURA_BOOTSTRAP_OWNER_EMAIL`
+- `AURA_ALLOW_OWNER_BOOTSTRAP=1`
+- `AURA_ALLOW_MANAGED_OWNER_BOOTSTRAP=1` for a managed Supabase project
+- the same server-side Supabase URL and service-role key requirements as the QA seed
+
+The command exits without changes when an active global owner already exists. Otherwise it requires exactly one confirmed, non-deleted Auth user, writes the owner grant, writes the audit event, rolls the grant back if auditing fails, and verifies the grant by reading it back.
+
+After success, sign out and sign back in before provisioning the QA organization. Verify the global owner grant and `platform_owner_bootstrapped` audit event before running the seed.

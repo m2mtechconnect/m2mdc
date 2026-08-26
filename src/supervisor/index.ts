@@ -5,3 +5,4 @@ export * from './assessment';
 export * from './releaseGate';
 export * from './knowledgeRegistry';
 export * from './runtimeIntegration';
+export * from './permissionBroker';

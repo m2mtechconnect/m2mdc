@@ -15,6 +15,8 @@ import {
   BookOpenText,
   ClipboardCheck,
   Cpu,
+  KeyRound,
+  Network,
   ShieldAlert,
   ShieldCheck,
   UserRound,
@@ -24,6 +26,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 import {
   ACTIVE_RUNTIME,
+  ACTIVATION_TRIGGERS,
+  AUTOMATIC_TRIGGERS,
+  CONNECTOR_POLICIES,
   KNOWLEDGE_SOURCES,
   READINESS_CATEGORIES,
   READINESS_CATEGORY_LABEL,
@@ -34,6 +39,7 @@ import {
   SUPERVISOR_PERSONAS,
   evaluateReleaseGate,
   prioritizeFindings,
+  resolveActivation,
   supervisorPersona,
   type FindingSeverity,
   type FindingStatus,
@@ -68,6 +74,21 @@ const DISPOSITION_LABEL = {
   rejected: 'Rejected',
   superseded: 'Superseded',
   unresolved: 'Unresolved',
+} as const;
+
+const TRIGGER_LABEL: Record<(typeof ACTIVATION_TRIGGERS)[number], string> = {
+  'manual-open': 'Manual open',
+  'edit-completion': 'Edit completion',
+  'change-review': 'Change / PR review',
+  'preview-qualification': 'Preview qualification',
+  'deployment-request': 'Deployment request',
+  'post-publish-smoke': 'Post-publish smoke',
+};
+
+const CONNECTOR_STATE_LABEL = {
+  connected: 'Connected',
+  unavailable: 'Unavailable',
+  'not-assessed': 'Not assessed',
 } as const;
 
 const REDACTION_LABEL = {
@@ -185,6 +206,102 @@ export default function Supervisor() {
         )}
       </SectionCard>
 
+      {/* Activation modes */}
+      <SectionCard
+        title="Activation and status"
+        description="The supervisor is reachable manually from this route and is invoked automatically in read-only assessment mode on edit completion, change review, preview qualification, deployment requests and post-publish smoke checks. Automatic invocation never changes user authorization and never grants itself new permissions."
+        icon={KeyRound}
+      >
+        <div className="grid gap-4 md:grid-cols-3" data-testid="activation-panel">
+          <article className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-accent/15 text-accent-foreground border-transparent">Active now</Badge>
+              <h3 className="text-sm font-semibold">Manual</h3>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">{resolveActivation('manual-open').note}</p>
+          </article>
+          <article className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">Read-only</Badge>
+              <h3 className="text-sm font-semibold">Automatic assessment</h3>
+            </div>
+            <ul className="mt-2 list-disc space-y-0.5 pl-5 text-xs text-muted-foreground">
+              {AUTOMATIC_TRIGGERS.map((trigger) => (
+                <li key={trigger}>{TRIGGER_LABEL[trigger]}</li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-muted-foreground">{resolveActivation('edit-completion').note}</p>
+          </article>
+          <article className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-destructive/10 text-destructive border-transparent">Approval required</Badge>
+              <h3 className="text-sm font-semibold">Elevated</h3>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Scoped write capability requires an explicitly recorded approval. Human approval remains mandatory for merges,
+              destructive data actions, database migrations and production publication. All grants are least-privilege,
+              time-bounded where supported, revocable and auditable.
+            </p>
+          </article>
+        </div>
+      </SectionCard>
+
+      {/* Permission broker matrix */}
+      <SectionCard
+        title="Permission broker"
+        description="Per-connector capability planes. Configured means the capability exists in the catalog; granted means an active scoped grant with recorded approval exists; completed means an audit record proves the action ran. Connector state is reported from evidence only."
+        icon={Network}
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs" data-testid="permission-matrix">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th scope="col" className="py-2 pr-3 font-medium">Connector</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Read-only default</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Elevated (scoped approval)</th>
+                <th scope="col" className="py-2 pr-3 font-medium">Always human approval</th>
+                <th scope="col" className="py-2 font-medium">State</th>
+              </tr>
+            </thead>
+            <tbody>
+              {CONNECTOR_POLICIES.map((policy) => (
+                <tr key={policy.id} className="border-b border-border last:border-0" data-testid={`connector-${policy.id}`}>
+                  <td className="py-2 pr-3 font-medium text-foreground">{policy.label}</td>
+                  <td className="py-2 pr-3 text-muted-foreground">{policy.defaultCapabilities.join(', ')}</td>
+                  <td className="py-2 pr-3 text-muted-foreground">
+                    {policy.elevatedCapabilities.length > 0 ? policy.elevatedCapabilities.join(', ') : 'None'}
+                  </td>
+                  <td className="py-2 pr-3 text-muted-foreground">
+                    {policy.humanApprovalAlways.length > 0 ? policy.humanApprovalAlways.join(', ') : 'None'}
+                  </td>
+                  <td className="py-2">
+                    <Badge
+                      variant="outline"
+                      className={
+                        policy.state === 'connected'
+                          ? 'bg-accent/15 text-accent-foreground border-transparent'
+                          : policy.state === 'unavailable'
+                            ? 'bg-destructive/10 text-destructive border-transparent'
+                            : 'bg-muted text-muted-foreground border-transparent'
+                      }
+                      title={policy.stateNote}
+                    >
+                      {CONNECTOR_STATE_LABEL[policy.state]}
+                    </Badge>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Every decision records actor, requested capability, scope, approval, action, result and evidence. When a connector,
+          approval or verified identity is unavailable, the broker fails closed. Credentials remain in platform secret managers
+          and are issued per task; cookies, tokens, session storage, service-role material, raw tenant data and personal data
+          are never ingested into supervisor knowledge.
+        </p>
+      </SectionCard>
+
       {/* Specialist domains */}
       <SectionCard
         title="Specialist domains"
@@ -206,8 +323,8 @@ export default function Supervisor() {
                     <span
                       className={
                         stage.state === 'evidenced'
-                          ? 'inline-flex items-center rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium text-accent-foreground'
-                          : 'inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground'
+                          ? 'inline-flex items-center rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent-foreground'
+                          : 'inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground'
                       }
                       title={
                         stage.state === 'evidenced'
@@ -257,7 +374,7 @@ export default function Supervisor() {
                 <Badge variant="outline" className="bg-muted text-muted-foreground border-transparent">
                   {SEVERITY_LABEL[finding.severity]}
                 </Badge>
-                <span className="text-[11px] text-muted-foreground">{READINESS_CATEGORY_LABEL[finding.category]}</span>
+                <span className="text-xs text-muted-foreground">{READINESS_CATEGORY_LABEL[finding.category]}</span>
               </div>
               <h3 className="mt-2 text-sm font-semibold">{finding.title}</h3>
               <dl className="mt-2 grid gap-x-6 gap-y-1 text-xs text-muted-foreground sm:grid-cols-2">
@@ -268,7 +385,7 @@ export default function Supervisor() {
                     {finding.evidenceRef ? (
                       <>
                         {' '}
-                        <code className="font-mono text-[11px]">{finding.evidenceRef}</code>
+                        <code className="font-mono text-xs">{finding.evidenceRef}</code>
                       </>
                     ) : null}
                   </dd>
@@ -283,7 +400,7 @@ export default function Supervisor() {
                 </div>
                 <div>
                   <dt className="font-medium text-foreground">Affected files</dt>
-                  <dd className="font-mono text-[11px]">{finding.affectedFiles.join(', ')}</dd>
+                  <dd className="font-mono text-xs">{finding.affectedFiles.join(', ')}</dd>
                 </div>
                 <div>
                   <dt className="font-medium text-foreground">Owner</dt>
@@ -322,7 +439,7 @@ export default function Supervisor() {
                   <td className="py-2 pr-3">
                     <span className="font-medium text-foreground">{source.title}</span>
                     <br />
-                    <code className="font-mono text-[11px] text-muted-foreground">{source.ref}</code>
+                    <code className="font-mono text-xs text-muted-foreground">{source.ref}</code>
                     {source.note ? (
                       <>
                         <br />
@@ -357,7 +474,7 @@ export default function Supervisor() {
                       {REDACTION_LABEL[source.redactionState]}
                     </Badge>
                   </td>
-                  <td className="py-2 font-mono text-[11px] text-muted-foreground">
+                  <td className="py-2 font-mono text-xs text-muted-foreground">
                     {source.regressionCaseRef ?? 'None'}
                   </td>
                 </tr>

@@ -188,7 +188,7 @@ export const MANAGE_NAV: AppNavItem[] = [
     description: `Configuration activation, external runtime evidence and immutable lifecycle events. ${stackDescription('governance.controls')}`,
   },
   {
-    name: 'Readiness',
+    name: 'Supervisor',
     fullName: 'Enterprise Readiness Supervisor',
     href: '/readiness/supervisor',
     icon: ClipboardCheck,

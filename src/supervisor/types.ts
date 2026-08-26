@@ -4,7 +4,7 @@
  * The supervisor is a governed, read-only assessment surface. Its cardinal
  * truth rules:
  *
- *  - A capability is never "fully trained" and never claims runtime behavior
+ *  - A capability is never presented as complete or self-sufficient and never claims runtime behavior
  *    without evidence. Capability maturity is reported as separate stages:
  *    architecture-aligned, configured, connected, tested, deployed and
  *    operationally verified.

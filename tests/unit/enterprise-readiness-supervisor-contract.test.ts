@@ -19,7 +19,11 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   ACTIVE_RUNTIME,
+  ACTIVATION_MODES,
+  AUTOMATIC_TRIGGERS,
   CAPABILITY_STAGES,
+  CONNECTOR_IDS,
+  CONNECTOR_POLICIES,
   KNOWLEDGE_SOURCES,
   MANDATORY_GATE_CATEGORIES,
   READINESS_CATEGORIES,
@@ -27,13 +31,20 @@ import {
   RUNTIME_BOUNDARIES,
   SPECIALIST_DOMAINS,
   SUPERVISOR_PERSONAS,
+  actionCompleted,
   buildReadinessAssessment,
+  capabilityConfigured,
+  evaluateCapabilityRequest,
   evaluateReleaseGate,
   isIngestible,
+  permissionGranted,
   prioritizeFindings,
+  resolveActivation,
   scanForSensitiveMaterial,
   supervisorPersona,
   toRegressionCase,
+  type ActivationTrigger,
+  type PermissionGrant,
   type ReadinessFinding,
 } from '@/supervisor';
 import { INTERNAL_ROUTES } from '@/config/routeRegistry';
@@ -294,11 +305,239 @@ describe('runtime boundary truth', () => {
       'src/supervisor/knowledgeRegistry.ts',
       'src/supervisor/personas.ts',
       'src/supervisor/runtimeIntegration.ts',
+      'src/supervisor/permissionBroker.ts',
       'src/pages/Supervisor.tsx',
     ]) {
       const source = read(file);
       expect(source, file).not.toMatch(/gpt-|gemini-|claude-|llama-/i);
       expect(source, file).not.toContain('fully trained');
     }
+  });
+});
+
+describe('activation model', () => {
+  it('offers manual, automatic read-only and elevated approval-required modes', () => {
+    expect([...ACTIVATION_MODES]).toEqual(['manual', 'automatic-read-only', 'elevated-approval-required']);
+  });
+
+  it('resolves every automatic trigger to read-only assessment', () => {
+    expect(AUTOMATIC_TRIGGERS).toEqual([
+      'edit-completion',
+      'change-review',
+      'preview-qualification',
+      'deployment-request',
+      'post-publish-smoke',
+    ]);
+    for (const trigger of AUTOMATIC_TRIGGERS) {
+      const activation = resolveActivation(trigger);
+      expect(activation.mode, trigger).toBe('automatic-read-only');
+      expect(activation.readOnly, trigger).toBe(true);
+    }
+  });
+
+  it('keeps manual route access read-only until a scoped grant is recorded', () => {
+    const activation = resolveActivation('manual-open');
+    expect(activation.mode).toBe('manual');
+    expect(activation.readOnly).toBe(true);
+  });
+
+  it('renders the activation panel and permission matrix on the page', () => {
+    const page = read('src/pages/Supervisor.tsx');
+    expect(page).toContain('data-testid="activation-panel"');
+    expect(page).toContain('data-testid="permission-matrix"');
+    expect(page).toContain('data-testid={`connector-${policy.id}`}');
+    expect(CONNECTOR_POLICIES.map((p) => p.id)).toEqual([...CONNECTOR_IDS]);
+  });
+});
+
+describe('permission broker', () => {
+  const connectedGithub = CONNECTOR_POLICIES.map((p) =>
+    p.id === 'github' ? { ...p, state: 'connected' as const } : p,
+  );
+
+  it('defines the five governed connectors with the approved default planes', () => {
+    expect(CONNECTOR_POLICIES.map((p) => p.id)).toEqual(['github', 'lovable', 'browser', 'supabase', 'production']);
+    const byId = Object.fromEntries(CONNECTOR_POLICIES.map((p) => [p.id, p]));
+    expect(byId.github.defaultCapabilities).toContain('read-diffs');
+    expect(byId.github.humanApprovalAlways).toContain('merge');
+    expect(byId.lovable.defaultCapabilities).toContain('read-preview');
+    expect(byId.lovable.humanApprovalAlways).toContain('production-publish');
+    expect(byId.browser.defaultCapabilities).toContain('capture-screenshots');
+    expect(byId.browser.elevatedCapabilities).toContain('form-submission');
+    expect(byId.supabase.elevatedCapabilities).toContain('service-role-operations');
+    expect(byId.supabase.humanApprovalAlways).toContain('migrations');
+    expect(byId.production.defaultCapabilities).toEqual(['health-checks', 'smoke-tests']);
+    expect(byId.production.elevatedCapabilities).toEqual([]);
+  });
+
+  it('reports every connector state truthfully: nothing claims connected without evidence', () => {
+    for (const policy of CONNECTOR_POLICIES) {
+      if (policy.state === 'connected') {
+        expect(policy.stateEvidenceRef, policy.id).toBeTruthy();
+      } else {
+        expect(['unavailable', 'not-assessed']).toContain(policy.state);
+        expect(policy.stateEvidenceRef).toBeNull();
+      }
+    }
+    // Phase 1 has no live handshake evidence inside the browser bundle.
+    expect(CONNECTOR_POLICIES.every((p) => p.state === 'not-assessed')).toBe(true);
+  });
+
+  it('fails closed when the connector state is unproven, even for reads', () => {
+    const decision = evaluateCapabilityRequest(
+      { actor: 'supervisor', connector: 'github', capability: 'read-diffs', scope: 'repo' },
+      resolveActivation('manual-open'),
+    );
+    expect(decision.allowed).toBe(false);
+    expect(decision.denialReason).toBe('connector-unavailable');
+    expect(decision.audit.result).toBe('denied');
+  });
+
+  it('denies unknown connectors and unknown capabilities', () => {
+    const unknownConnector = evaluateCapabilityRequest(
+      { actor: 'a', connector: 'unknown' as never, capability: 'read', scope: 'x' },
+      resolveActivation('manual-open'),
+    );
+    expect(unknownConnector.denialReason).toBe('unknown-connector');
+    const unknownCapability = evaluateCapabilityRequest(
+      { actor: 'a', connector: 'github', capability: 'delete-repository', scope: 'repo' },
+      resolveActivation('manual-open'),
+    );
+    expect(unknownCapability.denialReason).toBe('unknown-capability');
+  });
+
+  it('keeps automatic assessments read-only against a connected connector', () => {
+    for (const trigger of AUTOMATIC_TRIGGERS) {
+      const activation = resolveActivation(trigger as ActivationTrigger);
+      const read = evaluateCapabilityRequest(
+        { actor: 'supervisor', connector: 'github', capability: 'read-diffs', scope: 'repo' },
+        activation,
+        [],
+        connectedGithub,
+      );
+      expect(read.allowed, `${trigger} read`).toBe(true);
+      const write = evaluateCapabilityRequest(
+        {
+          actor: 'supervisor',
+          connector: 'github',
+          capability: 'remediation-changes',
+          scope: 'repo',
+          approval: { required: true, recorded: true, approver: 'human', reference: 'pr-1' },
+        },
+        activation,
+        [],
+        connectedGithub,
+      );
+      expect(write.allowed, `${trigger} write`).toBe(false);
+      expect(write.denialReason).toBe('automatic-invocation-read-only');
+    }
+  });
+
+  it('blocks elevated actions without recorded approval and without an active grant', () => {
+    const activation = resolveActivation('manual-open');
+    const noApproval = evaluateCapabilityRequest(
+      { actor: 'dev', connector: 'github', capability: 'review-comments', scope: 'pr-9' },
+      activation,
+      [],
+      connectedGithub,
+    );
+    expect(noApproval.allowed).toBe(false);
+    expect(noApproval.denialReason).toBe('approval-required');
+
+    const approvedNoGrant = evaluateCapabilityRequest(
+      {
+        actor: 'dev',
+        connector: 'github',
+        capability: 'review-comments',
+        scope: 'pr-9',
+        approval: { required: true, recorded: true, approver: 'lead', reference: 'ticket-1' },
+      },
+      activation,
+      [],
+      connectedGithub,
+    );
+    expect(approvedNoGrant.allowed).toBe(false);
+    expect(approvedNoGrant.denialReason).toBe('no-active-grant');
+  });
+
+  it('always requires human approval for merges, migrations and production publish', () => {
+    const grant: PermissionGrant = {
+      id: 'grant-1',
+      actor: 'dev',
+      connector: 'github',
+      capability: 'merge',
+      scope: 'repo',
+      approval: { required: true, recorded: true, approver: 'lead', reference: 'ticket-2' },
+      issuedAt: '2026-08-26T00:00:00Z',
+      expiresAt: '2026-08-26T01:00:00Z',
+      revocable: true,
+      status: 'active',
+    };
+    const decision = evaluateCapabilityRequest(
+      {
+        actor: 'dev',
+        connector: 'github',
+        capability: 'merge',
+        scope: 'repo',
+        approval: { required: true, recorded: true, approver: 'lead', reference: 'ticket-2' },
+      },
+      resolveActivation('manual-open'),
+      [grant],
+      connectedGithub,
+    );
+    expect(decision.allowed).toBe(false);
+    expect(decision.denialReason).toBe('human-approval-mandatory');
+
+    for (const [connector, capability] of [
+      ['supabase', 'migrations'],
+      ['lovable', 'production-publish'],
+    ] as const) {
+      const policy = CONNECTOR_POLICIES.find((p) => p.id === connector)!;
+      expect(policy.humanApprovalAlways).toContain(capability);
+    }
+  });
+
+  it('records actor, capability, scope, approval, action, result and evidence on every decision', () => {
+    const decision = evaluateCapabilityRequest(
+      { actor: 'auditor', connector: 'production', capability: 'health-checks', scope: 'prod' },
+      resolveActivation('post-publish-smoke'),
+    );
+    expect(decision.audit).toMatchObject({
+      actor: 'auditor',
+      requestedCapability: 'health-checks',
+      connector: 'production',
+      scope: 'prod',
+      action: 'health-checks',
+    });
+    expect(decision.audit.approval).toBeDefined();
+    expect(['allowed', 'denied']).toContain(decision.audit.result);
+  });
+
+  it('distinguishes configured, granted and completed as separate states', () => {
+    expect(capabilityConfigured('github', 'merge')).toBe(true);
+    expect(capabilityConfigured('github', 'delete-repository')).toBe(false);
+    // Configured does not imply granted.
+    expect(permissionGranted([], 'dev', 'github', 'merge')).toBe(false);
+    // Granted does not imply completed.
+    expect(actionCompleted([], 'dev', 'github', 'merge')).toBe(false);
+    // Completed requires an allowed audit record carrying evidence.
+    expect(
+      actionCompleted(
+        [{
+          actor: 'dev',
+          requestedCapability: 'merge',
+          connector: 'github',
+          scope: 'repo',
+          approval: { required: true, recorded: true, approver: 'lead', reference: 't' },
+          action: 'merge',
+          result: 'allowed',
+          denialReason: null,
+          evidenceRef: 'ci-run-1',
+        }],
+        'dev',
+        'github',
+        'merge',
+      ),
+    ).toBe(true);
   });
 });

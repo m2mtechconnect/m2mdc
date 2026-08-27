@@ -24,10 +24,10 @@ import {
   LogOut,
   User as UserIcon,
   Settings,
-  Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRBAC } from '@/contexts/RBACContext';
+import { accountAdminNavigation } from '@/config/appNavigation';
 import { fetchProfileFields } from '@/lib/auth/profileQuery';
 
 const LANGUAGES = [
@@ -110,6 +110,7 @@ export function UserMenu() {
   if (!user) return null;
 
   const userEmail = user.email || '';
+  const adminDestinations = accountAdminNavigation(can);
 
   return (
     <DropdownMenu>
@@ -231,13 +232,21 @@ export function UserMenu() {
             <span>Learning Hub</span>
           </Link>
         </DropdownMenuItem>
-        {can('tenant.view_members') && (
-          <DropdownMenuItem asChild>
-            <Link to="/teams" className="cursor-pointer">
-              <Users className="mr-2 h-4 w-4" />
-              <span>People &amp; Access</span>
-            </Link>
-          </DropdownMenuItem>
+        {adminDestinations.length > 0 && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+              Administration
+            </DropdownMenuLabel>
+            {adminDestinations.map((item) => (
+              <DropdownMenuItem key={item.href} asChild>
+                <Link to={item.href} className="cursor-pointer" data-nav-item={item.name}>
+                  <item.icon className="mr-2 h-4 w-4" aria-hidden="true" />
+                  <span>{item.fullName}</span>
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </>
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">

@@ -146,7 +146,9 @@ export const MANAGE_NAV: AppNavItem[] = [
     href: '/blueprint',
     icon: Boxes,
     matches: ['/blueprint', '/data-centre-twin'],
-    permission: 'twin.edit',
+    // Blueprint is a design/reporting surface; editing inside it is gated
+    // separately, so read-only personas may discover it.
+    permission: 'twin.view',
     group: 'design',
     description: stackDescription('twin.openusd'),
   },

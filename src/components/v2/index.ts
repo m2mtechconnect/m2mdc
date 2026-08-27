@@ -8,8 +8,8 @@ export type { PanelElevation, PanelProps } from './Panel';
 export { Instrument, InstrumentGrid } from './Instrument';
 export type { InstrumentLevel, InstrumentState, InstrumentProps } from './Instrument';
 
-export { ProvenanceBadgeV2 } from './ProvenanceBadgeV2';
-export type { TruthState, ProvenanceBadgeV2Props } from './ProvenanceBadgeV2';
+export { ProvenanceBadgeV2 } from '@/components/provenance/ProvenanceBadgeV2';
+export type { TruthState, ProvenanceBadgeV2Props } from '@/components/provenance/ProvenanceBadgeV2';
 
 export { CommandHeader, SectionHeader } from './CommandHeader';
 export type { CommandHeaderProps } from './CommandHeader';

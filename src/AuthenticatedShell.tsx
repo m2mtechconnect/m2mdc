@@ -153,7 +153,10 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />
-      <Route path="/simulation" element={<AuraWorkspace />} />
+      {/* The simulation workspace persists run records, so it is gated on the
+          same least-privileged twin read permission as the other twin
+          surfaces instead of being mounted for any approved account. */}
+      <Route path="/simulation" element={<PermissionRouteGuard permission="twin.view"><AuraWorkspace /></PermissionRouteGuard>} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
       {/* Read-only governance surface in the same family as /compliance and

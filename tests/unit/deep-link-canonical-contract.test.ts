@@ -132,7 +132,7 @@ describe('alias integrity', () => {
     for (const alias of ROUTE_ALIASES) {
       const target = alias.to.split(/[?#]/)[0];
       expect(devOnly.has(target), `${alias.from} -> ${target} targets a DEV-only route`).toBe(false);
-      // Parameterised targets (e.g. /blueprint/default) resolve against a
+      // Parameterised targets (e.g. /blueprint/example) resolve against a
       // declared parameter route rather than a literal declaration.
       const literal = mounted.has(target);
       const parameterised = ALL_ROUTES.some((r) => {

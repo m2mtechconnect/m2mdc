@@ -16,7 +16,10 @@ Client verification on the current head:
 
 - No file under `src/` reads `digital_twins` (enforced by
   `tests/unit/twin-model-canonicalization-contract.test.ts`).
-- No client code invokes any `digital-twin-*` edge function.
+- The only client module that still calls `digital-twin-*` functions is the
+  quarantined `src/lib/digitalTwin/api.ts`; its sole mounted surface
+  (`/digital-twins-demo/funding-intake`) is gated behind `import.meta.env.DEV`
+  and is therefore not reachable in production.
 - All nine `digital-twin-*` functions carry
   `production_disposition: "unknown-blocked"` with `consumer_count: 0` in
   `docs/remediation/evidence/pr-0.1/edge-function-inventory.json`, so they are

@@ -359,7 +359,13 @@ export const UTILITY_NAV: AppNavItem[] = [
   },
 ];
 
-/** One permission-aware hierarchy for every shell presentation. */
+/**
+ * One permission-aware hierarchy for every shell presentation.
+ *
+ * The permanent global navigation contains only the five lifecycle
+ * destinations. People & Access and Platform Administration are permission
+ * aware account/admin destinations and never form a second global navigation.
+ */
 export function primaryNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
   const childrenFor = (group: NavGroupId) => visible(
     MANAGE_NAV.filter((item) => item.group === group && item.href !== '/marketplace'),
@@ -367,21 +373,29 @@ export function primaryNavigation(can: (permission: Permission) => boolean): App
   );
   const governItems = childrenFor('govern');
   const evidenceChildren = governItems.filter((item) => item.href === '/readiness/supervisor');
-  const governPrimary = governItems.filter((item) =>
-    item.href === '/teams' || item.href === '/admin/platform-readiness'
-  );
 
   return visible(WORKSPACE_NAV, can).map((item) => {
     if (item.href === '/builder') return { ...item, children: childrenFor('design') };
     if (item.href === '/analytics') return { ...item, children: childrenFor('operate') };
     if (item.href === `${EVIDENCE_ROOT}/overview`) return { ...item, children: evidenceChildren };
     return item;
-  }).concat(governPrimary);
+  });
+}
+
+/** Account/admin destinations surfaced inside the user menu, not global nav. */
+export const ACCOUNT_ADMIN_HREFS = ['/teams', '/admin/platform-readiness'] as const;
+
+export function accountAdminNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(
+    MANAGE_NAV.filter((item) => (ACCOUNT_ADMIN_HREFS as readonly string[]).includes(item.href)),
+    can,
+  );
 }
 
 export function utilityNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
   return visible(UTILITY_NAV, can);
 }
+
 
 export interface NavGroup {
   id: NavGroupId;

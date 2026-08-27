@@ -43,6 +43,12 @@ describe('evidence facility context', () => {
     const shell = readFileSync('src/pages/dsx/EvidenceBetaShell.tsx', 'utf8');
     expect(shell).toContain('dsx-active-facility');
     expect(shell).toContain('Facility: not selected');
+    expect(shell).toContain('activeTwin?.id === facilityId');
+  });
+
+  it('carries the active facility through the global Evidence footer', () => {
+    const layout = readFileSync('src/components/Layout.tsx', 'utf8');
+    expect(layout).toContain('?facility=${encodeURIComponent(activeTwin.id)}');
   });
 });
 
@@ -62,6 +68,7 @@ describe('builder hand-off preserves the active twin', () => {
     const step5 = readFileSync('src/components/builder/steps/Step5Deploy.tsx', 'utf8');
     expect(step5).toContain('twinId: activeTwin?.id ?? null');
     expect(step5).toContain('handleOpenBlueprint');
-    expect(step5).not.toContain("activeTwin && window.open(`/blueprint/");
+    expect(step5).toContain('navigate(`/blueprint/${activeTwin.id}`)');
+    expect(step5).not.toContain('window.open(');
   });
 });

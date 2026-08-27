@@ -135,12 +135,29 @@ describe('production route classification', () => {
       '/dev-overlays',
       '/admin/asset-preview',
       '/admin/asset-pipeline',
-      '/blueprint/preview',
-      '/simulation/preview',
     ]) {
       expect(prod.has(route)).toBe(false);
     }
   });
+
+  /**
+   * The recommendation preview routes were promoted on 2026-08-24 as
+   * authenticated read-only surfaces. They may stay in production only while
+   * they remain behind a permission guard in the shipped router, so the
+   * classification is asserted against the guard rather than assumed.
+   */
+  it('only ships the promoted preview routes behind a permission guard', () => {
+    const shell = readFileSync(join(REPO, 'src/AuthenticatedShell.tsx'), 'utf8');
+    for (const route of ['/blueprint/preview', '/simulation/preview']) {
+      expect(prod.has(route)).toBe(true);
+      const declaration = shell
+        .split('\n')
+        .find((line) => line.includes(`path="${route}"`));
+      expect(declaration, `${route} must be declared in the authenticated router`).toBeDefined();
+      expect(declaration).toContain('PermissionRouteGuard');
+    }
+  });
+
 
   it('classifies each route exactly once', () => {
     const buckets = [

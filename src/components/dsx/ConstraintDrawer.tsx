@@ -47,7 +47,7 @@ export function ConstraintDrawer() {
     // finishes. Re-assert focus once immediately and once after that transition
     // so narrow/mobile viewports cannot leave focus on <body>.
     requestAnimationFrame(() => {
-      if (opener.isConnected) opener.focus();
+      if (!previousConstraintRef.current && opener.isConnected) opener.focus();
     });
     delayedRestoreRef.current = window.setTimeout(() => {
       delayedRestoreRef.current = null;

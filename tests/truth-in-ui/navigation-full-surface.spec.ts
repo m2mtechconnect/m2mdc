@@ -39,7 +39,7 @@ const DEEP_LINK_ROUTES: readonly string[] = [
   '/marketplace',
   '/marketplace/integrations',
   '/app/agents',
-  '/blueprint/default',
+  '/blueprint',
   '/blueprint/preview',
   '/simulation',
   '/simulation/preview',
@@ -76,9 +76,9 @@ async function clickManageDestination(page: Page, href: string): Promise<void> {
   // A route change can happen before Radix finishes the previous menu's close
   // animation. Reopening during that transition races the trigger and can leave
   // the next menu visually closed even though navigation is healthy.
-  await expect(page.getByTestId('manage-menu')).toBeHidden().catch(() => {});
-  await page.getByTestId('manage-trigger').click();
-  const menu = page.getByTestId('manage-menu');
+  await expect(page.getByRole('menu', { name: 'Design & Build' })).toBeHidden().catch(() => {});
+  await page.getByRole('button', { name: 'Design & Build' }).click();
+  const menu = page.getByRole('menu', { name: 'Design & Build' });
   await expect(menu).toBeVisible();
   await menu.locator(`a[href="${href}"]`).click();
 }

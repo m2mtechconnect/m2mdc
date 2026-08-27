@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "5bce67e07c08945630f4e138fb9d30afff32e6ee",
-    "workflowRunId": 32896213229,
-    "artifactId": 9581414434,
-    "artifactZipSha256": "0682b0143c65b350a2f981410535e6949cb4fc92b1669f2f5890bab5415531f4"
+    "sha": "db25d83404f26c43cdac4092c0c9e4e63e8f996f",
+    "workflowRunId": 33028128765,
+    "artifactId": 9629217477,
+    "artifactZipSha256": "fa3fc3ad78105a1ecd349166fb4f27d2881ccc06dead2756e886a626d6ba32f3"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
@@ -26,7 +26,8 @@
     "Across otherwise identical clean desktop Simulation captures, only compositor-level anti-aliasing on the selected tool-rail button has varied. The full screenshot remains generated and manually reviewed, while CI enforces its dimensions, route semantics and overflow invariant instead of an unstable byte hash.",
     "The other 19 screenshots remain exact SHA-256 fingerprints.",
     "No reviewed screenshot showed broken layout, clipped primary controls, overlapping text, unexpected horizontal overflow or a contradictory lifecycle navigation state.",
-    "2026-08-26 post-release smoke correction removes the placeholder Unix-epoch build date from the authenticated footer. The seven affected exact fingerprints were accepted from CI under the owner's standing no-human-review waiver; dimensions and verification modes remain unchanged."
+    "2026-08-26 post-release smoke correction removes the placeholder Unix-epoch build date from the authenticated footer. The seven affected exact fingerprints were accepted from CI under the owner's standing no-human-review waiver; dimensions and verification modes remain unchanged.",
+    "2026-08-27 persona-authority qualification explicitly models a tenant owner. Six deterministic changed surfaces were reviewed from workflow 33028128765 and explicitly approved by the owner: Teams renders the organization owner snapshot, Connections renders the full tenant control plane, and Command Center / Operations mobile layouts remain unclipped with no page-level horizontal overflow."
   ],
   "screenshots": [
     {
@@ -53,7 +54,7 @@
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e0ea8bb47553998e4da7dddb0cdc0d91255788d093a9b1bbbe7f7c6ec6c861c8",
+      "sha256": "dc96e11e5e9827d3742b978734650bd6bd65a77dc0e7aac0a7987e320d7c86be",
       "width": 375,
       "height": 5530
     },
@@ -109,23 +110,23 @@
     {
       "file": "connections-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e21face8b3d43fa2ba703db22d5b6439fe5e4ae88d32b4460d995125310de092",
+      "sha256": "ce85c3106fa70756e7e3ed116b0c3ac3e7dd992f071ccb865904e05fd584b20f",
       "width": 375,
-      "height": 1471
+      "height": 2780
     },
     {
       "file": "dashboard-hero-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "d2dfd126cb75670d0dab57e2f07bce0da2e648714e74222ea586ed5a9255a6a0",
+      "sha256": "633f60bbe7d88e8884980fde8c9465e3e9690314480f130fcc517312666a5833",
       "width": 1280,
       "height": 720
     },
     {
       "file": "dashboard-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c63465166dc0470f3cd4f907ce84602e4959377729ef7bd776d81b021e7e76c5",
+      "sha256": "7801d832921684c40f16e5d745e5ea07308852df126dce2236245533493b45ec",
       "width": 375,
-      "height": 2321
+      "height": 2355
     },
     {
       "file": "deployments-light-chromium-linux.png",
@@ -144,7 +145,7 @@
     {
       "file": "integrations-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "1569ef53daaf644ab9d1c395752360e56cf25efdf1f7549a4a1563a2f61397f3",
+      "sha256": "33027182b0ed79c4f553730e7f647ace2572d720c7a13c1adb8151ab424543e4",
       "width": 1280,
       "height": 720
     },
@@ -164,7 +165,7 @@
     {
       "file": "teams-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "6175398cbc8cdd22531fa9df0ca9f77a84fe6c90902f33107463dca5672b3808",
+      "sha256": "570f45b2ee1cd87000c8c9d351cddfae24e8e647883e098fe2736a0fbb81c300",
       "width": 1280,
       "height": 720
     }

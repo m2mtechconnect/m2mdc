@@ -45,7 +45,7 @@ const GETTING_STARTED: GuideLink[] = [
   {
     title: 'Facility Blueprint',
     description: 'Understand the canonical facility model, assets, automation definitions, validation and versions.',
-    route: '/blueprint/default',
+    route: '/blueprint',
     icon: Boxes,
   },
   {
@@ -114,7 +114,7 @@ const GUIDED_TOURS: Array<{ id: TourId; route: string; icon: ElementType }> = [
   { id: 'studioIntro', route: '/dashboard', icon: Compass },
   { id: 'overview', route: '/dashboard', icon: LayoutDashboard },
   { id: 'simulation', route: '/simulation', icon: FlaskConical },
-  { id: 'blueprint', route: '/blueprint/default', icon: Boxes },
+  { id: 'blueprint', route: '/blueprint', icon: Boxes },
 ];
 
 function GuideGrid({ items }: { items: GuideLink[] }) {
@@ -169,7 +169,7 @@ export default function Help() {
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Open Command Center
           </Button>
-          <Button variant="outline" onClick={() => navigate('/blueprint/default')}>
+          <Button variant="outline" onClick={() => navigate('/blueprint')}>
             <Boxes className="mr-2 h-4 w-4" />
             Open Blueprint
           </Button>
@@ -185,7 +185,7 @@ export default function Help() {
           <GuideGrid items={GETTING_STARTED} />
         </SectionCard>
 
-        <SectionCard title="Operate" icon={Activity}>
+        <SectionCard title="Operations" icon={Activity}>
           <GuideGrid items={OPERATE} />
         </SectionCard>
 

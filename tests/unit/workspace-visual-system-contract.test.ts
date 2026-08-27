@@ -87,8 +87,9 @@ describe('AURA shared workspace visual system', () => {
     const layout = read('src/components/Layout.tsx');
     expect(layout).toContain('aura-shellbar');
     expect(layout).toContain('data-testid="primary-navigation"');
-    expect(layout).toContain('data-testid="manage-trigger"');
-    expect(layout).toContain('data-testid="govern-trigger"');
+    expect(layout).toContain('primaryNavigation(can)');
+    expect(layout).toContain('visibleNavChildren(item, can)');
+    expect(layout).toContain('data-nav-item={item.name}');
   });
 
   it('defines the workspace visual tokens in the global stylesheet', () => {

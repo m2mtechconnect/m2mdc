@@ -95,6 +95,7 @@ describe('KPI card shell consolidation', () => {
     const shell = read('src/components/kpi/KpiCardShell.tsx');
     expect(shell).toContain('export function kpiTrendIcon');
     expect(shell).toContain('export function KpiStatusBadge');
-    expect(shell).toContain('export function KpiCardSurface');
+    expect(shell).toContain('export const KpiCardSurface = forwardRef');
+    expect(shell).toContain("KpiCardSurface.displayName = 'KpiCardSurface'");
   });
 });

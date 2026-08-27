@@ -106,7 +106,7 @@ async function expectLifecycleNavigation(page: Page) {
   await expect(page.getByRole('button', { name: /^Design & Build$/i }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: /^Operations$/i }).first()).toBeVisible();
   await expect(page.getByRole('link', { name: /^Simulation$/i }).first()).toBeVisible();
-  await expect(page.getByRole('link', { name: /^Evidence$/i }).first()).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Evidence$/i }).first()).toBeVisible();
 }
 
 async function installBuilderTenantMock(context: BrowserContext) {

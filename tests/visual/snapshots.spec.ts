@@ -143,6 +143,27 @@ async function installBuilderTenantMock(context: BrowserContext) {
   await context.route('**/rest/v1/rpc/active_org_id*', (route) =>
     route.fulfill({ status: 200, headers, body: JSON.stringify(organizationId) }),
   );
+  await context.route('**/rest/v1/rpc/tenant_people_access_snapshot*', (route) =>
+    route.fulfill({
+      status: 200,
+      headers,
+      body: JSON.stringify({
+        organization: { id: organizationId, name: 'AURA Qualification Organization' },
+        members: [{
+          userId: '00000000-0000-4000-8000-000000000001',
+          name: 'AURA Qualification Owner',
+          email: 'owner@aura.local',
+          role: 'owner',
+          status: 'active',
+          joinedAt: '2026-01-01T00:00:00.000Z',
+          avatarUrl: null,
+          avatarBgColor: null,
+          avatarInitials: 'AQ',
+        }],
+        invites: [],
+      }),
+    }),
+  );
 }
 
 async function installBuilderVisualMock(context: BrowserContext) {
@@ -262,6 +283,10 @@ test.use({ colorScheme: 'light' });
 
 test.beforeEach(async ({ context, page }) => {
   await installSupabaseMock(context);
+  // Visual acceptance represents an authenticated tenant owner, not a
+  // platform-only administrator. Keep the tenant authority explicit so route
+  // guards cannot silently turn workspace screenshots into dashboard redirects.
+  await installBuilderTenantMock(context);
   await primeGlobalLightTheme(page);
 });
 

@@ -145,20 +145,20 @@ function ApprovedUserRoutes() {
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
       <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />
-      <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.view"><TwinManage /></PermissionRouteGuard>} />
-      <Route path="/app/agents/:agentId/operations" element={<AgentOperationsRedirect />} />
+      <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.operate"><TwinManage /></PermissionRouteGuard>} />
+      <Route path="/app/agents/:agentId/operations" element={<PermissionRouteGuard permission="agent.operate"><AgentOperationsRedirect /></PermissionRouteGuard>} />
       <Route path="/twins/:instanceId/manage" element={<TwinManageRedirect />} />
       <Route path="/studio/systems/:systemId/manage" element={<PermissionRouteGuard permission="twin.edit"><SystemManage /></PermissionRouteGuard>} />
-      <Route path="/data-centre-twin" element={<DataCentreTwin />} />
-      <Route path="/data-centre-twin/:id" element={<DataCentreTwin />} />
-      <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
-      <Route path="/blueprint/preview" element={<BlueprintPreview />} />
-      <Route path="/blueprint/:id" element={<Blueprint />} />
+      <Route path="/data-centre-twin" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
+      <Route path="/data-centre-twin/:id" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
+      <Route path="/data-centre-twin/:id/blueprint" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
+      <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />
+      <Route path="/blueprint/:id" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
       {/* The simulation workspace persists run records, so it is gated on the
           same least-privileged twin read permission as the other twin
           surfaces instead of being mounted for any approved account. */}
       <Route path="/simulation" element={<PermissionRouteGuard permission="twin.view"><AuraWorkspace /></PermissionRouteGuard>} />
-      <Route path="/simulation/preview" element={<SimulationPreview />} />
+      <Route path="/simulation/preview" element={<PermissionRouteGuard permission="twin.view"><SimulationPreview /></PermissionRouteGuard>} />
       <Route path="/help" element={<Help />} />
       {/* Read-only governance surface in the same family as /compliance and
           /analytics, so it is gated on the same least-privileged read
@@ -167,7 +167,7 @@ function ApprovedUserRoutes() {
       <Route path="/search" element={<Search />} />
       <Route path="/settings/ai" element={<PermissionRouteGuard permission="agent.administer"><AISettings /></PermissionRouteGuard>} />
       <Route path="/sign-out" element={<SignOut />} />
-      <Route path="/twin-preview" element={<TwinPreview />} />
+      <Route path="/twin-preview" element={<PermissionRouteGuard permission="twin.view"><TwinPreview /></PermissionRouteGuard>} />
       <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
       {/* Demo-only intake surface. Not a supported production feature, so it is
           reachable in development builds only. */}

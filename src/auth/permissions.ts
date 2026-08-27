@@ -107,8 +107,6 @@ const ADMIN_BASE: Permission[] = [
   'platform.view_admin_console',
   'authz.view_assignments',
   'authz.manage_assignments',
-  'tenant.view_members',
-  'tenant.manage_members',
 ];
 
 export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {

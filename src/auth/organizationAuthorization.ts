@@ -42,6 +42,7 @@ const TENANT_ADMIN_BASE: readonly Permission[] = [
   'agent.administer',
   'tenant.view_members',
   'tenant.manage_members',
+  'authz.view_assignments',
 ];
 
 /**

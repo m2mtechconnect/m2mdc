@@ -608,7 +608,7 @@ export default function IntelligenceDashboard() {
                 formula="Total facility power / IT equipment power"
                 status={pueStatus(pueValue)}
                 statusLabel={`Target ≤ ${pueTarget.toFixed(2)}`}
-                quality="good"
+                quality={pueMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 change="-2.1%"
                 trend="down"
                 icon={Zap}
@@ -628,7 +628,7 @@ export default function IntelligenceDashboard() {
                 formula="mean(GPU_busy%) over filtered clusters"
                 status={gpuStatus(gpuValue)}
                 statusLabel="Target 70-90%"
-                quality="good"
+                quality={gpuMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 change="+5%"
                 trend="up"
                 icon={Cpu}
@@ -648,7 +648,7 @@ export default function IntelligenceDashboard() {
                 formula="count(threshold_breach) in window"
                 status={thermalStatus(thermalValue)}
                 statusLabel="Target 0 critical"
-                quality="good"
+                quality={thermalMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 change="-3"
                 trend="down"
                 icon={Thermometer}
@@ -669,7 +669,7 @@ export default function IntelligenceDashboard() {
                 formula="Operational gCO₂eq per kWh at grid region"
                 status={carbonStatus(carbonValue)}
                 statusLabel={`Target ≤ ${CARBON_INTENSITY_TARGET}`}
-                quality="good"
+                quality={carbonMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 icon={Flame}
                 tooltip="Simulated grid carbon intensity for the selected region. Lower is better. IEA 2024 + electricityMap convention."
               />
@@ -686,7 +686,7 @@ export default function IntelligenceDashboard() {
                 formula="compliant_workloads / in_scope_workloads"
                 status={sovereigntyStatus(sovereigntyValue)}
                 statusLabel="Target 100%"
-                quality="good"
+                quality={sovereigntyMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 change="0%"
                 trend="neutral"
                 icon={Globe}
@@ -706,7 +706,7 @@ export default function IntelligenceDashboard() {
                 formula="(window - downtime_minutes) / window"
                 status={uptimeStatus(uptimeValue)}
                 statusLabel="SLA Tier III 99.982%"
-                quality="good"
+                quality={uptimeMetric.provenance === 'simulated' ? 'suspect' : 'unknown'}
                 change="+0.02%"
                 trend="up"
                 icon={Activity}

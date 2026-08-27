@@ -132,9 +132,22 @@ export function Step5Deploy() {
     navigate(
       buildSimulationHandoffUrl({
         blueprintId: activeTwin?.id ?? builderId ?? 'unavailable',
+        twinId: activeTwin?.id ?? null,
         returnTab: 'simulation',
       }),
     );
+  };
+
+  /**
+   * Blueprint hand-off preserves the active facility (twin) id. With no active
+   * facility the action states that rather than opening an invented default.
+   */
+  const handleOpenBlueprint = () => {
+    if (!activeTwin?.id) {
+      toast.error('No active facility selected. Select a facility to open its Blueprint.');
+      return;
+    }
+    window.open(`/blueprint/${activeTwin.id}`, '_blank');
   };
 
   const handleAddKPIs = (newKPIs: any[]) => {

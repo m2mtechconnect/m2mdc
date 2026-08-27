@@ -124,6 +124,7 @@ export function buildContextChips(
   const chips: ContextChip[] = [];
   const named = (id: string) => resolve(id)?.name ?? 'Unavailable (record not found)';
 
+  if (ctx.facility_id) chips.push({ field: 'facility_id', label: 'Facility', value: named(ctx.facility_id), removable: false });
   if (ctx.building_id) chips.push({ field: 'building_id', label: 'Building', value: named(ctx.building_id), removable: true });
   if (ctx.data_hall_id) chips.push({ field: 'data_hall_id', label: 'Data hall', value: named(ctx.data_hall_id), removable: true });
   if (ctx.stable_asset_id) chips.push({ field: 'stable_asset_id', label: 'Asset', value: named(ctx.stable_asset_id), removable: true });

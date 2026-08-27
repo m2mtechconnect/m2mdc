@@ -6,6 +6,7 @@ import { NON_EMITTABLE_PATHS } from '@/config/routeRegistry';
 import { ROLE_PERMISSIONS, type AnyRole, type Permission } from '@/auth/permissions';
 import {
   MANAGE_NAV,
+  accountAdminNavigation,
   isNavItemActive,
   primaryNavigation,
   visibleNavChildren,
@@ -28,7 +29,10 @@ function flattenVisible(role: AnyRole) {
 }
 
 function visibleHrefs(role: AnyRole) {
-  return flattenVisible(role).map((item) => item.href);
+  return [
+    ...flattenVisible(role),
+    ...accountAdminNavigation(canFor(role)),
+  ].map((item) => item.href);
 }
 
 function activeRoots(role: AnyRole, pathname: string) {
@@ -59,6 +63,30 @@ describe('persona-aware consolidated navigation matrix', () => {
     },
   );
 
+  it('keeps the permanent global navigation at exactly five lifecycle destinations', () => {
+    for (const role of Object.keys(ROLE_PERMISSIONS) as AnyRole[]) {
+      const roots = primaryNavigation(canFor(role)).map((item) => item.href);
+      expect(roots, `${role} global navigation`).not.toContain('/teams');
+      expect(roots, `${role} global navigation`).not.toContain('/admin/platform-readiness');
+      for (const href of roots) {
+        expect(
+          ['/dashboard', '/builder', '/analytics', '/simulation', '/evidence/overview'],
+          `${role} global navigation`,
+        ).toContain(href);
+      }
+    }
+  });
+
+  it('surfaces People & Access and Platform Administration only through the permission-aware account menu', () => {
+    const userMenu = read('src/components/layout/UserMenu.tsx');
+    expect(userMenu).toContain('accountAdminNavigation(can)');
+    expect(userMenu).toContain('Administration');
+
+    expect(accountAdminNavigation(canFor('viewer')).map((i) => i.href)).toEqual([]);
+    expect(accountAdminNavigation(canFor('executive')).map((i) => i.href)).toEqual(['/teams']);
+    expect(accountAdminNavigation(canFor('owner')).map((i) => i.href)).toContain('/admin/platform-readiness');
+  });
+
   it('never promotes or emits retired Marketplace in discoverable navigation', () => {
     expect(MANAGE_NAV.map((item) => item.href)).toContain('/marketplace');
     expect(NON_EMITTABLE_PATHS).toContain('/marketplace');
@@ -74,8 +102,6 @@ describe('persona-aware consolidated navigation matrix', () => {
     ['viewer', '/deployments', '/analytics'],
     ['viewer', '/readiness/supervisor', '/evidence/overview'],
     ['admin', '/settings/ai', '/builder'],
-    ['admin', '/admin/platform-readiness', '/admin/platform-readiness'],
-    ['executive', '/teams', '/teams'],
   ] satisfies Array<[AnyRole, string, string]>)(
     'selects exactly one root for %s at %s',
     (role, pathname, expectedRoot) => {

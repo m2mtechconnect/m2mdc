@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 
@@ -32,7 +32,7 @@ export default function ActiveBlueprintResolver() {
           Blueprint is always tied to a facility in your active organization. Select an existing facility or create one to continue.
         </p>
         <Button asChild className="mt-4">
-          <a href="/manage/facilities">Open Facilities</a>
+          <Link to="/manage/facilities">Open Facilities</Link>
         </Button>
       </div>
     </section>

@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
 
-    const { agentId, targetEnvironment, notes } = await req.json();
+    const { agentId, targetEnvironment } = await req.json();
 
     if (!agentId || !targetEnvironment) {
       return new Response(

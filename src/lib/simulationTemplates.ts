@@ -409,6 +409,8 @@ const INDUSTRY_LABELS: Record<string, string> = {
   real_estate: 'Real Estate & Mortgage',
   travel_hospitality: 'Travel & Hospitality',
   government_transport: 'Government Transportation',
+  ai_compute: 'AI Compute Data Centre',
+  data_centre: 'Data Centre',
   generic: 'General Operations',
 };
 

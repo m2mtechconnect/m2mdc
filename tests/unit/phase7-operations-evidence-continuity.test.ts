@@ -11,8 +11,8 @@ const history = read('src/pages/DeploymentHistory.tsx');
 const analytics = read('src/pages/IntelligenceDashboard.tsx');
 
 describe('Phase 7 operations and evidence continuity', () => {
-  it('keeps Operate and Evidence as first-class persistent lifecycle workspaces', () => {
-    expect(navigation).toContain("fullName: 'Operate'");
+  it('keeps Operations and Evidence as first-class persistent lifecycle workspaces', () => {
+    expect(navigation).toContain("fullName: 'Operations'");
     expect(navigation).toContain("href: '/analytics'");
     expect(navigation).toContain("fullName: 'Evidence'");
     expect(navigation).toContain("href: `${EVIDENCE_ROOT}/overview`");
@@ -20,7 +20,7 @@ describe('Phase 7 operations and evidence continuity', () => {
 
   it('routes canonical operations and evidence workspaces to real application surfaces', () => {
     expect(shell).toContain('<Route path="/analytics"');
-    expect(shell).toContain('<Route path="/evidence" element={<EvidenceBetaShell />}>');
+    expect(shell).toContain('<Route path="/evidence" element={<PermissionRouteGuard permission="analytics.view"><EvidenceBetaShell /></PermissionRouteGuard>}>');
     expect(shell).toContain('<Route path="overview" element={<OverviewWorkspace />} />');
     expect(shell).toContain('IntelligenceDashboard');
     expect(shell).toContain('OverviewWorkspace');

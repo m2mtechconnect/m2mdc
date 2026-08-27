@@ -25,6 +25,7 @@ import {
   visibleNavChildren,
   isNavItemActive,
   primaryNavigation,
+  accountAdminNavigation,
   utilityNavigation,
 } from "@/config/appNavigation";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
@@ -63,6 +64,7 @@ export function Layout({ children }: LayoutProps) {
 
   const workspaceNavigation = roleLoading ? [] : primaryNavigation(can);
   const utilityNavigationItems = roleLoading ? [] : utilityNavigation(can);
+  const adminNavigationItems = roleLoading ? [] : accountAdminNavigation(can);
   const activeWorkspace = workspaceNavigation.find((item) =>
     isNavItemActive(item, location.pathname)
     || visibleNavChildren(item, can).some((child) => isNavItemActive(child, location.pathname))
@@ -360,6 +362,27 @@ export function Layout({ children }: LayoutProps) {
                 </div>
               );
             })}
+
+            {adminNavigationItems.length > 0 && (
+              <div className="mt-4 border-t border-border pt-4" aria-label="Administration">
+                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Administration</h3>
+                <div className="space-y-1">
+                  {adminNavigationItems.map((item) => (
+                    <Button key={item.href} asChild variant="ghost" className="w-full justify-start gap-3 min-h-[44px]">
+                      <Link
+                        to={linkTo(item.href)}
+                        data-nav-item={item.name}
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-current={isNavItemActive(item, location.pathname) ? "page" : undefined}
+                      >
+                        <item.icon className="h-4 w-4" aria-hidden="true" />
+                        {item.fullName}
+                      </Link>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="mt-4 border-t border-border pt-4" aria-label="Utilities">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Utilities</h3>

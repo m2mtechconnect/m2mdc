@@ -87,7 +87,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
     await auditGroupedDestinations(page, 'Operations', ['Agents', 'Deployments']);
-    await auditGroupedDestinations(page, 'Platform Admin', ['Platform Readiness']);
+    await auditGroupedDestinations(page, 'Platform Admin', ['Platform readiness']);
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 

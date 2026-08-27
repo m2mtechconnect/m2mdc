@@ -29,7 +29,7 @@ in the repository, or when a separately authorized pass deletes the function.
 ## Register
 
 `docs/remediation/evidence/pr-0.1/edge-function-quarantine.json` holds the
-authoritative list (88 functions at the time of writing) plus the criteria used
+authoritative list (86 functions at the time of writing) plus the criteria used
 to derive it.
 
 ## Enforcement

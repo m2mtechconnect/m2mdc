@@ -46,7 +46,12 @@ describe('P1 Batch A managed AI runtime truth contract', () => {
 
   it('reports readiness instead of presenting browser configuration as runtime evidence', () => {
     expect(aiSettings).toContain('title="Managed AI runtime"');
-    expect(aiSettings).toContain("status={runtimeAvailable ? 'operational' : 'critical'}");
+    expect(aiSettings).toContain('status={runtimeCardStatus}');
+    expect(aiSettings).toContain("'Configured—not verified'");
+    expect(aiSettings).toContain("'Verified healthy'");
+    expect(aiSettings).toContain("'Verification incomplete'");
+    expect(aiSettings).toContain("'Verified available'");
+    expect(aiSettings).toContain("'Server-owned runtime health probe'");
     expect(aiSettings).toContain("runtime?.groundingSearch.available === true ? 'Available' : 'Not exposed'");
     expect(aiSettings).toContain('Runtime health evidence');
     expect(aiSettings).toContain("health?.managedAi.status === 'ok'");

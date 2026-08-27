@@ -41,5 +41,23 @@ describe('facility builder context integrity', () => {
     const source = read('src/components/builder/steps/Step5Deploy.tsx');
     expect(source).toContain("blueprintId: activeTwin?.id ?? builderId ?? 'unavailable'");
     expect(source).toContain('twinId={activeTwin?.id || "unavailable"}');
+    expect(source).toContain('navigate(`/blueprint/${activeTwin.id}`)');
+    expect(source).not.toContain("window.open(`/blueprint/");
+  });
+
+  it('uses a data-centre simulation fixture for AI compute instead of generic ITIL content', () => {
+    const source = read('src/lib/simulationTemplates.ts');
+    expect(source).toContain("ai_compute: {");
+    expect(source).toContain("title: 'Data Centre Capacity & Resilience Scenario'");
+    expect(source).toContain("ai_compute: 'AI Compute & Data Centre'");
+    expect(source).toContain("'data_centre': 'ai_compute'");
+  });
+
+  it('carries and discloses facility context in the neutral Evidence workspace', () => {
+    const layout = read('src/components/Layout.tsx');
+    const evidence = read('src/pages/dsx/EvidenceBetaShell.tsx');
+    expect(layout).toContain('facility_id=${encodeURIComponent(activeTwin.id)}');
+    expect(evidence).toContain('data-testid="evidence-facility-context"');
+    expect(evidence).toContain('Evidence values remain simulated reference data unless their provenance marks them otherwise.');
   });
 });

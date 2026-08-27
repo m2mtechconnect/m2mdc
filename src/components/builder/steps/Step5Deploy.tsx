@@ -147,7 +147,7 @@ export function Step5Deploy() {
       toast.error('No active facility selected. Select a facility to open its Blueprint.');
       return;
     }
-    window.open(`/blueprint/${activeTwin.id}`, '_blank');
+    navigate(`/blueprint/${activeTwin.id}`);
   };
 
   const handleAddKPIs = (newKPIs: any[]) => {

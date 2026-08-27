@@ -141,15 +141,17 @@ describe('production route classification', () => {
   });
 
   /**
-   * The recommendation preview routes were promoted on 2026-08-24 as
-   * authenticated read-only surfaces. They may stay in production only while
-   * they remain behind a permission guard in the shipped router, so the
-   * classification is asserted against the guard rather than assumed.
+   * The recommendation preview routes are excluded from the production
+   * perimeter (2026-08-27). They remain declared in the authenticated router
+   * behind a permission guard, but they must stay classified as
+   * production_blocked and must never be re-promoted implicitly.
    */
-  it('only ships the promoted preview routes behind a permission guard', () => {
+  it('excludes the recommendation preview routes from the production perimeter', () => {
+    const blocked = new Set<string>(allowlist.production_blocked_routes);
     const shell = readFileSync(join(REPO, 'src/AuthenticatedShell.tsx'), 'utf8');
     for (const route of ['/blueprint/preview', '/simulation/preview']) {
-      expect(prod.has(route)).toBe(true);
+      expect(prod.has(route)).toBe(false);
+      expect(blocked.has(route)).toBe(true);
       const declaration = shell
         .split('\n')
         .find((line) => line.includes(`path="${route}"`));
@@ -157,6 +159,13 @@ describe('production route classification', () => {
       expect(declaration).toContain('PermissionRouteGuard');
     }
   });
+
+  it('keeps the production function allowlist free of preview-only promotions', () => {
+    for (const fn of allowlist.production_functions as string[]) {
+      expect(fn).not.toMatch(/preview/i);
+    }
+  });
+
 
 
   it('classifies each route exactly once', () => {

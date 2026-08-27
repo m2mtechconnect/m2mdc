@@ -43,7 +43,8 @@
     "2026-08-24 P1 Batch B route promotion: /blueprint/preview and /simulation/preview are authenticated read-only recommendation previews whose displays are now restricted to recommendation-backed planning values and committed scenario metadata. /studio/systems/:systemId/manage remains protected by twin.edit and now preserves missing runtime/configuration evidence instead of fabricating capability or metric claims. No new Edge Function is promoted by this checkpoint.",
     "2026-08-24 P1 Batch C governance: /infrastructure is compiled and routed only when import.meta.env.DEV is true, and its source remains a mock/reference page. It is therefore development-only rather than a production route. The canonical /admin/accelerated-ai-capabilities surface uses provider-neutral presentation while retaining source-controlled evidence mappings internally.",
     "2026-08-26 release reconciliation: /reset-password is the shipped recovery-completion route and /readiness/supervisor is the authenticated supervisor-readiness route. Both are explicitly classified without changing their existing guards or the default-deny policy.",
-    "2026-08-26 post-release smoke correction: /infrastructure remains non-canonical and its illustrative mock page remains excluded from production; the legacy URL is classified redirect-only and resolves to the tenant-bound /evidence/assets workspace."
+    "2026-08-26 post-release smoke correction: /infrastructure remains non-canonical and its illustrative mock page remains excluded from production; the legacy URL is classified redirect-only and resolves to the tenant-bound /evidence/assets workspace.",
+    "2026-08-27 perimeter exclusion: /blueprint/preview and /simulation/preview are reclassified from production_routes to production_blocked_routes. They remain authenticated, permission-guarded recommendation previews in the shipped router, but they are excluded from the production perimeter and are not part of the qualified production surface. No Edge Function classification changes; the production_functions allowlist is unchanged."
   ],
   "production_functions": [
     "agent-execute",
@@ -83,7 +84,6 @@
     "/app/agents/:slug/detail",
     "/auth/callback",
     "/blueprint/:id",
-    "/blueprint/preview",
     "/builder",
     "/compliance",
     "/dashboard",
@@ -108,7 +108,6 @@
     "/settings/ai",
     "/sign-out",
     "/simulation",
-    "/simulation/preview",
     "/studio/systems/:systemId/manage",
     "/teams",
     "/teams/access-control",
@@ -131,9 +130,11 @@
     "/admin/reference-facility-validation",
     "/agent/:id",
     "/agents/:id/chat",
+    "/blueprint/preview",
     "/deploy",
     "/digital-twins-demo/funding-intake",
     "/marketplace",
+    "/simulation/preview",
     "/twin-debug"
   ],
   "development_only_routes": [

@@ -187,7 +187,7 @@ export function DesignerModeHeader({
             </Button>
           )}
           {extraAction}
-          {onSave && (
+          {canEdit && onSave && (
             <Button
               size="sm"
               onClick={onSave}

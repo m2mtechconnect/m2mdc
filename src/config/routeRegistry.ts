@@ -293,7 +293,7 @@ export const SHARE_LINK_RULES: ShareLinkRule[] = [
   {
     legacy: '/twin-datacentre',
     publicCanonical: '/data-centre-twin',
-    internalCanonical: '/blueprint/default',
+    internalCanonical: '/blueprint',
     reason:
       'Public marketing variant; authenticated visitors are redirected into the Blueprint workspace, so the two audiences need distinct canonical paths.',
   },

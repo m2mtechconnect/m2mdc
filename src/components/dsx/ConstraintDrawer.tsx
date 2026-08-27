@@ -23,6 +23,10 @@ export function ConstraintDrawer() {
   // onOpenAutoFocus can run after focus has already shifted on narrow/mobile
   // layouts, so the render-to-open transition is the stable restoration point.
   useLayoutEffect(() => {
+    if (c && delayedRestoreRef.current !== null) {
+      window.clearTimeout(delayedRestoreRef.current);
+      delayedRestoreRef.current = null;
+    }
     if (c && !previousConstraintRef.current) {
       const active = document.activeElement;
       openerRef.current = active instanceof HTMLElement ? active : null;
@@ -45,8 +49,11 @@ export function ConstraintDrawer() {
     requestAnimationFrame(() => {
       if (opener.isConnected) opener.focus();
     });
-    window.setTimeout(() => {
-      if (opener.isConnected) opener.focus();
+    delayedRestoreRef.current = window.setTimeout(() => {
+      delayedRestoreRef.current = null;
+      // Do not let a previous drawer's delayed restoration steal focus from a
+      // newly opened drawer.
+      if (!previousConstraintRef.current && opener.isConnected) opener.focus();
     }, 400);
   };
 

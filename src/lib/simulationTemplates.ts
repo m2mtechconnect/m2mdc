@@ -34,7 +34,8 @@ export type TwinIndustry =
   | 'education'
   | 'real_estate'
   | 'travel_hospitality'
-  | 'government_transport';
+  | 'government_transport'
+  | 'ai_compute';
 
 export interface SimulationEvent {
   timestampOffsetMin: number;
@@ -313,6 +314,26 @@ export const SIMULATION_TEMPLATES: Record<TwinIndustry | 'generic', SimulationTe
     ],
   },
 
+  ai_compute: {
+    industry: 'ai_compute',
+    title: 'Data Centre Capacity & Resilience Scenario',
+    description: 'Clearly labelled sample scenario for facility capacity, thermal margin, power efficiency and sovereignty controls. Values are illustrative until a recorded simulation exists.',
+    defaultQuery: 'Simulate a 15% compute-demand increase at the active data centre and assess thermal margin, PUE drift, power headroom and sovereignty controls.',
+    scenarioSummary: 'Data centre twin assessing facility capacity and resilience under increased compute demand',
+    kpis: [
+      { code: 'pue', label: 'Power Usage Effectiveness', unit: 'PUE', baseline: 1.35, simulated: 1.30 },
+      { code: 'thermal_margin', label: 'Thermal Headroom', unit: '°C', baseline: 5, simulated: 8 },
+      { code: 'power_headroom', label: 'Power Capacity Headroom', unit: '%', baseline: 12, simulated: 18 },
+      { code: 'sovereignty_controls', label: 'Sovereignty Controls Passing', unit: '%', baseline: 95, simulated: 100 },
+    ],
+    events: [
+      { timestampOffsetMin: 0, type: 'demand_change', severity: 'medium', label: 'Sample compute-demand increase', details: { demand_change_pct: 15, data_mode: 'simulated' } },
+      { timestampOffsetMin: 3, type: 'capacity_assessment', severity: 'low', label: 'Sample power headroom assessed', details: { headroom_pct: 18, evidence_status: 'sample' } },
+      { timestampOffsetMin: 6, type: 'thermal_assessment', severity: 'medium', label: 'Sample thermal margin assessed', details: { margin_c: 8, evidence_status: 'sample' } },
+      { timestampOffsetMin: 9, type: 'sovereignty_check', severity: 'low', label: 'Sample sovereignty controls checked', details: { controls_passing_pct: 100, evidence_status: 'sample' } },
+    ],
+  },
+
   /**
    * Generic Enterprise Operations Twin
    * Based on ITIL v4 service management and ISO 20000 IT service delivery standards
@@ -356,6 +377,7 @@ const INDUSTRY_LABELS: Record<string, string> = {
   real_estate: 'Real Estate & Mortgage',
   travel_hospitality: 'Travel & Hospitality',
   government_transport: 'Government Transportation',
+  ai_compute: 'AI Compute & Data Centre',
   generic: 'General Operations',
 };
 
@@ -425,6 +447,11 @@ export function getSimulationTemplateForIndustry(
     'factory': 'manufacturing',
     'production': 'manufacturing',
     'industrial': 'manufacturing',
+    'data_centre': 'ai_compute',
+    'data_center': 'ai_compute',
+    'datacentre': 'ai_compute',
+    'ai_infrastructure': 'ai_compute',
+    'gpu_compute': 'ai_compute',
     'underwriting': 'insurance',
     'claims': 'insurance',
   };

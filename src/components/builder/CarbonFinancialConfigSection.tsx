@@ -37,7 +37,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
   const [coolingCostPct, setCoolingCostPct] = useState([DEFAULT_FINANCIAL_ASSUMPTIONS.coolingCostPct * 100]);
   const [gpuCostPerHour, setGpuCostPerHour] = useState([DEFAULT_FINANCIAL_ASSUMPTIONS.gpuCostPerHour]);
   const [amortizationYears, setAmortizationYears] = useState([DEFAULT_FINANCIAL_ASSUMPTIONS.amortizationYears]);
-  const [interestRate, setInterestRate] = useState([DEFAULT_FINANCIAL_ASSUMPTIONS.interestRatePct * 100]);
+  const [interestRate, setInterestRate] = useState([DEFAULT_FINANCIAL_ASSUMPTIONS.interestRatePct]);
 
   const regionalData = REGIONAL_CARBON_INTENSITY[region];
 
@@ -50,7 +50,7 @@ export function CarbonFinancialConfigSection({ onConfigChange }: CarbonFinancial
       coolingCostPct: coolingCostPct[0] / 100,
       gpuCostPerHour: gpuCostPerHour[0],
       amortizationYears: amortizationYears[0],
-      interestRatePct: interestRate[0] / 100,
+      interestRatePct: interestRate[0],
     });
   };
 

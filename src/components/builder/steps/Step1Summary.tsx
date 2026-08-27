@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { toast } from 'sonner';
@@ -25,6 +26,7 @@ export function Step1Summary() {
   } = useWizardBuilderStore();
   const { currentBlueprint, updateBlueprint } = useBlueprintStore();
   const { openWithQuestion } = useCoPilotContext();
+  const { twin: activeTwin } = useActiveTwin();
   
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isSwitchOpen, setIsSwitchOpen] = useState(false);
@@ -37,18 +39,20 @@ export function Step1Summary() {
   const [editDepartment, setEditDepartment] = useState('');
   const [editType, setEditType] = useState<'agent' | 'process_twin' | '3d_twin'>('agent');
 
-  // DC Metadata state - defaults for Data Centre twins
-  const [dcMetadata] = useState({
-    facilityLocation: 'CA-ON (Toronto)',
-    gpuFleet: 'NVIDIA H100 x 256, A100 x 128',
-    coolingType: 'Liquid + Chilled Water',
-    powerTopology: 'N+1 Redundancy',
-    renewablePercent: '85%',
-    sovereignCompliance: 'Yes',
-  });
+  // Facility truth comes from the active tenant-scoped twin. Unknown physical
+  // details stay explicit instead of falling back to a different demo site.
+  const dcMetadata = {
+    facilityLocation: activeTwin ? `${activeTwin.region_code} (${activeTwin.city})` : 'Facility unavailable',
+    gpuFleet: 'Not specified',
+    coolingType: 'Not specified',
+    powerTopology: 'Not specified',
+    renewablePercent: activeTwin?.renewable_target_pct != null ? `${activeTwin.renewable_target_pct}% target` : 'Not specified',
+    sovereignCompliance: activeTwin?.sovereignty_level || 'Not specified',
+  };
 
   // ALWAYS use blueprint data when available
   const agentName = currentBlueprint?.name || 
+                    (activeTwin && type === '3d_twin' ? `${activeTwin.name} Digital Twin` : '') ||
                     template || 
                     `${type === 'agent' ? 'AI Agent' : type === '3d_twin' ? '3D Digital Twin' : 'Process Twin'}${department ? ` for ${department}` : ''}`;
   
@@ -281,7 +285,7 @@ export function Step1Summary() {
       <div className="grid gap-4 grid-cols-3">
         <DCKPITile
           label="Target PUE"
-          value="1.2-1.4"
+          value={activeTwin?.pue_target != null ? activeTwin.pue_target.toFixed(2) : "Not specified"}
           sublabel="Power efficiency"
           status="normal"
           icon={<Zap className="h-4 w-4" />}
@@ -342,8 +346,8 @@ export function Step1Summary() {
 
       {/* Blueprint Snapshot */}
       <BlueprintSnapshotCard 
-        twinId="default"
-        onOpenFullBlueprint={() => window.open('/blueprint/default', '_blank')}
+        twinId={activeTwin?.id || "unavailable"}
+        onOpenFullBlueprint={() => activeTwin && window.open(`/blueprint/${activeTwin.id}`, '_blank')}
       />
 
       {/* Actions */}

@@ -124,7 +124,7 @@ export function ReadinessChecklist({
   const okCount = items.filter(i => i.status === 'ok').length;
   const warningCount = items.filter(i => i.status === 'warning').length;
   const missingCount = items.filter(i => i.status === 'missing').length;
-  const allPassed = missingCount === 0;
+  const criticalPassed = missingCount === 0;
 
   const statusIcon = (status: ReadinessItem['status']) => {
     switch (status) {
@@ -223,11 +223,11 @@ export function ReadinessChecklist({
                 })}
               </div>
 
-              {allPassed && (
+              {criticalPassed && (
                 <div className="mt-4 p-3 bg-success/10 border border-success/20 rounded-lg">
                   <div className="flex items-center gap-2 text-success">
                     <Check className="h-5 w-5" />
-                    <span className="font-medium">All critical checks passed! Ready for deployment.</span>
+                    <span className="font-medium">{warningCount > 0 ? `Critical checks passed; ${warningCount} warning${warningCount === 1 ? '': 's'} remain before deployment.` : 'All checks passed. Ready for deployment.'}</span>
                   </div>
                 </div>
               )}

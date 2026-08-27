@@ -75,14 +75,14 @@
     {
       "file": "builder-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "1395f47b0e636c92139c4f25d13832c73531c1ae43ad198b41e76c1788eb6a63",
+      "sha256": "7c67597561ff3395a49f906d3f4702479caa2fca7e736fbb303e711356d7c3b0",
       "width": 375,
       "height": 2476
     },
     {
       "file": "builder-step1-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "b82a69a3acdf1b691b49c75c431edbb2f27a793912b4baa4a6a5d896646b4544",
+      "sha256": "6f1ce390aeba16132a8f5a0018c6044cdb2dded7dd2f06d46114075fb96e6304",
       "width": 1280,
       "height": 720
     },

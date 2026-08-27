@@ -27,22 +27,31 @@ test.describe('Montreal twin context is preserved into Blueprint, Simulation and
     await seedDismissedTours(context);
   });
 
-  test('Command Centre evidence hand-offs carry the active facility id', async ({ page }) => {
+  test('Command Centre hand-offs carry the same twin into Blueprint, Simulation and Evidence', async ({ page }) => {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
 
-    const evidenceLinks = page.locator('a[href*="/evidence"]');
-    await expect(evidenceLinks.first()).toBeAttached({ timeout: 15_000 });
+    // The Command Centre resolves the active facility before it renders its
+    // scoped hand-offs; wait for that state rather than a bare first link.
+    const scopedEvidence = page.locator('a[href*="/evidence"][href*="facility="]').first();
+    await expect(scopedEvidence).toBeAttached({ timeout: 20_000 });
 
-    const hrefs = await evidenceLinks.evaluateAll((nodes) =>
-      nodes.map((n) => n.getAttribute('href') ?? ''),
-    );
-    const scoped = hrefs.filter((h) => h.includes('facility='));
-    expect(scoped.length, `evidence hand-offs must carry facility context: ${hrefs.join(' | ')}`)
-      .toBeGreaterThan(0);
-    for (const href of scoped) {
-      expect(new URLSearchParams(href.split('?')[1] ?? '').get('facility')).toBeTruthy();
-    }
+    const evidenceHref = (await scopedEvidence.getAttribute('href'))!;
+    const facilityId = new URLSearchParams(evidenceHref.split('?')[1] ?? '').get('facility');
+    expect(facilityId).toBeTruthy();
+
+    const blueprintHref = (await page
+      .locator('a[href^="/blueprint/"]')
+      .first()
+      .getAttribute('href'))!;
+    expect(blueprintHref).toContain(`/blueprint/${facilityId}`);
+
+    const simulationHref = (await page
+      .locator('a[href^="/simulation?"]')
+      .first()
+      .getAttribute('href'))!;
+    expect(new URLSearchParams(simulationHref.split('?')[1] ?? '').get('twin')).toBe(facilityId);
   });
+
 
   test('Blueprint opens on the twin id and keeps it in the URL', async ({ page }) => {
     await page.goto(`/blueprint/${MONTREAL_TWIN_ID}?tab=model&layer=thermal`, {

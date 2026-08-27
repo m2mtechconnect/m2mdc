@@ -91,12 +91,12 @@ export function FacilityHighlights({
             <p className="v2-label hidden sm:block">
               Data centre facility
             </p>
-            <h1
+            <h2
               id="facility-highlights-heading"
               className="v2-command-title mt-0.5 break-words"
             >
               {facilityName}
-            </h1>
+            </h2>
             <p className="mt-1 break-words text-[14px] text-muted-foreground">
               {location} · {tier} design
               {isFallback && ' · Reference model'}

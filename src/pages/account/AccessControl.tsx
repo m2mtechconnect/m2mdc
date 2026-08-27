@@ -232,7 +232,7 @@ export default function AccessControl() {
       <DCSectionHeader
         as="h1"
         title="Access control"
-        subtitle="Manage user roles and permissions across the platform"
+        subtitle="Manage user roles and permissions within the active organization"
         icon={<Shield className="h-5 w-5 text-info" />}
         action={!canManageAssignments ? (
           <Badge variant="outline">Read-only</Badge>
@@ -287,7 +287,7 @@ export default function AccessControl() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="global">Global (All agents)</SelectItem>
+                      <SelectItem value="global">Organization-wide (All agents)</SelectItem>
                       <SelectItem value="agent">Specific Agent</SelectItem>
                     </SelectContent>
                   </Select>
@@ -354,7 +354,7 @@ export default function AccessControl() {
                 • All operator permissions<br />
                 • Delete agents<br />
                 • Manage user roles<br />
-                • Full system control
+                • Full administrative control within this organization
               </p>
             </div>
           </div>
@@ -363,7 +363,7 @@ export default function AccessControl() {
       {/* User Roles Table */}
       <DCCard 
         title="Current User Roles" 
-        subtitle={`${userRoles?.length || 0} role assignments across the platform`}
+        subtitle={`${userRoles?.length || 0} role assignments in this organization`}
       >
           {rolesLoading ? (
             <div className="flex justify-center py-8">
@@ -423,11 +423,11 @@ export default function AccessControl() {
                         <Tooltip>
                           <TooltipTrigger>
                             <Badge variant="outline">
-                              {userRole.scope === 'global' || !userRole.scope ? 'Global' : 'Scoped'}
+                              {userRole.scope === 'global' || !userRole.scope ? 'Organization-wide' : 'Agent-scoped'}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {userRole.scope || 'All agents'}
+                            {userRole.scope === 'global' || !userRole.scope ? 'All agents in the active organization' : userRole.scope}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>

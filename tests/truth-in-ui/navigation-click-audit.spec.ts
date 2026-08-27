@@ -120,6 +120,13 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await expectPath(page, '/simulation');
     await expect(drawer).toBeHidden();
 
+    const trigger = page.getByRole('button', { name: 'Toggle mobile menu' });
+    await trigger.click();
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(trigger).toBeFocused();
+
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 

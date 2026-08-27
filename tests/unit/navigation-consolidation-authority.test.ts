@@ -9,7 +9,9 @@ describe('navigation consolidation authority contract', () => {
   const aliases = read('src/config/routeAliases.ts');
   const resolver = read('src/routing/ActiveBlueprintResolver.tsx');
   const header = read('src/components/blueprint/DesignerModeHeader.tsx');
-  const blueprint = read('src/pages/Blueprint.tsx');\n  const routeRegistry = read('src/config/routeRegistry.ts');\n  const surfaceRegistry = read('src/data/dataset/surfaceRegistry.ts');
+  const blueprint = read('src/pages/Blueprint.tsx');
+  const routeRegistry = read('src/config/routeRegistry.ts');
+  const surfaceRegistry = read('src/data/dataset/surfaceRegistry.ts');
 
   it('retires standalone Marketplace behind the Builder edit boundary', () => {
     expect(shell).not.toContain('import("./pages/Marketplace")');
@@ -18,19 +20,27 @@ describe('navigation consolidation authority contract', () => {
     );
   });
 
-  it('classifies the retired Marketplace as a redirect', () => {\n    expect(routeRegistry).toContain("path: '/marketplace', shell: 'internal', kind: 'redirect'");\n    expect(surfaceRegistry).toContain("neutral('/marketplace', 'Retired marketplace redirect'");\n  });\n\n  it('guards every Evidence workspace with reporting access', () => {
+  it('classifies the retired Marketplace as a redirect', () => {
+    expect(routeRegistry).toContain("path: '/marketplace', shell: 'internal', kind: 'redirect'");
+    expect(surfaceRegistry).toContain("neutral('/marketplace', 'Retired marketplace redirect'");
+  });
+
+  it('guards every Evidence workspace with reporting access', () => {
     expect(shell).toContain(
       'path="/evidence" element={<PermissionRouteGuard permission="analytics.view"><EvidenceBetaShell /></PermissionRouteGuard>}',
     );
   });
 
   it('resolves Blueprint from active facility context without a sentinel id', () => {
-    expect(aliases).not.toContain("from: '/blueprint'");\n    expect(aliases).not.toContain("/blueprint/default");
+    expect(aliases).not.toContain("from: '/blueprint'");
+    expect(aliases).not.toContain("/blueprint/default");
     expect(shell).toContain('path="/blueprint"');
     expect(shell).toContain('<ActiveBlueprintResolver />');
     expect(resolver).toContain('if (activeTwinId)');
     expect(resolver).toContain('/blueprint/${activeTwinId}');
-    expect(resolver).toContain('Select a facility before opening Blueprint');\n    expect(routeRegistry).toContain("path: '/blueprint', shell: 'internal', kind: 'canonical'");\n    expect(surfaceRegistry).toContain("neutral('/blueprint', 'Blueprint facility resolver'");
+    expect(resolver).toContain('Select a facility before opening Blueprint');
+    expect(routeRegistry).toContain("path: '/blueprint', shell: 'internal', kind: 'canonical'");
+    expect(surfaceRegistry).toContain("neutral('/blueprint', 'Blueprint facility resolver'");
   });
 
   it('derives Blueprint edit affordances from the canonical permission', () => {

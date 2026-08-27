@@ -180,13 +180,32 @@ describe('production route classification', () => {
 
 describe('allowlist / inventory synchronisation', () => {
   const allowlisted = new Set<string>(allowlist.production_functions);
+  // Mirrors the enforcer: the historical inventory is immutable, so explicit
+  // promotions from the additive ledger are overlaid before comparison.
+  const promotionPath = join(REPO, EVIDENCE_DIR, 'edge-function-promotions.json');
+  const promoted = new Set<string>(
+    existsSync(promotionPath)
+      ? (JSON.parse(readFileSync(promotionPath, 'utf8')).promotions ?? [])
+          .filter((p: { production_disposition: string }) => p.production_disposition === 'production-allowlisted')
+          .map((p: { function: string }) => p.function)
+      : [],
+  );
   const inventoryAllowlisted = inventory
-    .filter((entry: { production_disposition: string }) => entry.production_disposition === 'production-allowlisted')
+    .filter(
+      (entry: { function: string; production_disposition: string }) =>
+        entry.production_disposition === 'production-allowlisted' || promoted.has(entry.function),
+    )
     .map((entry: { function: string }) => entry.function);
+
+  it('only promotes functions that exist in the inventory', () => {
+    const known = new Set(inventory.map((entry: { function: string }) => entry.function));
+    for (const name of promoted) expect(known.has(name)).toBe(true);
+  });
 
   it('has exactly the same set on both sides', () => {
     expect(new Set(inventoryAllowlisted)).toEqual(allowlisted);
   });
+
 
   it('only allowlists functions that exist on disk', () => {
     for (const name of allowlisted) {

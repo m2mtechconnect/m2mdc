@@ -140,7 +140,8 @@ function ApprovedUserRoutes() {
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
 
       <Route path="/manage/integrations" element={<PermissionRouteGuard permission="twin.edit"><Connections /></PermissionRouteGuard>} />
-      <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.edit"><ManageFacilities /></PermissionRouteGuard>} />
+      {/* Admission is read-level; the page gates every mutation on twin.edit. */}
+      <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.view"><ManageFacilities /></PermissionRouteGuard>} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
       <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />

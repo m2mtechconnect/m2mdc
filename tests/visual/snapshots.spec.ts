@@ -103,10 +103,22 @@ async function expectGlobalLightTheme(page: Page) {
 }
 
 async function expectLifecycleNavigation(page: Page) {
-  await expect(page.getByRole('button', { name: /^Design & Build$/i }).first()).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Operations$/i }).first()).toBeVisible();
-  await expect(page.getByRole('link', { name: /^Simulation$/i }).first()).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Evidence$/i }).first()).toBeVisible();
+  const navigation = page.getByRole('navigation', { name: 'Primary navigation' });
+  const lifecycleDestinations = [
+    ['/dashboard', /Command Center/i],
+    ['/builder', /^Design & Build$/i],
+    ['/analytics', /^Operations$/i],
+    ['/simulation', /^Simulation$/i],
+    ['/evidence/overview', /^Evidence$/i],
+  ] as const;
+
+  for (const [href, name] of lifecycleDestinations) {
+    await expect(navigation.locator(`a[href="${href}"]`).filter({ hasText: name }).first()).toBeVisible();
+  }
+
+  await expect(navigation.getByRole('button', { name: /^Design & Build$/i })).toHaveCount(0);
+  await expect(navigation.getByRole('button', { name: /^Operations$/i })).toHaveCount(0);
+  await expect(navigation.getByRole('button', { name: /^Evidence$/i })).toHaveCount(0);
 }
 
 async function installBuilderTenantMock(context: BrowserContext) {

@@ -36,6 +36,13 @@ function runEnforcer(cwd: string): { code: number; output: string } {
  * Mirrors the repository into a temp directory: everything the enforcer reads
  * except the evidence files is symlinked, so the evidence can be mutated for
  * negative cases without touching the working tree.
+ *
+ * The additive promotion ledger is copied verbatim. The historical inventory
+ * is immutable, so teams-invite is still recorded there as "unknown-blocked";
+ * its effective disposition comes from edge-function-promotions.json. Without
+ * copying that ledger, every negative fixture reported a spurious
+ * "allowlist/teams-invite: inventory disposition is unknown-blocked" failure
+ * that had nothing to do with the case under test.
  */
 function mirrorRepo(mutate: (a: typeof allowlist) => void): string {
   const dir = mkdtempSync(join(tmpdir(), 'aura-perimeter-'));
@@ -47,6 +54,13 @@ function mirrorRepo(mutate: (a: typeof allowlist) => void): string {
   mutate(mutated);
   writeFileSync(join(dir, EVIDENCE_DIR, 'route-allowlist.json'), JSON.stringify(mutated, null, 2));
   writeFileSync(join(dir, EVIDENCE_DIR, 'edge-function-inventory.json'), JSON.stringify(inventory, null, 2));
+  const promotionSource = join(REPO, EVIDENCE_DIR, 'edge-function-promotions.json');
+  if (existsSync(promotionSource)) {
+    writeFileSync(
+      join(dir, EVIDENCE_DIR, 'edge-function-promotions.json'),
+      readFileSync(promotionSource, 'utf8'),
+    );
+  }
   return dir;
 }
 

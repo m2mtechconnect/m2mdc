@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TrendingUp, TrendingDown, Minus, Target, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { kpiTrendTone, KPI_TREND_TEXT_CLASS } from '@/components/kpi/kpiSemantics';
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import type { KPISnapshot } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS, getThresholdZoneForValue, getDistanceToTarget } from '@/engines/kpi/KPIOverlayEngine';
@@ -182,11 +183,13 @@ export function EnterpriseKPICard({
   const delta = previousValue !== undefined ? currentValue - previousValue : 0;
   const deltaPercent = previousValue ? ((delta / previousValue) * 100) : 0;
   
-  const isImproving = config.lowerIsBetter 
-    ? delta < 0 
-    : delta > 0;
-  
-  const isNeutral = Math.abs(deltaPercent) < 0.5;
+  const trendTone = kpiTrendTone(delta, {
+    lowerIsBetter: config.lowerIsBetter,
+    percentChange: deltaPercent,
+    neutralPercentThreshold: 0.5,
+  });
+  const isImproving = trendTone === 'improving';
+  const isNeutral = trendTone === 'flat';
 
   const severityColor = zone?.severity === 'critical' 
     ? 'border-destructive bg-destructive/5' 
@@ -203,11 +206,7 @@ export function EnterpriseKPICard({
         : '';
 
   const TrendIcon = isNeutral ? Minus : isImproving ? TrendingUp : TrendingDown;
-  const trendColor = isNeutral 
-    ? 'text-muted-foreground' 
-    : isImproving 
-      ? 'text-success' 
-      : 'text-destructive';
+  const trendColor = KPI_TREND_TEXT_CLASS[trendTone];
 
   const sparklineColor = zone?.severity === 'critical' 
     ? 'hsl(var(--destructive))' 

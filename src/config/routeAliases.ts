@@ -44,7 +44,6 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/agent-chat', to: '/app/agents' },
   { from: '/agents', to: '/app/agents' },
   { from: '/subsystem-agents', to: '/app/agents' },
-  { from: '/blueprint', to: '/blueprint/default' },
   { from: '/universal-search', to: '/search' },
   { from: '/settings/integrations/nvidia-dsx', to: '/manage/integrations#nvidia-dsx' },
   { from: '/twin-datacentre', to: '/blueprint/default' },

@@ -132,7 +132,15 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
-    await expectPath(page, '/evidence');
+    await expect
+      .poll(() => new URL(page.url()).pathname, { timeout: 5_000 })
+      .toBe('/evidence/overview');
+    const evidenceUrl = new URL(page.url());
+    expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
+    expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
+    expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
+    expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
+    expect(evidenceUrl.searchParams.get('tick')).toBe('0');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();
     expect(nestedInteractive, 'dashboard must not nest links and buttons').toBe(0);

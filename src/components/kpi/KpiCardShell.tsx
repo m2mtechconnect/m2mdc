@@ -16,7 +16,7 @@
  * truth, and it uses semantic design tokens exclusively.
  */
 
-import type { KeyboardEvent, ReactNode } from 'react';
+import { forwardRef, type KeyboardEvent, type ReactNode } from 'react';
 import { ArrowUpRight, ArrowDownRight, Minus, TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -56,7 +56,7 @@ export interface KpiCardSurfaceProps {
 }
 
 /** Card frame plus interaction affordances shared by every KPI card. */
-export function KpiCardSurface({
+export const KpiCardSurface = forwardRef<HTMLDivElement, KpiCardSurfaceProps>(function KpiCardSurface({
   children,
   className,
   onActivate,
@@ -64,7 +64,7 @@ export function KpiCardSurface({
   testId,
   dataAttributes,
   ariaLabel,
-}: KpiCardSurfaceProps) {
+}: KpiCardSurfaceProps, ref) {
   const interactive = Boolean(onActivate);
   const handleKeyDown = interactive
     ? (event: KeyboardEvent<HTMLElement>) => {
@@ -91,18 +91,20 @@ export function KpiCardSurface({
 
   if (as === 'div') {
     return (
-      <div className={cn('group relative', interactionClass, className)} {...shared}>
+      <div ref={ref} className={cn('group relative', interactionClass, className)} {...shared}>
         {children}
       </div>
     );
   }
 
   return (
-    <Card className={cn('group relative', interactionClass, className)} {...shared}>
+    <Card ref={ref} className={cn('group relative', interactionClass, className)} {...shared}>
       {children}
     </Card>
   );
-}
+});
+
+KpiCardSurface.displayName = 'KpiCardSurface';
 
 export interface KpiValueProps {
   value: string | number;

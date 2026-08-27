@@ -32,6 +32,7 @@ import {
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
 import { useDataset } from "@/data/dataset/DatasetProvider";
+import { useActiveTwin } from "@/context/ActiveTwinContext";
 import {
   useAssistantLayoutStore,
   useAssistantPresentation,
@@ -46,6 +47,10 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const { linkTo } = useDataset();
+  const { twin: activeTwin } = useActiveTwin();
+  const governanceEvidenceHref = activeTwin?.id
+    ? `/evidence/sustainability/sovereignty?facility=${encodeURIComponent(activeTwin.id)}`
+    : "/evidence/sustainability/sovereignty";
   const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);
   const location = useLocation();
   const navigate = useNavigate();
@@ -431,7 +436,7 @@ export function Layout({ children }: LayoutProps) {
                 Learning Hub
               </Link>
               <Link
-                to="/evidence/sustainability/sovereignty"
+                to={governanceEvidenceHref}
                 className="hover:text-foreground transition-smooth"
               >
                 Governance evidence

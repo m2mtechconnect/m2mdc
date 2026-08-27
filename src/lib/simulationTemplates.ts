@@ -34,7 +34,9 @@ export type TwinIndustry =
   | 'education'
   | 'real_estate'
   | 'travel_hospitality'
-  | 'government_transport';
+  | 'government_transport'
+  | 'ai_compute'
+  | 'data_centre';
 
 export interface SimulationEvent {
   timestampOffsetMin: number;

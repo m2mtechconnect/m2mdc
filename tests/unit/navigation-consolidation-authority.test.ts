@@ -20,8 +20,9 @@ describe('navigation consolidation authority contract', () => {
     );
   });
 
-  it('classifies the retired Marketplace as a redirect', () => {
-    expect(routeRegistry).toContain("path: '/marketplace', shell: 'internal', kind: 'redirect'");
+  it('classifies Marketplace as a non-emittable retired redirect', () => {
+    expect(routeRegistry).toContain("path: '/marketplace', shell: 'internal', kind: 'retired-redirect'");
+    expect(routeRegistry).toContain("'/marketplace',");
     expect(surfaceRegistry).toContain("neutral('/marketplace', 'Retired marketplace redirect'");
   });
 

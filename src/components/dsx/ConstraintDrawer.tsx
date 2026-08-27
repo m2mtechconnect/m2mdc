@@ -4,7 +4,7 @@
  * Opening a constraint explains what was measured, which objects it affects,
  * how much evidence supports it and where to continue the investigation.
  */
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,7 @@ import { relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 export function ConstraintDrawer() {
   const { investigatedConstraint: c, closeConstraint, hrefWithContext, selectAsset } = useWorkspace();
   const openerRef = useRef<HTMLElement | null>(null);
-  const previousConstraintRef = useRef<typeof c>(null);
+  const previousConstraintRef = useRef<typeof c>(null);\n  const delayedRestoreRef = useRef<number | null>(null);
 
   // Capture the keyboard trigger before Radix moves focus into the portal.
   // onOpenAutoFocus can run after focus has already shifted on narrow/mobile
@@ -29,7 +29,7 @@ export function ConstraintDrawer() {
     previousConstraintRef.current = c;
   }, [c]);
 
-  const restoreOpener = () => {
+  useEffect(() => () => {\n    if (delayedRestoreRef.current !== null) window.clearTimeout(delayedRestoreRef.current);\n  }, []);\n\n  const restoreOpener = () => {
     const opener = openerRef.current;
     openerRef.current = null;
     if (!opener || !opener.isConnected) return;

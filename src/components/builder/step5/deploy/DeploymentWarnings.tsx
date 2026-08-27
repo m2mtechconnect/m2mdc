@@ -76,10 +76,10 @@ export function DeploymentWarnings({
   }
 
   // Check for missing model or instructions
-  if (!builderState?.modelConfig?.model) {
+  if (!builderState?.modelConfig?.response_profile && !builderState?.modelConfig?.model) {
     warnings.push({
       id: 'no-model',
-      message: 'No AI model selected. Configure intelligence settings to proceed.',
+      message: 'No managed AI response profile selected. Configure intelligence settings to proceed.',
       severity: 'critical',
       fixStep: 2,
       icon: Brain

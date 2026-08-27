@@ -22,6 +22,7 @@ import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
 import { buildHierarchy, identityByAuraId, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
@@ -214,12 +215,15 @@ function WorkspaceNav() {
 function EvidenceWorkspaceHeader() {
   const { pathname } = useLocation();
   const { selectedAncestry, selectAsset, hrefWithContext, context } = useWorkspace();
+  const { twin: activeTwin } = useActiveTwin();
   const title = evidenceTitle(pathname);
 
   // The shell always states which facility the evidence is scoped to. An id
   // that does not resolve is reported as unavailable, never substituted.
   const facilityId = context.facility_id;
-  const facilityName = facilityId ? identityByAuraId(facilityId)?.name ?? null : null;
+  const facilityName = facilityId
+    ? (activeTwin?.id === facilityId ? activeTwin.name : identityByAuraId(facilityId)?.name) ?? null
+    : null;
   const facilityLabel = !facilityId
     ? 'Facility: not selected'
     : facilityName

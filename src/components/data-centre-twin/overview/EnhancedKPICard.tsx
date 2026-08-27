@@ -3,18 +3,18 @@
  */
 
 import { useState, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { TrendingUp, TrendingDown, Minus, Info, PlayCircle, ChevronRight } from 'lucide-react';
+import { Info, PlayCircle, ChevronRight } from 'lucide-react';
 import { SparklineChart, generateSparklineData } from './SparklineChart';
 import { cn } from '@/lib/utils';
 import {
   KPI_SEVERITY_TEXT_CLASS,
-  KPI_SEVERITY_BADGE,
   KPI_TREND_TEXT_CLASS,
 } from '@/components/kpi/kpiSemantics';
+import { KpiCardSurface, KpiStatusBadge, KpiValue, kpiTrendIcon } from '@/components/kpi/KpiCardShell';
 
 interface EnhancedKPICardProps {
   id: string;
@@ -53,9 +53,7 @@ export function EnhancedKPICard({
   
   const statusColors = KPI_SEVERITY_TEXT_CLASS;
 
-  const statusBadge = KPI_SEVERITY_BADGE;
-  
-  const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
+  const TrendIcon = kpiTrendIcon(trend === 'up' ? 'improving' : trend === 'down' ? 'declining' : 'flat');
   
   const sparkData = useMemo(() => 
     sparklineData || generateSparklineData(typeof value === 'number' ? value : 50), 
@@ -64,12 +62,14 @@ export function EnhancedKPICard({
   
   if (compact) {
     return (
-      <div 
+      <KpiCardSurface
+        as="div"
         className={cn(
-          'flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border hover:border-primary/30 transition-all cursor-pointer',
+          'flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border hover:border-primary/30',
           highlighted && 'ring-2 ring-primary ring-offset-2'
         )}
-        onClick={() => setShowDrilldown(true)}
+        ariaLabel={`${label} details`}
+        onActivate={() => setShowDrilldown(true)}
       >
         <div className="flex items-center gap-3">
           {icon && <div className="p-1.5 rounded bg-accent/10">{icon}</div>}
@@ -87,28 +87,27 @@ export function EnhancedKPICard({
           <SparklineChart data={sparkData} width={60} height={20} />
           <ChevronRight className="h-4 w-4 text-muted-foreground" />
         </div>
-      </div>
+      </KpiCardSurface>
     );
   }
   
   return (
     <>
-      <Card 
+      <KpiCardSurface
         className={cn(
-          'bg-card border-border hover:border-primary/30 transition-all cursor-pointer group overflow-hidden',
+          'bg-card border-border hover:border-primary/30 overflow-hidden',
           highlighted && 'ring-2 ring-primary ring-offset-2',
           status === 'critical' && 'border-destructive/30',
           status === 'warning' && 'border-warning/30'
         )}
-        onClick={() => setShowDrilldown(true)}
+        ariaLabel={`${label} details`}
+        onActivate={() => setShowDrilldown(true)}
       >
         <CardContent className="p-4 overflow-hidden">
           <div className="flex items-start justify-between mb-3">
             <div className="flex items-center gap-2">
               {icon && <div className="p-2 rounded-lg bg-accent/10">{icon}</div>}
-              <Badge variant="outline" className={statusBadge[status].className}>
-                {statusBadge[status].label}
-              </Badge>
+              <KpiStatusBadge severity={status} />
             </div>
             {delta !== undefined && (
               <div className={cn(
@@ -123,12 +122,13 @@ export function EnhancedKPICard({
           
           <div className="space-y-2 min-w-0">
             <p className="text-xs text-muted-foreground truncate">{label}</p>
-            <div className="flex items-baseline gap-1 min-w-0">
-              <span className={cn('text-2xl font-bold font-mono truncate', statusColors[status])}>
-                {value}
-              </span>
-              <span className="text-sm text-muted-foreground flex-shrink-0">{unit}</span>
-            </div>
+            <KpiValue
+              value={value}
+              unit={unit}
+              className="gap-1"
+              valueClassName={cn('font-mono truncate', statusColors[status])}
+              unitClassName="flex-shrink-0"
+            />
           </div>
           
           <div className="mt-3 w-full overflow-hidden">
@@ -150,7 +150,7 @@ export function EnhancedKPICard({
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </KpiCardSurface>
       
       {/* Drill-down Modal */}
       <Dialog open={showDrilldown} onOpenChange={setShowDrilldown}>
@@ -168,16 +168,15 @@ export function EnhancedKPICard({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Current Value</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className={cn('text-3xl font-bold font-mono', statusColors[status])}>
-                      {value}
-                    </span>
-                    <span className="text-lg text-muted-foreground">{unit}</span>
-                  </div>
+                  <KpiValue
+                    value={value}
+                    unit={unit}
+                    className="gap-2"
+                    valueClassName={cn('text-3xl font-mono', statusColors[status])}
+                    unitClassName="text-lg"
+                  />
                 </div>
-                <Badge variant="outline" className={statusBadge[status].className}>
-                  {statusBadge[status].label}
-                </Badge>
+                <KpiStatusBadge severity={status} />
               </div>
             </div>
             

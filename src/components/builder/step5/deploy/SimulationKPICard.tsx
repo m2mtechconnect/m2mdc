@@ -3,12 +3,12 @@
  * Displays baseline vs simulated KPI comparison with visual delta
  */
 
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SimulationKPI } from '@/lib/simulationTemplates';
 import { isLowerBetterMetric, kpiTrendTone, KPI_TREND_TEXT_CLASS } from '@/components/kpi/kpiSemantics';
+import { KpiCardSurface, kpiTrendIcon } from '@/components/kpi/KpiCardShell';
 
 interface SimulationKPICardProps {
   kpi: SimulationKPI;
@@ -26,9 +26,11 @@ export function SimulationKPICard({ kpi, isSampleData = false }: SimulationKPICa
   const isImprovement = trendTone === 'improving';
   const displayDelta = Math.abs(delta);
   const displayPercent = Math.abs(percentChange);
+  // Icon direction follows the raw delta, tone follows the shared semantics.
+  const DirectionIcon = kpiTrendIcon(delta === 0 ? 'flat' : delta > 0 ? 'improving' : 'declining');
 
   return (
-    <Card className="relative overflow-hidden">
+    <KpiCardSurface className="relative overflow-hidden">
       {isSampleData && (
         <Badge 
           variant="secondary" 
@@ -62,13 +64,7 @@ export function SimulationKPICard({ kpi, isSampleData = false }: SimulationKPICa
             "flex items-center gap-1.5 text-sm font-medium",
             KPI_TREND_TEXT_CLASS[trendTone]
           )}>
-            {delta > 0 ? (
-              <TrendingUp className="h-4 w-4" />
-            ) : delta < 0 ? (
-              <TrendingDown className="h-4 w-4" />
-            ) : (
-              <Minus className="h-4 w-4" />
-            )}
+            <DirectionIcon className="h-4 w-4" />
             <span>
               {delta === 0 ? 'No change' : (
                 <>
@@ -81,6 +77,6 @@ export function SimulationKPICard({ kpi, isSampleData = false }: SimulationKPICa
           </div>
         </div>
       </CardContent>
-    </Card>
+    </KpiCardSurface>
   );
 }

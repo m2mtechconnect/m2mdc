@@ -1,15 +1,18 @@
-import { Card } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { LucideIcon, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
+import { LucideIcon, ArrowUpRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import {
-  KPI_STATUS_BADGE_CLASS,
-  KPI_QUALITY_DOT_CLASS,
-  KPI_TREND_TEXT_CLASS,
   type KpiStatusTone,
   type KpiQualityTone,
 } from "@/components/kpi/kpiSemantics";
+import {
+  KpiCardSurface,
+  KpiQualityDot,
+  KpiStatusBadge,
+  KpiTrendChip,
+  KpiValue,
+} from "@/components/kpi/KpiCardShell";
 
 /**
  * KPI metric-basis metadata.
@@ -82,37 +85,19 @@ export default function KpiCard({
   quality,
   badge,
 }: KpiCardProps) {
-  const trendColor =
-    trend === 'up'
-      ? KPI_TREND_TEXT_CLASS.improving
-      : trend === 'down'
-        ? KPI_TREND_TEXT_CLASS.declining
-        : KPI_TREND_TEXT_CLASS.flat;
-  const TrendIcon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : null;
+  const trendTone = trend === 'up' ? 'improving' : trend === 'down' ? 'declining' : 'flat';
   const isInteractive = Boolean(to || onClick);
-
-  const statusColor = KPI_STATUS_BADGE_CLASS;
-
-  const qualityColor = KPI_QUALITY_DOT_CLASS;
 
   const basisParts = [grain, window, aggregation].filter(Boolean) as string[];
 
   const cardContent = (
-    <Card 
+    <KpiCardSurface
       className={cn(
-        "p-6 bg-secondary/5 border-secondary/10 transition-all group relative",
-        isInteractive && "cursor-pointer hover:shadow-lg hover:border-secondary/30 hover:-translate-y-0.5 hover:bg-secondary/10",
+        "p-6 bg-secondary/5 border-secondary/10",
+        isInteractive && "hover:border-secondary/30 hover:-translate-y-0.5 hover:bg-secondary/10",
         className
       )}
-      onClick={to ? undefined : onClick}
-      role={!to && onClick ? "button" : undefined}
-      tabIndex={!to && onClick ? 0 : undefined}
-      onKeyDown={!to && onClick ? (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      } : undefined}
+      onActivate={!to && onClick ? onClick : undefined}
     >
       <div className="flex items-start justify-between mb-4">
         <div className={cn(
@@ -127,39 +112,28 @@ export default function KpiCard({
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin text-studio-muted" />
         ) : change ? (
-          <span className={cn("flex items-center gap-1 text-xs font-mono", trendColor)}>
-            {TrendIcon && <TrendIcon className="h-3 w-3" />}
-            {change}
-          </span>
+          <KpiTrendChip tone={trendTone} label={change} iconStyle="arrow" showIcon={trend !== 'neutral'} />
         ) : null}
       </div>
       <div>
         <p className="text-sm text-studio-muted mb-2 flex items-center gap-2">
           {label}
-          {quality && (
-            <span
-              className={cn('inline-block w-1.5 h-1.5 rounded-full', qualityColor[quality])}
-              aria-label={`Data quality: ${quality}`}
-              title={`Data quality: ${quality}`}
-            />
-          )}
+          {quality && <KpiQualityDot quality={quality} />}
           {isInteractive && (
             <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity text-studio-muted" />
           )}
         </p>
-        <div className="flex items-baseline gap-1.5 flex-wrap">
-          <p className="text-3xl sm:text-4xl font-bold text-foreground" style={{ fontSize: 'clamp(28px, 5vw, 36px)' }}>
-            {value}
-          </p>
-          {unit && (
-            <span className="text-sm font-medium text-muted-foreground">{unit}</span>
-          )}
-          {badge && (
+        <KpiValue
+          value={value}
+          unit={unit}
+          valueClassName="text-3xl sm:text-4xl [font-size:clamp(28px,5vw,36px)]"
+          unitClassName="font-medium"
+          badge={badge ? (
             <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-accent/15 text-accent-foreground border border-accent/30">
               {badge}
             </span>
-          )}
-        </div>
+          ) : undefined}
+        />
         {basisParts.length > 0 && (
           <p className="text-[11px] text-muted-foreground mt-1.5 leading-tight">
             {basisParts.join(' \u00b7 ')}
@@ -167,14 +141,7 @@ export default function KpiCard({
         )}
         {(status || statusLabel) && (
           <div className="mt-2">
-            <span
-              className={cn(
-                'inline-flex items-center text-[10px] font-medium px-1.5 py-0.5 rounded border',
-                statusColor[status ?? 'neutral']
-              )}
-            >
-              {statusLabel ?? status}
-            </span>
+            <KpiStatusBadge status={status ?? 'neutral'} label={statusLabel ?? status} />
           </div>
         )}
         {subtext && (
@@ -186,7 +153,7 @@ export default function KpiCard({
           <ArrowUpRight className="h-4 w-4 text-studio-muted" />
         </div>
       )}
-    </Card>
+    </KpiCardSurface>
   );
 
   const tooltipBody = tooltip || formula || source ? (

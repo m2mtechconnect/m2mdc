@@ -57,3 +57,44 @@ describe('KPI semantics consolidation', () => {
     }
   });
 });
+
+/**
+ * Consolidation: the four cards share one presentation shell.
+ *
+ * They keep their own exported prop contracts and their own drill-down
+ * behaviours (link navigation, dialog, overlay click); only the surface,
+ * value, trend, status and quality primitives are shared.
+ */
+describe('KPI card shell consolidation', () => {
+  it.each(KPI_CARDS)('%s composes the shared KPI card shell', (file) => {
+    expect(read(file)).toContain('@/components/kpi/KpiCardShell');
+  });
+
+  it.each(KPI_CARDS)('%s no longer frames its own bare Card element', (file) => {
+    expect(read(file)).not.toMatch(/<Card[\s>]/);
+  });
+
+  it('keeps each card\'s distinct prop contract', () => {
+    expect(read(KPI_CARDS[0])).toContain('interface KpiCardProps');
+    expect(read(KPI_CARDS[1])).toContain('kpiId');
+    expect(read(KPI_CARDS[2])).toContain('interface EnhancedKPICardProps');
+    expect(read(KPI_CARDS[3])).toContain('interface SimulationKPICardProps');
+  });
+
+  it('preserves the distinct drill-down behaviours', () => {
+    // Dashboard card: link or click-through drill-down.
+    expect(read(KPI_CARDS[0])).toContain('<Link');
+    // Enterprise card: caller-owned overlay click.
+    expect(read(KPI_CARDS[1])).toContain('onActivate={onClick');
+    // DC twin card: dialog drill-down.
+    expect(read(KPI_CARDS[2])).toContain('setShowDrilldown(true)');
+    expect(read(KPI_CARDS[2])).toContain('<Dialog');
+  });
+
+  it('centralises the trend icon and status chip in the shell', () => {
+    const shell = read('src/components/kpi/KpiCardShell.tsx');
+    expect(shell).toContain('export function kpiTrendIcon');
+    expect(shell).toContain('export function KpiStatusBadge');
+    expect(shell).toContain('export function KpiCardSurface');
+  });
+});

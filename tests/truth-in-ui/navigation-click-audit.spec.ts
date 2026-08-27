@@ -64,7 +64,17 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
       const link = page.getByRole('link', { name: item.name }).first();
       await expect(link, `${item.name} is a visible link`).toBeVisible();
       await link.click();
-      await expectPath(page, item.path);
+      if (item.name === 'Evidence') {
+        await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(item.path);
+        const evidenceUrl = new URL(page.url());
+        expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
+        expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
+        expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
+        expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
+        expect(evidenceUrl.searchParams.get('tick')).toBe('0');
+      } else {
+        await expectPath(page, item.path);
+      }
     }
 
     const nestedInteractive = await page.locator('header a button, header button a').count();
@@ -85,7 +95,17 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
     await auditGroupedDestinations(page, 'Operations', ['/analytics', '/app/agents', '/deployments']);
-    await auditGroupedDestinations(page, 'Platform Administration', ['/admin/platform-readiness']);
+
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+    await page.getByRole('button', { name: 'Platform Administration' }).click();
+    const platformMenu = page.getByRole('menu');
+    await expect(platformMenu.getByRole('menuitem', { name: 'Platform Administration', exact: true })).toBeVisible();
+    const readinessLink = platformMenu.getByRole('menuitem', { name: 'Platform readiness', exact: true });
+    await expect(readinessLink).toBeVisible();
+    await readinessLink.click();
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe('/admin/platform-readiness');
+
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 

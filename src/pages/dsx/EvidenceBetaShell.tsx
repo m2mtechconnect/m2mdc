@@ -22,6 +22,7 @@ import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
 import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
 
@@ -254,6 +255,13 @@ function EvidenceWorkspaceHeader() {
 
 
 function ShellBody() {
+  const { twin: activeTwin } = useActiveTwin();
+  const { context } = useWorkspace();
+  const requestedFacilityId = context.facility_id;
+  const facilityLabel = activeTwin && (!requestedFacilityId || requestedFacilityId === activeTwin.id)
+    ? activeTwin.name
+    : requestedFacilityId;
+
   return (
     <div className="v2-canvas flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
       <Helmet>
@@ -265,6 +273,15 @@ function ShellBody() {
       </Helmet>
       <OperationalTruthBar />
       <ContextBar />
+      <div
+        role="status"
+        data-testid="evidence-facility-context"
+        className="border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-panel))] px-4 py-2 text-[13px] text-muted-foreground sm:px-6"
+      >
+        <span className="font-semibold text-foreground">Facility context:</span>{' '}
+        {facilityLabel || 'No facility selected'}.
+        {' '}Evidence values remain simulated reference data unless their provenance marks them otherwise.
+      </div>
       <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
         <WorkspaceNav />
         <div className="min-w-0 flex-1 p-4 sm:p-6">

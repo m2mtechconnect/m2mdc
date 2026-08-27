@@ -167,7 +167,8 @@ const EVIDENCE_BETA_ROUTES: readonly [string, string][] = [
 export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/dashboard', 'Dashboard', ['facilities', 'kpis', 'ngc'], [KPI, CONFIG]),
   consumer('/manage/facilities', 'Facilities', ['facilities', 'montreal'], [CONFIG, SPEC]),
-  neutral('/blueprint', 'Blueprint facility resolver', 'Resolves the active facility before any dataset-backed Blueprint route is opened.'),\n  consumer('/blueprint/:id', 'Blueprint', ['specifications', 'configurations', 'derivation', 'evidence'], [SPEC, CONFIG]),
+  neutral('/blueprint', 'Blueprint facility resolver', 'Resolves the active facility before any dataset-backed Blueprint route is opened.'),
+  consumer('/blueprint/:id', 'Blueprint', ['specifications', 'configurations', 'derivation', 'evidence'], [SPEC, CONFIG]),
   consumer('/blueprint/preview', 'Blueprint preview', ['specifications', 'configurations'], [SPEC, CONFIG]),
   consumer('/data-centre-twin/:id/blueprint', 'Twin blueprint', ['specifications', 'configurations', 'derivation'], [SPEC, CONFIG]),
   consumer('/builder', 'Build twin', ['configurations', 'derivation'], [CONFIG, SPEC]),

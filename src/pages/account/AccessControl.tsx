@@ -29,7 +29,19 @@ type Profile = {
   user_id: string;
   email: string;
   full_name: string | null;
+  avatar_initials: string | null;
 };
+
+function profileDisplayName(profile: Profile | null | undefined): string {
+  const fullName = profile?.full_name?.trim();
+  if (fullName) return fullName;
+
+  const email = profile?.email?.trim();
+  if (email) return email.split('@')[0];
+
+  const initials = profile?.avatar_initials?.trim();
+  return initials || 'Profile unavailable';
+}
 
 /*
  * The grant dropdown previously offered only admin/operator/viewer while the
@@ -104,7 +116,7 @@ export default function AccessControl() {
 
       const { data: profileRows, error: profilesErr } = await supabase
         .from('profiles')
-        .select('user_id, email, full_name')
+        .select('user_id, email, full_name, avatar_initials')
         .in('user_id', userIds);
       if (profilesErr) throw profilesErr;
 
@@ -390,7 +402,7 @@ export default function AccessControl() {
                     <TableCell>
                       <div>
                         <div className="font-medium">
-                          {userRole.profiles?.full_name || 'Unknown User'}
+                          {profileDisplayName(userRole.profiles)}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {userRole.profiles?.email}
@@ -427,7 +439,9 @@ export default function AccessControl() {
                       {userRole.expires_at ? new Date(userRole.expires_at).toLocaleDateString() : 'Never'}
                     </TableCell>
                     <TableCell className="text-right">
-                      {canManageAssignments && (
+                      {canManageAssignments && userRole.role === 'owner' ? (
+                      <span className="text-xs text-muted-foreground">Owner protected</span>
+                      ) : canManageAssignments && (
                       <Dialog open={isRevokeDialogOpen && selectedRole?.id === userRole.id} onOpenChange={(open) => {
                         setIsRevokeDialogOpen(open);
                         if (!open) setSelectedRole(null);

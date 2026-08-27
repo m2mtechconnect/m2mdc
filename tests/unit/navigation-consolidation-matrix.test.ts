@@ -6,6 +6,7 @@ import { NON_EMITTABLE_PATHS } from '@/config/routeRegistry';
 import { ROLE_PERMISSIONS, type AnyRole, type Permission } from '@/auth/permissions';
 import {
   MANAGE_NAV,
+  WORKSPACE_NAV,
   isNavItemActive,
   primaryNavigation,
   visibleNavChildren,
@@ -40,27 +41,20 @@ function activeRoots(role: AnyRole, pathname: string) {
 }
 
 describe('persona-aware consolidated navigation matrix', () => {
-  it.each([
-    ['viewer', ['/builder', '/analytics', '/simulation', '/evidence/overview', '/manage/facilities', '/blueprint', '/app/agents', '/deployments', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['operator', ['/manage/integrations', '/deploy', '/app/agents', '/readiness/supervisor'], ['/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['engineer', ['/manage/integrations', '/deploy', '/app/agents'], ['/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['manager', ['/manage/integrations', '/deploy', '/teams'], ['/settings/ai', '/admin/platform-readiness']],
-    ['executive', ['/analytics', '/evidence/overview', '/teams', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/admin/platform-readiness']],
-    ['compliance', ['/analytics', '/evidence/overview', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['data_analyst', ['/analytics', '/evidence/overview', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['admin', ['/manage/integrations', '/settings/ai', '/admin/platform-readiness', '/deploy'], ['/teams']],
-    ['owner', ['/manage/integrations', '/settings/ai', '/admin/platform-readiness', '/deploy'], ['/teams']],
-  ] satisfies Array<[AnyRole, string[], string[]]>)(
-    '%s sees only destinations supported by canonical permissions',
-    (role, present, absent) => {
-      const hrefs = visibleHrefs(role);
-      for (const href of present) expect(hrefs, `${role} should see ${href}`).toContain(href);
-      for (const href of absent) expect(hrefs, `${role} should not see ${href}`).not.toContain(href);
+  it.each(Object.keys(ROLE_PERMISSIONS) as AnyRole[])(
+    '%s sees only permission-supported lifecycle workspaces in the permanent shell',
+    (role) => {
+      const can = canFor(role);
+      const expected = WORKSPACE_NAV
+        .filter((item) => !item.permission || can(item.permission))
+        .map((item) => item.href);
+      expect(visibleHrefs(role)).toEqual(expected);
+      expect(primaryNavigation(can).every((item) => !item.children?.length)).toBe(true);
     },
   );
 
   it('never promotes or emits retired Marketplace in discoverable navigation', () => {
-    expect(MANAGE_NAV.map((item) => item.href)).toContain('/marketplace');
+    expect(MANAGE_NAV.map((item) => item.href)).not.toContain('/marketplace');
     expect(NON_EMITTABLE_PATHS).toContain('/marketplace');
 
     for (const role of Object.keys(ROLE_PERMISSIONS) as AnyRole[]) {
@@ -74,13 +68,13 @@ describe('persona-aware consolidated navigation matrix', () => {
     ['viewer', '/deployments', '/analytics'],
     ['viewer', '/readiness/supervisor', '/evidence/overview'],
     ['admin', '/settings/ai', '/builder'],
-    ['admin', '/admin/platform-readiness', '/admin/platform-readiness'],
-    ['executive', '/teams', '/teams'],
-  ] satisfies Array<[AnyRole, string, string]>)(
+    ['admin', '/admin/platform-readiness', null],
+    ['executive', '/teams', null],
+  ] satisfies Array<[AnyRole, string, string | null]>)(
     'selects exactly one root for %s at %s',
     (role, pathname, expectedRoot) => {
       const active = activeRoots(role, pathname);
-      expect(active.map((item) => item.href)).toEqual([expectedRoot]);
+      expect(active.map((item) => item.href)).toEqual(expectedRoot ? [expectedRoot] : []);
     },
   );
 });

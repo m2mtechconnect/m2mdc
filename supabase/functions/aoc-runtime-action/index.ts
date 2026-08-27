@@ -65,76 +65,28 @@ serve(async (req) => {
       });
     }
 
-    // Map action to status
-    const statusMap: Record<string, string> = {
-      run: 'running',
-      pause: 'paused',
-      stop: 'stopped',
-      restart: 'running',
-    };
-
-    const newStatus = statusMap[action] || 'stopped';
-
-    // Update runtime status
-    const { data: runtimeStatus, error: runtimeError } = await supabaseClient
-      .from('agent_runtime_status')
-      .upsert({
-        agent_id: agentId,
-        environment,
-        status: newStatus,
-        last_action: action,
-        last_action_at: new Date().toISOString(),
-        health_status: 'healthy',
-        current_version: agent.version,
-      }, {
-        onConflict: 'agent_id,environment',
-      })
-      .select()
-      .single();
-
-    if (runtimeError) {
-      console.error('Runtime status update error:', runtimeError);
+    const supportedActions = new Set(['run', 'pause', 'stop', 'restart']);
+    if (!supportedActions.has(String(action))) {
+      return new Response(JSON.stringify({ error_code: 'invalid_action', error: 'Invalid action' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
     }
 
-    // Update agent status
-    await supabaseClient
-      .from('agents')
-      .update({ status: newStatus === 'running' ? 'active' : newStatus })
-      .eq('id', agentId);
-
-    // Log activity
-    await supabaseClient
-      .from('agent_activity_logs')
-      .insert({
-        agent_id: agentId,
-        log_type: 'info',
-        message: `Agent ${action} initiated`,
-        details: { action, environment, user_id: user.id },
-      });
-
-    // Log to audit
-    await supabaseClient
-      .from('audit_logs')
-      .insert({
-        user_id: user.id,
-        action: `agent_${action}`,
-        entity_type: 'agent',
-        entity_id: agentId,
-        details: { environment, status: newStatus },
-      });
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        status: newStatus,
-        action,
-        runtime: runtimeStatus 
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+    // No provider adapter or signed runtime receipt is configured for this
+    // legacy endpoint. Fail closed instead of manufacturing health/runtime
+    // state from a requested action.
+    return new Response(JSON.stringify({
+      success: false,
+      error_code: 'runtime_not_configured',
+      error: 'No verified runtime provider is configured for this agent.',
+      action,
+      environment,
+      runtime_verified: false,
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 409,
+    });
   } catch (error) {
     console.error('Runtime action error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';

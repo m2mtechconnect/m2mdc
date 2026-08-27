@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Target, AlertTriangle, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { kpiTrendTone, KPI_TREND_TEXT_CLASS } from '@/components/kpi/kpiSemantics';
-import { kpiTrendIcon } from '@/components/kpi/KpiCardShell';
+import { KpiCardSurface, kpiTrendIcon } from '@/components/kpi/KpiCardShell';
 import { motion, AnimatePresence, useSpring, useTransform } from 'framer-motion';
 import type { KPISnapshot } from '@/simulation/types';
 import { DEFAULT_KPI_CONFIGS, getThresholdZoneForValue, getDistanceToTarget } from '@/engines/kpi/KPIOverlayEngine';
@@ -313,16 +313,16 @@ export function EnterpriseKPICard({
         }}
         transition={{ duration: 0.3 }}
       >
-        <Card 
+        <KpiCardSurface
           className={cn(
-            "cursor-pointer transition-all hover:shadow-lg overflow-hidden",
+            "overflow-hidden",
             severityColor,
             (resolvedProvenance === 'live' || resolvedProvenance === 'derived') && "ring-1 ring-primary/30",
             (resolvedProvenance === 'live' || resolvedProvenance === 'derived') && glowColor
           )}
-          onClick={onClick}
-          data-testid={testId}
-          data-provenance={resolvedProvenance}
+          onActivate={onClick ?? (() => {})}
+          testId={testId}
+          dataAttributes={{ 'data-provenance': resolvedProvenance }}
         >
           <CardContent className="p-4 overflow-hidden">
             {/* Header */}
@@ -465,7 +465,7 @@ export function EnterpriseKPICard({
               />
             </div>
           </CardContent>
-        </Card>
+        </KpiCardSurface>
       </motion.div>
     </TooltipProvider>
   );

@@ -7,15 +7,14 @@ import { CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { TrendingUp, TrendingDown, Minus, Info, PlayCircle, ChevronRight } from 'lucide-react';
+import { Info, PlayCircle, ChevronRight } from 'lucide-react';
 import { SparklineChart, generateSparklineData } from './SparklineChart';
 import { cn } from '@/lib/utils';
 import {
   KPI_SEVERITY_TEXT_CLASS,
-  KPI_SEVERITY_BADGE,
   KPI_TREND_TEXT_CLASS,
 } from '@/components/kpi/kpiSemantics';
-import { KpiCardSurface, KpiStatusBadge, KpiValue } from '@/components/kpi/KpiCardShell';
+import { KpiCardSurface, KpiStatusBadge, KpiValue, kpiTrendIcon } from '@/components/kpi/KpiCardShell';
 
 interface EnhancedKPICardProps {
   id: string;
@@ -54,9 +53,7 @@ export function EnhancedKPICard({
   
   const statusColors = KPI_SEVERITY_TEXT_CLASS;
 
-  const statusBadge = KPI_SEVERITY_BADGE;
-  
-  const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
+  const TrendIcon = kpiTrendIcon(trend === 'up' ? 'improving' : trend === 'down' ? 'declining' : 'flat');
   
   const sparkData = useMemo(() => 
     sparklineData || generateSparklineData(typeof value === 'number' ? value : 50), 

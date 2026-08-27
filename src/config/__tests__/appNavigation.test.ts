@@ -78,7 +78,8 @@ describe('canonical navigation', () => {
 
     const operate = WORKSPACE_NAV[2];
     expect(isNavItemActive(operate, '/analytics/system/abc')).toBe(true);
-    expect(isNavItemActive(operate, '/deployments/abc')).toBe(true);
+    expect(isNavItemActive(operate, '/deployments/abc')).toBe(false);
+    expect(isNavItemActive(MANAGE_NAV.find((item) => item.href === '/deployments')!, '/deployments/abc')).toBe(true);
 
     const evidence = WORKSPACE_NAV[4];
     expect(isNavItemActive(evidence, '/evidence/thermal')).toBe(true);

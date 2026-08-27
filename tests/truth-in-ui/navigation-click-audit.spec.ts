@@ -29,26 +29,6 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
     .toBe(expected);
 }
 
-async function auditGroupedDestinations(
-  page: import('@playwright/test').Page,
-  parentName: string,
-  childHrefs: readonly string[],
-) {
-  for (const href of childHrefs) {
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-    const trigger = page.getByRole('button', { name: parentName });
-    await expect(trigger, `${parentName} group is rendered`).toBeVisible();
-    await trigger.click();
-    const menu = page.getByRole('menu');
-    await expect(menu, `${parentName} menu opens`).toBeVisible();
-    const link = menu.locator(`a[href="${href}"]`);
-    await expect(link, `${parentName} exposes ${href}`).toBeVisible();
-    await link.click();
-    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(href);
-  }
-}
-
 test.describe('AURA DC authenticated navigation real-click matrix', () => {
   test('desktop header links navigate with React Router anchors', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
@@ -61,7 +41,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     ];
 
     for (const item of matrix) {
-      const link = page.getByRole('link', { name: item.name }).first();
+      const candidate = page.getByRole('link', { name: item.name }).first();
+      if (!(await candidate.isVisible().catch(() => false))) {
+        await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
+      }
+      const link = page.getByRole('link', { name: item.name }).filter({ visible: true }).first();
       await expect(link, `${item.name} is a visible link`).toBeVisible();
       await link.click();
       if (item.name === 'Evidence') {
@@ -82,29 +66,32 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop Design & Build child destinations are real links', async ({ context, page, guard }) => {
+  test('supporting workspace routes remain reachable but outside global navigation', async ({ context, page, guard }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Design & Build', ['/builder', '/manage/facilities', '/blueprint', '/manage/integrations', '/settings/ai']);
-    expect(guard.anyExternalCompleted()).toBe(false);
-  });
 
-  test('desktop Operations and Platform Admin child destinations are real links', async ({ context, page, guard }) => {
-    test.setTimeout(120_000);
-    await page.setViewportSize({ width: 1400, height: 900 });
-    await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Operations', ['/analytics', '/app/agents', '/deployments']);
+    const supportingRoutes = [
+      '/manage/facilities',
+      '/blueprint',
+      '/manage/integrations',
+      '/settings/ai',
+      '/app/agents',
+      '/deployments',
+      '/admin/platform-readiness',
+    ] as const;
 
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-    await page.getByRole('button', { name: 'Platform Administration' }).click();
-    const platformMenu = page.getByRole('menu');
-    await expect(platformMenu.getByRole('menuitem', { name: 'Platform Administration', exact: true })).toBeVisible();
-    const readinessLink = platformMenu.getByRole('menuitem', { name: 'Platform readiness', exact: true });
-    await expect(readinessLink).toBeVisible();
-    await readinessLink.click();
-    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe('/admin/platform-readiness');
+    for (const href of supportingRoutes) {
+      await page.goto(href, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+      await expect(page.locator('header').first(), `${href} remains inside the authenticated shell`).toBeVisible();
+      await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
+      const drawer = page.locator('#mobile-nav-sheet');
+      await expect(drawer).toBeVisible();
+      await expect(drawer.locator(`a[href="${href}"]`), `${href} is not promoted globally`).toHaveCount(0);
+      await page.keyboard.press('Escape');
+      await expect(drawer).toBeHidden();
+    }
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });

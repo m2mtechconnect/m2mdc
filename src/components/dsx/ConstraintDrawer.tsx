@@ -4,7 +4,7 @@
  * Opening a constraint explains what was measured, which objects it affects,
  * how much evidence supports it and where to continue the investigation.
  */
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,18 @@ import { relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 export function ConstraintDrawer() {
   const { investigatedConstraint: c, closeConstraint, hrefWithContext, selectAsset } = useWorkspace();
   const openerRef = useRef<HTMLElement | null>(null);
+  const previousConstraintRef = useRef<typeof c>(null);
+
+  // Capture the keyboard trigger before Radix moves focus into the portal.
+  // onOpenAutoFocus can run after focus has already shifted on narrow/mobile
+  // layouts, so the render-to-open transition is the stable restoration point.
+  useLayoutEffect(() => {
+    if (c && !previousConstraintRef.current) {
+      const active = document.activeElement;
+      openerRef.current = active instanceof HTMLElement ? active : null;
+    }
+    previousConstraintRef.current = c;
+  }, [c]);
 
   const restoreOpener = () => {
     const opener = openerRef.current;
@@ -41,8 +53,10 @@ export function ConstraintDrawer() {
         data-testid="dsx-constraint-drawer"
         data-constraint-domain={c?.domain ?? ''}
         onOpenAutoFocus={() => {
-          const active = document.activeElement;
-          openerRef.current = active instanceof HTMLElement ? active : null;
+          if (!openerRef.current) {
+            const active = document.activeElement;
+            openerRef.current = active instanceof HTMLElement ? active : null;
+          }
         }}
         onCloseAutoFocus={(event) => {
           event.preventDefault();

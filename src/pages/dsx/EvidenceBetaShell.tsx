@@ -225,10 +225,10 @@ function EvidenceWorkspaceHeader() {
     ? (activeTwin?.id === facilityId ? activeTwin.name : identityByAuraId(facilityId)?.name) ?? null
     : null;
   const facilityLabel = !facilityId
-    ? 'Facility: not selected'
+    ? 'Demonstration facility: Evidence Beta Site (active facility not selected)'
     : facilityName
-      ? `Facility: ${facilityName}`
-      : 'Facility: Unavailable (record not found)';
+      ? `Demonstration facility: ${facilityName}`
+      : 'Demonstration facility: Unavailable (record not found)';
 
   const breadcrumb = (
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">

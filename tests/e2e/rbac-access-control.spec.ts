@@ -37,7 +37,7 @@ test.describe('Access Control Page - Admin Only', () => {
     // Check for permission descriptions
     await expect(page.getByText(/View agents and their status/i)).toBeVisible();
     await expect(page.getByText(/Start\/stop\/restart agents/i)).toBeVisible();
-    await expect(page.getByText(/Full system control/i)).toBeVisible();
+    await expect(page.getByText(/Full administrative control within this organization/i)).toBeVisible();
   });
 
   test('should display current user roles table', async ({ page }) => {
@@ -94,7 +94,7 @@ test.describe('Grant Role Flow', () => {
     await expect(submitButton).toBeDisabled();
   });
 
-  test('should successfully grant a global viewer role', async ({ page }) => {
+  test('should successfully grant an organization-wide viewer role', async ({ page }) => {
     await page.getByRole('button', { name: /Grant Role/i }).click();
     
     // Fill in form
@@ -103,7 +103,7 @@ test.describe('Grant Role Flow', () => {
     await page.getByLabel(/Role/i).click();
     await page.getByRole('option', { name: /Viewer/i }).click();
     
-    // Global scope is default
+    // Organization-wide scope is the default; backend scope value remains `global` for compatibility.
     
     // Submit
     await page.getByRole('button', { name: /^Grant Role$/i }).click();

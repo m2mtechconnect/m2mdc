@@ -206,16 +206,6 @@ export const MANAGE_NAV: AppNavItem[] = [
     ],
   },
   {
-    name: 'Marketplace',
-    fullName: 'Agent & template marketplace',
-    href: '/marketplace',
-    icon: Boxes,
-    matches: ['/marketplace'],
-    permission: 'twin.edit',
-    group: 'design',
-    description: 'Reference agents, templates and integration blueprints available to configure.',
-  },
-  {
     name: 'Supervisor',
     fullName: 'Enterprise Readiness Supervisor',
     href: '/readiness/supervisor',
@@ -362,7 +352,7 @@ export const UTILITY_NAV: AppNavItem[] = [
 /** One permission-aware hierarchy for every shell presentation. */
 export function primaryNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
   const childrenFor = (group: NavGroupId) => visible(
-    MANAGE_NAV.filter((item) => item.group === group && item.href !== '/marketplace'),
+    MANAGE_NAV.filter((item) => item.group === group),
     can,
   );
   const governItems = childrenFor('govern');

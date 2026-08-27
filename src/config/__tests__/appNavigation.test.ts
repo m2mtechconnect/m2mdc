@@ -90,8 +90,9 @@ describe('canonical navigation', () => {
     // Write-level callers see the write-oriented surfaces...
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Connections',
-      'Marketplace',
     ]);
+    expect(MANAGE_NAV.map((i) => i.href)).not.toContain('/marketplace');
+    expect(navGroups(() => true).flatMap((group) => group.items.map((i) => i.href))).not.toContain('/marketplace');
     // ...and read-only personas discover the surfaces they report on.
     expect(visibleManageNav((p) => p === 'twin.view').map((i) => i.name)).toEqual([
       'Facilities',

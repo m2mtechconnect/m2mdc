@@ -205,7 +205,7 @@ export function BuilderStarterLists() {
         )}
       </section>
 
-      <section aria-labelledby="builder-templates-heading" className="rounded-lg border border-border bg-card p-4 text-left">
+      <section id="templates" aria-labelledby="builder-templates-heading" className="rounded-lg border border-border bg-card p-4 text-left">
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <LayoutTemplate className="h-4 w-4 text-primary" aria-hidden="true" />

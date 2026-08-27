@@ -349,24 +349,16 @@ export const UTILITY_NAV: AppNavItem[] = [
   },
 ];
 
-/** One permission-aware hierarchy for every shell presentation. */
+/**
+ * The permanent shell exposes only the five lifecycle workspaces.
+ *
+ * Supporting tools remain in MANAGE_NAV for contextual workspace links, route
+ * registries and permission checks; they must not become a second global menu.
+ * Account, tenant and platform administration live in the permission-aware
+ * user menu.
+ */
 export function primaryNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
-  const childrenFor = (group: NavGroupId) => visible(
-    MANAGE_NAV.filter((item) => item.group === group),
-    can,
-  );
-  const governItems = childrenFor('govern');
-  const evidenceChildren = governItems.filter((item) => item.href === '/readiness/supervisor');
-  const governPrimary = governItems.filter((item) =>
-    item.href === '/teams' || item.href === '/admin/platform-readiness'
-  );
-
-  return visible(WORKSPACE_NAV, can).map((item) => {
-    if (item.href === '/builder') return { ...item, children: childrenFor('design') };
-    if (item.href === '/analytics') return { ...item, children: childrenFor('operate') };
-    if (item.href === `${EVIDENCE_ROOT}/overview`) return { ...item, children: evidenceChildren };
-    return item;
-  }).concat(governPrimary);
+  return visible(WORKSPACE_NAV, can);
 }
 
 export function utilityNavigation(can: (permission: Permission) => boolean): AppNavItem[] {

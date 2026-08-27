@@ -51,6 +51,20 @@ describe('tenant-only roles never carry platform authority', () => {
   });
 });
 
+describe('platform and tenant authority remain separate', () => {
+  it('does not give a global platform administrator tenant membership authority', () => {
+    const permissions = globalPermissions('admin');
+    expect(permissions.has('tenant.view_members')).toBe(false);
+    expect(permissions.has('tenant.manage_members')).toBe(false);
+  });
+
+  it('lets authoritative organization administrators view tenant assignments', () => {
+    expect(organizationPermissions('owner').has('authz.view_assignments')).toBe(true);
+    expect(organizationPermissions('admin').has('authz.view_assignments')).toBe(true);
+    expect(organizationPermissions('viewer').has('authz.view_assignments')).toBe(false);
+  });
+});
+
 describe('persona allow and deny per gated destination', () => {
   const cases: Array<[AnyRole, Permission, boolean]> = [
     // /admin/*

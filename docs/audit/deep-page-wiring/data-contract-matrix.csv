@@ -1,5 +1,5 @@
 page,read_or_mutation,source,scoping,observed,classification
-Simulation workspace,run create,zustand persist (localStorage key aura-workspace),browser profile only,no write to public.simulation_runs observed in source or network,DATA_INTEGRITY_DEFECT
+Simulation workspace,run create,public.simulation_runs via src/workspace/runPersistence.ts:151 (zustand persist retained as local cache),server RLS plus active organization,run rows are inserted server-side; route now gated on twin.view,WIRED_READ_WRITE
 Dashboard,read,workspace store + facility model,client,renders "No run recorded" honestly when empty,WIRED_READ_ONLY
 Admin signups,read,public.profiles,server RLS,324 rows rendered with tab counts All/Pending/Approved,WIRED_READ_ONLY
 Agent detail,read,public.agent_definitions?slug=eq.<id>,server,406 on unknown slug retried 3x then spinner persists,PERMANENT_LOADING

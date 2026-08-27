@@ -19,7 +19,7 @@ import { ProvenanceDrawer } from '@/components/dsx/ProvenanceDrawer';
 import { ContextBar } from '@/components/dsx/ContextBar';
 import { SideInspector } from '@/components/dsx/SideInspector';
 import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
-import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
+import { buildHierarchy, identityByAuraId, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
 
@@ -213,8 +213,18 @@ function WorkspaceNav() {
 /** One h1 per route, plus the scope breadcrumb the workspace is answering for. */
 function EvidenceWorkspaceHeader() {
   const { pathname } = useLocation();
-  const { selectedAncestry, selectAsset, hrefWithContext } = useWorkspace();
+  const { selectedAncestry, selectAsset, hrefWithContext, context } = useWorkspace();
   const title = evidenceTitle(pathname);
+
+  // The shell always states which facility the evidence is scoped to. An id
+  // that does not resolve is reported as unavailable, never substituted.
+  const facilityId = context.facility_id;
+  const facilityName = facilityId ? identityByAuraId(facilityId)?.name ?? null : null;
+  const facilityLabel = !facilityId
+    ? 'Facility: not selected'
+    : facilityName
+      ? `Facility: ${facilityName}`
+      : 'Facility: Unavailable (record not found)';
 
   const breadcrumb = (
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">
@@ -241,13 +251,22 @@ function EvidenceWorkspaceHeader() {
     </nav>
   );
 
+  const meta = (
+    <div className="flex flex-col gap-1">
+      <p data-testid="dsx-active-facility" className="text-[13px] font-medium text-foreground">
+        {facilityLabel}
+      </p>
+      {breadcrumb}
+    </div>
+  );
+
   return (
     <WorkspaceHeader
       eyebrow="AURA Evidence"
       title={<span data-testid="dsx-workspace-title">{title}</span>}
       icon={FileSearch}
       capabilityId="evidence.workspace"
-      meta={breadcrumb}
+      meta={meta}
     />
   );
 }

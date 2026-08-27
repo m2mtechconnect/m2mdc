@@ -53,11 +53,12 @@ export function blueprintHrefForKpi(facilityId: string, key: KpiKey): string {
  * link opens that exact record's provenance drilldown; otherwise it opens the
  * domain workspace.
  */
-export function evidenceHrefForKpi(key: KpiKey): string {
+export function evidenceHrefForKpi(key: KpiKey, facilityId?: string | null): string {
   const workspace = EVIDENCE_WORKSPACE[key] ?? 'evidence';
   const params = new URLSearchParams({ kpi: key });
   const claim = EVIDENCE_CLAIM[key];
   if (claim) params.set('claim', claim);
+  if (facilityId) params.set('facility', facilityId);
   return `/evidence/${workspace}?${params.toString()}`;
 }
 

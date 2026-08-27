@@ -103,7 +103,11 @@ async function expectGlobalLightTheme(page: Page) {
 }
 
 async function expectLifecycleNavigation(page: Page) {
-  const navigation = page.getByRole('navigation', { name: 'Primary navigation' });
+  const designLink = page.getByRole('link', { name: /^Design & Build$/i }).first();
+  if (!(await designLink.isVisible().catch(() => false))) {
+    await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
+  }
+
   const lifecycleDestinations = [
     ['/dashboard', /Command Center/i],
     ['/builder', /^Design & Build$/i],
@@ -113,14 +117,14 @@ async function expectLifecycleNavigation(page: Page) {
   ] as const;
 
   for (const [href, name] of lifecycleDestinations) {
-    const link = navigation.getByRole('link', { name }).first();
+    const link = page.getByRole('link', { name }).filter({ visible: true }).first();
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute('href', href);
   }
 
-  await expect(navigation.getByRole('button', { name: /^Design & Build$/i })).toHaveCount(0);
-  await expect(navigation.getByRole('button', { name: /^Operations$/i })).toHaveCount(0);
-  await expect(navigation.getByRole('button', { name: /^Evidence$/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Design & Build$/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Operations$/i })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Evidence$/i })).toHaveCount(0);
 }
 
 async function installBuilderTenantMock(context: BrowserContext) {

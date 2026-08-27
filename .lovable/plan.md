@@ -42,26 +42,27 @@ Legend for disposition: KEEP = canonical page; TAB = becomes a tab/panel inside 
 
 Before: every persona sees the same 7 top items plus Design & Build's 4 children and Platform Administration's 7 technical pages, filtered only by permission.
 
-After (target: max 6 top-level items, max 2 levels deep):
+After (five permanent lifecycle destinations, max 2 levels deep; People & Access and Platform Administration are permission-aware account/admin destinations, already applied in the shell):
 
 ```text
-Overview            /dashboard
-Build               /builder            > Facilities | Blueprint | Connections
-Simulate            /simulation
-Operate             /analytics          > Agents | Runtime (Activation | History)
+Command Center      /dashboard
+Design & Build      /builder            > Facilities | Blueprint | Connections
+Operations          /analytics          > Agents | Runtime (Activation | History)
+Simulation          /simulation
 Evidence            /evidence/overview  > Operations | Sustainability | Decisions | Assets
-Govern              /teams              > Access control | Onboarding | Agent configuration
-Administration      /admin/platform-readiness (admin only, tabbed console)
-Utilities           Search, Help, Account (top bar, not in the rail)
+Account menu        Profile | Preferences | Language | Learning Hub
+                    Administration: People & Access | Platform Administration (permission-gated)
+Utilities           Search, Help (top bar, not in the rail)
 ```
 
 | Persona | Sees | Does not see |
 |---|---|---|
-| Executive | Overview, Evidence, Operate (read) | Build, Simulate, Govern, Administration |
-| Operator/engineer | Overview, Build, Simulate, Operate | Administration; Govern only if member-view granted |
-| Compliance/auditor | Overview, Evidence (incl. Decisions), Operate read | Build, Simulate, Administration |
-| Organization admin | All tenant items + Govern (People, Access, Agent configuration) | Administration |
-| Platform admin | All of the above + Administration console (7 pages as tabs) | n/a |
+| Executive | Command Center, Evidence, Operations (read), People & Access in account menu | Build, Simulation, Platform Administration |
+| Operator/engineer | Command Center, Build, Simulation, Operations | Platform Administration; People & Access unless member-view granted |
+| Compliance/auditor | Command Center, Evidence (incl. Decisions), Operations read | Build, Simulation, any Administration entry |
+| Organization admin | All tenant destinations + People & Access, Agent configuration | Platform Administration |
+| Platform admin | All of the above + Platform Administration console (7 pages as tabs) | n/a |
+
 
 Presentation only. Visibility keeps deriving from `can(permission)` in `appNavigation.ts`; no persona label ever grants access, and every page keeps its own route guard.
 

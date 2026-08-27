@@ -128,6 +128,31 @@ test.describe('DSX drawer sequencing', () => {
     await closeAndSettle(page, drawer, 'reactivation after escape');
   });
 
+
+  test('a closed drawer cannot steal focus from an immediate re-open', async ({ page }) => {
+    await open(page);
+    const trigger = page.locator('[data-testid^="dsx-constraint-open-"]').first();
+    const drawer = page.locator('[data-testid="dsx-constraint-drawer"]');
+
+    await activateCard(page, trigger, drawer, 'initial drawer');
+    await drawer.getByRole('button', { name: /close/i }).first().click();
+    await expect(drawer).toBeHidden({ timeout: 10_000 });
+
+    // Re-open before the previous close animation's delayed restoration fires.
+    await trigger.click();
+    await expect(drawer).toBeVisible({ timeout: 10_000 });
+    await page.waitForTimeout(500);
+    expect(
+      await page.evaluate(() => {
+        const root = document.querySelector('[data-testid="dsx-constraint-drawer"]');
+        return !!root && !!document.activeElement && root.contains(document.activeElement);
+      }),
+      'the previous close must not move focus outside the newly opened drawer',
+    ).toBe(true);
+
+    await closeAndSettle(page, drawer, 're-opened drawer');
+  });
+
   test('close-button closure restores focus and scroll position', async ({ page }) => {
     await open(page);
     const trigger = page.locator('[data-testid^="dsx-constraint-open-"]').last();

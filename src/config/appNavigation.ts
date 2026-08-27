@@ -20,6 +20,7 @@ import {
   Server,
   Shield,
   Sparkles,
+  User,
   Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -76,33 +77,22 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     description: `Facility status, priority actions and recent runs. ${stackDescription('platform.command')}`,
   },
   {
-    name: 'Build',
-    fullName: 'Build & Configure',
+    name: 'Design & Build',
+    fullName: 'Design & Build',
     href: '/builder',
     icon: Boxes,
-    matches: [
-      '/builder',
-      '/blueprint',
-      '/data-centre-twin',
-      '/manage/facilities',
-    ],
+    matches: ['/builder'],
+    permission: 'twin.view',
     group: 'design',
     description: 'Create the facility, configure the twin, define the blueprint and prepare activation inputs.',
   },
   {
-    name: 'Operate',
-    fullName: 'Operate',
+    name: 'Operations',
+    fullName: 'Operations',
     href: '/analytics',
     icon: BarChart3,
-    matches: [
-      '/analytics',
-      '/operations',
-      '/intelligence',
-      '/deployments',
-      '/app/agents',
-      '/agent',
-      '/agents',
-    ],
+    matches: ['/analytics', '/operations', '/intelligence'],
+    permission: 'analytics.view',
     group: 'operate',
     description: 'Operational telemetry, agents, configuration activation, runtime evidence and current health state.',
   },
@@ -112,6 +102,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     href: '/simulation',
     icon: FlaskConical,
     matches: ['/simulation'],
+    permission: 'twin.view',
     group: 'simulate',
     description: stackDescription('simulation.engine'),
   },
@@ -121,6 +112,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     href: `${EVIDENCE_ROOT}/overview`,
     icon: FileSearch,
     matches: [EVIDENCE_ROOT, LEGACY_EVIDENCE_ROOT, '/compliance'],
+    permission: 'analytics.view',
     group: 'govern',
     description: stackDescription('evidence.workspace'),
   },
@@ -184,7 +176,7 @@ export const MANAGE_NAV: AppNavItem[] = [
   },
   {
     name: 'Runtime',
-    fullName: 'Activation & Runtime Evidence',
+    fullName: 'Deployments',
     href: '/deployments',
     icon: Rocket,
     matches: ['/deployments', '/deploy'],
@@ -352,6 +344,38 @@ export const SUPPORT_NAV: AppNavItem[] = [
     description: 'AURA DC guides, workflows, governance and product documentation.',
   },
 ];
+
+/** Compact utilities shared by desktop and mobile shell presentations. */
+export const UTILITY_NAV: AppNavItem[] = [
+  ...SUPPORT_NAV,
+  {
+    name: 'Account',
+    fullName: 'Account settings',
+    href: '/account/settings',
+    icon: User,
+    matches: ['/account/settings', '/account/profile'],
+    group: 'support',
+    description: 'Profile, workspace preferences, security and notifications.',
+  },
+];
+
+/** One permission-aware hierarchy for every shell presentation. */
+export function primaryNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
+  const childrenFor = (group: NavGroupId) => visible(
+    MANAGE_NAV.filter((item) => item.group === group && item.href !== '/marketplace'),
+    can,
+  );
+
+  return visible(WORKSPACE_NAV, can).map((item) => {
+    if (item.href === '/builder') return { ...item, children: childrenFor('design') };
+    if (item.href === '/analytics') return { ...item, children: childrenFor('operate') };
+    return item;
+  }).concat(childrenFor('govern'));
+}
+
+export function utilityNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
+  return visible(UTILITY_NAV, can);
+}
 
 export interface NavGroup {
   id: NavGroupId;

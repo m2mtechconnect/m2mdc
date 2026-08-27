@@ -72,12 +72,12 @@ function currentPath(page: Page): string {
   return u.pathname + u.search;
 }
 
-async function clickManageDestination(page: Page, href: string): Promise<void> {
+async function clickGroupedDestination(page: Page, parentName: string, href: string): Promise<void> {
   // A route change can happen before Radix finishes the previous menu's close
   // animation. Reopening during that transition races the trigger and can leave
   // the next menu visually closed even though navigation is healthy.
   await expect(page.getByRole('menu')).toBeHidden().catch(() => {});
-  await page.getByRole('button', { name: 'Design & Build' }).click();
+  await page.getByRole('button', { name: parentName }).click();
   const menu = page.getByRole('menu');
   await expect(menu).toBeVisible();
   await menu.locator(`a[href="${href}"]`).click();
@@ -172,10 +172,10 @@ guardedTest.describe('AURA DC browser back/forward preserves navigation', () => 
     await page.setViewportSize({ width: 1600, height: 900 });
     await openAuthed(context, page, '/dashboard');
 
-    await clickManageDestination(page, '/manage/facilities');
+    await clickGroupedDestination(page, 'Design & Build', '/manage/facilities');
     await expect.poll(() => new URL(page.url()).pathname).toBe('/manage/facilities');
 
-    await clickManageDestination(page, '/app/agents');
+    await clickGroupedDestination(page, 'Operations', '/app/agents');
     await expect.poll(() => new URL(page.url()).pathname).toBe('/app/agents');
 
     await page.goBack({ waitUntil: 'domcontentloaded' });

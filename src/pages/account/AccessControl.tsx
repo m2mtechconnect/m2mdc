@@ -32,7 +32,7 @@ type Profile = {
   avatar_initials: string | null;
 };
 
-function profileDisplayName(profile: Profile | null | undefined): string {
+export function profileDisplayName(profile: Profile | null | undefined): string {
   const fullName = profile?.full_name?.trim();
   if (fullName) return fullName;
 

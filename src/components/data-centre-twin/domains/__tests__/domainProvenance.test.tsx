@@ -1,5 +1,5 @@
 /**
- * Phase 1A.3.c — domain-view + chart-array + InfrastructurePage
+ * Phase 1A.3.c — domain-view + chart-array
  * truth-in-UI regression tests.
  *
  * These render each retrofitted surface in isolation and assert:

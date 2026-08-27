@@ -1,5 +1,9 @@
 /**
- * Phase 1A.3.c — chart-array + InfrastructurePage provenance regression.
+ * Phase 1A.3.c — IntelligenceDashboard chart-array provenance regression.
+ *
+ * The former InfrastructurePage was retired (the /infrastructure path is an
+ * alias to /evidence/assets), so its assertions and metric catalog were
+ * removed with it.
  *
  * Scope note. IntelligenceDashboard is a Supabase-backed route with a
  * large data-fetch graph; wiring the full page under jsdom would drag
@@ -14,20 +18,12 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import {
-  INTELLIGENCE_CHART_METRICS,
-  INFRASTRUCTURE_OPERATIONAL_METRICS,
-} from '@/components/data-centre-twin/domains/metricCatalogs';
+import { INTELLIGENCE_CHART_METRICS } from '@/components/data-centre-twin/domains/metricCatalogs';
 
 const intelligenceSrc = readFileSync(
   resolve(__dirname, '../IntelligenceDashboard.tsx'),
   'utf8',
 );
-const infraSrc = readFileSync(
-  resolve(__dirname, '../InfrastructurePage.tsx'),
-  'utf8',
-);
-
 describe('IntelligenceDashboard — chart-array provenance retrofit', () => {
   it('PUE Trend card is tagged demo and imports the header primitive', () => {
     expect(intelligenceSrc).toMatch(
@@ -63,44 +59,6 @@ describe('IntelligenceDashboard — chart-array provenance retrofit', () => {
     // via the `reference` field, never the `source` field.
     for (const m of INTELLIGENCE_CHART_METRICS) {
       expect(m.reference ?? '').not.toBe(m.source);
-    }
-  });
-});
-
-describe('InfrastructurePage — Operational Metrics retrofit', () => {
-  it('section root is tagged demo and header primitive is present', () => {
-    expect(infraSrc).toMatch(
-      /data-testid="infrastructure-operational-metrics"[^>]*data-provenance="demo"|data-provenance="demo"[^>]*data-testid="infrastructure-operational-metrics"/,
-    );
-    expect(infraSrc).toMatch(/DomainProvenanceHeader/);
-  });
-
-  it('Twin Freshness tile is classified unavailable (no synthetic reading)', () => {
-    expect(infraSrc).toMatch(/Twin Freshness[\s\S]{0,200}unavailable/);
-  });
-
-  it('no tile in the operational-metrics grid is marked live', () => {
-    // Restrict search to a window around the grid to avoid false
-    // positives from unrelated future edits elsewhere in the file.
-    const start = infraSrc.indexOf('infrastructure-operational-metrics');
-    expect(start).toBeGreaterThan(-1);
-    const window = infraSrc.slice(start, start + 4000);
-    expect(window).not.toMatch(/data-provenance="live"/);
-  });
-
-  it('operational metrics catalog enumerates 5 metrics with expected provenance mix', () => {
-    // Enumeration test — every id and its classification is asserted.
-    const expected: Record<string, string> = {
-      'infra.training-gpus':  'demo',
-      'infra.inference-gpus': 'demo',
-      'infra.edge-devices':   'demo',
-      'infra.ddn-throughput': 'demo',
-      'infra.twin-freshness': 'unavailable',
-    };
-    expect(INFRASTRUCTURE_OPERATIONAL_METRICS).toHaveLength(5);
-    for (const m of INFRASTRUCTURE_OPERATIONAL_METRICS) {
-      expect(expected[m.id], `unexpected metric id ${m.id}`).toBeDefined();
-      expect(m.provenance).toBe(expected[m.id]);
     }
   });
 });

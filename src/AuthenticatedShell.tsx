@@ -152,7 +152,8 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin/:id" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin/:id/blueprint" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
-      <Route path="/blueprint" element={<PermissionRouteGuard permission="twin.view"><ActiveBlueprintResolver /></PermissionRouteGuard>} />\n      <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />
+      <Route path="/blueprint" element={<PermissionRouteGuard permission="twin.view"><ActiveBlueprintResolver /></PermissionRouteGuard>} />
+      <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />
       <Route path="/blueprint/:id" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
       {/* The simulation workspace persists run records, so it is gated on the
           same least-privileged twin read permission as the other twin

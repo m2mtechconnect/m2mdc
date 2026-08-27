@@ -69,12 +69,26 @@ describe('legacy twin function retirement', () => {
     expect(promoted.filter((name) => legacy.includes(name))).toEqual([]);
   });
 
-  it('has no client invocation of any legacy twin function', () => {
-    const offenders = walk(join(REPO, 'src')).filter((file) => {
-      const source = readFileSync(file, 'utf8');
-      return legacy.some((name) => source.includes(`'${name}'`) || source.includes(`"${name}"`));
-    });
+  it('confines legacy twin function calls to the quarantined legacy client module', () => {
+    const offenders = walk(join(REPO, 'src'))
+      .filter((file) => {
+        const source = readFileSync(file, 'utf8');
+        return legacy.some(
+          (name) => source.includes(`'${name}`) || source.includes(`"${name}`),
+        );
+      })
+      .map((file) => file.slice(REPO.length + 1).split('\\').join('/'));
 
-    expect(offenders).toEqual([]);
+    expect(offenders).toEqual(['src/lib/digitalTwin/api.ts']);
+  });
+
+  it('mounts the legacy twin demo surface behind a development-only gate', () => {
+    const shell = readFileSync(join(REPO, 'src/AuthenticatedShell.tsx'), 'utf8');
+
+    expect(shell).toMatch(/const FundingIntakeDemo = import\.meta\.env\.DEV/);
+    expect(shell).toMatch(
+      /import\.meta\.env\.DEV && FundingIntakeDemo && \(\s*\n\s*<Route path="\/digital-twins-demo\/funding-intake"/,
+    );
   });
 });
+

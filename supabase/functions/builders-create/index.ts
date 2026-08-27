@@ -52,17 +52,30 @@ serve(createHandler({
       };
     }
 
+    let facility: {
+      id: string;
+      name: string;
+      city: string;
+      region_code: string;
+      industry: string | null;
+      tier: string;
+      capacity_kw: number;
+      pue_target: number | null;
+      renewable_target_pct: number | null;
+      sovereignty_level: string | null;
+    } | null = null;
+
     // The user-level Supabase client is RLS-bound. An invisible facility must
     // look exactly like a missing facility, so the browser cannot bind a draft
     // to an arbitrary twin id.
     if (twin_id) {
-      const { data: facility, error: facilityError } = await supabase
+      const { data: resolvedFacility, error: facilityError } = await supabase
         .from('data_centre_twins')
-        .select('id')
+        .select('id, name, city, region_code, industry, tier, capacity_kw, pue_target, renewable_target_pct, sovereignty_level')
         .eq('id', twin_id)
         .maybeSingle();
 
-      if (facilityError || !facility) {
+      if (facilityError || !resolvedFacility) {
         log('Builder facility binding rejected', { twinId: twin_id, error: facilityError?.message });
         throw {
           code: 'NOT_FOUND',
@@ -70,26 +83,44 @@ serve(createHandler({
           status: 404,
         };
       }
+      facility = resolvedFacility;
     }
+
+    const facilityBuildName = facility ? `${facility.name} Digital Twin` : null;
+    const facilityDepartment = facility ? 'Data Centre Operations' : '';
 
     const { data: draft, error: dbError } = await supabase
       .from('agents')
       .insert({
-        name: goal || 'Untitled Build',
-        description: `Draft ${type || 'agent'} for ${department || 'unspecified department'}`,
+        name: goal || facilityBuildName || 'Untitled Build',
+        description: facility
+          ? `Draft ${type || '3d_twin'} for ${facility.name}`
+          : `Draft ${type || 'agent'} for ${department || 'unspecified department'}`,
         owner_id: userId,
         org_id: activeOrgId,
         status: 'draft',
         version: 'v0',
         template_id: template_id || null,
+        twin_id: twin_id || null,
         config: {
           source: source || 'dashboard',
-          goal: goal || '',
-          industry: industry || '',
-          department: department || '',
+          goal: goal || (facility ? `Configure and operate ${facility.name}` : ''),
+          industry: industry || facility?.industry || '',
+          department: department || facilityDepartment,
           type: type || null,
           template_id: template_id || null,
           twin_id: twin_id || null,
+          facility: facility ? {
+            id: facility.id,
+            name: facility.name,
+            city: facility.city,
+            region_code: facility.region_code,
+            tier: facility.tier,
+            capacity_kw: facility.capacity_kw,
+            pue_target: facility.pue_target,
+            renewable_target_pct: facility.renewable_target_pct,
+            sovereignty_level: facility.sovereignty_level,
+          } : null,
           workflow: {
             triggers: [],
             actions: [],

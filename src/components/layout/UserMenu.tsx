@@ -24,6 +24,7 @@ import {
   LogOut,
   User as UserIcon,
   Settings,
+  Shield,
   Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -236,6 +237,14 @@ export function UserMenu() {
             <Link to="/teams" className="cursor-pointer">
               <Users className="mr-2 h-4 w-4" />
               <span>People &amp; Access</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+        {can('platform.view_admin_console') && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin/platform-readiness" className="cursor-pointer">
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Platform Administration</span>
             </Link>
           </DropdownMenuItem>
         )}

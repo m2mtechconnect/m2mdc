@@ -15,8 +15,8 @@ describe('canonical navigation', () => {
   it('exposes the five persistent lifecycle workspaces', () => {
     expect(WORKSPACE_NAV.map((i) => i.fullName)).toEqual([
       'Command Center',
-      'Build & Configure',
-      'Operate',
+      'Design & Build',
+      'Operations',
       'Simulation',
       'Evidence',
     ]);
@@ -31,14 +31,14 @@ describe('canonical navigation', () => {
       '/evidence/overview',
     ]);
     const workspace = Object.fromEntries(WORKSPACE_NAV.map((i) => [i.fullName, i.href]));
-    expect(workspace['Build & Configure']).toBe('/builder');
-    expect(workspace['Operate']).toBe('/analytics');
+    expect(workspace['Design & Build']).toBe('/builder');
+    expect(workspace['Operations']).toBe('/analytics');
     expect(workspace['Evidence']).toBe('/evidence/overview');
 
     const manage = Object.fromEntries(MANAGE_NAV.map((i) => [i.fullName, i.href]));
     expect(manage['Facility Blueprint']).toBe('/blueprint');
     expect(manage['Agents']).toBe('/app/agents');
-    expect(manage['Activation & Runtime Evidence']).toBe('/deployments');
+    expect(manage['Deployments']).toBe('/deployments');
     expect(manage['AI Runtime & Policies']).toBe('/settings/ai');
     expect(manage['Connections']).toBe('/manage/integrations');
     expect(manage['Facilities']).toBe('/manage/facilities');

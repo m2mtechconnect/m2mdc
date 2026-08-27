@@ -153,7 +153,7 @@ export default function KpiCard({
           <ArrowUpRight className="h-4 w-4 text-studio-muted" />
         </div>
       )}
-    </Card>
+    </KpiCardSurface>
   );
 
   const tooltipBody = tooltip || formula || source ? (

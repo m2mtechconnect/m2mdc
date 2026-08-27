@@ -232,7 +232,7 @@ export function resolveAuthorization(
 
   const permissions = new Set<Permission>();
   for (const grant of globalGrants) {
-    for (const permission of ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
+    for (const permission of GLOBAL_ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
   }
 
   if (globalGrants.length > 0) permissions.add('platform.access_internal_shell');

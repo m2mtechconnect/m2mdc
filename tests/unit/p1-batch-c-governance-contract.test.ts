@@ -49,10 +49,20 @@ describe('P1 route classification', () => {
     expect(allowlist.redirect_only_routes).toContain('/infrastructure');
   });
 
-  it('promotes the truth-remediated Batch B routes', () => {
-    for (const route of ['/blueprint/preview', '/simulation/preview', '/studio/systems/:systemId/manage']) {
-      expect(allowlist.production_routes).toContain(route);
-      expect(allowlist.production_blocked_routes).not.toContain(route);
+  it('promotes the truth-remediated Batch B manage route', () => {
+    expect(allowlist.production_routes).toContain('/studio/systems/:systemId/manage');
+    expect(allowlist.production_blocked_routes).not.toContain('/studio/systems/:systemId/manage');
+  });
+
+  /**
+   * The recommendation preview routes were excluded from the production
+   * perimeter on 2026-08-27. They remain permission-guarded in the shipped
+   * router but are no longer part of the qualified production surface.
+   */
+  it('keeps the recommendation preview routes out of the production perimeter', () => {
+    for (const route of ['/blueprint/preview', '/simulation/preview']) {
+      expect(allowlist.production_routes).not.toContain(route);
+      expect(allowlist.production_blocked_routes).toContain(route);
     }
   });
 });

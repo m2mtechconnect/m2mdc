@@ -21,7 +21,10 @@ function canFor(role: AnyRole) {
 function flattenVisible(role: AnyRole) {
   const can = canFor(role);
   const roots = primaryNavigation(can);
-  return roots.flatMap((item) => [item, ...visibleNavChildren(item, can)]);
+  return roots.flatMap((item) => {
+    const children = visibleNavChildren(item, can);
+    return [item, ...children, ...children.flatMap((child) => visibleNavChildren(child, can))];
+  });
 }
 
 function visibleHrefs(role: AnyRole) {
@@ -45,8 +48,8 @@ describe('persona-aware consolidated navigation matrix', () => {
     ['executive', ['/analytics', '/evidence/overview', '/teams', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/admin/platform-readiness']],
     ['compliance', ['/analytics', '/evidence/overview', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness']],
     ['data_analyst', ['/analytics', '/evidence/overview', '/readiness/supervisor'], ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness']],
-    ['admin', ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness', '/deploy'], []],
-    ['owner', ['/manage/integrations', '/settings/ai', '/teams', '/admin/platform-readiness', '/deploy'], []],
+    ['admin', ['/manage/integrations', '/settings/ai', '/admin/platform-readiness', '/deploy'], ['/teams']],
+    ['owner', ['/manage/integrations', '/settings/ai', '/admin/platform-readiness', '/deploy'], ['/teams']],
   ] satisfies Array<[AnyRole, string[], string[]]>)(
     '%s sees only destinations supported by canonical permissions',
     (role, present, absent) => {

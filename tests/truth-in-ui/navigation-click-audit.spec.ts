@@ -29,39 +29,24 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
     .toBe(expected);
 }
 
-async function auditMenuDestinations(
+async function auditGroupedDestinations(
   page: import('@playwright/test').Page,
-  triggerTestId: 'manage-trigger' | 'govern-trigger',
-  menuTestId: 'manage-menu' | 'govern-menu',
+  parentName: string,
+  childNames: readonly string[],
 ) {
-  const trigger = page.getByTestId(triggerTestId);
-  await expect(trigger, `${triggerTestId} is rendered`).toBeVisible();
-  await trigger.click();
+  const trigger = page.getByRole('button', { name: parentName });
+  await expect(trigger, `${parentName} group is rendered`).toBeVisible();
 
-  const menu = page.getByTestId(menuTestId);
-  await expect(menu).toBeVisible();
-  const items = menu.getByRole('menuitem');
-  const count = await items.count();
-  expect(count, `${menuTestId} must expose at least one destination`).toBeGreaterThan(0);
-
-  const hrefs: string[] = [];
-  for (let index = 0; index < count; index += 1) {
-    const item = items.nth(index);
-    const href = (await item.getAttribute('href'))
-      ?? (await item.locator('a[href]').first().getAttribute('href').catch(() => null));
-    if (href) hrefs.push(href);
-  }
-  expect(hrefs.length, `${menuTestId} entries must be links`).toBe(count);
-
-  for (const href of hrefs) {
-    const target = new URL(href, 'http://localhost').pathname;
+  for (const childName of childNames) {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await expect(trigger).toBeVisible();
     await trigger.click();
-    await page.locator(`[data-testid="${menuTestId}"] [href="${href}"]`).first().click();
-    await expect
-      .poll(() => new URL(page.url()).pathname, { timeout: 5_000, message: `${href} must commit a route` })
-      .toMatch(new RegExp(`^${target.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|$)`));
+    const link = page.getByRole('link', { name: childName, exact: true });
+    await expect(link, `${parentName} exposes ${childName}`).toBeVisible();
+    const href = await link.getAttribute('href');
+    expect(href, `${childName} must be a link`).toBeTruthy();
+    const target = new URL(href!, 'http://localhost').pathname;
+    await link.click();
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(target);
   }
 }
 
@@ -71,7 +56,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     const matrix = [
-      { name: 'Build & Configure', path: '/builder' },
+      { name: 'Design & Build', path: '/builder' },
       { name: 'Simulation', path: '/simulation' },
       { name: 'Evidence', path: '/evidence/overview' },
       { name: 'Command Center', path: '/dashboard' },
@@ -89,19 +74,20 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop Manage destinations are real links', async ({ context, page, guard }) => {
+  test('desktop Design & Build child destinations are real links', async ({ context, page, guard }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditMenuDestinations(page, 'manage-trigger', 'manage-menu');
+    await auditGroupedDestinations(page, 'Design & Build', ['Facilities', 'Facility Blueprint', 'Connections', 'AI Runtime & Policies']);
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop Govern destinations are real links', async ({ context, page, guard }) => {
+  test('desktop Operations and Platform Admin child destinations are real links', async ({ context, page, guard }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditMenuDestinations(page, 'govern-trigger', 'govern-menu');
+    await auditGroupedDestinations(page, 'Operations', ['Agents', 'Deployments']);
+    await auditGroupedDestinations(page, 'Platform Admin', ['Platform Readiness']);
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 

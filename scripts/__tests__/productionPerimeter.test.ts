@@ -229,6 +229,23 @@ describe('allowlist / inventory synchronisation', () => {
     expect(new Set(inventoryAllowlisted)).toEqual(allowlisted);
   });
 
+  /**
+   * teams-invite is allowlisted through the additive promotion ledger, not by
+   * rewriting the historical inventory. Its effective disposition must resolve
+   * to production-allowlisted, and no enforcer run may report it as
+   * unknown-blocked.
+   */
+  it('resolves teams-invite to production-allowlisted through the promotion ledger', () => {
+    expect(allowlisted.has('teams-invite')).toBe(true);
+    expect(promoted.has('teams-invite')).toBe(true);
+    const dir = mirrorRepo(() => {});
+    temps.push(dir);
+    const result = runEnforcer(dir);
+    expect(result.output).not.toContain('teams-invite');
+    expect(result.code).toBe(0);
+  });
+
+
 
   it('only allowlists functions that exist on disk', () => {
     for (const name of allowlisted) {

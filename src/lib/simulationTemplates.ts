@@ -433,6 +433,27 @@ export function getSimulationTemplateForIndustry(
     return SIMULATION_TEMPLATES[normalizedIndustry as TwinIndustry];
   }
 
+  // Data centre keywords are resolved first: they must never fall through to
+  // the generic ITIL fixture, nor to `energy_utilities` via the `power` keyword.
+  const dataCentreMatches: Record<string, TwinIndustry> = {
+    ai_compute: 'ai_compute',
+    ai_factory: 'ai_compute',
+    accelerated_compute: 'ai_compute',
+    hpc: 'ai_compute',
+    data_centre: 'data_centre',
+    data_center: 'data_centre',
+    datacentre: 'data_centre',
+    datacenter: 'data_centre',
+    colocation: 'data_centre',
+    colo: 'data_centre',
+  };
+  for (const [keyword, mappedIndustry] of Object.entries(dataCentreMatches)) {
+    if (normalizedIndustry.includes(keyword)) {
+      return SIMULATION_TEMPLATES[mappedIndustry];
+    }
+  }
+
+
   // Loose matching for common variations
   const looseMatches: Record<string, TwinIndustry> = {
     'finance': 'banking',

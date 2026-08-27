@@ -60,118 +60,27 @@ serve(async (req) => {
       });
     }
 
-    let newStatus: string;
-    let deploymentStatus: string;
-
-    switch (action) {
-      case 'run':
-        newStatus = 'active';
-        deploymentStatus = 'running';
-        break;
-      case 'pause':
-        newStatus = 'paused';
-        deploymentStatus = 'paused';
-        break;
-      case 'stop':
-        newStatus = 'draft';
-        deploymentStatus = 'stopped';
-        break;
-      case 'restart':
-        // First stop, then start
-        newStatus = 'active';
-        deploymentStatus = 'running';
-        break;
-      default:
-        return new Response(JSON.stringify({ error: 'Invalid action' }), {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-    }
-
-    // Update agent status
-    const { error: updateError } = await supabase
-      .from('agents')
-      .update({ 
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', agentId);
-
-    if (updateError) throw updateError;
-
-    // Update or create deployment record
-    const { data: existingDeployment } = await supabase
-      .from('deployments')
-      .select('*')
-      .eq('system_id', agentId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (existingDeployment) {
-      await supabase
-        .from('deployments')
-        .update({ 
-          status: deploymentStatus,
-          health: action === 'stop' ? 'stopped' : 'healthy',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existingDeployment.id);
-    } else {
-      await supabase
-        .from('deployments')
-        .insert({
-          system_id: agentId,
-          status: deploymentStatus,
-          health: action === 'stop' ? 'stopped' : 'healthy',
-          deployed_by: user.id,
-          version: agent.version,
-          region: 'us-east-1',
-        });
-    }
-
-    // Log the action
-    await supabase
-      .from('audit_logs')
-      .insert({
-        user_id: user.id,
-        entity_type: 'agent',
-        entity_id: agentId,
-        action: `agent_${action}`,
-        details: {
-          agent_name: agent.name,
-          previous_status: agent.status,
-          new_status: newStatus,
-          timestamp: new Date().toISOString(),
-        },
-      });
-
-    // Create activity log
-    await supabase
-      .from('agent_action_logs')
-      .insert({
-        system_id: agentId,
-        action_key: `runtime.${action}`,
-        status: 'success',
-        action_params: { user_id: user.id },
-        duration_ms: 0,
-      });
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: {
-          agentId,
-          action,
-          newStatus,
-          timestamp: new Date().toISOString(),
-        },
-      }),
-      {
-        status: 200,
+    const supportedActions = new Set(['run', 'pause', 'stop', 'restart']);
+    if (!supportedActions.has(String(action))) {
+      return new Response(JSON.stringify({ error_code: 'invalid_action', error: 'Invalid action' }), {
+        status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+      });
+    }
+
+    // This endpoint has no provider adapter and cannot produce a signed
+    // runtime receipt or observed health result. Do not mutate agent or
+    // deployment state from intent alone.
+    return new Response(JSON.stringify({
+      success: false,
+      error_code: 'runtime_not_configured',
+      error: 'No verified runtime provider is configured for this agent.',
+      action,
+      runtime_verified: false,
+    }), {
+      status: 409,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
     console.error('Runtime control error:', error);

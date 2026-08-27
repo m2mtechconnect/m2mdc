@@ -30,7 +30,7 @@ serve(async (req) => {
       );
     }
 
-    const { agentId, targetEnvironment, notes } = await req.json();
+    const { agentId, targetEnvironment } = await req.json();
 
     if (!agentId || !targetEnvironment) {
       return new Response(
@@ -56,99 +56,20 @@ serve(async (req) => {
       );
     }
 
-    // Get or create target environment
-    const { data: existingEnv } = await supabaseClient
-      .from('environments')
-      .select('id')
-      .eq('name', targetEnvironment)
-      .single();
-
-    let targetEnvId = existingEnv?.id;
-
-    if (!targetEnvId) {
-      const { data: newEnv, error: envError } = await supabaseClient
-        .from('environments')
-        .insert({ name: targetEnvironment })
-        .select('id')
-        .single();
-
-      if (envError) {
-        console.error('[aoc-environment-promotion] Environment creation error:', envError);
-        return new Response(
-          JSON.stringify({ error: 'Failed to create environment' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-
-      targetEnvId = newEnv.id;
-    }
-
-    // Update agent's environment
-    const { error: updateError } = await supabaseClient
-      .from('agents')
-      .update({ 
-        environment_id: targetEnvId,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', agentId);
-
-    if (updateError) {
-      console.error('[aoc-environment-promotion] Update error:', updateError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to promote agent' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Create deployment record
-    const { data: deployment, error: deployError } = await supabaseClient
-      .from('deployments')
-      .insert({
-        system_id: agentId,
-        deployed_by: user.id,
-        status: 'active',
-        region: targetEnvironment,
-        version: `v${Date.now()}`,
-        model: agent.model_id || 'default'
-      })
-      .select()
-      .single();
-
-    if (deployError) {
-      console.error('[aoc-environment-promotion] Deployment record error:', deployError);
-    }
-
-    // Log the promotion in audit logs
-    await supabaseClient
-      .from('audit_logs')
-      .insert({
-        user_id: user.id,
-        entity_type: 'agent',
-        entity_id: agentId,
-        action: 'environment.promote',
-        details: {
-          from_environment: agent.environment?.name || 'none',
-          to_environment: targetEnvironment,
-          deployment_id: deployment?.id,
-          notes: notes || null,
-          timestamp: new Date().toISOString()
-        }
-      });
-
-    console.log(`[aoc-environment-promotion] Successfully promoted agent ${agentId} to ${targetEnvironment}`);
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        agent: {
-          id: agent.id,
-          name: agent.name,
-          environment: targetEnvironment
-        },
-        deployment: deployment || null
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    // Promotion requires a provider adapter, immutable release identity and
+    // a signed provider receipt. None is configured for this legacy endpoint,
+    // so intent must not be converted into an active deployment record.
+    return new Response(JSON.stringify({
+      success: false,
+      error_code: 'runtime_not_configured',
+      error: 'Environment promotion is unavailable until a verified runtime provider is configured.',
+      agent_id: agentId,
+      target_environment: targetEnvironment,
+      runtime_verified: false,
+    }), {
+      status: 409,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
     console.error('[aoc-environment-promotion] Error:', error);

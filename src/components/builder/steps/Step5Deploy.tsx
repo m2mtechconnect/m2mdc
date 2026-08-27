@@ -6,6 +6,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
+import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,7 @@ export function Step5Deploy() {
   
   const { openWithQuestion } = useCoPilotContext();
   const navigate = useNavigate();
+  const { twin: activeTwin } = useActiveTwin();
 
   const [activeTab, setActiveTab] = useState('overview');
   const [isDeploying, setIsDeploying] = useState(false);
@@ -129,7 +131,7 @@ export function Step5Deploy() {
   const handleOpenInSimulation = () => {
     navigate(
       buildSimulationHandoffUrl({
-        blueprintId: builderId ?? 'default',
+        blueprintId: activeTwin?.id ?? builderId ?? 'unavailable',
         returnTab: 'simulation',
       }),
     );
@@ -315,8 +317,8 @@ export function Step5Deploy() {
 
         <TabsContent value="blueprint" className="mt-4">
           <BlueprintReviewSection 
-            twinId="default"
-            onOpenBlueprint={() => window.open('/blueprint/default', '_blank')}
+            twinId={activeTwin?.id || "unavailable"}
+            onOpenBlueprint={() => activeTwin && window.open(`/blueprint/${activeTwin.id}`, '_blank')}
           />
         </TabsContent>
 

@@ -7,7 +7,7 @@
  */
 
 import { useMemo, useEffect, useRef, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Target, AlertTriangle, Info } from 'lucide-react';

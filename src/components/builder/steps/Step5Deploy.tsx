@@ -331,7 +331,7 @@ export function Step5Deploy() {
         <TabsContent value="blueprint" className="mt-4">
           <BlueprintReviewSection 
             twinId={activeTwin?.id || "unavailable"}
-            onOpenBlueprint={() => activeTwin && window.open(`/blueprint/${activeTwin.id}`, '_blank')}
+            onOpenBlueprint={handleOpenBlueprint}
           />
         </TabsContent>
 

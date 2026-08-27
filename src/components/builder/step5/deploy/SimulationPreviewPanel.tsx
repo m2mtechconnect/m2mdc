@@ -86,8 +86,8 @@ export function SimulationPreviewPanel({
         <Alert className="bg-warning/10 border-warning/30">
           <Info className="h-4 w-4 text-warning" />
           <AlertDescription className="text-sm">
-            Showing recommended sample KPIs for <strong>{industryLabel}</strong>.
-            Open this design in the Simulation workspace to execute a scenario.
+            Design-time sample KPIs for <strong>{industryLabel}</strong>. No run has been
+            executed. Open this design in the Simulation workspace to execute a scenario.
           </AlertDescription>
         </Alert>
       )}

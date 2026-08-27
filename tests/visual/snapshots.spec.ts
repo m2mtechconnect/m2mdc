@@ -113,7 +113,9 @@ async function expectLifecycleNavigation(page: Page) {
   ] as const;
 
   for (const [href, name] of lifecycleDestinations) {
-    await expect(navigation.locator(`a[href="${href}"]`).filter({ hasText: name }).first()).toBeVisible();
+    const link = navigation.getByRole('link', { name }).first();
+    await expect(link).toBeVisible();
+    await expect(link).toHaveAttribute('href', href);
   }
 
   await expect(navigation.getByRole('button', { name: /^Design & Build$/i })).toHaveCount(0);

@@ -108,6 +108,7 @@ function AISettingsPage() {
   const { can } = useRBAC();
   const [runtime, setRuntime] = useState<RuntimeConfig | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [healthCheckedAt, setHealthCheckedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -138,8 +139,10 @@ function AISettingsPage() {
     try {
       const data = await invokeEdgeFunction('copilot-health', {});
       setHealth(normalizeHealthStatus(data));
+      setHealthCheckedAt(new Date());
     } catch (cause) {
       setHealth(normalizeHealthStatus(null));
+      setHealthCheckedAt(new Date());
       setError(cause instanceof Error ? cause.message : 'Managed AI health check failed.');
     } finally {
       setChecking(false);
@@ -159,6 +162,14 @@ function AISettingsPage() {
 
   const managedOk = health?.managedAi.status === 'ok';
   const runtimeAvailable = runtime?.managedAi.available === true;
+  const runtimeStatus = !runtimeAvailable
+    ? 'Runtime unavailable'
+    : managedOk
+      ? 'Verified healthy'
+      : health
+        ? 'Verification incomplete'
+        : 'Configured—not verified';
+  const runtimeCardStatus = managedOk ? 'operational' : health || !runtimeAvailable ? 'critical' : 'neutral';
 
   return (
     <div className="w-full min-w-0 space-y-6 py-8" data-testid="ai-settings-workspace">
@@ -181,23 +192,25 @@ function AISettingsPage() {
         </div>
       )}
 
-      <DCCard title="Managed AI runtime" icon={<Sparkles className="h-5 w-5 text-primary" />} status={runtimeAvailable ? 'operational' : 'critical'}>
+      <DCCard title="Managed AI runtime" icon={<Sparkles className="h-5 w-5 text-primary" />} status={runtimeCardStatus}>
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">Server-owned runtime</Badge>
-            <Badge variant={runtimeAvailable ? 'default' : 'destructive'}>
-              {runtimeAvailable ? 'Runtime configured' : 'Runtime unavailable'}
+            <Badge variant={managedOk ? 'default' : runtimeAvailable && !health ? 'secondary' : 'destructive'}>
+              {runtimeStatus}
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">
-            AURA exposes stable response profiles to product workflows. A profile is available only when the server-owned managed runtime is configured.
+            AURA exposes stable response profiles to product workflows. Configuration makes a profile selectable; only a successful health check verifies that the execution path is currently available.
           </p>
           <div className="grid gap-3 md:grid-cols-3">
             {(runtime?.profiles ?? []).map((profile) => (
               <div key={profile.id} className="rounded-lg border border-border p-3">
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-sm font-medium text-foreground">{profile.label}</p>
-                  <Badge variant="outline" className="text-xs">{profile.available ? 'Available' : 'Unavailable'}</Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {!profile.available ? 'Unavailable' : managedOk ? 'Verified available' : 'Configured—not verified'}
+                  </Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{profile.description}</p>
               </div>
@@ -232,14 +245,32 @@ function AISettingsPage() {
                 {managedOk ? <CheckCircle className="h-5 w-5 text-green-600" aria-hidden="true" /> : <XCircle className="h-5 w-5 text-destructive" aria-hidden="true" />}
                 <div>
                   <p className="font-medium">Managed AI</p>
-                  <p className="text-xs text-muted-foreground">{health.managedAi.error ?? 'Server-owned execution path responded successfully.'}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {health.managedAi.error ?? 'Server-owned execution path responded successfully.'}
+                  </p>
+                  {!managedOk && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      The runtime remains configured, but availability is not verified. Retry the check or ask a platform administrator to inspect the server-owned runtime evidence.
+                    </p>
+                  )}
                 </div>
               </div>
               {typeof health.managedAi.latency === 'number' && <Badge variant="outline">{health.managedAi.latency} ms</Badge>}
             </div>
-            <div className="rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground">
-              Grounding: {health.groundingSearch.status}. {health.groundingSearch.error ?? ''}
-            </div>
+            <dl className="grid gap-2 rounded-lg bg-muted/30 p-3 text-xs text-muted-foreground sm:grid-cols-3">
+              <div>
+                <dt className="font-medium text-foreground">Evidence source</dt>
+                <dd>Server-owned runtime health probe</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-foreground">Last checked</dt>
+                <dd>{healthCheckedAt ? healthCheckedAt.toLocaleString() : 'Not checked'}</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-foreground">Grounding</dt>
+                <dd>{health.groundingSearch.status}. {health.groundingSearch.error ?? ''}</dd>
+              </div>
+            </dl>
           </div>
         </DCCard>
       )}

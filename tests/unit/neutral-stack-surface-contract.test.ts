@@ -117,7 +117,7 @@ describe('neutral canonical Evidence routes', () => {
   const shell = read('src/AuthenticatedShell.tsx');
 
   it('mounts the full neutral Evidence matrix', () => {
-    expect(shell).toContain('<Route path="/evidence" element={<EvidenceBetaShell />}>');
+    expect(shell).toContain('<Route path="/evidence" element={<PermissionRouteGuard permission="analytics.view"><EvidenceBetaShell /></PermissionRouteGuard>}>');
     for (const sub of [
       'overview',
       'operations/thermal',

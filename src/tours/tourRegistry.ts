@@ -199,7 +199,7 @@ const roleExecutiveSteps: Step[] = [
 const roleManagerSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-testid="manage-trigger"]',
+    target: 'button[aria-label="Design & Build"]',
     title: 'Manage operations',
     content: 'Facilities, Connections, Agents, Operations and Runtime are grouped under Manage for day-to-day platform work.',
     placement: 'bottom',
@@ -221,7 +221,7 @@ const roleEngineerSteps: Step[] = [
 const roleSecurityAdminSteps: Step[] = [
   ...roleSharedSteps,
   {
-    target: '[data-testid="govern-trigger"]',
+    target: 'button[aria-label="Platform Admin"]',
     title: 'Govern',
     content: 'People & Access, Agent Policies and Platform Administration are separated from operational management.',
     placement: 'bottom',
@@ -302,7 +302,7 @@ export const tourRoutes: Record<TourId, string> = {
   studioIntro: '/dashboard',
   overview: '/dashboard',
   simulation: '/simulation',
-  blueprint: '/blueprint/default',
+  blueprint: '/blueprint',
   role_executive: '/dashboard',
   role_manager: '/dashboard',
   role_engineer: '/dashboard',

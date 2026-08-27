@@ -39,6 +39,8 @@ export type RouteKind =
   | 'canonical'
   /** A mount that only redirects to a canonical route. */
   | 'redirect'
+  /** A retired compatibility URL that redirects and must never be emitted. */
+  | 'retired-redirect'
   /** Mounted only under `import.meta.env.DEV`. */
   | 'dev-only'
   /** Terminal `*` / `/*` handler for a router branch. */
@@ -147,7 +149,7 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/admin/platform-readiness', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/manage/integrations', shell: 'internal', kind: 'canonical' },
   { path: '/manage/facilities', shell: 'internal', kind: 'canonical' },
-  { path: '/marketplace', shell: 'internal', kind: 'canonical' },
+  { path: '/marketplace', shell: 'internal', kind: 'retired-redirect', note: 'Retired standalone catalogue; redirects to Builder templates behind twin.edit and must never be emitted.' },
   { path: '/app/agents', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents/:slug/detail', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents/:agentId/manage', shell: 'internal', kind: 'canonical' },
@@ -157,6 +159,7 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/data-centre-twin', shell: 'internal', kind: 'canonical' },
   { path: '/data-centre-twin/:id', shell: 'internal', kind: 'canonical' },
   { path: '/data-centre-twin/:id/blueprint', shell: 'internal', kind: 'canonical' },
+  { path: '/blueprint', shell: 'internal', kind: 'canonical', note: 'Resolves the active facility or renders an explicit facility setup state.' },
   { path: '/blueprint/preview', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint/:id', shell: 'internal', kind: 'canonical' },
   { path: '/simulation', shell: 'internal', kind: 'canonical' },
@@ -293,7 +296,7 @@ export const SHARE_LINK_RULES: ShareLinkRule[] = [
   {
     legacy: '/twin-datacentre',
     publicCanonical: '/data-centre-twin',
-    internalCanonical: '/blueprint/default',
+    internalCanonical: '/blueprint',
     reason:
       'Public marketing variant; authenticated visitors are redirected into the Blueprint workspace, so the two audiences need distinct canonical paths.',
   },
@@ -318,6 +321,7 @@ export const NON_EMITTABLE_PATHS: string[] = Array.from(
     LEGACY_EVIDENCE_ROOT,
     LEGACY_CAPABILITIES_ROUTE,
     '/settings/integrations/nvidia-dsx',
+    '/marketplace',
   ]),
 );
 

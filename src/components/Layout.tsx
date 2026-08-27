@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AuraLogo } from "@/components/brand/AuraLogo";
-import { Menu, X, LogOut, Settings, Search, Shield, Sparkles } from "lucide-react";
+import { ChevronDown, Menu, X, LogOut, Search, Sparkles } from "lucide-react";
 import GlobalSearchBar from "@/components/search/GlobalSearchBar";
 import { LazyCoPilotPanel } from "@/components/copilot/LazyCoPilotPanel";
 import { useCoPilot } from "@/contexts/CoPilotContext";
@@ -22,12 +22,10 @@ import { toast } from "sonner";
 import { useTourAutoStart } from "@/tours/useTourAutoStart";
 import { useRBAC } from "@/contexts/RBACContext";
 import {
-  WORKSPACE_NAV,
   visibleNavChildren,
   isNavItemActive,
-  visibleGovernNav,
-  visibleManageNav,
-  navGroups,
+  primaryNavigation,
+  utilityNavigation,
 } from "@/config/appNavigation";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
@@ -55,6 +53,7 @@ export function Layout({ children }: LayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedMobileHref, setExpandedMobileHref] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isOpen, setIsOpen } = useCoPilot();
   const { can, loading: roleLoading } = useRBAC();
@@ -62,14 +61,12 @@ export function Layout({ children }: LayoutProps) {
   const assistantWidth = useAssistantLayoutStore((s) => s.width);
   const assistantReflow = isOpen && assistantPresentation === 'docked';
 
-  const workspaceNavigation = WORKSPACE_NAV;
-  const manageNavigation = roleLoading ? [] : visibleManageNav(can);
-  const governNavigation = roleLoading ? [] : visibleGovernNav(can);
-  const manageActive = manageNavigation.some((item) => isNavItemActive(item, location.pathname));
-  const governActive = governNavigation.some((item) => isNavItemActive(item, location.pathname));
-  const activeWorkspace = workspaceNavigation.find((item) => isNavItemActive(item, location.pathname));
-
-  const drawerGroups = roleLoading ? [] : navGroups(can);
+  const workspaceNavigation = roleLoading ? [] : primaryNavigation(can);
+  const utilityNavigationItems = roleLoading ? [] : utilityNavigation(can);
+  const activeWorkspace = workspaceNavigation.find((item) =>
+    isNavItemActive(item, location.pathname)
+    || visibleNavChildren(item, can).some((child) => isNavItemActive(child, location.pathname))
+  );
   const headerRef = useRef<HTMLElement>(null);
 
   useAuraV2Theme();
@@ -206,8 +203,48 @@ export function Layout({ children }: LayoutProps) {
         >
           {workspaceNavigation.map((item) => {
             const isActive = isNavItemActive(item, location.pathname);
-            const tourId =
-              item.href === '/dashboard' ? 'nav-dashboard' : item.href === '/simulation' ? 'nav-simulation' : undefined;
+            const children = visibleNavChildren(item, can);
+            const childActive = children.some((child) => isNavItemActive(child, location.pathname));
+            const tourId = item.href === '/dashboard'
+              ? 'nav-dashboard'
+              : item.href === '/simulation'
+                ? 'nav-simulation'
+                : undefined;
+
+            if (children.length > 0) {
+              return (
+                <DropdownMenu key={item.name}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="aura-shellbar-tab"
+                      data-active={isActive || childActive ? 'true' : undefined}
+                      aria-label={item.fullName}
+                      data-nav-item={item.name}
+                    >
+                      <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                      <span>{item.name}</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-80">
+                    <DropdownMenuItem asChild>
+                      <Link to={linkTo(item.href)}>{item.fullName}</Link>
+                    </DropdownMenuItem>
+                    {children.map((child) => (
+                      <DropdownMenuItem key={child.href} asChild>
+                        <Link
+                          to={linkTo(child.href)}
+                          aria-current={isNavItemActive(child, location.pathname) ? 'page' : undefined}
+                        >
+                          {child.fullName}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              );
+            }
+
             return (
               <Tooltip key={item.name}>
                 <TooltipTrigger asChild>
@@ -224,92 +261,10 @@ export function Layout({ children }: LayoutProps) {
                     <span>{item.name}</span>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>{item.description}</p>
-                </TooltipContent>
+                <TooltipContent side="bottom"><p>{item.description}</p></TooltipContent>
               </Tooltip>
             );
           })}
-
-          {(manageNavigation.length > 0 || governNavigation.length > 0) && (
-            <span className="aura-shellbar-divider" aria-hidden="true" />
-          )}
-
-          {manageNavigation.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="aura-shellbar-tab"
-                  data-active={manageActive ? 'true' : undefined}
-                  aria-label="Manage"
-                  data-testid="manage-trigger"
-                  data-nav-item="Manage"
-                >
-                  <Settings className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                  <span>Manage</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80" data-testid="manage-menu">
-                {manageNavigation.map((item) => {
-                  const isActive = isNavItemActive(item, location.pathname);
-                  return (
-                    <DropdownMenuItem key={item.name} asChild>
-                      <Link
-                        to={linkTo(item.href)}
-                        className={`flex items-start gap-2.5 py-2 ${isActive ? 'text-primary' : ''}`}
-                        aria-current={isActive ? 'page' : undefined}
-                      >
-                        <item.icon className="mt-0.5 h-[18px] w-[18px] flex-shrink-0" aria-hidden="true" />
-                        <span>
-                          <span className="block text-[14px] font-medium">{item.fullName}</span>
-                          <span className="block text-[12px] leading-snug text-muted-foreground">{item.description}</span>
-                        </span>
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {governNavigation.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="aura-shellbar-tab"
-                  data-active={governActive ? 'true' : undefined}
-                  aria-label="Govern"
-                  data-testid="govern-trigger"
-                  data-nav-item="Govern"
-                >
-                  <Shield className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden="true" />
-                  <span>Govern</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80" data-testid="govern-menu">
-                {governNavigation.map((item) => {
-                  const isActive = isNavItemActive(item, location.pathname);
-                  return (
-                    <DropdownMenuItem key={item.name} asChild>
-                      <Link
-                        to={linkTo(item.href)}
-                        className={`flex items-start gap-2.5 py-2 ${isActive ? 'text-primary' : ''}`}
-                        aria-current={isActive ? 'page' : undefined}
-                      >
-                        <item.icon className="mt-0.5 h-[18px] w-[18px] flex-shrink-0" aria-hidden="true" />
-                        <span>
-                          <span className="block text-[14px] font-medium">{item.fullName}</span>
-                          <span className="block text-[12px] leading-snug text-muted-foreground">{item.description}</span>
-                        </span>
-                      </Link>
-                    </DropdownMenuItem>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
 
           {activeWorkspace ? (
             <span className="aura-shellbar-context" data-testid="shell-workspace-context">
@@ -336,64 +291,86 @@ export function Layout({ children }: LayoutProps) {
             </SheetTitle>
           </SheetHeader>
 
-          <nav className="mt-6 space-y-1" aria-label="Mobile navigation">
-            {drawerGroups.map((group, groupIndex) => (
-              <div
-                key={group.id}
-                data-nav-group={group.id}
-                className={groupIndex === 0 ? "pb-4" : "pb-4 border-t border-border pt-4"}
-              >
-                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  {group.label}
-                </h3>
-                {group.items.map((item) => {
-                  const isActive = isNavItemActive(item, location.pathname);
-                  return (
-                    <div key={item.href}>
-                      <Button
-                        asChild
-                        variant={isActive ? "secondary" : "ghost"}
-                        className="w-full justify-start gap-3 min-h-[44px] text-base"
+          <nav className="mt-6 space-y-1 pb-40" aria-label="Mobile navigation">
+            {workspaceNavigation.map((item) => {
+              const isActive = isNavItemActive(item, location.pathname);
+              const children = visibleNavChildren(item, can);
+              const childActive = children.some((child) => isNavItemActive(child, location.pathname));
+              const expanded = childActive || expandedMobileHref === item.href;
+
+              return (
+                <div key={item.href}>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      asChild
+                      variant={isActive || childActive ? "secondary" : "ghost"}
+                      className="min-h-[44px] flex-1 justify-start gap-3 text-base"
+                    >
+                      <Link
+                        to={linkTo(item.href)}
+                        data-nav-item={item.name}
+                        onClick={() => setMobileMenuOpen(false)}
+                        aria-current={isActive ? "page" : undefined}
                       >
-                        <Link
-                          to={linkTo(item.href)}
-                          data-nav-item={item.name}
-                          onClick={() => setMobileMenuOpen(false)}
-                          aria-current={isActive ? "page" : undefined}
-                        >
-                          <item.icon className="h-5 w-5" aria-hidden="true" />
-                          {item.fullName}
-                        </Link>
+                        <item.icon className="h-5 w-5" aria-hidden="true" />
+                        {item.fullName}
+                      </Link>
+                    </Button>
+                    {children.length > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="min-h-[44px] min-w-[44px] p-0"
+                        aria-label={`${expanded ? 'Collapse' : 'Expand'} ${item.fullName}`}
+                        aria-expanded={expanded}
+                        onClick={() => setExpandedMobileHref((current) => current === item.href ? null : item.href)}
+                      >
+                        <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden="true" />
                       </Button>
-                      {isActive && item.children?.length ? (
-                        <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
-                          {visibleNavChildren(item, can).map((child) => {
-                            const childActive = isNavItemActive(child, location.pathname);
-                            return (
-                              <Button
-                                key={child.href}
-                                asChild
-                                variant={childActive ? "secondary" : "ghost"}
-                                size="sm"
-                                className="w-full justify-start min-h-11 text-sm"
-                              >
-                                <Link
-                                  to={linkTo(child.href)}
-                                  onClick={() => setMobileMenuOpen(false)}
-                                  aria-current={childActive ? "page" : undefined}
-                                >
-                                  {child.fullName}
-                                </Link>
-                              </Button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
+                    )}
+                  </div>
+                  {expanded && children.length > 0 && (
+                    <div className="ml-6 mt-1 space-y-1 border-l border-border pl-2">
+                      {children.map((child) => {
+                        const active = isNavItemActive(child, location.pathname);
+                        return (
+                          <Button
+                            key={child.href}
+                            asChild
+                            variant={active ? "secondary" : "ghost"}
+                            size="sm"
+                            className="w-full justify-start min-h-11 text-sm"
+                          >
+                            <Link
+                              to={linkTo(child.href)}
+                              onClick={() => setMobileMenuOpen(false)}
+                              aria-current={active ? "page" : undefined}
+                            >
+                              {child.fullName}
+                            </Link>
+                          </Button>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  )}
+                </div>
+              );
+            })}
+
+            <div className="mt-4 border-t border-border pt-4" aria-label="Utilities">
+              <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Utilities</h3>
+              <div className="grid grid-cols-2 gap-1">
+                {utilityNavigationItems.map((item) => (
+                  <Button key={item.href} asChild variant="ghost" className="justify-start gap-2 min-h-[44px]">
+                    <Link to={linkTo(item.href)} onClick={() => setMobileMenuOpen(false)}>
+                      <item.icon className="h-4 w-4" aria-hidden="true" />
+                      {item.name}
+                    </Link>
+                  </Button>
+                ))}
               </div>
-            ))}
+            </div>
           </nav>
 
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border bg-card">

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
+import { useRBAC } from '@/contexts/RBACContext';
 import { resolveFacilityNaming } from '@/workspace/facilityNaming';
 import { useToast } from '@/hooks/use-toast';
 import { BLUEPRINT } from '@/ux';
@@ -166,6 +167,8 @@ export default function Blueprint() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { twin, activeTwinId: twinId } = useActiveTwin();
+  const { can } = useRBAC();
+  const canEdit = can('twin.edit');
   const [showCoPilotPanel, setShowCoPilotPanel] = useState(false);
   
   // The URL is authoritative: /blueprint/:id must render :id. The active twin's
@@ -290,6 +293,7 @@ export default function Blueprint() {
                 }).displayName}
                 twinId={blueprintId}
                 location={twin?.city || blueprint.location}
+                canEdit={canEdit}
                 showSimulationLink={true}
                 blueprintId={blueprintId}
                 versionId={blueprint.version ?? null}
@@ -307,7 +311,7 @@ export default function Blueprint() {
                   showCoPilotPanel ? t('blueprint.hideAssistant') : t('blueprint.showAssistant')
                 }
                 extraAction={
-                  !twin && blueprintId === 'default' ? (
+                  canEdit && !twin && blueprintId === 'default' ? (
                     <CreateTwinFromBlueprintButton blueprint={blueprint} />
                   ) : undefined
                 }

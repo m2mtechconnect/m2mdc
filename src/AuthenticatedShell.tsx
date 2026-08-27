@@ -27,7 +27,7 @@ const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard")
 const Compliance = lazy(() => import("./pages/Compliance"));
 const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
-const Marketplace = lazy(() => import("./pages/Marketplace"));
+const ActiveBlueprintResolver = lazy(() => import("./routing/ActiveBlueprintResolver"));
 const Help = lazy(() => import("./pages/Help"));
 const Supervisor = lazy(() => import("./pages/Supervisor"));
 const Search = lazy(() => import("./pages/Search"));
@@ -142,7 +142,7 @@ function ApprovedUserRoutes() {
       <Route path="/manage/integrations" element={<PermissionRouteGuard permission="twin.edit"><Connections /></PermissionRouteGuard>} />
       {/* Admission is read-level; the page gates every mutation on twin.edit. */}
       <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.view"><ManageFacilities /></PermissionRouteGuard>} />
-      <Route path="/marketplace" element={<Marketplace />} />
+      <Route path="/marketplace" element={<PermissionRouteGuard permission="twin.edit"><PreserveNavigate to="/builder#templates" /></PermissionRouteGuard>} />
       <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
       <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.operate"><TwinManage /></PermissionRouteGuard>} />
@@ -152,6 +152,7 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin/:id" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin/:id/blueprint" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
+      <Route path="/blueprint" element={<PermissionRouteGuard permission="twin.view"><ActiveBlueprintResolver /></PermissionRouteGuard>} />
       <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />
       <Route path="/blueprint/:id" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
       {/* The simulation workspace persists run records, so it is gated on the
@@ -181,7 +182,7 @@ function ApprovedUserRoutes() {
 
       {/* Neutral canonical Evidence family. The same shell and workspaces as
           before; only the URL vocabulary changed. */}
-      <Route path="/evidence" element={<EvidenceBetaShell />}>
+      <Route path="/evidence" element={<PermissionRouteGuard permission="analytics.view"><EvidenceBetaShell /></PermissionRouteGuard>}>
         <Route index element={<PreserveNavigate to="/evidence/overview" />} />
         <Route path="overview" element={<OverviewWorkspace />} />
         <Route path="operations" element={<PreserveNavigate to="/evidence/operations/thermal" />} />

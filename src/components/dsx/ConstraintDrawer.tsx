@@ -4,7 +4,7 @@
  * Opening a constraint explains what was measured, which objects it affects,
  * how much evidence supports it and where to continue the investigation.
  */
-import { useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,27 @@ import { relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 export function ConstraintDrawer() {
   const { investigatedConstraint: c, closeConstraint, hrefWithContext, selectAsset } = useWorkspace();
   const openerRef = useRef<HTMLElement | null>(null);
+  const previousConstraintRef = useRef<typeof c>(null);
+  const delayedRestoreRef = useRef<number | null>(null);
+
+  // Capture the keyboard trigger before Radix moves focus into the portal.
+  // onOpenAutoFocus can run after focus has already shifted on narrow/mobile
+  // layouts, so the render-to-open transition is the stable restoration point.
+  useLayoutEffect(() => {
+    if (c && delayedRestoreRef.current !== null) {
+      window.clearTimeout(delayedRestoreRef.current);
+      delayedRestoreRef.current = null;
+    }
+    if (c && !previousConstraintRef.current) {
+      const active = document.activeElement;
+      openerRef.current = active instanceof HTMLElement ? active : null;
+    }
+    previousConstraintRef.current = c;
+  }, [c]);
+
+  useEffect(() => () => {
+    if (delayedRestoreRef.current !== null) window.clearTimeout(delayedRestoreRef.current);
+  }, []);
 
   const restoreOpener = () => {
     const opener = openerRef.current;
@@ -26,10 +47,13 @@ export function ConstraintDrawer() {
     // finishes. Re-assert focus once immediately and once after that transition
     // so narrow/mobile viewports cannot leave focus on <body>.
     requestAnimationFrame(() => {
-      if (opener.isConnected) opener.focus();
+      if (!previousConstraintRef.current && opener.isConnected) opener.focus();
     });
-    window.setTimeout(() => {
-      if (opener.isConnected) opener.focus();
+    delayedRestoreRef.current = window.setTimeout(() => {
+      delayedRestoreRef.current = null;
+      // Do not let a previous drawer's delayed restoration steal focus from a
+      // newly opened drawer.
+      if (!previousConstraintRef.current && opener.isConnected) opener.focus();
     }, 400);
   };
 
@@ -41,8 +65,10 @@ export function ConstraintDrawer() {
         data-testid="dsx-constraint-drawer"
         data-constraint-domain={c?.domain ?? ''}
         onOpenAutoFocus={() => {
-          const active = document.activeElement;
-          openerRef.current = active instanceof HTMLElement ? active : null;
+          if (!openerRef.current) {
+            const active = document.activeElement;
+            openerRef.current = active instanceof HTMLElement ? active : null;
+          }
         }}
         onCloseAutoFocus={(event) => {
           event.preventDefault();

@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "db25d83404f26c43cdac4092c0c9e4e63e8f996f",
-    "workflowRunId": 33028128765,
-    "artifactId": 9629217477,
-    "artifactZipSha256": "fa3fc3ad78105a1ecd349166fb4f27d2881ccc06dead2756e886a626d6ba32f3"
+    "sha": "60386880df53f62d8dbaae902194463ae8c3c23f",
+    "workflowRunId": 33083257810,
+    "artifactId": 9651065976,
+    "artifactZipSha256": "ccc2d3d61ddbdec179af6840939b8efbbc7cd5e88c5cec70e57bca850b0b2b45"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
@@ -27,13 +27,14 @@
     "The other 19 screenshots remain exact SHA-256 fingerprints.",
     "No reviewed screenshot showed broken layout, clipped primary controls, overlapping text, unexpected horizontal overflow or a contradictory lifecycle navigation state.",
     "2026-08-26 post-release smoke correction removes the placeholder Unix-epoch build date from the authenticated footer. The seven affected exact fingerprints were accepted from CI under the owner's standing no-human-review waiver; dimensions and verification modes remain unchanged.",
-    "2026-08-27 persona-authority qualification explicitly models a tenant owner. Six deterministic changed surfaces were reviewed from workflow 33028128765 and explicitly approved by the owner: Teams renders the organization owner snapshot, Connections renders the full tenant control plane, and Command Center / Operations mobile layouts remain unclipped with no page-level horizontal overflow."
+    "2026-08-27 persona-authority qualification explicitly models a tenant owner. Six deterministic changed surfaces were reviewed from workflow 33028128765 and explicitly approved by the owner: Teams renders the organization owner snapshot, Connections renders the full tenant control plane, and Command Center / Operations mobile layouts remain unclipped with no page-level horizontal overflow.",
+    "2026-08-27 navigation consolidation updates the reviewed desktop lifecycle shell fingerprints for the shared permission-aware Design & Build, Operations and Evidence group triggers. All 21 Playwright visual scenarios passed before the exact fingerprint check; unchanged mobile and responsive fingerprints remain pinned."
   ],
   "screenshots": [
     {
       "file": "activation-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "66b81da2054466741d3236b86f303ef3093ff8b2e19555a2aa52fa4bee73f2ad",
+      "sha256": "8bb7c596834b5b4bb5b806dc35712502de6888a9aa760758dee63c78e98b0af0",
       "width": 1280,
       "height": 1682
     },
@@ -47,7 +48,7 @@
     {
       "file": "ai-runtime-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e3bbb40b92396b445747e4255dad3411d39ff37603930918c1d3725215fa5667",
+      "sha256": "1b69b1055c06f48892c3a2dd544415ccf7af1b1efffca63679b889601ceb9be1",
       "width": 1280,
       "height": 906
     },
@@ -61,14 +62,14 @@
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "361f9fea0d48725d38f9812918f22e8ec93b18fa1309f93f2dbcb388320de437",
+      "sha256": "993ba9bb030e28f1017a085867ffdd5c4d205aa57786567da01b00dbc9005d6c",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-first-run-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "cc6847fbbdb4694b0b44e27b6368dbd6c451a9b65e0b02c09f1bfad97f867cc4",
+      "sha256": "2fe6f25515fc2580b441754e903d8d67f041dc5cdb0022a36b5dbb650aec6b3d",
       "width": 1280,
       "height": 720
     },
@@ -82,28 +83,28 @@
     {
       "file": "builder-step1-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "6f1ce390aeba16132a8f5a0018c6044cdb2dded7dd2f06d46114075fb96e6304",
+      "sha256": "0583dd5173b01b4f6f5dbd0f6175d0011c3da41925c62b9eafc4972d78548f3c",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step2-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "76212d4a67eddcdee9e95b546653fccb0b67dbe2672ce5ab89653f342555aeb4",
+      "sha256": "f7c1077464a4aa3a88de73314a526959ed66f095e35a12642c71b0c563160ebb",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step5-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e30b300c3d32e15f2468159c6a1fde52913057c64baf80125c825f7ceff49642",
+      "sha256": "1a93fd590cc4ee523629b16ff91213eccb121f32a6b122abe846bf03575f0880",
       "width": 1280,
       "height": 720
     },
     {
       "file": "compliance-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c7eb150321b49d5a29ee6eb9c271c3f5501c1291d325fcd059ebcdd04ff9db3d",
+      "sha256": "82649253ac3a3bb8b7a30effa76f40ced17348c384f2dc55a075d9455889669f",
       "width": 1280,
       "height": 720
     },
@@ -117,7 +118,7 @@
     {
       "file": "dashboard-hero-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "633f60bbe7d88e8884980fde8c9465e3e9690314480f130fcc517312666a5833",
+      "sha256": "9ad546683ff78bebc218ad82d9f6365c791b7a4df2239ec02dc46b50f63f6c51",
       "width": 1280,
       "height": 720
     },
@@ -131,21 +132,21 @@
     {
       "file": "deployments-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c008aef73c0ce0dccee928bf1cc8cfaf6d59c8893d1c86db465fc622138364b3",
+      "sha256": "ce883ecc9c57c85dc902f5a892d76835b35e3d982f04bbdfe8866cb19b41a819",
       "width": 1280,
       "height": 720
     },
     {
       "file": "evidence-overview-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "b5264fa09b7b827e595e957c4740378ed02487069b8aa313978ad7cbc971d257",
+      "sha256": "e596fead96373295642b69aa71f28b0228e14b4bdbcd96be730c8f1d611fdeea",
       "width": 1280,
       "height": 720
     },
     {
       "file": "integrations-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "33027182b0ed79c4f553730e7f647ace2572d720c7a13c1adb8151ab424543e4",
+      "sha256": "2e0c39ef317865a23cd9fae801db65c7d27110df76093bc5b4b3941fc06068db",
       "width": 1280,
       "height": 720
     },
@@ -165,7 +166,7 @@
     {
       "file": "teams-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "570f45b2ee1cd87000c8c9d351cddfae24e8e647883e098fe2736a0fbb81c300",
+      "sha256": "0478fdb9b22d2f66bbc1137e509108b6b845f73defa799c5124f97657fc3b68f",
       "width": 1280,
       "height": 720
     }

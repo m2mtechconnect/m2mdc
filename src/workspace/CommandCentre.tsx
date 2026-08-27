@@ -107,7 +107,9 @@ export default function CommandCentre() {
   );
   const rackCount = assets.filter((a) => a.kind === 'rack').length;
   const blueprintHref = `/blueprint/${facility.id || 'default'}`;
-  const evidenceHref = '/evidence';
+  const evidenceHref = facility.id
+    ? `/evidence?facility=${encodeURIComponent(facility.id)}`
+    : '/evidence';
   const simulationHref = `/simulation?twin=${encodeURIComponent(facility.id || 'default')}`;
   const calculatedAt = latestRun
     ? new Date(latestRun.completedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -247,7 +249,7 @@ export default function CommandCentre() {
           blueprintHref={blueprintHref}
           evidenceHref={evidenceHref}
           kpis={primaryKpis}
-          evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key)}
+          evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key, facility.id)}
           onSelectKpi={setMetricKpi}
           assumptions={assumptions}
         />

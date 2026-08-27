@@ -79,7 +79,7 @@ export function MetricQuickView({ kpi, facilityId, calculatedAt, onClose }: Prop
 
           <div className="flex flex-wrap gap-2">
             <Button asChild size="sm" className="h-9 text-[13px] font-semibold max-sm:h-11" data-testid="metric-open-evidence">
-              <Link to={evidenceHrefForKpi(kpi.key)}>
+              <Link to={evidenceHrefForKpi(kpi.key, facilityId)}>
                 <FileSearch className="mr-1.5 h-4 w-4" strokeWidth={1.75} aria-hidden />
                 Open Evidence
               </Link>

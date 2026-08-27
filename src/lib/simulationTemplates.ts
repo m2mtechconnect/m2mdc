@@ -34,7 +34,9 @@ export type TwinIndustry =
   | 'education'
   | 'real_estate'
   | 'travel_hospitality'
-  | 'government_transport';
+  | 'government_transport'
+  | 'ai_compute'
+  | 'data_centre';
 
 export interface SimulationEvent {
   timestampOffsetMin: number;
@@ -314,6 +316,57 @@ export const SIMULATION_TEMPLATES: Record<TwinIndustry | 'generic', SimulationTe
   },
 
   /**
+   * Data Centre Operations Twin (design-time sample scenario).
+   * Provider-neutral: no vendor runtime, accelerated-computing or measured
+   * telemetry claims. All values are illustrative design-time samples.
+   */
+  data_centre: {
+    industry: 'data_centre',
+    title: 'Data Centre Operations Twin (sample scenario)',
+    description: 'Design-time sample scenario for data centre thermal, power and capacity operations. Values are illustrative, not measured telemetry.',
+    defaultQuery: 'Simulate a thermal excursion in one data hall and show how cooling setpoints and workload placement would be adjusted.',
+    scenarioSummary: 'Sample data centre scenario covering thermal excursion detection, workload rebalancing and cooling response',
+    kpis: [
+      { code: 'pue', label: 'Power Usage Effectiveness (PUE)', unit: 'ratio', baseline: 1.58, simulated: 1.32 },
+      { code: 'rack_power_density', label: 'Average Rack Power Density', unit: 'kW/rack', baseline: 8.5, simulated: 14.2 },
+      { code: 'cooling_efficiency', label: 'Cooling Plant Efficiency', unit: '%', baseline: 72, simulated: 88 },
+      { code: 'it_load_utilisation', label: 'IT Load Utilisation', unit: '%', baseline: 61, simulated: 79 },
+    ],
+    events: [
+      { timestampOffsetMin: 0, type: 'thermal_excursion', severity: 'high', label: 'Hot aisle temperature above threshold', details: { dataHall: 'Hall A', returnAirTempC: 31.4, thresholdC: 28 } },
+      { timestampOffsetMin: 3, type: 'capacity_analysis', severity: 'medium', label: 'Affected racks identified', details: { racks: 12, aggregateLoadKw: 168 } },
+      { timestampOffsetMin: 7, type: 'workload_rebalance', severity: 'medium', label: 'Workload redistribution modelled', details: { movedWorkloads: 6, targetHall: 'Hall B', modelled: true } },
+      { timestampOffsetMin: 12, type: 'cooling_response', severity: 'low', label: 'Cooling setpoint adjustment modelled', details: { setpointChangeC: -1.5, plantMode: 'economiser' } },
+      { timestampOffsetMin: 20, type: 'validation', severity: 'low', label: 'Modelled temperatures back within envelope', details: { returnAirTempC: 26.8, pueDelta: -0.06, source: 'simulated' } },
+    ],
+  },
+
+  /**
+   * AI Compute Data Centre Twin (design-time sample scenario).
+   * Provider-neutral: describes high-density compute generically.
+   */
+  ai_compute: {
+    industry: 'ai_compute',
+    title: 'AI Compute Data Centre Twin (sample scenario)',
+    description: 'Design-time sample scenario for high-density AI compute halls covering power headroom, thermal envelope and job scheduling. Values are illustrative, not measured telemetry.',
+    defaultQuery: 'Simulate a sustained high-density training workload and show power headroom, thermal envelope and scheduling response.',
+    scenarioSummary: 'Sample high-density compute scenario covering power headroom, liquid cooling response and job placement',
+    kpis: [
+      { code: 'pue', label: 'Power Usage Effectiveness (PUE)', unit: 'ratio', baseline: 1.45, simulated: 1.18 },
+      { code: 'rack_power_density', label: 'Average Rack Power Density', unit: 'kW/rack', baseline: 22, simulated: 48 },
+      { code: 'cooling_efficiency', label: 'Liquid Cooling Loop Efficiency', unit: '%', baseline: 76, simulated: 92 },
+      { code: 'compute_utilisation', label: 'Accelerated Node Utilisation', unit: '%', baseline: 58, simulated: 84 },
+    ],
+    events: [
+      { timestampOffsetMin: 0, type: 'workload_admitted', severity: 'low', label: 'Sustained training workload admitted', details: { nodes: 32, requestedPowerKw: 1280, modelled: true } },
+      { timestampOffsetMin: 4, type: 'power_headroom', severity: 'medium', label: 'Branch circuit headroom narrowing', details: { headroomPercent: 9, branch: 'PDU-3' } },
+      { timestampOffsetMin: 9, type: 'thermal_excursion', severity: 'high', label: 'Coolant return temperature above target', details: { returnTempC: 42.1, targetC: 38 } },
+      { timestampOffsetMin: 14, type: 'workload_rebalance', severity: 'medium', label: 'Job placement rebalanced across halls', details: { movedJobs: 4, targetHall: 'Hall C', modelled: true } },
+      { timestampOffsetMin: 22, type: 'validation', severity: 'low', label: 'Modelled envelope restored', details: { returnTempC: 37.2, headroomPercent: 18, source: 'simulated' } },
+    ],
+  },
+
+  /**
    * Generic Enterprise Operations Twin
    * Based on ITIL v4 service management and ISO 20000 IT service delivery standards
    * KPI benchmarks from Gartner IT Operations research and ServiceNow industry benchmarks
@@ -356,6 +409,8 @@ const INDUSTRY_LABELS: Record<string, string> = {
   real_estate: 'Real Estate & Mortgage',
   travel_hospitality: 'Travel & Hospitality',
   government_transport: 'Government Transportation',
+  ai_compute: 'AI Compute Data Centre',
+  data_centre: 'Data Centre',
   generic: 'General Operations',
 };
 
@@ -377,6 +432,27 @@ export function getSimulationTemplateForIndustry(
   if (normalizedIndustry in SIMULATION_TEMPLATES) {
     return SIMULATION_TEMPLATES[normalizedIndustry as TwinIndustry];
   }
+
+  // Data centre keywords are resolved first: they must never fall through to
+  // the generic ITIL fixture, nor to `energy_utilities` via the `power` keyword.
+  const dataCentreMatches: Record<string, TwinIndustry> = {
+    ai_compute: 'ai_compute',
+    ai_factory: 'ai_compute',
+    accelerated_compute: 'ai_compute',
+    hpc: 'ai_compute',
+    data_centre: 'data_centre',
+    data_center: 'data_centre',
+    datacentre: 'data_centre',
+    datacenter: 'data_centre',
+    colocation: 'data_centre',
+    colo: 'data_centre',
+  };
+  for (const [keyword, mappedIndustry] of Object.entries(dataCentreMatches)) {
+    if (normalizedIndustry.includes(keyword)) {
+      return SIMULATION_TEMPLATES[mappedIndustry];
+    }
+  }
+
 
   // Loose matching for common variations
   const looseMatches: Record<string, TwinIndustry> = {

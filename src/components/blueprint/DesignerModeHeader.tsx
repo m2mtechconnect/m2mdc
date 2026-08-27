@@ -64,7 +64,9 @@ interface DesignerModeHeaderProps {
   assistantOpen?: boolean;
   onToggleAssistant?: () => void;
   assistantLabel?: string;
-  /** Whether the current persona may mutate Blueprint state. */\n  canEdit?: boolean;\n  /** Optional extra action (for example, create a twin from this blueprint). */
+  /** Whether the current persona may mutate Blueprint state. */
+  canEdit?: boolean;
+  /** Optional extra action (for example, create a twin from this blueprint). */
   extraAction?: ReactNode;
 }
 

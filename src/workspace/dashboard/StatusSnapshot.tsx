@@ -22,7 +22,7 @@ export function buildSnapshotRows(evidenceNeedingReview: number): SnapshotRow[] 
   return [
     { label: 'Operating mode', value: 'Simulated', tone: 'neutral', to: '/manage/integrations' },
     { label: 'Live telemetry', value: 'Not connected', tone: 'neutral', to: '/manage/integrations' },
-    { label: 'NVIDIA runtime', value: 'Not available', tone: 'neutral', to: '/manage/integrations#nvidia-dsx' },
+    { label: 'Accelerated runtime', value: 'Not verified', tone: 'neutral', to: '/manage/integrations#nvidia-dsx' },
     {
       label: 'Evidence requiring review',
       value: String(evidenceNeedingReview),

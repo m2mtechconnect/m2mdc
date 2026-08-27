@@ -365,12 +365,18 @@ export function primaryNavigation(can: (permission: Permission) => boolean): App
     MANAGE_NAV.filter((item) => item.group === group && item.href !== '/marketplace'),
     can,
   );
+  const governItems = childrenFor('govern');
+  const evidenceChildren = governItems.filter((item) => item.href === '/readiness/supervisor');
+  const governPrimary = governItems.filter((item) =>
+    item.href === '/teams' || item.href === '/admin/platform-readiness'
+  );
 
   return visible(WORKSPACE_NAV, can).map((item) => {
     if (item.href === '/builder') return { ...item, children: childrenFor('design') };
     if (item.href === '/analytics') return { ...item, children: childrenFor('operate') };
+    if (item.href === `${EVIDENCE_ROOT}/overview`) return { ...item, children: evidenceChildren };
     return item;
-  }).concat(childrenFor('govern'));
+  }).concat(governPrimary);
 }
 
 export function utilityNavigation(can: (permission: Permission) => boolean): AppNavItem[] {

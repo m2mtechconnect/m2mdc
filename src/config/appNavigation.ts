@@ -133,7 +133,10 @@ export const MANAGE_NAV: AppNavItem[] = [
     href: '/manage/facilities',
     icon: Building2,
     matches: ['/manage/facilities'],
-    permission: 'twin.edit',
+    // Read-only personas (executive, compliance, data analyst) must be able to
+    // discover the facility they report on. The page itself gates every write
+    // on `twin.edit`, so discovery does not imply authority to change anything.
+    permission: 'twin.view',
     group: 'design',
     description: 'Sites, halls, capacity, infrastructure scope and lifecycle state.',
   },
@@ -143,7 +146,9 @@ export const MANAGE_NAV: AppNavItem[] = [
     href: '/blueprint',
     icon: Boxes,
     matches: ['/blueprint', '/data-centre-twin'],
-    permission: 'twin.edit',
+    // Blueprint is a design/reporting surface; editing inside it is gated
+    // separately, so read-only personas may discover it.
+    permission: 'twin.view',
     group: 'design',
     description: stackDescription('twin.openusd'),
   },

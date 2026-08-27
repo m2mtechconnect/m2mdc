@@ -85,11 +85,15 @@ describe('canonical navigation', () => {
 
   it('hides manage items the caller cannot use', () => {
     expect(visibleManageNav(() => false)).toHaveLength(0);
+    // Write-level callers see the write-oriented surfaces...
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
-      'Facilities',
-      'Blueprint',
       'Connections',
       'Marketplace',
+    ]);
+    // ...and read-only personas discover the surfaces they report on.
+    expect(visibleManageNav((p) => p === 'twin.view').map((i) => i.name)).toEqual([
+      'Facilities',
+      'Blueprint',
     ]);
     const designOrOperate = MANAGE_NAV.filter((i) => i.group === 'operate' || i.group === 'design');
     expect(visibleManageNav(() => true)).toHaveLength(designOrOperate.length);

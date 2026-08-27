@@ -140,7 +140,8 @@ function ApprovedUserRoutes() {
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
 
       <Route path="/manage/integrations" element={<PermissionRouteGuard permission="twin.edit"><Connections /></PermissionRouteGuard>} />
-      <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.edit"><ManageFacilities /></PermissionRouteGuard>} />
+      {/* Admission is read-level; the page gates every mutation on twin.edit. */}
+      <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.view"><ManageFacilities /></PermissionRouteGuard>} />
       <Route path="/marketplace" element={<Marketplace />} />
       <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
       <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />
@@ -153,7 +154,10 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin/:id/blueprint" element={<Blueprint />} />
       <Route path="/blueprint/preview" element={<BlueprintPreview />} />
       <Route path="/blueprint/:id" element={<Blueprint />} />
-      <Route path="/simulation" element={<AuraWorkspace />} />
+      {/* The simulation workspace persists run records, so it is gated on the
+          same least-privileged twin read permission as the other twin
+          surfaces instead of being mounted for any approved account. */}
+      <Route path="/simulation" element={<PermissionRouteGuard permission="twin.view"><AuraWorkspace /></PermissionRouteGuard>} />
       <Route path="/simulation/preview" element={<SimulationPreview />} />
       <Route path="/help" element={<Help />} />
       {/* Read-only governance surface in the same family as /compliance and

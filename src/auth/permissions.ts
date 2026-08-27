@@ -128,6 +128,26 @@ export const ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
   viewer: [...VIEWER_BASE],
 };
 
+/**
+ * Tenant-plane role labels. A row in public.user_roles with scope 'global' and
+ * one of these labels must NOT confer platform authority: tenant authority is
+ * resolved from authoritative organization membership
+ * (see src/auth/organizationAuthorization.ts), never inferred from a global
+ * grant. `owner` is deliberately excluded - a global owner grant is the
+ * platform-owner bootstrap contract.
+ */
+export const TENANT_ONLY_ROLES: readonly AnyRole[] = ['operator', 'viewer'];
+
+/**
+ * Permissions a global grant of a tenant-only role may confer. Shell admission
+ * only; every product permission has to come from organization membership.
+ */
+export const GLOBAL_ROLE_PERMISSIONS: Record<AnyRole, readonly Permission[]> = {
+  ...ROLE_PERMISSIONS,
+  operator: [],
+  viewer: [],
+};
+
 const ROLE_PRECEDENCE: AnyRole[] = [
   'security_admin',
   'admin',
@@ -212,7 +232,7 @@ export function resolveAuthorization(
 
   const permissions = new Set<Permission>();
   for (const grant of globalGrants) {
-    for (const permission of ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
+    for (const permission of GLOBAL_ROLE_PERMISSIONS[grant.role]) permissions.add(permission);
   }
 
   if (globalGrants.length > 0) permissions.add('platform.access_internal_shell');

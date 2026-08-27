@@ -29,8 +29,6 @@
     "copilot-search",
     "dc-create-twin-from-recommendation",
     "deterministic-recommendations",
-    "digital-twin-run-get",
-    "digital-twin-runs-list",
     "digital-twin-runtime",
     "generate-ai-recommendations",
     "generate-ctas",

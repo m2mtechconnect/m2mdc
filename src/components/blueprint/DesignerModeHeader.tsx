@@ -64,7 +64,7 @@ interface DesignerModeHeaderProps {
   assistantOpen?: boolean;
   onToggleAssistant?: () => void;
   assistantLabel?: string;
-  /** Optional extra action (for example, create a twin from this blueprint). */
+  /** Whether the current persona may mutate Blueprint state. */\n  canEdit?: boolean;\n  /** Optional extra action (for example, create a twin from this blueprint). */
   extraAction?: ReactNode;
 }
 
@@ -88,6 +88,7 @@ export function DesignerModeHeader({
   assistantOpen = false,
   onToggleAssistant,
   assistantLabel = 'AURA Assistant',
+  canEdit = true,
   extraAction,
 }: DesignerModeHeaderProps) {
   const navigate = useNavigate();
@@ -137,10 +138,13 @@ export function DesignerModeHeader({
           </h2>
         </div>
 
-        {/* Exactly one edit-state label. */}
-        <Badge variant="outline" className="gap-1 border-success/40 text-success">
-          <Edit3 className="h-3 w-3" aria-hidden />
-          Designer - editable
+        {/* Exactly one authority-derived edit-state label. */}
+        <Badge
+          variant="outline"
+          className={canEdit ? 'gap-1 border-success/40 text-success' : 'gap-1 border-border text-muted-foreground'}
+        >
+          {canEdit ? <Edit3 className="h-3 w-3" aria-hidden /> : <Lock className="h-3 w-3" aria-hidden />}
+          {canEdit ? 'Designer - editable' : 'Blueprint - read only'}
         </Badge>
 
         {hasUnsavedChanges && (
@@ -155,8 +159,9 @@ export function DesignerModeHeader({
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs">
             <p className="text-sm">
-              Designer mode edits the facility model. Scenarios and runs are owned by
-              the Simulation workspace: open this version there to configure or execute a run.
+              {canEdit
+                ? 'Designer mode edits the facility model. Scenarios and runs are owned by the Simulation workspace.'
+                : 'Your role can inspect this Blueprint but cannot change the facility model.'}
             </p>
           </TooltipContent>
         </Tooltip>

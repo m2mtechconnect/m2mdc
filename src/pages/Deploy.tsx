@@ -268,7 +268,14 @@ export default function Deploy() {
 
   if (!systemId) {
     return (
-      <div className="container mx-auto max-w-2xl py-16">
+      <main className="container mx-auto max-w-2xl py-16">
+        <WorkspaceHeader
+          eyebrow="Operate"
+          title="Configuration activation"
+          icon={Rocket}
+          capabilityId="governance.controls"
+          description="Select a configured system before recording an AURA activation."
+        />
         <DCCard title="No system selected">
           <div className="space-y-4 p-1">
             <p className="text-sm text-muted-foreground">
@@ -277,7 +284,7 @@ export default function Deploy() {
             <Button onClick={() => navigate('/builder')}>Open Builder</Button>
           </div>
         </DCCard>
-      </div>
+      </main>
     );
   }
 

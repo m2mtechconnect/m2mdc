@@ -20,7 +20,6 @@ import {
   CARBON_METRICS,
   FINANCIAL_METRICS,
   INTELLIGENCE_CHART_METRICS,
-  INFRASTRUCTURE_OPERATIONAL_METRICS,
 } from '@/components/data-centre-twin/domains/metricCatalogs';
 import type { MetricCatalogEntry } from '../metricCatalog';
 
@@ -35,7 +34,6 @@ const allCatalogs: Array<[string, MetricCatalogEntry[]]> = [
   ['carbon',      CARBON_METRICS],
   ['financial',   FINANCIAL_METRICS],
   ['intelligence-charts',      INTELLIGENCE_CHART_METRICS],
-  ['infrastructure-operational', INFRASTRUCTURE_OPERATIONAL_METRICS],
 ];
 
 describe('metric catalog integrity', () => {

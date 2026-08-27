@@ -125,12 +125,3 @@ export const INTELLIGENCE_CHART_METRICS = defineCatalog('intelligence-charts', [
     provenance: 'demo', source: FIXTURE,
     reference: 'ASHRAE TC 9.9 (reference range only)' },
 ]).metrics;
-
-/** InfrastructurePage operational metrics — mixed demo + unavailable. */
-export const INFRASTRUCTURE_OPERATIONAL_METRICS = defineCatalog('infrastructure-operational', [
-  { id: 'infra.training-gpus',     label: 'Training GPUs',            provenance: 'demo',        source: FIXTURE },
-  { id: 'infra.inference-gpus',    label: 'Inference GPUs',           provenance: 'demo',        source: FIXTURE },
-  { id: 'infra.edge-devices',      label: 'Edge Devices',             provenance: 'demo',        source: FIXTURE },
-  { id: 'infra.ddn-throughput',    label: 'DDN Throughput',           provenance: 'demo',        source: FIXTURE },
-  { id: 'infra.twin-freshness',    label: 'Twin Freshness',           provenance: 'unavailable', source: 'no telemetry signal wired' },
-]).metrics;

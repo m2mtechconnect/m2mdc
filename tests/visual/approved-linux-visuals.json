@@ -54,14 +54,14 @@
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "dc96e11e5e9827d3742b978734650bd6bd65a77dc0e7aac0a7987e320d7c86be",
+      "sha256": "680aa907caeafd67afa7004482d242e5eb4f9d1c5a8a844ac4f1246a02b661ef",
       "width": 375,
       "height": 5530
     },
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "7cdbde46b6377706db290ccb8241be71cc74beff08c62f8fc902705aa55ab9b7",
+      "sha256": "361f9fea0d48725d38f9812918f22e8ec93b18fa1309f93f2dbcb388320de437",
       "width": 1280,
       "height": 720
     },

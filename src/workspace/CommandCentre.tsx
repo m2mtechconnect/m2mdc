@@ -247,7 +247,7 @@ export default function CommandCentre() {
           blueprintHref={blueprintHref}
           evidenceHref={evidenceHref}
           kpis={primaryKpis}
-          evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key)}
+          evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key, facility.id)}
           onSelectKpi={setMetricKpi}
           assumptions={assumptions}
         />

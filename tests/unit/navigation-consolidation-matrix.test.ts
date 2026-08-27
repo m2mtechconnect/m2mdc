@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
+import { NON_EMITTABLE_PATHS } from '@/config/routeRegistry';
 import { ROLE_PERMISSIONS, type AnyRole, type Permission } from '@/auth/permissions';
 import {
   MANAGE_NAV,
@@ -55,8 +56,9 @@ describe('persona-aware consolidated navigation matrix', () => {
     },
   );
 
-  it('never promotes Marketplace into primary desktop or mobile navigation', () => {
+  it('never promotes or emits retired Marketplace in discoverable navigation', () => {
     expect(MANAGE_NAV.map((item) => item.href)).toContain('/marketplace');
+    expect(NON_EMITTABLE_PATHS).toContain('/marketplace');
 
     for (const role of Object.keys(ROLE_PERMISSIONS) as AnyRole[]) {
       expect(visibleHrefs(role), `${role} primary navigation`).not.toContain('/marketplace');

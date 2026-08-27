@@ -3,6 +3,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { LucideIcon, ArrowUpRight, ArrowDownRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import {
+  KPI_STATUS_BADGE_CLASS,
+  KPI_QUALITY_DOT_CLASS,
+  KPI_TREND_TEXT_CLASS,
+  type KpiStatusTone,
+  type KpiQualityTone,
+} from "@/components/kpi/kpiSemantics";
 
 /**
  * KPI metric-basis metadata.
@@ -23,8 +30,8 @@ export type KpiGrain =
   | 'Grid Region'
   | 'Region';
 
-export type KpiQuality = 'good' | 'suspect' | 'stale' | 'unknown';
-export type KpiStatus = 'good' | 'warning' | 'critical' | 'neutral';
+export type KpiQuality = KpiQualityTone;
+export type KpiStatus = KpiStatusTone;
 
 interface KpiCardProps {
   label: string;
@@ -75,23 +82,18 @@ export default function KpiCard({
   quality,
   badge,
 }: KpiCardProps) {
-  const trendColor = trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-studio-muted';
+  const trendColor =
+    trend === 'up'
+      ? KPI_TREND_TEXT_CLASS.improving
+      : trend === 'down'
+        ? KPI_TREND_TEXT_CLASS.declining
+        : KPI_TREND_TEXT_CLASS.flat;
   const TrendIcon = trend === 'up' ? ArrowUpRight : trend === 'down' ? ArrowDownRight : null;
   const isInteractive = Boolean(to || onClick);
 
-  const statusColor: Record<KpiStatus, string> = {
-    good: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
-    warning: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30',
-    critical: 'bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30',
-    neutral: 'bg-muted text-muted-foreground border-border',
-  };
+  const statusColor = KPI_STATUS_BADGE_CLASS;
 
-  const qualityColor: Record<KpiQuality, string> = {
-    good: 'bg-emerald-500',
-    suspect: 'bg-amber-500',
-    stale: 'bg-orange-500',
-    unknown: 'bg-muted-foreground',
-  };
+  const qualityColor = KPI_QUALITY_DOT_CLASS;
 
   const basisParts = [grain, window, aggregation].filter(Boolean) as string[];
 

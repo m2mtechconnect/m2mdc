@@ -10,6 +10,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { TrendingUp, TrendingDown, Minus, Info, PlayCircle, ChevronRight } from 'lucide-react';
 import { SparklineChart, generateSparklineData } from './SparklineChart';
 import { cn } from '@/lib/utils';
+import {
+  KPI_SEVERITY_TEXT_CLASS,
+  KPI_SEVERITY_BADGE,
+  KPI_TREND_TEXT_CLASS,
+} from '@/components/kpi/kpiSemantics';
 
 interface EnhancedKPICardProps {
   id: string;
@@ -46,17 +51,9 @@ export function EnhancedKPICard({
 }: EnhancedKPICardProps) {
   const [showDrilldown, setShowDrilldown] = useState(false);
   
-  const statusColors = {
-    normal: 'text-success',
-    warning: 'text-warning',
-    critical: 'text-destructive',
-  };
-  
-  const statusBadge = {
-    normal: { label: 'Stable', className: 'bg-success/10 text-success border-success/30' },
-    warning: { label: 'Warning', className: 'bg-warning/10 text-warning border-warning/30' },
-    critical: { label: 'Critical', className: 'bg-destructive/10 text-destructive border-destructive/30' },
-  };
+  const statusColors = KPI_SEVERITY_TEXT_CLASS;
+
+  const statusBadge = KPI_SEVERITY_BADGE;
   
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
   
@@ -116,7 +113,7 @@ export function EnhancedKPICard({
             {delta !== undefined && (
               <div className={cn(
                 'flex items-center gap-1 text-xs font-mono',
-                delta >= 0 ? 'text-success' : 'text-destructive'
+                delta >= 0 ? KPI_TREND_TEXT_CLASS.improving : KPI_TREND_TEXT_CLASS.declining
               )}>
                 <TrendIcon className="h-3 w-3" />
                 {delta >= 0 ? '+' : ''}{delta}%

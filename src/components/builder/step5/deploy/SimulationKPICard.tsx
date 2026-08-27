@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SimulationKPI } from '@/lib/simulationTemplates';
+import { isLowerBetterMetric, kpiTrendTone, KPI_TREND_TEXT_CLASS } from '@/components/kpi/kpiSemantics';
 
 interface SimulationKPICardProps {
   kpi: SimulationKPI;
@@ -20,15 +21,9 @@ export function SimulationKPICard({ kpi, isSampleData = false }: SimulationKPICa
     ? Math.round((delta / kpi.baseline) * 100) 
     : delta > 0 ? 100 : 0;
   
-  // Determine if increase is positive based on the KPI type
-  const isPositiveMetric = !kpi.code.includes('error') && 
-                           !kpi.code.includes('downtime') && 
-                           !kpi.code.includes('churn') &&
-                           !kpi.code.includes('false_positive') &&
-                           !kpi.code.includes('stockout') &&
-                           !kpi.code.includes('readmission');
-  
-  const isImprovement = isPositiveMetric ? delta > 0 : delta < 0;
+  // Direction of improvement comes from the shared KPI semantics module.
+  const trendTone = kpiTrendTone(delta, { lowerIsBetter: isLowerBetterMetric(kpi.code) });
+  const isImprovement = trendTone === 'improving';
   const displayDelta = Math.abs(delta);
   const displayPercent = Math.abs(percentChange);
 
@@ -65,8 +60,7 @@ export function SimulationKPICard({ kpi, isSampleData = false }: SimulationKPICa
 
           <div className={cn(
             "flex items-center gap-1.5 text-sm font-medium",
-            isImprovement ? "text-green-600 dark:text-green-400" : 
-            delta === 0 ? "text-muted-foreground" : "text-red-600 dark:text-red-400"
+            KPI_TREND_TEXT_CLASS[trendTone]
           )}>
             {delta > 0 ? (
               <TrendingUp className="h-4 w-4" />

@@ -32,21 +32,20 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
 async function auditGroupedDestinations(
   page: import('@playwright/test').Page,
   parentName: string,
-  childNames: readonly string[],
+  childHrefs: readonly string[],
 ) {
-  const trigger = page.getByRole('button', { name: parentName });
-  await expect(trigger, `${parentName} group is rendered`).toBeVisible();
-
-  for (const childName of childNames) {
+  for (const href of childHrefs) {
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
+    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+    const trigger = page.getByRole('button', { name: parentName });
+    await expect(trigger, `${parentName} group is rendered`).toBeVisible();
     await trigger.click();
-    const link = page.getByRole('link', { name: childName, exact: true });
-    await expect(link, `${parentName} exposes ${childName}`).toBeVisible();
-    const href = await link.getAttribute('href');
-    expect(href, `${childName} must be a link`).toBeTruthy();
-    const target = new URL(href!, 'http://localhost').pathname;
+    const menu = page.getByRole('menu');
+    await expect(menu, `${parentName} menu opens`).toBeVisible();
+    const link = menu.locator(`a[href="${href}"]`);
+    await expect(link, `${parentName} exposes ${href}`).toBeVisible();
     await link.click();
-    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(target);
+    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(href);
   }
 }
 
@@ -56,7 +55,6 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     const matrix = [
-      { name: 'Design & Build', path: '/builder' },
       { name: 'Simulation', path: '/simulation' },
       { name: 'Evidence', path: '/evidence/overview' },
       { name: 'Command Center', path: '/dashboard' },
@@ -78,7 +76,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Design & Build', ['Facilities', 'Facility Blueprint', 'Connections', 'AI Runtime & Policies']);
+    await auditGroupedDestinations(page, 'Design & Build', ['/builder', '/manage/facilities', '/blueprint', '/manage/integrations', '/settings/ai']);
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
@@ -86,8 +84,8 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Operations', ['Agents', 'Deployments']);
-    await auditGroupedDestinations(page, 'Platform Admin', ['Platform readiness']);
+    await auditGroupedDestinations(page, 'Operations', ['/analytics', '/app/agents', '/deployments']);
+    await auditGroupedDestinations(page, 'Platform Administration', ['/admin/platform-readiness']);
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 

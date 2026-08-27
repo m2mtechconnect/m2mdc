@@ -68,6 +68,7 @@ export function Layout({ children }: LayoutProps) {
     || visibleNavChildren(item, can).some((child) => isNavItemActive(child, location.pathname))
   );
   const headerRef = useRef<HTMLElement>(null);
+  const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
   useAuraV2Theme();
   useTourAutoStart();
@@ -174,6 +175,7 @@ export function Layout({ children }: LayoutProps) {
             <UserMenu />
 
             <Button
+              ref={mobileMenuTriggerRef}
               variant="ghost"
               size="sm"
               className="xl:hidden min-h-[44px] min-w-[44px] text-[hsl(var(--v2-header-fg))] hover:bg-[hsl(var(--v2-header-elevated))] transition-smooth group"
@@ -278,7 +280,15 @@ export function Layout({ children }: LayoutProps) {
       <OperatingStateBar srOnly={pageOwnsOperatingState} />
 
 
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+      <Sheet
+        open={mobileMenuOpen}
+        onOpenChange={(open) => {
+          setMobileMenuOpen(open);
+          if (!open) {
+            window.requestAnimationFrame(() => mobileMenuTriggerRef.current?.focus());
+          }
+        }}
+      >
         <SheetContent
           side="left"
           className="w-full sm:w-[400px] bg-card border-border overflow-y-auto"

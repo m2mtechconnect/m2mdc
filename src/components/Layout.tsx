@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { SkipToContent, MAIN_CONTENT_ID } from '@/components/a11y/SkipToContent';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   DropdownMenu,
@@ -289,6 +289,9 @@ export function Layout({ children }: LayoutProps) {
             <SheetTitle className="flex items-center gap-2">
               <AuraLogo surface="light" />
             </SheetTitle>
+            <SheetDescription className="sr-only">
+              Navigate between AURA workspaces and account utilities.
+            </SheetDescription>
           </SheetHeader>
 
           <nav className="mt-6 space-y-1 pb-40" aria-label="Mobile navigation">

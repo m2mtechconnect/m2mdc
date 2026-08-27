@@ -46,7 +46,7 @@ export const ROUTE_ALIASES: RouteAlias[] = [
   { from: '/subsystem-agents', to: '/app/agents' },
   { from: '/universal-search', to: '/search' },
   { from: '/settings/integrations/nvidia-dsx', to: '/manage/integrations#nvidia-dsx' },
-  { from: '/twin-datacentre', to: '/blueprint/default' },
+  { from: '/twin-datacentre', to: '/blueprint' },
   { from: '/auth', to: '/dashboard' },
   { from: '/sign-in', to: '/dashboard' },
   { from: '/sign-up', to: '/dashboard' },

@@ -262,6 +262,10 @@ test.use({ colorScheme: 'light' });
 
 test.beforeEach(async ({ context, page }) => {
   await installSupabaseMock(context);
+  // Visual acceptance represents an authenticated tenant owner, not a
+  // platform-only administrator. Keep the tenant authority explicit so route
+  // guards cannot silently turn workspace screenshots into dashboard redirects.
+  await installBuilderTenantMock(context);
   await primeGlobalLightTheme(page);
 });
 

@@ -16,7 +16,8 @@ import { relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 export function ConstraintDrawer() {
   const { investigatedConstraint: c, closeConstraint, hrefWithContext, selectAsset } = useWorkspace();
   const openerRef = useRef<HTMLElement | null>(null);
-  const previousConstraintRef = useRef<typeof c>(null);\n  const delayedRestoreRef = useRef<number | null>(null);
+  const previousConstraintRef = useRef<typeof c>(null);
+  const delayedRestoreRef = useRef<number | null>(null);
 
   // Capture the keyboard trigger before Radix moves focus into the portal.
   // onOpenAutoFocus can run after focus has already shifted on narrow/mobile
@@ -29,7 +30,11 @@ export function ConstraintDrawer() {
     previousConstraintRef.current = c;
   }, [c]);
 
-  useEffect(() => () => {\n    if (delayedRestoreRef.current !== null) window.clearTimeout(delayedRestoreRef.current);\n  }, []);\n\n  const restoreOpener = () => {
+  useEffect(() => () => {
+    if (delayedRestoreRef.current !== null) window.clearTimeout(delayedRestoreRef.current);
+  }, []);
+
+  const restoreOpener = () => {
     const opener = openerRef.current;
     openerRef.current = null;
     if (!opener || !opener.isConnected) return;

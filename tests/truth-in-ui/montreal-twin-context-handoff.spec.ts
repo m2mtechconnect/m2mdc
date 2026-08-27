@@ -83,9 +83,9 @@ test.describe('Montreal twin context is preserved into Blueprint, Simulation and
 
     const label = page.getByTestId('dsx-active-facility');
     await expect(label).toBeVisible({ timeout: 15_000 });
-    await expect(label).toHaveText(/^Facility: .+/);
+    await expect(label).toHaveText(/^Demonstration facility: .+/);
     // Never blank, and never silently dropped.
-    await expect(label).not.toHaveText('Facility: not selected');
+    await expect(label).not.toHaveText('Demonstration facility: not selected');
 
     const chip = page.getByTestId('dsx-context-chip-facility_id');
     await expect(chip).toBeVisible();
@@ -103,7 +103,7 @@ test.describe('Montreal twin context is preserved into Blueprint, Simulation and
     });
 
     await expect(page.getByTestId('dsx-active-facility')).toHaveText(
-      'Facility: Unavailable (record not found)',
+      'Demonstration facility: Unavailable (record not found)',
       { timeout: 15_000 },
     );
   });

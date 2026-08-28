@@ -214,6 +214,10 @@ export default function Builder() {
           const next = new URLSearchParams();
           next.set('draft', createdId);
           if (twinId) next.set('twin', twinId);
+          const requestedStep = Number.parseInt(params.get('step') ?? '', 10);
+          if (requestedStep >= 1 && requestedStep <= 5) {
+            next.set('step', String(requestedStep));
+          }
           setSearchParams(next, { replace: true });
         }
       })

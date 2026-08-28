@@ -1,5 +1,6 @@
 import type { BrowserContext, Page } from '@playwright/test';
 import { test, expect } from '../truth-in-ui/_setup/fixtures';
+import { FROZEN_ISO } from '../truth-in-ui/_setup/clock';
 import { installSupabaseMock } from '../truth-in-ui/_setup/supabase-mock';
 
 /**
@@ -246,9 +247,17 @@ async function installBuilderVisualMock(context: BrowserContext) {
     }
 
     const pathname = new URL(route.request().url()).pathname;
+    // These routes model a draft created by the current `new=true` journey.
+    // Keep the returned save time fresh so the canonical draft reload preserves
+    // the same truthful "Saved: just now" state as the create response.
+    const freshBuilder = {
+      ...visualBuilder,
+      created_at: FROZEN_ISO,
+      updated_at: FROZEN_ISO,
+    };
     const payload = pathname.endsWith('/builders-create')
-      ? { data: { id: VISUAL_BUILDER_ID, builder: visualBuilder } }
-      : { data: { builder: visualBuilder } };
+      ? { data: { id: VISUAL_BUILDER_ID, builder: freshBuilder } }
+      : { data: { builder: freshBuilder } };
     await route.fulfill({ status: 200, headers, body: JSON.stringify(payload) });
   });
 }
@@ -341,6 +350,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
     await expect(page.getByText('System Configuration', { exact: true }).first()).toBeVisible();
+    await expect(page.getByText('Saved: just now', { exact: true }).first()).toBeVisible();
     await expect(page).toHaveScreenshot('builder-step1-light.png', { maxDiffPixels: 100 });
   });
 
@@ -350,6 +360,7 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.goto(builderVisualUrl(2));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expect(page.getByText('Managed AI configuration', { exact: true }).first()).toBeVisible();
     await expect(page).toHaveScreenshot('builder-step2-light.png', { maxDiffPixels: 100 });
   });
 
@@ -359,7 +370,22 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.goto(builderVisualUrl(5));
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expect(page.getByText('Deployment Readiness', { exact: true }).first()).toBeVisible();
     await expect(page).toHaveScreenshot('builder-step5-light.png', { maxDiffPixels: 150 });
+  });
+
+  test('Builder step URLs commit their requested workspace state', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
+    await installBuilderVisualMock(context);
+
+    for (const [step, marker] of [
+      [2, 'Managed AI configuration'],
+      [5, 'Deployment Readiness'],
+    ] as const) {
+      await page.goto(builderVisualUrl(step));
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByText(marker, { exact: true }).first()).toBeVisible();
+    }
   });
 
   test('Connections', async ({ page }) => {

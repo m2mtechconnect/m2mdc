@@ -117,6 +117,13 @@ const initialState = {
   lastSaved: null,
 };
 
+function requestedBuilderStep(params: URLSearchParams): number | null {
+  const raw = params.get('step');
+  if (!raw) return null;
+  const step = Number.parseInt(raw, 10);
+  return step >= 1 && step <= 5 ? step : null;
+}
+
 export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => ({
   ...initialState,
 
@@ -284,14 +291,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         }
 
         // Auto-advance to appropriate step based on blueprint completeness
-        const stepParam = params.get('step');
-        if (stepParam) {
-          const requestedStep = parseInt(stepParam, 10);
-          if (requestedStep >= 1 && requestedStep <= 5) {
-            console.log('📍 [STORE] Using requested step:', requestedStep);
-            set({ currentStep: requestedStep });
-            return;
-          }
+        const requestedStep = requestedBuilderStep(params);
+        if (requestedStep) {
+          console.log('📍 [STORE] Using requested step:', requestedStep);
+          set({ currentStep: requestedStep });
+          return;
         }
 
         // Smart step selection based on blueprint completeness
@@ -324,6 +328,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       if (builderId) {
         console.log('🔄 [STORE] Loading existing draft:', builderId);
         await get().loadBuilder(builderId);
+        const requestedStep = requestedBuilderStep(params);
+        if (requestedStep) {
+          console.log('📍 [STORE] Restoring requested draft step:', requestedStep);
+          set({ currentStep: requestedStep });
+        }
         return;
       }
 
@@ -451,14 +460,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       const state = get();
       
       // Check for step param first
-      const stepParam = params.get('step');
-      if (stepParam) {
-        const requestedStep = parseInt(stepParam, 10);
-        if (requestedStep >= 1 && requestedStep <= 5) {
-          console.log('📍 [STORE] Using requested step:', requestedStep);
-          set({ currentStep: requestedStep });
-          return;
-        }
+      const requestedStep = requestedBuilderStep(params);
+      if (requestedStep) {
+        console.log('📍 [STORE] Using requested step:', requestedStep);
+        set({ currentStep: requestedStep });
+        return;
       }
       
       // If gemini analysis exists, start at step 2 (Intelligence) since summary is pre-filled

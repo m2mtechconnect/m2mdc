@@ -41,7 +41,10 @@ async function expectWorkspaceCommitted(
         { exact: true },
       )
     : workspace === 'builder'
-      ? page.getByRole('heading', { name: 'Start a facility build', level: 1 })
+      // The mocked organization is intentionally empty. A successful Builder
+      // navigation therefore commits the tenant-scoped first-facility state;
+      // it must not fabricate a saved facility just to reach the build form.
+      ? page.getByRole('heading', { name: 'Create your first facility', level: 1 })
       : workspace === 'operations'
         ? page.getByRole('heading', { name: 'Operations & Telemetry', level: 1 })
         : workspace === 'simulation'
@@ -155,7 +158,9 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     const drawer = page.locator('#mobile-nav-sheet');
     await expect(drawer).toBeVisible();
     await drawer.getByRole('link', { name: 'Simulation' }).first().click();
-    await expectPath(page, '/simulation');
+    // The compact workspace intentionally opens the inspector and owns that
+    // state in the canonical URL so refresh/back preserve the active step.
+    await expectPath(page, '/simulation?step=inspect');
     await expectWorkspaceCommitted(page, 'simulation');
     await expect(drawer).toBeHidden();
 

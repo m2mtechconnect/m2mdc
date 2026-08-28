@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 const read = (file: string) => readFileSync(resolve(process.cwd(), file), 'utf8');
 
 describe('authenticated shell navigation performance contract', () => {
+  const app = read('src/App.tsx');
   const shell = read('src/AuthenticatedShell.tsx');
   const layout = read('src/components/Layout.tsx');
   const loaders = read('src/routing/primaryWorkspaceLoaders.ts');
@@ -30,6 +31,7 @@ describe('authenticated shell navigation performance contract', () => {
   });
 
   it('does not leave the previous workspace visible while a new route suspends', () => {
+    expect(app).toContain('<BrowserRouter useTransitions={false}>');
     expect(shell).toContain('<Suspense\n                    key={location.pathname}');
     expect(shell).toContain('Loading workspace...');
   });

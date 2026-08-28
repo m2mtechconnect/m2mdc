@@ -451,7 +451,18 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await page.goto('/compliance');
     await page.waitForLoadState('networkidle');
     await expectGlobalLightTheme(page);
+    await expect(page.getByText(/undefined%/)).toHaveCount(0);
+    await expect(page.getByText('Below configured threshold', { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/PIPEDA Compliant: Not assessed/)).toBeVisible();
     await expect(page).toHaveScreenshot('compliance-light.png', { maxDiffPixels: 100 });
+  });
+
+  test('Compliance does not grade unavailable KPI evidence', async ({ page }) => {
+    await page.goto('/compliance');
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByText(/undefined%/)).toHaveCount(0);
+    await expect(page.getByText('Below configured threshold', { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/PIPEDA Compliant: Not assessed/)).toBeVisible();
   });
 });
 

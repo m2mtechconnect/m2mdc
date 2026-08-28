@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "3b2d772606c62e73d0aba3721fe55a50bf2efffa",
-    "workflowRunId": 33136149911,
-    "artifactId": 9672131396,
-    "artifactZipSha256": "4d9527aa80fdc5c81b2d1d54f8be5b52df75db560fff3e9140b30e659d2e9bfb"
+    "sha": "d8b5774c428595aebd665081c43aadedf7978f06",
+    "workflowRunId": 33198830967,
+    "artifactId": 9696967963,
+    "artifactZipSha256": "0bd7af07629d480916ff4e3d1d7365e9d0a05c3b045bfb1122b8f5c5f559d0b1"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
@@ -29,7 +29,8 @@
     "2026-08-26 post-release smoke correction removes the placeholder Unix-epoch build date from the authenticated footer. The seven affected exact fingerprints were accepted from CI under the owner's standing no-human-review waiver; dimensions and verification modes remain unchanged.",
     "2026-08-27 persona-authority qualification explicitly models a tenant owner. Six deterministic changed surfaces were reviewed from workflow 33028128765 and explicitly approved by the owner: Teams renders the organization owner snapshot, Connections renders the full tenant control plane, and Command Center / Operations mobile layouts remain unclipped with no page-level horizontal overflow.",
     "2026-08-27 navigation consolidation updates the reviewed desktop lifecycle shell fingerprints for the shared permission-aware Design & Build, Operations and Evidence group triggers. All 21 Playwright visual scenarios passed before the exact fingerprint check; unchanged mobile and responsive fingerprints remain pinned.",
-    "2026-08-27 exact-head remediation review inspected all 20 generated screenshots from Visual Regression workflow 33136149911 at source 3b2d772606c62e73d0aba3721fe55a50bf2efffa before updating fingerprints. The reviewed changes consolidate the five lifecycle workspaces, retire Marketplace from the global experience, preserve honest simulated/unavailable runtime labels, clarify organization-scoped access, and keep desktop/mobile layouts free of blocking clipping, overlap or contradictory navigation."
+    "2026-08-27 exact-head remediation review inspected all 20 generated screenshots from Visual Regression workflow 33136149911 at source 3b2d772606c62e73d0aba3721fe55a50bf2efffa before updating fingerprints. The reviewed changes consolidate the five lifecycle workspaces, retire Marketplace from the global experience, preserve honest simulated/unavailable runtime labels, clarify organization-scoped access, and keep desktop/mobile layouts free of blocking clipping, overlap or contradictory navigation.",
+    "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged."
   ],
   "screenshots": [
     {
@@ -105,7 +106,7 @@
     {
       "file": "compliance-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c0ddcd719b46de678ecbf414504a24facb0b63db4191dc833896513724d4b705",
+      "sha256": "4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887",
       "width": 1280,
       "height": 720
     },
@@ -173,3 +174,4 @@
     }
   ]
 }
+

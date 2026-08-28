@@ -119,7 +119,14 @@ async function expectLifecycleNavigation(page: Page) {
   for (const [href, name] of lifecycleDestinations) {
     const link = page.getByRole('link', { name }).filter({ visible: true }).first();
     await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute('href', href);
+    if (href === '/evidence/overview') {
+      const actualHref = await link.getAttribute('href');
+      const evidenceUrl = new URL(actualHref ?? '', 'http://aura.local');
+      expect(evidenceUrl.pathname).toBe(href);
+      expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
+    } else {
+      await expect(link).toHaveAttribute('href', href);
+    }
   }
 
   await expect(page.getByRole('button', { name: /^Design & Build$/i })).toHaveCount(0);

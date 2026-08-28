@@ -73,3 +73,14 @@ describe('Compliance audit timeline truth qualifier', () => {
     }
   });
 });
+
+describe('Compliance unavailable-evidence truth contract', () => {
+  it('does not mount the demo sovereignty engine risk scores as facility assessment', () => {
+    expect(compliance).not.toContain('<SovereigntyRiskOverview');
+    expect(compliance).toContain('data-testid="compliance-risk-unavailable"');
+    expect(compliance).toContain('No audited sovereignty evidence is bound to this facility');
+    expect(compliance).toContain('does not');
+    expect(compliance).toContain('certification readiness from');
+  });
+});
+

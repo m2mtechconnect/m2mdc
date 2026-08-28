@@ -14,6 +14,7 @@
  */
 
 import { test, expect, type Page } from './_setup/fixtures';
+import { assertNoOnboardingOverlay, seedDismissedTours } from './_setup/app-state';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
 // Exercise the canonical workspace directly. Starting from the retired index
@@ -119,10 +120,15 @@ for (const vp of VIEWPORTS) {
     test.use({ viewport: { width: vp.width, height: vp.height } });
 
     test.beforeEach(async ({ context, page }) => {
+      // This suite audits the Evidence controls, not first-run onboarding.
+      // Seed the same returning-operator state used by the other DSX drawer
+      // suites so the delayed Studio Intro cannot steal focus mid-assertion.
+      await seedDismissedTours(context);
       await installSupabaseMock(context);
       await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 15_000 });
       await expect(page.getByText('Loading workspace...', { exact: true })).toHaveCount(0);
+      await assertNoOnboardingOverlay(page, 'DSX keyboard focus precondition');
     });
 
     test('primary triggers are tabbable and paint a visible focus ring', async ({ page, guard }) => {

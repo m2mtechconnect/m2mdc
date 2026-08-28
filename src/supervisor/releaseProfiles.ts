@@ -37,7 +37,7 @@ export const RELEASE_PROFILE_DESCRIPTION: Record<ReleaseProfileId, string> = {
   'accelerated-runtime-enterprise':
     'Full gate. Accelerated AI runtime evidence (NIM/NeMo/DSX/Omniverse) is mandatory. This is the default and never downgrades blockers.',
   'enterprise-pilot-simulated':
-    'May exempt the accelerated-runtime blocker only while that capability is visibly marked Unavailable and out-of-scope, and only when all truth/provenance controls pass. The exemption is reported explicitly.',
+    'May exempt only the accelerated-runtime blocker while that capability is visibly Unavailable and out-of-scope. Exact-SHA qualification, post-publish smoke, security and truth/provenance blockers remain mandatory.',
 };
 
 /** The only finding a pilot profile may exempt, and only when honestly unavailable. */
@@ -77,7 +77,7 @@ export function evaluateReleaseGateForProfile(
   }
 
   const exemptionReason =
-    'Accelerated runtime is visibly marked Unavailable and out of pilot scope; all truth/provenance controls pass.';
+    'Accelerated runtime is visibly marked Unavailable and out of pilot scope; all truth/provenance controls pass. All other release blockers remain mandatory.';
 
   const blockers = base.blockers.filter((b) => !b.includes(PILOT_EXEMPTIBLE_FINDING_ID));
   const categoryResults = base.categoryResults.map((result) => ({

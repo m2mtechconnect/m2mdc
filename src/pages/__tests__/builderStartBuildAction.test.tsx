@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { Link, MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom';
 
@@ -117,6 +117,7 @@ import Builder from '@/pages/Builder';
 function renderBuilder(entry: string) {
   return render(
     <MemoryRouter initialEntries={[entry]}>
+      <Link to="/builder?draft=saved-draft-2">Open saved build</Link>
       <Builder />
     </MemoryRouter>,
   );
@@ -178,6 +179,20 @@ describe('Builder start screen action', () => {
     expect(target).toContain(`twin=${FACILITY_ID}`);
     expect(target).toContain('source=facility');
     expect(target).toContain('type=3d_twin');
+  });
+
+  it('initializes a saved draft when only the Builder query string changes', async () => {
+    initializeBuilder.mockResolvedValue(undefined);
+    renderBuilder('/builder');
+
+    expect(await screen.findByRole('heading', { name: 'Start a facility build' })).toBeInTheDocument();
+    expect(initializeBuilder).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole('link', { name: 'Open saved build' }));
+
+    await waitFor(() => expect(initializeBuilder).toHaveBeenCalledTimes(1));
+    const params = initializeBuilder.mock.calls[0][0] as URLSearchParams;
+    expect(params.get('draft')).toBe('saved-draft-2');
   });
 
   it('fails closed without a verified active organization', async () => {

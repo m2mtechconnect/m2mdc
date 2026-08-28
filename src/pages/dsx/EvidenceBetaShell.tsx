@@ -9,7 +9,7 @@
  */
 import { useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ChevronRight, FileSearch } from "lucide-react";
+import { AlertTriangle, ChevronRight, FileSearch } from "lucide-react";
 import { Helmet } from 'react-helmet-async';
 import { cn } from '@/lib/utils';
 import { WorkspaceHeader } from "@/components/workspace-system";
@@ -19,9 +19,10 @@ import { ProvenanceDrawer } from '@/components/dsx/ProvenanceDrawer';
 import { ContextBar } from '@/components/dsx/ContextBar';
 import { SideInspector } from '@/components/dsx/SideInspector';
 import { ConstraintDrawer } from '@/components/dsx/ConstraintDrawer';
-import { buildHierarchy, identityByAuraId, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
+import { buildHierarchy, type HierarchyNode } from '@/dsx/workspaces/facilityGraph';
 import { DSX_ROOT, relatedViewsForDomain } from '@/dsx/workspaces/relatedViews';
 import { EVIDENCE_SECTIONS, evidenceTitle } from '@/dsx/nav/evidenceNav';
+import { Button } from '@/components/ui/button';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 
 interface NavEntry { to: string; label: string; end?: boolean; domain?: string }
@@ -158,15 +159,15 @@ function WorkspaceNav() {
     <nav
       aria-label="DSX workspaces"
       data-testid="dsx-workspace-nav"
-      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-auto border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-60 lg:overflow-x-visible lg:overflow-y-auto lg:border-b-0"
+      className="v2-rail relative w-full min-w-0 max-w-full shrink-0 overflow-x-hidden border-b border-[hsl(var(--v2-line))] p-2.5 lg:w-60 lg:overflow-y-auto lg:border-b-0"
     >
-      <div className="flex min-w-max gap-4 lg:block lg:min-w-0">
+      <div className="grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2 lg:block">
         {NAV.map((g) => (
-          <div key={g.group} className="pb-0 lg:pb-4">
+          <div key={g.group} className="min-w-0 pb-0 lg:pb-4">
             <p className="v2-field-label px-2 pb-1.5 font-semibold text-foreground">
               {g.group}
             </p>
-            <ul className="flex gap-1 lg:block lg:space-y-0.5">
+            <ul className="flex min-w-0 flex-wrap gap-1 lg:block lg:space-y-0.5">
               {g.items.map((i) => {
                 const s = i.domain ? status[i.domain] : undefined;
                 return (
@@ -177,7 +178,7 @@ function WorkspaceNav() {
                       data-testid={`dsx-nav-${i.label.toLowerCase().replace(/\s+/g, '-')}`}
                       className={({ isActive }) =>
                         cn(
-                          'flex min-h-10 items-center gap-2 whitespace-nowrap rounded-md px-2.5 py-1.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          'flex min-h-10 max-w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                           isActive
                             ? 'bg-[hsl(var(--v2-tech)/0.10)] font-semibold text-[hsl(var(--v2-tech-strong))]'
                             : 'text-muted-foreground hover:bg-[hsl(var(--v2-canvas-deep)/0.7)] hover:text-foreground',
@@ -214,21 +215,8 @@ function WorkspaceNav() {
 /** One h1 per route, plus the scope breadcrumb the workspace is answering for. */
 function EvidenceWorkspaceHeader() {
   const { pathname } = useLocation();
-  const { selectedAncestry, selectAsset, hrefWithContext, context } = useWorkspace();
-  const { twin: activeTwin } = useActiveTwin();
+  const { selectedAncestry, selectAsset, hrefWithContext, facilityScope } = useWorkspace();
   const title = evidenceTitle(pathname);
-
-  // The shell always states which facility the evidence is scoped to. An id
-  // that does not resolve is reported as unavailable, never substituted.
-  const facilityId = context.facility_id;
-  const facilityName = facilityId
-    ? (activeTwin?.id === facilityId ? activeTwin.name : identityByAuraId(facilityId)?.name) ?? null
-    : null;
-  const facilityLabel = !facilityId
-    ? 'Demonstration facility: Evidence Beta Site (active facility not selected)'
-    : facilityName
-      ? `Demonstration facility: ${facilityName}`
-      : 'Demonstration facility: Unavailable (record not found)';
 
   const breadcrumb = (
     <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-[13px] text-muted-foreground">
@@ -258,7 +246,7 @@ function EvidenceWorkspaceHeader() {
   const meta = (
     <div className="flex flex-col gap-1">
       <p data-testid="dsx-active-facility" className="text-[13px] font-medium text-foreground">
-        {facilityLabel}
+        {facilityScope.headerLabel}
       </p>
       {breadcrumb}
     </div>
@@ -277,6 +265,8 @@ function EvidenceWorkspaceHeader() {
 
 
 function ShellBody() {
+  const { facilityScope } = useWorkspace();
+
   return (
     <div className="v2-canvas flex min-h-[calc(100vh-4rem)] w-full min-w-0 max-w-full flex-col overflow-x-hidden">
       <Helmet>
@@ -288,16 +278,39 @@ function ShellBody() {
       </Helmet>
       <OperationalTruthBar />
       <ContextBar />
-      <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
-        <WorkspaceNav />
-        <div className="min-w-0 flex-1 p-4 sm:p-6">
-          <div className="mx-auto w-full min-w-0 max-w-screen-2xl">
-            <EvidenceWorkspaceHeader />
-            <Outlet />
-            <RelatedWorkspaces />
+      {facilityScope.availability === 'unavailable' ? (
+        <main className="flex flex-1 items-start justify-center p-4 sm:p-8" data-testid="evidence-facility-unavailable">
+          <section className="w-full max-w-3xl rounded-lg border border-amber-500/40 bg-amber-500/5 p-5 sm:p-8" aria-labelledby="evidence-unavailable-heading">
+            <AlertTriangle className="mb-4 h-7 w-7 text-amber-700 dark:text-amber-300" aria-hidden />
+            <h1 id="evidence-unavailable-heading" className="text-2xl font-semibold text-foreground">
+              Evidence unavailable for this facility
+            </h1>
+            <p data-testid="dsx-active-facility" className="mt-2 text-sm font-medium text-foreground">
+              {facilityScope.headerLabel}
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">{facilityScope.reason}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link to="/manage/integrations?tab=connections">Review data connections</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/dashboard">Return to Command Center</Link>
+              </Button>
+            </div>
+          </section>
+        </main>
+      ) : (
+        <div className="flex flex-1 min-w-0 flex-col lg:flex-row">
+          <WorkspaceNav />
+          <div className="min-w-0 flex-1 p-4 sm:p-6">
+            <div className="mx-auto w-full min-w-0 max-w-screen-2xl">
+              <EvidenceWorkspaceHeader />
+              <Outlet />
+              <RelatedWorkspaces />
+            </div>
           </div>
         </div>
-      </div>
+      )}
       <SideInspector />
       <ConstraintDrawer />
       <ProvenanceDrawer />
@@ -306,8 +319,9 @@ function ShellBody() {
 }
 
 export default function EvidenceBetaShell() {
+  const { twins } = useActiveTwin();
   return (
-    <EvidenceBetaProvider>
+    <EvidenceBetaProvider twins={twins}>
       <ShellBody />
     </EvidenceBetaProvider>
   );

@@ -83,7 +83,9 @@ test.describe('Montreal twin context is preserved into Blueprint, Simulation and
 
     const label = page.getByTestId('dsx-active-facility');
     await expect(label).toBeVisible({ timeout: 15_000 });
-    await expect(label).toHaveText(/^Demonstration facility: .+/);
+    await expect(label).toHaveText(
+      'Demonstration facility: Evidence Beta Site (reference demonstration)',
+    );
     // Never blank, and never silently dropped.
     await expect(label).not.toHaveText('Demonstration facility: not selected');
 
@@ -103,8 +105,31 @@ test.describe('Montreal twin context is preserved into Blueprint, Simulation and
     });
 
     await expect(page.getByTestId('dsx-active-facility')).toHaveText(
-      'Demonstration facility: Unavailable (record not found)',
+      'Facility evidence unavailable: record not found',
       { timeout: 15_000 },
     );
+    await expect(page.getByTestId('evidence-facility-unavailable')).toContainText(
+      'Demonstration values are not substituted',
+    );
+    await expect(page.getByTestId('dsx-truth-bar')).toHaveAttribute('data-mode', 'UNAVAILABLE');
+    await expect(page.getByTestId('dsx-workspace-nav')).toHaveCount(0);
+  });
+
+  test('Evidence navigation wraps without horizontal overflow on a narrow viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 820, height: 900 });
+    await page.goto(`/evidence/overview?facility=${MONTREAL_TWIN_ID}`, {
+      waitUntil: 'domcontentloaded',
+    });
+
+    const nav = page.getByTestId('dsx-workspace-nav');
+    await expect(nav).toBeVisible({ timeout: 15_000 });
+    const widths = await nav.evaluate((element) => ({
+      client: element.clientWidth,
+      scroll: element.scrollWidth,
+      documentClient: document.documentElement.clientWidth,
+      documentScroll: document.documentElement.scrollWidth,
+    }));
+    expect(widths.scroll).toBeLessThanOrEqual(widths.client + 1);
+    expect(widths.documentScroll).toBeLessThanOrEqual(widths.documentClient + 1);
   });
 });

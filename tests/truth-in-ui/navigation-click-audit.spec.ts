@@ -1,7 +1,7 @@
 /**
  * Real-click navigation regression for the authenticated AURA DC shell.
  *
- * Covers desktop primary links, Manage/Govern menus, the mobile drawer,
+ * Covers desktop primary links, supporting routes, the mobile drawer,
  * dashboard actions and command-palette route targets under the network guard.
  */
 
@@ -27,6 +27,29 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
   await expect
     .poll(() => new URL(page.url()).pathname + new URL(page.url()).search, { timeout: 5_000 })
     .toBe(expected);
+}
+
+async function expectWorkspaceCommitted(
+  page: import('@playwright/test').Page,
+  workspace: 'dashboard' | 'builder' | 'operations' | 'simulation' | 'evidence',
+) {
+  const marker = workspace === 'dashboard'
+    ? page.getByText(
+        'The AURA operating surface for data centre command, operations and day-to-day workspace navigation.',
+        { exact: true },
+      )
+    : workspace === 'builder'
+      ? page.getByRole('heading', { name: 'Start a facility build', level: 1 })
+      : workspace === 'operations'
+        ? page.getByRole('heading', { name: 'Operations & Telemetry', level: 1 })
+        : workspace === 'simulation'
+          ? page.getByTestId('aura-workspace')
+          : page.getByTestId('dsx-workspace-title');
+
+  await expect(marker, `${workspace} must commit visible page content, not only update the URL`).toBeVisible({
+    timeout: 10_000,
+  });
+  await expect(page.getByText('Loading workspace...', { exact: true })).toHaveCount(0);
 }
 
 async function expectEvidenceContext(
@@ -64,10 +87,12 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     const matrix = [
-      { name: 'Simulation', path: '/simulation' },
-      { name: 'Evidence', path: '/evidence/overview' },
-      { name: 'Command Center', path: '/dashboard' },
-    ];
+      { name: 'Design & Build', path: '/builder', workspace: 'builder' },
+      { name: 'Operations', path: '/analytics', workspace: 'operations' },
+      { name: 'Simulation', path: '/simulation', workspace: 'simulation' },
+      { name: 'Evidence', path: '/evidence/overview', workspace: 'evidence' },
+      { name: 'Command Center', path: '/dashboard', workspace: 'dashboard' },
+    ] as const;
 
     for (const item of matrix) {
       const candidate = page.getByRole('link', { name: item.name }).first();
@@ -82,6 +107,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
       } else {
         await expectPath(page, item.path);
       }
+      await expectWorkspaceCommitted(page, item.workspace);
     }
 
     const nestedInteractive = await page.locator('header a button, header button a').count();
@@ -128,6 +154,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await expect(drawer).toBeVisible();
     await drawer.getByRole('link', { name: 'Simulation' }).first().click();
     await expectPath(page, '/simulation');
+    await expectWorkspaceCommitted(page, 'simulation');
     await expect(drawer).toBeHidden();
 
     // Simulation intentionally opens its workspace inspector on mobile. Close

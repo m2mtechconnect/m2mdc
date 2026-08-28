@@ -8,6 +8,10 @@ import { readFileSync } from 'node:fs';
 import { buildContextChips, EMPTY_CONTEXT, parseContext } from '@/dsx/runtime/investigationContext';
 import { evidenceHrefForKpi } from '@/workspace/kpiDrilldown';
 import { buildSimulationHandoffUrl } from '@/simulation/handoff';
+import {
+  EVIDENCE_REFERENCE_FACILITY_ALIAS,
+  resolveEvidenceFacilityScope,
+} from '@/dsx/runtime/evidenceFacilityScope';
 
 describe('evidence facility context', () => {
   it('parses the facility parameter from an inbound deep link', () => {
@@ -42,8 +46,34 @@ describe('evidence facility context', () => {
   it('states the active facility in the Evidence shell header', () => {
     const shell = readFileSync('src/pages/dsx/EvidenceBetaShell.tsx', 'utf8');
     expect(shell).toContain('dsx-active-facility');
-    expect(shell).toContain('Demonstration facility: Evidence Beta Site (active facility not selected)');
-    expect(shell).toContain('activeTwin?.id === facilityId');
+    expect(shell).toContain('facilityScope.headerLabel');
+    expect(shell).toContain('evidence-facility-unavailable');
+  });
+
+  it('supports only the declared demonstration facility and reference alias', () => {
+    expect(resolveEvidenceFacilityScope(null, []).availability).toBe('demonstration');
+    expect(resolveEvidenceFacilityScope(EVIDENCE_REFERENCE_FACILITY_ALIAS, []).availability).toBe('demonstration');
+
+    const storedFacility = resolveEvidenceFacilityScope('stored-facility', [
+      { id: 'stored-facility', name: 'Montreal Sovereign AI DC' },
+    ]);
+    expect(storedFacility.availability).toBe('unavailable');
+    expect(storedFacility.headerLabel).toBe('Facility evidence unavailable: Montreal Sovereign AI DC');
+    expect(storedFacility.reason).toMatch(/not substituted/i);
+  });
+
+  it('does not hardcode the beta fixture name in the operational truth bar', () => {
+    const truthBar = readFileSync('src/components/dsx/OperationalTruthBar.tsx', 'utf8');
+    expect(truthBar).toContain('facilityScope.truthLabel');
+    expect(truthBar).not.toContain('EVIDENCE_BETA_SITE.name');
+  });
+
+  it('uses data-mode-aware copy instead of unqualified measured claims', () => {
+    const workspaces = readFileSync('src/pages/dsx/workspaces/index.tsx', 'utf8');
+    expect(workspaces).not.toContain('Maximum measured rack inlet');
+    expect(workspaces).not.toContain('from the measured value only');
+    expect(workspaces).not.toContain('Ranked by measured inlet temperature');
+    expect(workspaces).not.toContain('their measured inlet temperatures');
   });
 
   it('carries the active facility through the global Evidence footer', () => {

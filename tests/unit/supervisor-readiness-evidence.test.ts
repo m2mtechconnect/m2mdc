@@ -130,6 +130,13 @@ describe('multicloud portability evidence matrix', () => {
     expect(aws?.stages.find((s) => s.stage === 'verified')?.state).toBe('not-evidenced');
   });
 
+  it('does not call the current managed stack tested or verified from documentation alone', () => {
+    const current = PORTABILITY_MATRIX.find((target) => target.id === 'lovable-cloud-stack');
+    expect(current?.stages.find((stage) => stage.stage === 'tested')?.state).toBe('not-evidenced');
+    expect(current?.stages.find((stage) => stage.stage === 'verified')?.state).toBe('not-evidenced');
+    expect(current?.currentClaim).toMatch(/not evidenced/i);
+  });
+
   it('rejects a fabricated verified claim in the guardrail', () => {
     const aws = PORTABILITY_MATRIX.find((t) => t.id === 'aws');
     const fabricated = {
@@ -171,6 +178,16 @@ describe('release qualification profiles', () => {
     const decision = evaluateReleaseGateForProfile(baseFindings, 'enterprise-pilot-simulated');
     expect(decision.exemptedFindings.map((e) => e.id)).toEqual([PILOT_EXEMPTIBLE_FINDING_ID]);
     expect(decision.blockers.some((b) => b.includes(PILOT_EXEMPTIBLE_FINDING_ID))).toBe(false);
+    expect(decision.decision).toBe('no-go');
+    expect(decision.blockers.some((b) => b.includes('release-post-publish-smoke'))).toBe(true);
+  });
+
+  it('every profile fails closed until exact-release post-publish smoke is recorded', () => {
+    for (const profile of RELEASE_PROFILES) {
+      const decision = evaluateReleaseGateForProfile(baseFindings, profile);
+      expect(decision.decision, profile).toBe('no-go');
+      expect(decision.blockers.some((blocker) => blocker.includes('release-post-publish-smoke')), profile).toBe(true);
+    }
   });
 
   it('pilot profile never exempts a defective (gap) runtime capability', () => {

@@ -173,6 +173,13 @@ export function ThermalWorkspace() {
   const { rt, selectAsset } = useWorkspace();
   const trends = useTrendSeries(['max_inlet_c', 'cooling_load_kw']);
   const ranked = [...rt.bundle.racks].sort((a, b) => (b.inlet_c ?? -Infinity) - (a.inlet_c ?? -Infinity));
+  const valueKind = rt.snapshot.data_mode === 'SIMULATED'
+    ? 'simulated'
+    : rt.snapshot.data_mode === 'REPLAYED'
+      ? 'replayed'
+      : rt.snapshot.data_mode === 'LIVE'
+        ? 'live-source'
+        : 'unavailable';
   return (
     <div className="space-y-6">
       <Section
@@ -182,15 +189,15 @@ export function ThermalWorkspace() {
         <MetricGrid ids={['max_rack_inlet', 'thermal_headroom', 'cooling_load']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
-      <Section title="Thermal trend" description="Maximum measured rack inlet and cooling draw at each observation step of this run.">
+      <Section title="Thermal trend" description={`Maximum ${valueKind} rack inlet and cooling draw at each observation step of this run.`}>
         <TrendStrip series={trends} className="sm:grid-cols-2 xl:grid-cols-2" />
       </Section>
 
-      <Section title="Rack map" description="Inlet band per rack, from the measured value only.">
+      <Section title="Rack map" description={`Inlet band per rack, from ${valueKind} values only.`}>
         <RackMapPanel defaultOverlay="thermal" />
       </Section>
 
-      <Section title="Rack inlet queue" description="Ranked by measured inlet temperature. A rack without an observation is never ranked as cool.">
+      <Section title="Rack inlet queue" description={`Ranked by ${valueKind} inlet temperature. A rack without an observation is never ranked as cool.`}>
         <Table data-testid="dsx-thermal-queue">
           <TableHeader>
             <TableRow>
@@ -304,6 +311,13 @@ export function PowerWorkspace() {
 /* 4 - Cooling */
 export function CoolingWorkspace() {
   const { rt } = useWorkspace();
+  const valueKind = rt.snapshot.data_mode === 'SIMULATED'
+    ? 'simulated'
+    : rt.snapshot.data_mode === 'REPLAYED'
+      ? 'replayed'
+      : rt.snapshot.data_mode === 'LIVE'
+        ? 'live-source'
+        : 'unavailable';
   const coolingTrends = useTrendSeries(['cooling_load_kw', 'pue']);
   return (
     <div className="space-y-6">
@@ -311,7 +325,7 @@ export function CoolingWorkspace() {
         <MetricGrid ids={['cooling_load', 'pue', 'thermal_headroom']} metrics={rt.bundle.metrics} columns="sm:grid-cols-3" />
       </Section>
 
-      <Section title="Loop diagram" description="Each cooling unit with the racks it serves and their measured inlet temperatures.">
+      <Section title="Loop diagram" description={`Each cooling unit with the racks it serves and their ${valueKind} inlet temperatures.`}>
         <CoolingLoopDiagram />
       </Section>
 

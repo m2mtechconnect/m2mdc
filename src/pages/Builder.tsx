@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Building2, Loader2, Sparkles } from 'lucide-react';
@@ -62,6 +62,9 @@ export default function Builder() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
+  const [initializationRevision, setInitializationRevision] = useState(0);
+  const requestedInitializationRef = useRef<string | null>(null);
+  const initializationQueueRef = useRef<Promise<void>>(Promise.resolve());
 
   const requestedTwinId = searchParams.get('twin');
   const configuredTwins = useMemo(
@@ -159,35 +162,63 @@ export default function Builder() {
       return;
     }
     if (activeTwinId !== requested.id) void setActiveTwin(requested.id);
-  }, [authChecked, requestedTwinId, twinLoading, configuredTwins, activeTwinId, setActiveTwin]);
+  }, [tenantVerified, requestedTwinId, twinLoading, configuredTwins, activeTwinId, setActiveTwin]);
 
   useEffect(() => {
     // Builder creation fails closed before any data access when the
     // server-verified active organization is absent.
-    if (!tenantVerified || isInitialized) return;
+    if (!tenantVerified) return;
+
+    // A Builder URL is an initialization contract, not just decoration. React
+    // Router keeps the component mounted when only `?draft=`, `?new=` or other
+    // intent parameters change, so key every request to the actual history
+    // entry plus an explicit retry revision. This prevents a saved-build click
+    // from updating the URL while leaving the landing screen behind.
+    const requestKey = `${location.key}:${location.search}:${initializationRevision}`;
+    if (requestedInitializationRef.current === requestKey) return;
+    requestedInitializationRef.current = requestKey;
+    setInitError(null);
+
     if (!hasIntent) {
       setIsInitialized(true);
       return;
     }
 
+    setIsInitialized(false);
+    const params = new URLSearchParams(location.search);
     const state = (location.state ?? {}) as {
       geminiAnalysis?: unknown;
       prefilled?: unknown;
       blueprint?: unknown;
     };
+    const twinId = params.get('twin');
 
-    initializeBuilder(searchParams, state.geminiAnalysis, state.prefilled, state.blueprint as never)
+    // Serialize intent changes. If an operator selects another draft while a
+    // previous load is finishing, the newest request waits for that load and
+    // then becomes authoritative. It never gets discarded by the store's
+    // in-flight guard, and stale completions never commit visible state.
+    const run = initializationQueueRef.current
+      .catch(() => undefined)
+      .then(async () => {
+        if (requestedInitializationRef.current !== requestKey) return;
+        await initializeBuilder(params, state.geminiAnalysis, state.prefilled, state.blueprint as never);
+      });
+    initializationQueueRef.current = run;
+
+    void run
       .then(() => {
+        if (requestedInitializationRef.current !== requestKey) return;
         const createdId = useWizardBuilderStore.getState().builderId;
         setIsInitialized(true);
-        if (searchParams.get('new') === 'true' && createdId) {
+        if (params.get('new') === 'true' && createdId) {
           const next = new URLSearchParams();
           next.set('draft', createdId);
-          if (requestedTwinId) next.set('twin', requestedTwinId);
+          if (twinId) next.set('twin', twinId);
           setSearchParams(next, { replace: true });
         }
       })
       .catch((initializationError) => {
+        if (requestedInitializationRef.current !== requestKey) return;
         console.error('[Builder] Initialization failed', initializationError);
         setIsInitialized(true);
         const errorMessage = initializationError instanceof Error ? initializationError.message : 'Unknown error';
@@ -199,16 +230,15 @@ export default function Builder() {
         });
       });
   }, [
-    searchParams,
+    location.key,
+    location.search,
     location.state,
+    initializationRevision,
     initializeBuilder,
-    isInitialized,
-    authChecked,
     tenantVerified,
     toast,
     hasIntent,
     t,
-    requestedTwinId,
     setSearchParams,
   ]);
 
@@ -339,6 +369,7 @@ export default function Builder() {
         setInitError(null);
         useWizardBuilderStore.getState().reset();
         setIsInitialized(false);
+        setInitializationRevision((revision) => revision + 1);
         return;
       }
 

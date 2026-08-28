@@ -1,8 +1,8 @@
 name: Post-Publish Smoke (read-only)
 
 # Read-only qualification. This workflow never mutates the production target,
-# never deploys and never publishes: it performs GET navigations only and
-# stores evidence artifacts.
+# never deploys and never publishes: it performs GET navigations and read-only
+# route-link activations only, then stores evidence artifacts.
 #
 # It runs automatically after a publish. Publishes happen outside GitHub, so
 # the trigger is a poll of the live release fingerprint: on a schedule and

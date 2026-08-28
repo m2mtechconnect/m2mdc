@@ -48,7 +48,8 @@ describe('evidence facility context', () => {
 
   it('carries the active facility through the global Evidence footer', () => {
     const layout = readFileSync('src/components/Layout.tsx', 'utf8');
-    expect(layout).toContain('?facility=${encodeURIComponent(activeTwin.id)}');
+    expect(layout).toContain('const { facility: workspaceFacility } = useFacilityModel()');
+    expect(layout).toContain('?facility=${encodeURIComponent(evidenceFacilityId)}');
   });
 });
 

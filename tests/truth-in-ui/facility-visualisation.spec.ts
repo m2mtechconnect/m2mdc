@@ -5,6 +5,7 @@
  * centring, zoom/fit and keyboard access across the required viewports.
  */
 import { test, expect, type Page } from './_setup/fixtures';
+import { assertNoOnboardingOverlay, seedDismissedTours } from './_setup/app-state';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
 const VIEWPORTS = [
@@ -18,6 +19,7 @@ const VIEWPORTS = [
 async function openDashboard(page: Page) {
   await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
   await expect(page.getByTestId('facility-floor-plan')).toBeVisible({ timeout: 30_000 });
+  await assertNoOnboardingOverlay(page, 'facility visualisation precondition');
 }
 
 async function occupancy(page: Page) {
@@ -32,6 +34,9 @@ async function occupancy(page: Page) {
 
 test.describe('facility visualisation', () => {
   test.beforeEach(async ({ context }) => {
+    // This suite audits facility controls as a returning operator. First-run
+    // onboarding is covered separately and must not steal focus mid-journey.
+    await seedDismissedTours(context);
     await installSupabaseMock(context);
   });
 

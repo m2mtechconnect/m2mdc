@@ -17,13 +17,21 @@ import DatasetCanaryBanner from '@/components/dataset/DatasetCanaryBanner';
 import ReferenceRouteGate from '@/components/dataset/ReferenceRouteGate';
 import { AdminRouteGuard } from '@/routing/AdminRouteGuard';
 import { PermissionRouteGuard } from '@/routing/PermissionRouteGuard';
+import {
+  loadBuilder,
+  loadDashboard,
+  loadEvidenceShell,
+  loadEvidenceWorkspaces,
+  loadOperations,
+  loadSimulation,
+} from '@/routing/primaryWorkspaceLoaders';
 import NotFound from "./pages/NotFound";
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Builder = lazy(() => import("./pages/Builder"));
+const Dashboard = lazy(loadDashboard);
+const Builder = lazy(loadBuilder);
 const Deploy = lazy(() => import("./pages/Deploy"));
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
-const IntelligenceDashboard = lazy(() => import("./pages/IntelligenceDashboard"));
+const IntelligenceDashboard = lazy(loadOperations);
 const Compliance = lazy(() => import("./pages/Compliance"));
 const DataCentreTwin = lazy(() => import("./pages/DataCentreTwin"));
 const Teams = lazy(() => import("./pages/Teams"));
@@ -47,7 +55,7 @@ const TwinManage = lazy(() => import("./pages/TwinManage"));
 const Blueprint = lazy(() => import("./pages/Blueprint"));
 const BlueprintPreview = lazy(() => import("./pages/BlueprintPreview"));
 const SimulationPreview = lazy(() => import("./pages/SimulationPreview"));
-const AuraWorkspace = lazy(() => import("./workspace/AuraWorkspace"));
+const AuraWorkspace = lazy(loadSimulation);
 const TwinPreview = lazy(() => import("./pages/TwinPreview"));
 const TwinDebug = lazy(() => import("./pages/TwinDebug"));
 const AgentDetail = lazy(() => import("./pages/AgentDetail"));
@@ -67,19 +75,19 @@ const ReferenceFacilityValidation = lazy(() => import("@/pages/admin/ReferenceFa
 const DsxCapabilityRegistryPage = lazy(() => import("@/pages/admin/DsxCapabilityRegistryPage"));
 const DatasetRegistryPage = lazy(() => import("@/pages/admin/DatasetRegistryPage"));
 
-const EvidenceBetaShell = lazy(() => import("./pages/dsx/EvidenceBetaShell"));
-const OverviewWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.OverviewWorkspace })));
-const SimulationsWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.SimulationsWorkspace })));
-const ThermalWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.ThermalWorkspace })));
-const PowerWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.PowerWorkspace })));
-const CoolingWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.CoolingWorkspace })));
-const NetworkWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.NetworkWorkspace })));
-const FacilityWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.FacilityWorkspace })));
-const WorkloadWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.WorkloadWorkspace })));
-const SovereigntyWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.SovereigntyWorkspace })));
-const CarbonWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.CarbonWorkspace })));
-const FinancialWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.FinancialWorkspace })));
-const EvidenceWorkspace = lazy(() => import("./pages/dsx/workspaces").then((m) => ({ default: m.EvidenceWorkspace })));
+const EvidenceBetaShell = lazy(loadEvidenceShell);
+const OverviewWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.OverviewWorkspace })));
+const SimulationsWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.SimulationsWorkspace })));
+const ThermalWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.ThermalWorkspace })));
+const PowerWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.PowerWorkspace })));
+const CoolingWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.CoolingWorkspace })));
+const NetworkWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.NetworkWorkspace })));
+const FacilityWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.FacilityWorkspace })));
+const WorkloadWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.WorkloadWorkspace })));
+const SovereigntyWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.SovereigntyWorkspace })));
+const CarbonWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.CarbonWorkspace })));
+const FinancialWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.FinancialWorkspace })));
+const EvidenceWorkspace = lazy(() => loadEvidenceWorkspaces().then((m) => ({ default: m.EvidenceWorkspace })));
 const OverlayFixtures = import.meta.env.DEV ? lazy(() => import("./pages/test/OverlayFixtures")) : null;
 
 function AgentOperationsRedirect() {
@@ -232,6 +240,7 @@ export default function AuthenticatedShell() {
               <ReferenceRouteGate>
                 <RouteLoadRecovery resetKey={location.pathname}>
                   <Suspense
+                    key={location.pathname}
                     fallback={
                       <div role="status" aria-live="polite" className="p-6 text-sm text-muted-foreground">
                         Loading workspace...

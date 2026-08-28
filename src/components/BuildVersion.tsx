@@ -1,46 +1,101 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { getBuildFingerprint } from '@/lib/buildFingerprint';
 
-// PR-0.1 Checkpoint B7: `VITE_BUILD_VERSION` / `VITE_BUILD_TIMESTAMP` are not
-// part of the approved public-variable allowlist. The version stamp is now a
-// constant produced at check-in time; a future release-tag pipeline may
-// substitute it via a code-mod, but no `import.meta.env` read is permitted.
-const BUILD_VERSION = "pilot";
+interface PublishedReleaseFingerprint {
+  schema: 'aura.release-fingerprint.v1';
+  sha: string;
+  buildId: string;
+}
+
+// Keep the customer-facing release channel stable. Exact stale-bundle detection
+// uses the signed build fingerprint below rather than this presentation label.
+const PUBLIC_RELEASE_CHANNEL = 'pilot';
+
+function isPublishedReleaseFingerprint(value: unknown): value is PublishedReleaseFingerprint {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Partial<PublishedReleaseFingerprint>;
+  return candidate.schema === 'aura.release-fingerprint.v1'
+    && typeof candidate.sha === 'string'
+    && candidate.sha.length > 0
+    && typeof candidate.buildId === 'string'
+    && candidate.buildId.length > 0;
+}
 
 export function BuildVersion() {
   const [showRefreshPrompt, setShowRefreshPrompt] = useState(false);
+  const currentBuild = getBuildFingerprint();
 
   useEffect(() => {
-    // Check for version mismatch on mount
-    const storedVersion = localStorage.getItem("app_version");
-    
-    if (storedVersion && storedVersion !== BUILD_VERSION) {
-      console.warn("Version mismatch detected:", { stored: storedVersion, current: BUILD_VERSION });
-      setShowRefreshPrompt(true);
-      
-      toast.warning("New version available", {
-        description: "Please refresh to get the latest updates",
-        action: {
-          label: "Refresh",
-          onClick: () => window.location.reload()
-        },
-        duration: 10000
-      });
-    }
-    
-    // Store current version
-    localStorage.setItem("app_version", BUILD_VERSION);
-  }, []);
+    // release.json is emitted only for production builds. Polling for it from
+    // the Vite development server creates a false 404 on every full-page test
+    // navigation and cannot provide a meaningful stale-release signal.
+    if (!import.meta.env.PROD) return;
+
+    let active = true;
+    let notified = false;
+
+    const checkPublishedRelease = async () => {
+      try {
+        const response = await fetch(
+          `/release.json?build=${encodeURIComponent(currentBuild.buildId)}&check=${Date.now()}`,
+          {
+            cache: 'no-store',
+            headers: { accept: 'application/json' },
+          },
+        );
+        if (!response.ok) return;
+        const published: unknown = await response.json();
+        if (!active || !isPublishedReleaseFingerprint(published)) return;
+
+        const stale = published.sha !== currentBuild.commitSha
+          || published.buildId !== currentBuild.buildId;
+        if (!stale) return;
+
+        setShowRefreshPrompt(true);
+        if (!notified) {
+          notified = true;
+          toast.warning('AURA has been updated', {
+            description: 'Reload before changing workspaces to use the current release.',
+            action: {
+              label: 'Reload',
+              onClick: () => window.location.reload(),
+            },
+            duration: 15000,
+          });
+        }
+      } catch {
+        // Release attestation being temporarily unreachable is not evidence
+        // that the active bundle is stale. Keep the current page available.
+      }
+    };
+
+    const checkWhenVisible = () => {
+      if (document.visibilityState === 'visible') void checkPublishedRelease();
+    };
+
+    void checkPublishedRelease();
+    const interval = window.setInterval(checkPublishedRelease, 5 * 60 * 1000);
+    window.addEventListener('focus', checkPublishedRelease);
+    document.addEventListener('visibilitychange', checkWhenVisible);
+
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+      window.removeEventListener('focus', checkPublishedRelease);
+      document.removeEventListener('visibilitychange', checkWhenVisible);
+    };
+  }, [currentBuild.buildId, currentBuild.commitSha]);
 
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span>v{BUILD_VERSION}</span>
+      <span>v{PUBLIC_RELEASE_CHANNEL}</span>
       {showRefreshPrompt && (
         <button
           onClick={() => window.location.reload()}
           className="ml-2 px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-medium hover:bg-primary/20 transition-colors"
         >
-          Update Available
+          Reload to update
         </button>
       )}
     </div>

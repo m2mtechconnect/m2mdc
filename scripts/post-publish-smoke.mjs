@@ -23,8 +23,9 @@
  *     BLOCKED_BY_AUTH and the suite exits non-zero. Passing a partial run is
  *     not possible without the explicit --unauthenticated-only flag, which
  *     records plane: 'public-only' in the evidence.
- *   - The suite performs GET navigations only. It never submits a form,
- *     never writes to the database and never calls a mutation endpoint.
+ *   - The suite performs GET navigations and activates read-only route links
+ *     only. It never submits a form, writes to the database or calls a
+ *     mutation endpoint.
  *   - Tenant-boundary probing requires a second tenant identity and is
  *     recorded as 'not-run' with a reason rather than approximated.
  *
@@ -182,6 +183,9 @@ async function checkAuthenticatedPlane(browser) {
         record(`authed-route:${route}`, 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
       }
       record('truth-labels:analytics', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
+      record('truth-labels:evidence', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
+      record('journey:builder-saved-draft', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
+      record('journey:builder-to-operations', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
       return false;
     }
     throw error;
@@ -211,6 +215,62 @@ async function checkAuthenticatedPlane(browser) {
       record('truth-labels:analytics', 'authenticated', 'PASS', 'simulated/demo provenance language present');
     } else {
       record('truth-labels:analytics', 'authenticated', 'FAIL', 'no simulated/demo provenance language detected');
+    }
+
+    // Evidence truth language must agree with the current data mode. Run the
+    // deterministic demonstration without a tenant-facility id so a stored
+    // facility is never silently substituted onto the fixture.
+    await page.goto(`${TARGET}/evidence/operations/thermal`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    const evidenceText = await page.evaluate(() => document.body.innerText ?? '');
+    if (
+      /simulat|replayed|live-source|unavailable/i.test(evidenceText) &&
+      !/Maximum measured rack inlet|from the measured value only|Ranked by measured inlet temperature/i.test(evidenceText)
+    ) {
+      record('truth-labels:evidence', 'authenticated', 'PASS', 'Evidence value language agrees with its visible data mode');
+    } else {
+      record('truth-labels:evidence', 'authenticated', 'FAIL', 'Evidence contains missing or contradictory data-mode language');
+    }
+
+    // High-value Builder journeys are read-only. The smoke identity must own
+    // a saved draft fixture so the same-path `?draft=` transition is exercised
+    // without creating or changing production data.
+    await page.goto(`${TARGET}/builder`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2500);
+    const savedDraft = page.locator('section[aria-labelledby="builder-existing-heading"] a[href^="/builder?draft="]').first();
+    if (await savedDraft.count()) {
+      try {
+        await savedDraft.click();
+        await page.waitForSelector('[data-testid="builder-layout"]', { state: 'visible', timeout: 15000 });
+        const draftLoaded = new URL(page.url()).pathname === '/builder' && new URL(page.url()).searchParams.has('draft');
+        record(
+          'journey:builder-saved-draft',
+          'authenticated',
+          draftLoaded ? 'PASS' : 'FAIL',
+          draftLoaded ? 'saved draft committed without a document reload' : 'saved draft did not become the visible Builder state',
+        );
+      } catch (error) {
+        record('journey:builder-saved-draft', 'authenticated', 'FAIL', `read-only journey error: ${error.message}`);
+      }
+    } else {
+      record('journey:builder-saved-draft', 'authenticated', 'FAIL', 'smoke identity has no saved Builder draft fixture');
+    }
+
+    try {
+      const operationsLink = page.locator('a[href="/analytics"]:visible').first();
+      if (!(await operationsLink.count())) throw new Error('visible Operations route link not found');
+      await operationsLink.click();
+      await page.waitForURL((url) => url.pathname === '/analytics', { timeout: 10000 });
+      await page.getByRole('heading', { name: 'Operations & Telemetry', exact: true }).waitFor({ state: 'visible', timeout: 15000 });
+      const staleBuilder = await page.locator('[data-testid="builder-layout"]').count();
+      record(
+        'journey:builder-to-operations',
+        'authenticated',
+        staleBuilder === 0 ? 'PASS' : 'FAIL',
+        staleBuilder === 0 ? 'Operations URL and visible workspace committed together' : 'URL changed while stale Builder content remained visible',
+      );
+    } catch (error) {
+      record('journey:builder-to-operations', 'authenticated', 'FAIL', `read-only journey error: ${error.message}`);
     }
   } catch (error) {
     record('authenticated-plane', 'authenticated', 'FAIL', `browser error: ${error.message}`);
@@ -284,7 +344,7 @@ async function main() {
         plane: PUBLIC_ONLY ? 'public-only' : 'public+authenticated',
         session: PUBLIC_ONLY ? 'not-requested' : '<session-installed>',
         verdict,
-        results,
+        checks: results,
       },
       null,
       2,

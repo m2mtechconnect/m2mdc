@@ -150,11 +150,16 @@ export interface SupabaseMockHandle {
 
 export async function installSupabaseMock(
   target: BrowserContext | Page,
-  opts: { session?: FakeSession; profileRole?: 'admin' | 'user' } = {},
+  opts: {
+    session?: FakeSession;
+    profileRole?: 'admin' | 'user';
+    withActiveOrganization?: boolean;
+  } = {},
 ): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
   const log: SanitizedRequest[] = [];
   let profileHits = 0;
+  const organizationId = '00000000-0000-4000-8000-000000000010';
 
   const profileRow = {
     id: session.userId,
@@ -263,6 +268,34 @@ export async function installSupabaseMock(
           },
         ]),
       );
+    }
+
+    if (pathname.startsWith('/rest/v1/org_memberships')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.withActiveOrganization ? [{
+        org_id: organizationId,
+        user_id: session.userId,
+        role: 'owner',
+        status: 'active',
+        is_default: true,
+      }] : []));
+    }
+
+    if (pathname.startsWith('/rest/v1/organizations')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.withActiveOrganization ? [{
+        id: organizationId,
+        name: 'AURA Truth Organization',
+        domain: 'aura.local',
+      }] : []));
+    }
+
+    if (pathname.startsWith('/rest/v1/rpc/active_org_id')) {
+      return fulfillJson(JSON.stringify(opts.withActiveOrganization ? organizationId : null));
+    }
+
+    if (pathname.startsWith('/rest/v1/rpc/set_active_org')) {
+      return fulfillJson(JSON.stringify(opts.withActiveOrganization ? organizationId : null));
     }
 
     // ---- RPC / other REST --------------------------------------

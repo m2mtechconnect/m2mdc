@@ -253,6 +253,15 @@ describe('Template URL Loading Integration', () => {
     }
   });
 
+  it('should restore a requested step after loading an existing draft', async () => {
+    const { result } = renderHook(() => useWizardBuilderStore());
+    const params = new URLSearchParams({ draft: 'test-builder-id', step: '5' });
+
+    await result.current.initializeBuilder(params);
+
+    expect(useWizardBuilderStore.getState().currentStep).toBe(5);
+  });
+
   it('should load all available templates from JSON', () => {
     const templates = loadAllTemplates();
     

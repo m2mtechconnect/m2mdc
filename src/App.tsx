@@ -89,7 +89,10 @@ const App = () => (
           which run through the Web Animations API and are not covered by the
           global prefers-reduced-motion CSS rule in index.css. */}
       <MotionConfig reducedMotion="user">
-        <BrowserRouter>
+        {/* Lazy authenticated workspaces must commit their loading boundary on
+            navigation. Retaining the previous route while a destination
+            suspends can leave the URL and visible workspace out of sync. */}
+        <BrowserRouter useTransitions={false}>
           <RouteEntry />
         </BrowserRouter>
       </MotionConfig>

@@ -81,6 +81,7 @@ describe('persona-aware consolidated navigation matrix', () => {
 
 describe('direct-route and read-only boundary contracts', () => {
   const shell = read('src/AuthenticatedShell.tsx');
+  const builderStarterLists = read('src/components/builder/BuilderStarterLists.tsx');
   const blueprint = read('src/pages/Blueprint.tsx');
   const designerHeader = read('src/components/blueprint/DesignerModeHeader.tsx');
 
@@ -89,6 +90,10 @@ describe('direct-route and read-only boundary contracts', () => {
     expect(shell).toContain(
       'path="/marketplace" element={<PermissionRouteGuard permission="twin.edit"><PreserveNavigate to="/builder#templates" /></PermissionRouteGuard>}',
     );
+    expect(builderStarterLists).not.toContain('to="/marketplace"');
+    expect(builderStarterLists).not.toContain('Browse marketplace');
+    expect(builderStarterLists).toContain('to="/builder#templates"');
+    expect(builderStarterLists).toContain('View all templates');
   });
 
   it('guards direct URLs consistently with their navigation permissions', () => {

@@ -348,7 +348,8 @@ export default function Compliance() {
                   // Get KPI value if rule has a kpiKey
                   const kpiValue = rule.kpiKey ? simulationKpis[rule.kpiKey] : null;
                   const kpiDef = rule.kpiKey ? KPI_CATALOG[rule.kpiKey as KPIKey] : null;
-                  const isCompliant = kpiValue !== null && kpiDef 
+                  const hasAssessedKpi = typeof kpiValue === 'number' && Number.isFinite(kpiValue);
+                  const isCompliant = hasAssessedKpi && kpiDef
                     ? (kpiDef.direction === 'higher_is_better' ? kpiValue >= (kpiDef.target || 0) : kpiValue <= (kpiDef.target || 100))
                     : null;
                   
@@ -374,7 +375,7 @@ export default function Compliance() {
                       <h4 className="font-medium mb-1">{rule.label}</h4>
                       {rule.kpiKey && kpiDef && (
                         <div className="text-sm text-muted-foreground mb-2">
-                          {kpiDef.label}: {kpiValue !== null ? `${kpiValue}${kpiDef.unit || ''}` : 'N/A'}
+                          {kpiDef.label}: {hasAssessedKpi ? `${kpiValue}${kpiDef.unit || ''}` : 'Not assessed'}
                         </div>
                       )}
                       <div className="space-y-1">

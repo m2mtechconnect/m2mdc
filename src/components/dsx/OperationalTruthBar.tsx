@@ -8,7 +8,6 @@ import { useWorkspace } from '@/dsx/runtime/EvidenceBetaContext';
 import { ConnectionState, DataModeBadge, FreshnessIndicator, SafetyChip } from './StateBadges';
 import { EvidenceQualityBar } from './EvidenceQualityBar';
 import { capability } from '@/dsx/workspaces/availability';
-import { EVIDENCE_BETA_SITE } from '@/dsx/fixtures/evidenceBetaFacility';
 
 function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
@@ -37,10 +36,14 @@ function Chip({ label, children }: { label: string; children: React.ReactNode })
 }
 
 export function OperationalTruthBar() {
-  const { rt, freshness, constraints, openConstraint } = useWorkspace();
+  const { rt, freshness, constraints, openConstraint, facilityScope } = useWorkspace();
   const exchange = capability('dsx_exchange_runtime');
-  const window = rt.bundle.metrics.pue?.observation_window;
-  const unassessable = constraints.filter((c) => c.status === 'unavailable');
+  const evidenceAvailable = facilityScope.availability === 'demonstration';
+  const window = evidenceAvailable ? rt.bundle.metrics.pue?.observation_window : null;
+  const unassessable = evidenceAvailable
+    ? constraints.filter((c) => c.status === 'unavailable')
+    : [];
+  const dataMode = evidenceAvailable ? rt.snapshot.data_mode : 'UNAVAILABLE';
 
   return (
     <div
@@ -49,23 +52,31 @@ export function OperationalTruthBar() {
       aria-label="Operational truth bar"
       tabIndex={0}
       data-testid="dsx-truth-bar"
-      data-mode={rt.snapshot.data_mode}
+      data-mode={dataMode}
       className="v2-mono relative w-full min-w-0 max-w-full border-b border-[hsl(var(--v2-line))] bg-[hsl(var(--v2-canvas-deep))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 px-3 py-2.5 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
         {/* Facility identity and the trust level of what is displayed. */}
         <Cluster label="Facility context">
-          <Field label="Demonstration facility" value={EVIDENCE_BETA_SITE.name} />
+          <Field
+            label={evidenceAvailable ? 'Demonstration facility' : 'Facility evidence'}
+            value={facilityScope.truthLabel}
+          />
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Chip label="Data mode">
-              <DataModeBadge mode={rt.snapshot.data_mode} />
+              <DataModeBadge mode={dataMode} />
             </Chip>
             <Chip label="Calibration">
               <Badge
                 variant="outline"
-                className="border-amber-500/50 bg-amber-500/10 text-[11px] text-amber-800 dark:text-amber-200"
+                className={cn(
+                  'text-[11px]',
+                  evidenceAvailable
+                    ? 'border-amber-500/50 bg-amber-500/10 text-amber-800 dark:text-amber-200'
+                    : 'border-zinc-500/50 bg-zinc-500/10 text-muted-foreground',
+                )}
               >
-                Uncalibrated
+                {evidenceAvailable ? 'Uncalibrated' : 'Not assessed'}
               </Badge>
             </Chip>
           </div>
@@ -73,7 +84,7 @@ export function OperationalTruthBar() {
 
         {/* When the displayed evidence was observed. */}
         <Cluster label="Observation">
-          <Field mono label="Last validated observation" value={rt.snapshot.last_observed_at ?? 'none'} />
+          <Field mono label="Last validated observation" value={evidenceAvailable ? (rt.snapshot.last_observed_at ?? 'none') : 'none'} />
           <Field
             label="Observation window"
             value={window ? `${window.from.slice(11, 19)} to ${window.to.slice(11, 19)} UTC` : 'none'}
@@ -85,23 +96,29 @@ export function OperationalTruthBar() {
           <Chip label="DSX Exchange">
             <ConnectionState state="unavailable" label="Exchange" />
           </Chip>
-          <Field label="Active scenario" value={rt.timeline.replace(/_/g, ' ')} />
+          <Field label="Active scenario" value={evidenceAvailable ? rt.timeline.replace(/_/g, ' ') : 'none'} />
         </Cluster>
 
         {/* How healthy and how complete that evidence is. */}
         <Cluster label="Evidence health">
           <Chip label="Connection health">
-            <ConnectionState state={rt.snapshot.connection_state} label="Source" />
+            <ConnectionState state={evidenceAvailable ? rt.snapshot.connection_state : 'unavailable'} label="Source" />
           </Chip>
           <div className="flex flex-wrap items-end gap-x-5 gap-y-2">
-            <Chip label="Simulated timeline freshness">
-              <FreshnessIndicator freshness={freshness} />
+            <Chip label={evidenceAvailable ? 'Simulated timeline freshness' : 'Evidence freshness'}>
+              <FreshnessIndicator freshness={evidenceAvailable ? freshness : 'unknown'} />
             </Chip>
-            <EvidenceQualityBar
-              compact
-              accepted={rt.snapshot.accepted.length}
-              rejected={rt.snapshot.rejected.length}
-            />
+            {evidenceAvailable ? (
+              <EvidenceQualityBar
+                compact
+                accepted={rt.snapshot.accepted.length}
+                rejected={rt.snapshot.rejected.length}
+              />
+            ) : (
+              <Badge variant="outline" className="border-zinc-500/50 text-[11px] text-muted-foreground">
+                Quality not assessed
+              </Badge>
+            )}
           </div>
         </Cluster>
       </div>
@@ -120,7 +137,13 @@ export function OperationalTruthBar() {
             </button>
           </span>
         )}
-        <SafetyChip className="ml-auto shrink-0" />
+        {evidenceAvailable ? (
+          <SafetyChip className="ml-auto shrink-0" />
+        ) : (
+          <Badge variant="outline" className="ml-auto shrink-0 border-zinc-500/50 text-[11px] text-muted-foreground">
+            No facility evidence
+          </Badge>
+        )}
       </div>
       {/* Anchored to the bar (which is `relative`) so this visually hidden box
           cannot escape the scroll container and widen the document. */}

@@ -19,6 +19,10 @@ import {
   type ContextChip, type InvestigationContext,
 } from './investigationContext';
 import { TIMELINE_IDS, type TimelineId } from '../fixtures/timelines';
+import type { DataCentreTwin } from '@/context/ActiveTwinContext';
+import { resolveEvidenceFacilityScope, type EvidenceFacilityScope } from './evidenceFacilityScope';
+
+const NO_FACILITY_TWINS: readonly DataCentreTwin[] = [];
 
 export interface EvidenceBetaWorkspace {
   rt: EvidenceBetaRuntime;
@@ -27,6 +31,7 @@ export interface EvidenceBetaWorkspace {
 
   /** Shared, URL-persisted investigation context. */
   context: InvestigationContext;
+  facilityScope: EvidenceFacilityScope;
   chips: ContextChip[];
   clearContextField: (field: keyof InvestigationContext) => void;
   clearContext: () => void;
@@ -63,7 +68,13 @@ export interface EvidenceBetaWorkspace {
 
 const Ctx = createContext<EvidenceBetaWorkspace | null>(null);
 
-export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
+export function EvidenceBetaProvider({
+  children,
+  twins = NO_FACILITY_TWINS,
+}: {
+  children: ReactNode;
+  twins?: readonly DataCentreTwin[];
+}) {
   const rt = useEvidenceBeta();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
@@ -278,9 +289,15 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     [context, currentWorkspace],
   );
 
+  const facilityScope = useMemo(
+    () => resolveEvidenceFacilityScope(context.facility_id, twins),
+    [context.facility_id, twins],
+  );
   const chips = useMemo(
-    () => buildContextChips(context, (id) => identityByAuraId(id)),
-    [context],
+    () => buildContextChips(context, (id) => identityByAuraId(id)).map((chip) =>
+      chip.field === 'facility_id' ? { ...chip, value: facilityScope.contextLabel } : chip,
+    ),
+    [context, facilityScope.contextLabel],
   );
 
   const freshness = freshnessFor(rt.snapshot.last_observed_at, Date.parse(rt.nowIso));
@@ -319,6 +336,7 @@ export function EvidenceBetaProvider({ children }: { children: ReactNode }) {
     freshness,
     constraints,
     context,
+    facilityScope,
     chips,
     clearContextField,
     clearContext,

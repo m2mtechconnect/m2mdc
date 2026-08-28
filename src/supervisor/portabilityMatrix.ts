@@ -43,10 +43,10 @@ export const PORTABILITY_MATRIX: readonly PortabilityTarget[] = [
     stages: [
       stage('designed', 'evidenced', 'docs/AURA-DC-Architecture.md'),
       stage('configured', 'evidenced', 'supabase/config.toml'),
-      stage('tested', 'evidenced', 'docs/AURA-DC-Testing-Strategy.md'),
-      stage('verified', 'evidenced', 'docs/release/PRODUCTION_SOURCE_OF_TRUTH.md', 'SHA-bound live fingerprint attestation practice.'),
+      stage('tested', 'not-evidenced', null, 'A test strategy is documentation, not an execution artifact for the current release.'),
+      stage('verified', 'not-evidenced', null, 'Requires an artifact-backed post-publish smoke report for the exact live SHA.'),
     ],
-    currentClaim: 'Deployed and verified on the current managed stack only.',
+    currentClaim: 'Architecture and configuration are documented for the current managed stack. Exact-release tested and verified status is not evidenced.',
   },
   {
     id: 'aws',

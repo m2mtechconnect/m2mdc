@@ -14,9 +14,13 @@
  */
 
 import { test, expect, type Page } from './_setup/fixtures';
+import { assertNoOnboardingOverlay, seedDismissedTours } from './_setup/app-state';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const ROUTE = '/evidence';
+// Exercise the canonical workspace directly. Starting from the retired index
+// races its redirect and can transiently replace the rendered shell with the
+// route-level Suspense fallback on slower tablet/mobile runs.
+const ROUTE = '/evidence/overview';
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
@@ -34,6 +38,7 @@ async function focusFingerprint(page: Page, selector: string, focused: boolean) 
       const before = getComputedStyle(el, '::before');
       const after = getComputedStyle(el, '::after');
       return {
+        isActive: document.activeElement === el,
         matchesFocusVisible: isFocused ? el.matches(':focus-visible') : false,
         fp: [
           s.outlineStyle, s.outlineWidth, s.outlineColor, s.outlineOffset,
@@ -51,6 +56,12 @@ async function keyboardFocus(page: Page, selector: string) {
   await page.locator(selector).first().focus();
   await page.keyboard.press('Shift+Tab');
   await page.keyboard.press('Tab');
+  // The contract is visual: allow Chromium to commit the focus paint before
+  // reading computed styles. This does not retry the interaction or relax the
+  // assertion; it observes the result after the next rendered frame.
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  }));
 }
 
 async function assertVisibleFocusRing(page: Page, selector: string, label: string) {
@@ -59,6 +70,7 @@ async function assertVisibleFocusRing(page: Page, selector: string, label: strin
   await keyboardFocus(page, selector);
   const focused = await focusFingerprint(page, selector, true);
   expect(focused, `${label} must exist while focused`).not.toBeNull();
+  expect(focused!.isActive, `${label} must receive keyboard focus`).toBe(true);
   expect(focused!.matchesFocusVisible, `${label} must match :focus-visible after keyboard focus`).toBe(true);
   expect(focused!.fp, `${label} must paint a visible focus indicator`).not.toBe(blurred!.fp);
 }
@@ -108,9 +120,15 @@ for (const vp of VIEWPORTS) {
     test.use({ viewport: { width: vp.width, height: vp.height } });
 
     test.beforeEach(async ({ context, page }) => {
+      // This suite audits the Evidence controls, not first-run onboarding.
+      // Seed the same returning-operator state used by the other DSX drawer
+      // suites so the delayed Studio Intro cannot steal focus mid-assertion.
+      await seedDismissedTours(context);
       await installSupabaseMock(context);
       await page.goto(ROUTE, { waitUntil: 'domcontentloaded' });
       await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 15_000 });
+      await expect(page.getByText('Loading workspace...', { exact: true })).toHaveCount(0);
+      await assertNoOnboardingOverlay(page, 'DSX keyboard focus precondition');
     });
 
     test('primary triggers are tabbable and paint a visible focus ring', async ({ page, guard }) => {
@@ -131,7 +149,9 @@ for (const vp of VIEWPORTS) {
       // Scope tree is desktop-only chrome; assert it when it is rendered.
       const scope = page.locator('[data-testid^="dsx-scope-"]').first();
       if (await scope.isVisible().catch(() => false)) {
-        await assertVisibleFocusRing(page, '[data-testid^="dsx-scope-"]', 'facility scope button');
+        const scopeTestId = await scope.getAttribute('data-testid');
+        expect(scopeTestId, 'facility scope button must expose a stable test id').toBeTruthy();
+        await assertVisibleFocusRing(page, `[data-testid="${scopeTestId}"]`, 'facility scope button');
       }
       void guard;
     });

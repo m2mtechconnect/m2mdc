@@ -37,6 +37,7 @@ import {
 } from "@/stores/assistantLayoutStore";
 import { COPILOT } from "@/ux";
 import { useAuraV2Theme } from "@/components/v2";
+import { preloadPrimaryWorkspace } from '@/routing/primaryWorkspaceLoaders';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -72,6 +73,7 @@ export function Layout({ children }: LayoutProps) {
   const assistantReflow = isOpen && assistantPresentation === 'docked';
 
   const workspaceNavigation = roleLoading ? [] : primaryNavigation(can);
+  const workspacePreloadKey = workspaceNavigation.map((item) => item.href).join('|');
   const utilityNavigationItems = roleLoading ? [] : utilityNavigation(can);
   const activeWorkspace = workspaceNavigation.find((item) =>
     isNavItemActive(item, location.pathname)
@@ -106,6 +108,42 @@ export function Layout({ children }: LayoutProps) {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    // These are the five permanent authenticated workspaces, not the public
+    // landing bundle. Warm them gently after the current route settles so a
+    // header click does not begin a cold route graph download.
+    const candidates = workspacePreloadKey
+      .split('|')
+      .filter((href) => {
+        if (!href) return false;
+        const pathname = href.split(/[?#]/, 1)[0];
+        return location.pathname !== pathname && !location.pathname.startsWith(`${pathname}/`);
+      });
+    let cancelled = false;
+    let timer = 0;
+    let index = 0;
+
+    const warmNext = () => {
+      if (cancelled || index >= candidates.length) return;
+      const href = candidates[index++];
+      void preloadPrimaryWorkspace(href)
+        .catch(() => undefined)
+        .finally(() => {
+          if (!cancelled) timer = window.setTimeout(warmNext, 150);
+        });
+    };
+
+    timer = window.setTimeout(warmNext, 750);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [location.pathname, workspacePreloadKey]);
+
+  const preloadWorkspaceIntent = (href: string) => {
+    void preloadPrimaryWorkspace(href).catch(() => undefined);
+  };
 
   return (
     <div
@@ -204,9 +242,7 @@ export function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Workspace bar: the four persistent AURA workspaces plus the
-          Manage / Govern groups, on the technical graphite surface so the
-          information architecture is visible at a glance. */}
+      {/* The five permanent lifecycle workspaces on one consistent surface. */}
       <div className="aura-shellbar sticky top-14 z-40 hidden lg:block">
         <nav
           className="aura-shellbar-inner px-3 sm:px-4 md:px-5 lg:px-6"
@@ -240,7 +276,14 @@ export function Layout({ children }: LayoutProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-80">
                     <DropdownMenuItem asChild>
-                      <Link to={workspaceHref(item.href)}>{item.fullName}</Link>
+                      <Link
+                        to={workspaceHref(item.href)}
+                        onPointerEnter={() => preloadWorkspaceIntent(item.href)}
+                        onFocus={() => preloadWorkspaceIntent(item.href)}
+                        onTouchStart={() => preloadWorkspaceIntent(item.href)}
+                      >
+                        {item.fullName}
+                      </Link>
                     </DropdownMenuItem>
                     {children.map((child) => (
                       <DropdownMenuItem key={child.href} asChild>
@@ -268,6 +311,9 @@ export function Layout({ children }: LayoutProps) {
                     data-nav-item={item.name}
                     aria-label={item.fullName}
                     aria-current={isActive ? 'page' : undefined}
+                    onPointerEnter={() => preloadWorkspaceIntent(item.href)}
+                    onFocus={() => preloadWorkspaceIntent(item.href)}
+                    onTouchStart={() => preloadWorkspaceIntent(item.href)}
                   >
                     <item.icon className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} aria-hidden="true" />
                     <span>{item.name}</span>
@@ -299,6 +345,12 @@ export function Layout({ children }: LayoutProps) {
           className="w-full sm:w-[400px] bg-card border-border overflow-y-auto"
           id="mobile-nav-sheet"
           aria-label="Mobile navigation menu"
+          onKeyDownCapture={(event) => {
+            // A previously closed workspace Sheet can remain in Radix's
+            // dismissable-layer stack briefly. Keep Escape reliable while
+            // focus is inside the navigation drawer even in that sequence.
+            if (event.key === 'Escape') setMobileMenuOpen(false);
+          }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             mobileMenuTriggerRef.current?.focus();
@@ -333,6 +385,9 @@ export function Layout({ children }: LayoutProps) {
                         data-nav-item={item.name}
                         onClick={() => setMobileMenuOpen(false)}
                         aria-current={isActive ? "page" : undefined}
+                        onPointerEnter={() => preloadWorkspaceIntent(item.href)}
+                        onFocus={() => preloadWorkspaceIntent(item.href)}
+                        onTouchStart={() => preloadWorkspaceIntent(item.href)}
                       >
                         <item.icon className="h-5 w-5" aria-hidden="true" />
                         {item.fullName}

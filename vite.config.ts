@@ -1,6 +1,7 @@
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { fileURLToPath } from "node:url";
 import { componentTagger } from "lovable-tagger";
 import { seoBuildGate } from "./scripts/seoBuildGate";
 import {
@@ -9,7 +10,7 @@ import {
   resolveReleaseSource,
 } from "./scripts/releaseMetadata";
 
-const PROJECT_ROOT = __dirname;
+const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 
 function releaseFingerprint(): Plugin {
   const fingerprint = buildReleaseFingerprint({ rootDir: PROJECT_ROOT, isReleaseBuild: true });
@@ -74,7 +75,7 @@ export default defineConfig(({ mode }) => {
     ].filter(Boolean),
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"),
+        "@": path.resolve(PROJECT_ROOT, "./src"),
       },
     },
     define: {

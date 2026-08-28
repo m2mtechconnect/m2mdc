@@ -137,6 +137,14 @@ describe('automatic on-publish execution contract', () => {
     expect(script).toContain('docs/evidence/post-publish-smoke');
     expect(script).toContain('POST_PUBLISH_SMOKE_REGISTRY');
     expect(workflow).toContain('upload-artifact');
+    expect(script).toContain('checks: results');
+  });
+
+  it('exercises the read-only Builder transitions that previously left stale content visible', () => {
+    expect(script).toContain('journey:builder-saved-draft');
+    expect(script).toContain('journey:builder-to-operations');
+    expect(script).toContain('[data-testid="builder-layout"]');
+    expect(script).toContain('Operations URL and visible workspace committed together');
   });
 
   it('remains read-only and never publishes or writes to main', () => {

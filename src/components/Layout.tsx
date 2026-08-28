@@ -345,6 +345,12 @@ export function Layout({ children }: LayoutProps) {
           className="w-full sm:w-[400px] bg-card border-border overflow-y-auto"
           id="mobile-nav-sheet"
           aria-label="Mobile navigation menu"
+          onKeyDownCapture={(event) => {
+            // A previously closed workspace Sheet can remain in Radix's
+            // dismissable-layer stack briefly. Keep Escape reliable while
+            // focus is inside the navigation drawer even in that sequence.
+            if (event.key === 'Escape') setMobileMenuOpen(false);
+          }}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
             mobileMenuTriggerRef.current?.focus();

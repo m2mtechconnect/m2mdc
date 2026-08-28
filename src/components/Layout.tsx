@@ -30,7 +30,7 @@ import {
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
 import { useDataset } from "@/data/dataset/DatasetProvider";
-import { useActiveTwin } from "@/context/ActiveTwinContext";
+import { useFacilityModel } from "@/workspace/facilityModel";
 import {
   useAssistantLayoutStore,
   useAssistantPresentation,
@@ -45,18 +45,18 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const { linkTo } = useDataset();
-  const { twin: activeTwin } = useActiveTwin();
-  const governanceEvidenceHref = activeTwin?.id
-    ? `/evidence/sustainability/sovereignty?facility=${encodeURIComponent(activeTwin.id)}`
-    : "/evidence/sustainability/sovereignty";
+  const { facility: workspaceFacility } = useFacilityModel();
+  const evidenceFacilityId = workspaceFacility.id;
+  const governanceEvidenceHref =
+    `/evidence/sustainability/sovereignty?facility=${encodeURIComponent(evidenceFacilityId)}`;
 
   const workspaceHref = (href: string) => {
     const datasetHref = linkTo(href);
-    if (!href.startsWith('/evidence') || !activeTwin?.id) return datasetHref;
+    if (!href.startsWith('/evidence')) return datasetHref;
 
     const [pathname, query = ''] = datasetHref.split('?');
     const params = new URLSearchParams(query);
-    params.set('facility', activeTwin.id);
+    params.set('facility', evidenceFacilityId);
     return `${pathname}?${params.toString()}`;
   };
   const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);

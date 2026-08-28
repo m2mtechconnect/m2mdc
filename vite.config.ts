@@ -12,9 +12,9 @@ import {
 
 const PROJECT_ROOT = path.dirname(fileURLToPath(import.meta.url));
 
-function releaseFingerprint(): Plugin {
-  const fingerprint = buildReleaseFingerprint({ rootDir: PROJECT_ROOT, isReleaseBuild: true });
-
+function releaseFingerprintPlugin(
+  fingerprint: ReturnType<typeof buildReleaseFingerprint>,
+): Plugin {
   return {
     name: 'aura-release-fingerprint',
     apply: 'build',
@@ -55,9 +55,24 @@ function kitProxy() {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const releaseSha = resolveReleaseSource({ rootDir: PROJECT_ROOT }).sha;
-  const buildTimestamp = new Date().toISOString();
-  const buildId = process.env.AURA_BUILD_ID || `b${Date.now().toString(36)}`;
+  const buildStartedAt = new Date();
+  const productionFingerprint = mode !== "development"
+    ? buildReleaseFingerprint({
+        rootDir: PROJECT_ROOT,
+        isReleaseBuild: true,
+        now: buildStartedAt,
+      })
+    : null;
+  const releaseSha = productionFingerprint?.sha
+    ?? resolveReleaseSource({ rootDir: PROJECT_ROOT }).sha;
+  const buildTimestamp = productionFingerprint?.builtAt
+    ?? buildStartedAt.toISOString();
+  const buildId = productionFingerprint?.buildId
+    ?? process.env.AURA_BUILD_ID
+    ?? `b${buildStartedAt.getTime().toString(36)}`;
+  const appVersion = productionFingerprint?.version
+    ?? process.env.npm_package_version
+    ?? '1.0.0';
 
   return {
     server: {
@@ -68,7 +83,9 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       mode === "development" && componentTagger(),
-      mode !== "development" && releaseFingerprint(),
+      mode !== "development"
+        && productionFingerprint
+        && releaseFingerprintPlugin(productionFingerprint),
       // Hard gate: fails `vite build` (and therefore Lovable publish) if
       // the produced dist/ has SEO errors. Bypass with SKIP_SEO_GATE=1.
       mode !== "development" && seoBuildGate(),
@@ -79,14 +96,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(process.env.npm_package_version || '1.0.0'),
+      'import.meta.env.VITE_BUILD_VERSION': JSON.stringify(appVersion),
       'import.meta.env.VITE_BUILD_TIMESTAMP': JSON.stringify(buildTimestamp),
       // Non-sensitive deployment fingerprint. The same SHA is also emitted to
       // /release.json so release verification can compare the live site to Git.
       __AURA_BUILD_ID__: JSON.stringify(buildId),
       __AURA_COMMIT_SHA__: JSON.stringify(releaseSha),
       __AURA_BUILD_TIMESTAMP__: JSON.stringify(buildTimestamp),
-      __AURA_APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
+      __AURA_APP_VERSION__: JSON.stringify(appVersion),
     },
     build: {
       // Source maps are useful to Lighthouse and CI diagnostics, but publishing
@@ -115,3 +132,4 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
+

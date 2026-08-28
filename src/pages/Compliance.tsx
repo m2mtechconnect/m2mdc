@@ -30,7 +30,6 @@ import { useBlueprint } from "@/hooks/useBlueprint";
 import { useBlueprintScenarios } from "@/hooks/useBlueprintScenarios";
 import { useSovereignty } from "@/sovereignty";
 import { SovereigntyAuditTimeline } from "@/components/compliance/SovereigntyAuditTimeline";
-import { SovereigntyRiskOverview } from "@/components/compliance/SovereigntyRiskOverview";
 import { useActiveTwin } from "@/context/ActiveTwinContext";
 import { useTwinSovereigntyEvents } from "@/hooks/useTwinData";
 import { DOMAINS } from "@/ux";
@@ -219,10 +218,6 @@ export default function Compliance() {
   const handleReplayOpen = (eventDetails: string) => {
     setSelectedEvent(eventDetails);
     setReplayModalOpen(true);
-  };
-
-  const handleRiskClick = (riskName: string) => {
-    console.log("View risk details:", riskName);
   };
 
   return (
@@ -515,7 +510,7 @@ export default function Compliance() {
 
             {/* Right Column */}
             <div className="space-y-6">
-              {/* Risk Overview - Now powered by Sovereignty Engine */}
+              {/* Risk scores stay unavailable until audited evidence is wired. */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -527,10 +522,17 @@ export default function Compliance() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <SovereigntyRiskOverview 
-                    result={sovereignty.result} 
-                    onClick={() => navigate('/data-centre-twin?tab=sovereignty')}
-                  />
+                  <div
+                    className="rounded-lg border border-border bg-muted/30 p-4"
+                    data-testid="compliance-risk-unavailable"
+                  >
+                    <p className="font-medium">Not assessed</p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      No audited sovereignty evidence is bound to this facility. AURA does not
+                      calculate risk scores, clean-state badges, or certification readiness from
+                      the demonstration fixture.
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
 
@@ -674,3 +676,4 @@ export default function Compliance() {
     </TooltipProvider>
   );
 }
+

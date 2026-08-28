@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -220,3 +220,16 @@ describe('production fingerprint fail-closed gate', () => {
     expect(fingerprint.branch).not.toBe('unknown');
   });
 });
+
+describe('Vite release fingerprint wiring', () => {
+  const configSource = readFileSync(path.resolve(process.cwd(), 'vite.config.ts'), 'utf8');
+
+  it('builds one production fingerprint and shares it with the bundle and release.json', () => {
+    expect(configSource.match(/buildReleaseFingerprint\(/g)).toHaveLength(1);
+    expect(configSource).toContain('releaseFingerprintPlugin(productionFingerprint)');
+    expect(configSource).toContain('productionFingerprint?.buildId');
+    expect(configSource).toContain('productionFingerprint?.builtAt');
+    expect(configSource).toContain('productionFingerprint?.sha');
+  });
+});
+

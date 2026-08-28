@@ -467,6 +467,9 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await expect(page.getByText(/undefined%/)).toHaveCount(0);
     await expect(page.getByText('Below configured threshold', { exact: true })).toHaveCount(0);
     await expect(page.getByText(/PIPEDA Compliant: Not assessed/)).toBeVisible();
+    await expect(page.getByTestId('compliance-risk-unavailable')).toBeVisible();
+    await expect(page.getByText('Clean', { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/frameworks certified/i)).toHaveCount(0);
     await expect(page).toHaveScreenshot('compliance-light.png', { maxDiffPixels: 100 });
   });
 
@@ -476,6 +479,9 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await expect(page.getByText(/undefined%/)).toHaveCount(0);
     await expect(page.getByText('Below configured threshold', { exact: true })).toHaveCount(0);
     await expect(page.getByText(/PIPEDA Compliant: Not assessed/)).toBeVisible();
+    await expect(page.getByTestId('compliance-risk-unavailable')).toBeVisible();
+    await expect(page.getByText('Clean', { exact: true })).toHaveCount(0);
+    await expect(page.getByText(/frameworks certified/i)).toHaveCount(0);
   });
 });
 
@@ -535,3 +541,4 @@ test.describe('Visual Regression - Mobile', () => {
     await expect(page).toHaveScreenshot('connections-mobile.png', { maxDiffPixels: 150, fullPage: true });
   });
 });
+

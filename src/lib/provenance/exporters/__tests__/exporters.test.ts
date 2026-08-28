@@ -290,7 +290,10 @@ describe('toPrintHtml — per-row provenance disclosure', () => {
 
 describe('describeExportBlock — explains why export is disabled', () => {
   it('sovereignty reason mentions not assessed', () => {
-    expect(describeExportBlock('sovereignty-not-assessed')).toMatch(/not assessed/i);
+    const reason = describeExportBlock('sovereignty-not-assessed');
+    expect(reason).toMatch(/not assessed/i);
+    expect(reason).toMatch(/audited evidence source/i);
+    expect(reason).not.toMatch(/docs\//i);
   });
   it('no-audited-source reason mentions demonstration values', () => {
     expect(describeExportBlock('no-audited-source')).toMatch(/demonstration/i);

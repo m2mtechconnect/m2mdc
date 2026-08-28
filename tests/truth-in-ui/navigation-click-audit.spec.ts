@@ -6,6 +6,7 @@
  */
 
 import { test, expect } from './_setup/fixtures';
+import { assertNoOnboardingOverlay, seedDismissedTours } from './_setup/app-state';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
 async function installSessionAndOpen(
@@ -13,6 +14,9 @@ async function installSessionAndOpen(
   page: import('@playwright/test').Page,
   path = '/dashboard',
 ) {
+  // Navigation correctness is exercised as a returning operator. First-run
+  // onboarding has its own coverage and must not intercept unrelated links.
+  await seedDismissedTours(context);
   // This journey verifies the authorized Builder surface, so model the
   // server-owned tenant membership and active_org_id contract explicitly.
   const mock = await installSupabaseMock(context, { withActiveOrganization: true });
@@ -22,6 +26,7 @@ async function installSessionAndOpen(
     .toBeGreaterThan(0);
   await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
   await expect(page.locator('text=Account Pending Approval')).toHaveCount(0);
+  await assertNoOnboardingOverlay(page, `navigation ${path}`);
   return mock;
 }
 

@@ -88,6 +88,12 @@ async function expectEvidenceContext(
 
 test.describe('AURA DC authenticated navigation real-click matrix', () => {
   test('desktop header links navigate with React Router anchors', async ({ context, page, guard }) => {
+    // This is a five-workspace correctness journey, not a performance budget.
+    // Each destination must commit real content before the next click, so the
+    // suite-level 20 s default is too short on a cold CI runner even when every
+    // navigation is healthy. Performance thresholds live in the dedicated
+    // performance and route-stress suites.
+    test.setTimeout(60_000);
     await page.setViewportSize({ width: 1600, height: 900 });
     await installSessionAndOpen(context, page);
 

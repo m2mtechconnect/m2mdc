@@ -113,11 +113,11 @@ test.describe('NVIDIA Reference Facility runtime regression', () => {
             families: snapshot.families,
             isAuraAuthored: (id) =>
               Object.entries(snapshot!.roles).some(([key, r]) => r.assetId === id && aura.has(key)),
-          }).nvidiaObjects;
+          }).passed;
         },
         { timeout: 180_000, intervals: [1_000] },
       )
-      .toBeGreaterThanOrEqual(BASELINE_NVIDIA_OBJECTS);
+      .toBe(true);
 
     const data = snapshot!;
     const auraRoles = new Set(data.auraAuthoredRoles);

@@ -107,6 +107,14 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await expectPath(page, '/simulation');
     await expect(drawer).toBeHidden();
 
+    // Simulation intentionally opens its workspace inspector on mobile. Close
+    // that independent dialog before exercising the global navigation trigger.
+    const workspaceInspector = page.getByTestId('workspace-inspector-drawer');
+    if (await workspaceInspector.isVisible().catch(() => false)) {
+      await page.keyboard.press('Escape');
+      await expect(workspaceInspector).toBeHidden();
+    }
+
     const trigger = page.getByRole('button', { name: 'Toggle mobile menu' });
     await trigger.click();
     await expect(drawer).toBeVisible();

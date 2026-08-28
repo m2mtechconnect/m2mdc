@@ -197,7 +197,7 @@ export function describeExportBlock(reason: ExportBlockReason): string {
     case 'no-audited-source':
       return 'Export disabled: this report requires an audited data source. AURA has no upstream telemetry integration yet, so any file would carry demonstration values only.';
     case 'sovereignty-not-assessed':
-      return 'Export disabled: sovereignty score and audit readiness are not assessed. See docs/remediation/random-and-synthetic-data-register.md.';
+      return 'Export disabled: sovereignty score and audit readiness are not assessed because this facility has no audited evidence source.';
     case 'metric-catalog-missing':
       return 'Export disabled: no metric catalog is registered for this surface, so per-metric provenance cannot be attached.';
     case 'value-map-missing':

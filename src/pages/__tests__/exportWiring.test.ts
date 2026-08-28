@@ -54,7 +54,10 @@ describe('Compliance page — exports that cannot retain provenance are disabled
   });
 
   it('tooltip explains why (uses describeExportBlock)', () => {
-    expect(describeExportBlock('sovereignty-not-assessed')).toMatch(/not assessed/i);
+    const sovereigntyReason = describeExportBlock('sovereignty-not-assessed');
+    expect(sovereigntyReason).toMatch(/not assessed/i);
+    expect(sovereigntyReason).toMatch(/audited evidence source/i);
+    expect(sovereigntyReason).not.toMatch(/docs\//i);
     expect(describeExportBlock('no-audited-source')).toMatch(/demonstration/i);
   });
 });

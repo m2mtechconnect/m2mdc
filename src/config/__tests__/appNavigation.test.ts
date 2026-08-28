@@ -166,4 +166,11 @@ describe('page positioning', () => {
     expect(positioningFor('/simulation')!.title).toBe('Simulation Studio');
     expect(positioningFor('/builder')!.title).toBe('OpenUSD Asset Pipeline');
   });
+
+  it('does not describe simulated-only Operations as measured telemetry', () => {
+    const operationsPurpose = positioningFor('/analytics')!.purpose;
+    expect(operationsPurpose).toContain('Operational data availability');
+    expect(operationsPurpose).toContain('verified telemetry when a facility source is connected');
+    expect(operationsPurpose).not.toMatch(/measured operational data/i);
+  });
 });

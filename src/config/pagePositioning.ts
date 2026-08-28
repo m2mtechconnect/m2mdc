@@ -66,7 +66,7 @@ export const PAGE_POSITIONING: PagePositioning[] = [
     route: '/analytics',
     title: 'Operations & Telemetry',
     purpose:
-      'Measured operational data, simulation outputs and data availability across facility systems.',
+      'Operational data availability, simulated outputs and verified telemetry when a facility source is connected.',
     breadcrumb: ['Operate', 'Operations & Telemetry'],
     capabilityId: 'operations-telemetry',
   },

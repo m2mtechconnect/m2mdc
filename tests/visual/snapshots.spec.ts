@@ -343,6 +343,19 @@ test.describe('Visual Regression - Lifecycle Workspaces', () => {
     await expect(page).toHaveScreenshot('builder-first-run-light.png', { maxDiffPixels: 100 });
   });
 
+  test('Builder keeps template discovery inside the consolidated workspace', async ({ page, context }) => {
+    await installBuilderTenantMock(context);
+    await installBuilderVisualMock(context);
+    await page.goto('/builder');
+    await page.waitForLoadState('networkidle');
+
+    await expect(page.getByRole('heading', { name: 'Start a facility build' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Available templates' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'View all templates' })).toHaveAttribute('href', '/builder#templates');
+    await expect(page.getByRole('link', { name: /browse marketplace/i })).toHaveCount(0);
+    await expect(page.locator('a[href^="/marketplace"]')).toHaveCount(0);
+  });
+
   test('Builder Step 1', async ({ page, context }) => {
     await installBuilderTenantMock(context);
     await installBuilderVisualMock(context);

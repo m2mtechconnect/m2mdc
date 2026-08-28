@@ -94,7 +94,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     const matrix = [
       { name: 'Design & Build', path: '/builder', workspace: 'builder' },
       { name: 'Operations', path: '/analytics', workspace: 'operations' },
-      { name: 'Simulation', path: '/simulation', workspace: 'simulation' },
+      // Simulation owns its active workflow step in the canonical URL. The
+      // workspace initializes on Inspect when no explicit step is supplied,
+      // so the real-click contract must wait for that committed URL rather
+      // than asserting the transient bare route.
+      { name: 'Simulation', path: '/simulation?step=inspect', workspace: 'simulation' },
       { name: 'Evidence', path: '/evidence/overview', workspace: 'evidence' },
       { name: 'Command Center', path: '/dashboard', workspace: 'dashboard' },
     ] as const;

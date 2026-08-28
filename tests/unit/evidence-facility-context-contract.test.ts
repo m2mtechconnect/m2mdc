@@ -42,13 +42,14 @@ describe('evidence facility context', () => {
   it('states the active facility in the Evidence shell header', () => {
     const shell = readFileSync('src/pages/dsx/EvidenceBetaShell.tsx', 'utf8');
     expect(shell).toContain('dsx-active-facility');
-    expect(shell).toContain('Facility: not selected');
+    expect(shell).toContain('Demonstration facility: Evidence Beta Site (active facility not selected)');
     expect(shell).toContain('activeTwin?.id === facilityId');
   });
 
   it('carries the active facility through the global Evidence footer', () => {
     const layout = readFileSync('src/components/Layout.tsx', 'utf8');
-    expect(layout).toContain('?facility=${encodeURIComponent(activeTwin.id)}');
+    expect(layout).toContain('const { facility: workspaceFacility } = useFacilityModel()');
+    expect(layout).toContain('?facility=${encodeURIComponent(evidenceFacilityId)}');
   });
 });
 

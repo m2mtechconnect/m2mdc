@@ -6,7 +6,7 @@ import { useRBAC } from '@/contexts/RBACContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LayoutTemplate, FolderOpen, ArrowRight, Trash2, Loader2 } from 'lucide-react';
+import { LayoutTemplate, FolderOpen, Trash2, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -214,10 +214,7 @@ export function BuilderStarterLists() {
             </h2>
           </div>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/marketplace">
-              Browse marketplace
-              <ArrowRight className="ml-1 h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
+            <Link to="/builder#templates">View all templates</Link>
           </Button>
         </div>
         {templates && templates.length > 0 ? (

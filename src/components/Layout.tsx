@@ -25,13 +25,12 @@ import {
   visibleNavChildren,
   isNavItemActive,
   primaryNavigation,
-  accountAdminNavigation,
   utilityNavigation,
 } from "@/config/appNavigation";
 import { OperatingStateBar } from "@/components/capability/OperatingStateBar";
 import { useShellLayoutStore } from "@/stores/shellLayoutStore";
 import { useDataset } from "@/data/dataset/DatasetProvider";
-import { useActiveTwin } from "@/context/ActiveTwinContext";
+import { useFacilityModel } from "@/workspace/facilityModel";
 import {
   useAssistantLayoutStore,
   useAssistantPresentation,
@@ -46,10 +45,20 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const fullBleed = useShellLayoutStore((s) => s.fullBleed);
   const { linkTo } = useDataset();
-  const { twin: activeTwin } = useActiveTwin();
-  const governanceEvidenceHref = activeTwin?.id
-    ? `/evidence/sustainability/sovereignty?facility=${encodeURIComponent(activeTwin.id)}`
-    : "/evidence/sustainability/sovereignty";
+  const { facility: workspaceFacility } = useFacilityModel();
+  const evidenceFacilityId = workspaceFacility.id;
+  const governanceEvidenceHref =
+    `/evidence/sustainability/sovereignty?facility=${encodeURIComponent(evidenceFacilityId)}`;
+
+  const workspaceHref = (href: string) => {
+    const datasetHref = linkTo(href);
+    if (!href.startsWith('/evidence')) return datasetHref;
+
+    const [pathname, query = ''] = datasetHref.split('?');
+    const params = new URLSearchParams(query);
+    params.set('facility', evidenceFacilityId);
+    return `${pathname}?${params.toString()}`;
+  };
   const pageOwnsOperatingState = useShellLayoutStore((s) => s.pageOwnsOperatingState);
   const location = useLocation();
   const navigate = useNavigate();
@@ -64,12 +73,12 @@ export function Layout({ children }: LayoutProps) {
 
   const workspaceNavigation = roleLoading ? [] : primaryNavigation(can);
   const utilityNavigationItems = roleLoading ? [] : utilityNavigation(can);
-  const adminNavigationItems = roleLoading ? [] : accountAdminNavigation(can);
   const activeWorkspace = workspaceNavigation.find((item) =>
     isNavItemActive(item, location.pathname)
     || visibleNavChildren(item, can).some((child) => isNavItemActive(child, location.pathname))
   );
   const headerRef = useRef<HTMLElement>(null);
+  const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
   useAuraV2Theme();
   useTourAutoStart();
@@ -176,6 +185,7 @@ export function Layout({ children }: LayoutProps) {
             <UserMenu />
 
             <Button
+              ref={mobileMenuTriggerRef}
               variant="ghost"
               size="sm"
               className="xl:hidden min-h-[44px] min-w-[44px] text-[hsl(var(--v2-header-fg))] hover:bg-[hsl(var(--v2-header-elevated))] transition-smooth group"
@@ -230,7 +240,7 @@ export function Layout({ children }: LayoutProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-80">
                     <DropdownMenuItem asChild>
-                      <Link to={linkTo(item.href)}>{item.fullName}</Link>
+                      <Link to={workspaceHref(item.href)}>{item.fullName}</Link>
                     </DropdownMenuItem>
                     {children.map((child) => (
                       <DropdownMenuItem key={child.href} asChild>
@@ -251,7 +261,7 @@ export function Layout({ children }: LayoutProps) {
               <Tooltip key={item.name}>
                 <TooltipTrigger asChild>
                   <Link
-                    to={linkTo(item.href)}
+                    to={workspaceHref(item.href)}
                     className="aura-shellbar-tab"
                     data-active={isActive ? 'true' : undefined}
                     data-tour={tourId}
@@ -280,12 +290,19 @@ export function Layout({ children }: LayoutProps) {
       <OperatingStateBar srOnly={pageOwnsOperatingState} />
 
 
-      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+      <Sheet
+        open={mobileMenuOpen}
+        onOpenChange={setMobileMenuOpen}
+      >
         <SheetContent
           side="left"
           className="w-full sm:w-[400px] bg-card border-border overflow-y-auto"
           id="mobile-nav-sheet"
           aria-label="Mobile navigation menu"
+          onCloseAutoFocus={(event) => {
+            event.preventDefault();
+            mobileMenuTriggerRef.current?.focus();
+          }}
         >
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2">
@@ -312,7 +329,7 @@ export function Layout({ children }: LayoutProps) {
                       className="min-h-[44px] flex-1 justify-start gap-3 text-base"
                     >
                       <Link
-                        to={linkTo(item.href)}
+                        to={workspaceHref(item.href)}
                         data-nav-item={item.name}
                         onClick={() => setMobileMenuOpen(false)}
                         aria-current={isActive ? "page" : undefined}
@@ -363,33 +380,12 @@ export function Layout({ children }: LayoutProps) {
               );
             })}
 
-            {adminNavigationItems.length > 0 && (
-              <div className="mt-4 border-t border-border pt-4" aria-label="Administration">
-                <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Administration</h3>
-                <div className="space-y-1">
-                  {adminNavigationItems.map((item) => (
-                    <Button key={item.href} asChild variant="ghost" className="w-full justify-start gap-3 min-h-[44px]">
-                      <Link
-                        to={linkTo(item.href)}
-                        data-nav-item={item.name}
-                        onClick={() => setMobileMenuOpen(false)}
-                        aria-current={isNavItemActive(item, location.pathname) ? "page" : undefined}
-                      >
-                        <item.icon className="h-4 w-4" aria-hidden="true" />
-                        {item.fullName}
-                      </Link>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="mt-4 border-t border-border pt-4" aria-label="Utilities">
               <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Utilities</h3>
               <div className="grid grid-cols-2 gap-1">
                 {utilityNavigationItems.map((item) => (
                   <Button key={item.href} asChild variant="ghost" className="justify-start gap-2 min-h-[44px]">
-                    <Link to={linkTo(item.href)} onClick={() => setMobileMenuOpen(false)}>
+                    <Link to={workspaceHref(item.href)} onClick={() => setMobileMenuOpen(false)}>
                       <item.icon className="h-4 w-4" aria-hidden="true" />
                       {item.name}
                     </Link>

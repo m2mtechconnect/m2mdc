@@ -55,7 +55,7 @@ export function OperationalTruthBar() {
       <div className="grid grid-cols-1 gap-x-8 gap-y-4 px-3 py-2.5 sm:grid-cols-2 sm:px-4 lg:grid-cols-4">
         {/* Facility identity and the trust level of what is displayed. */}
         <Cluster label="Facility context">
-          <Field label="Facility" value={EVIDENCE_BETA_SITE.name} />
+          <Field label="Demonstration facility" value={EVIDENCE_BETA_SITE.name} />
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Chip label="Data mode">
               <DataModeBadge mode={rt.snapshot.data_mode} />
@@ -94,7 +94,7 @@ export function OperationalTruthBar() {
             <ConnectionState state={rt.snapshot.connection_state} label="Source" />
           </Chip>
           <div className="flex flex-wrap items-end gap-x-5 gap-y-2">
-            <Chip label="Data freshness">
+            <Chip label="Simulated timeline freshness">
               <FreshnessIndicator freshness={freshness} />
             </Chip>
             <EvidenceQualityBar

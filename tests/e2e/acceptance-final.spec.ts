@@ -84,7 +84,7 @@ test.describe('Functional acceptance - persisted behavior, not presence-only smo
     await page.goto('/teams/access-control');
     await expect(page).toHaveURL(/\/teams\/access-control(?:[/?#]|$)/, { timeout: 15_000 });
     await expect(page.getByRole('heading', { name: /Access control/i })).toBeVisible();
-    await expect(page.getByText(/role assignments across the platform/i)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/role assignments in this organization/i)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByRole('button', { name: 'Grant Role' })).toBeVisible();
   });
 });

@@ -257,7 +257,7 @@ export default function Settings() {
                       onValueChange={(value) => setFormData({ ...formData, industry: value })}
                       disabled={!isAdmin}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="industry" aria-label="Industry">
                         <SelectValue placeholder="Select industry" />
                       </SelectTrigger>
                       <SelectContent>
@@ -293,7 +293,7 @@ export default function Settings() {
                       onValueChange={(value) => setFormData({ ...formData, default_role: value })}
                       disabled={!isAdmin}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger id="default_role" aria-label="Default role for new members">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

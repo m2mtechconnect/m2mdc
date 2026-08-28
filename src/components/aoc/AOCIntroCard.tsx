@@ -32,9 +32,9 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
             <Activity className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">Introducing Agent Operations Center</h3>
+            <p className="font-semibold text-lg">Agent operations overview</p>
             <p className="text-sm text-muted-foreground">
-              Your mission control for deployed AI agents
+              Available controls, activity, metrics and collaboration context for configured agents
             </p>
           </div>
         </div>
@@ -55,9 +55,9 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
             <Zap className="h-4 w-4 text-blue-500" />
           </div>
           <div>
-            <p className="font-medium text-sm">Real-Time Control</p>
+            <p className="font-medium text-sm">Agent controls</p>
             <p className="text-xs text-muted-foreground">
-              Start, pause, stop agents on demand
+              Inspect the controls available for each agent
             </p>
           </div>
         </div>
@@ -67,9 +67,9 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
             <Activity className="h-4 w-4 text-green-500" />
           </div>
           <div>
-            <p className="font-medium text-sm">Live Monitoring</p>
+            <p className="font-medium text-sm">Activity evidence</p>
             <p className="text-xs text-muted-foreground">
-              Stream activity logs in real-time
+              Review recorded activity and current state
             </p>
           </div>
         </div>
@@ -81,7 +81,7 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
           <div>
             <p className="font-medium text-sm">Performance Metrics</p>
             <p className="text-xs text-muted-foreground">
-              Track success rate and latency
+              Review available success and latency evidence
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ export function AOCIntroCard({ onDismiss }: AOCIntroCardProps) {
           <div>
             <p className="font-medium text-sm">Team Collaboration</p>
             <p className="text-xs text-muted-foreground">
-              See who's viewing and recent changes
+              Review recorded ownership and recent changes
             </p>
           </div>
         </div>

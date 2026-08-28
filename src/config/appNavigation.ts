@@ -81,7 +81,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     fullName: 'Design & Build',
     href: '/builder',
     icon: Boxes,
-    matches: ['/builder'],
+    matches: ['/builder', '/manage/facilities', '/blueprint', '/data-centre-twin', '/manage/integrations', '/settings/ai'],
     permission: 'twin.view',
     group: 'design',
     description: 'Create the facility, configure the twin, define the blueprint and prepare activation inputs.',
@@ -91,7 +91,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     fullName: 'Operations',
     href: '/analytics',
     icon: BarChart3,
-    matches: ['/analytics', '/operations', '/intelligence'],
+    matches: ['/analytics', '/operations', '/intelligence', '/app/agents', '/agent', '/agents', '/deployments', '/deploy'],
     permission: 'analytics.view',
     group: 'operate',
     description: 'Operational telemetry, agents, configuration activation, runtime evidence and current health state.',
@@ -111,7 +111,7 @@ export const WORKSPACE_NAV: AppNavItem[] = [
     fullName: 'Evidence',
     href: `${EVIDENCE_ROOT}/overview`,
     icon: FileSearch,
-    matches: [EVIDENCE_ROOT, LEGACY_EVIDENCE_ROOT, '/compliance'],
+    matches: [EVIDENCE_ROOT, LEGACY_EVIDENCE_ROOT, '/compliance', '/readiness/supervisor'],
     permission: 'analytics.view',
     group: 'govern',
     description: stackDescription('evidence.workspace'),
@@ -204,16 +204,6 @@ export const MANAGE_NAV: AppNavItem[] = [
         description: 'Immutable lifecycle events and stored activation evidence.',
       },
     ],
-  },
-  {
-    name: 'Marketplace',
-    fullName: 'Agent & template marketplace',
-    href: '/marketplace',
-    icon: Boxes,
-    matches: ['/marketplace'],
-    permission: 'twin.edit',
-    group: 'design',
-    description: 'Reference agents, templates and integration blueprints available to configure.',
   },
   {
     name: 'Supervisor',
@@ -360,42 +350,20 @@ export const UTILITY_NAV: AppNavItem[] = [
 ];
 
 /**
- * One permission-aware hierarchy for every shell presentation.
+ * The permanent shell exposes only the five lifecycle workspaces.
  *
- * The permanent global navigation contains only the five lifecycle
- * destinations. People & Access and Platform Administration are permission
- * aware account/admin destinations and never form a second global navigation.
+ * Supporting tools remain in MANAGE_NAV for contextual workspace links, route
+ * registries and permission checks; they must not become a second global menu.
+ * Account, tenant and platform administration live in the permission-aware
+ * user menu.
  */
 export function primaryNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
-  const childrenFor = (group: NavGroupId) => visible(
-    MANAGE_NAV.filter((item) => item.group === group && item.href !== '/marketplace'),
-    can,
-  );
-  const governItems = childrenFor('govern');
-  const evidenceChildren = governItems.filter((item) => item.href === '/readiness/supervisor');
-
-  return visible(WORKSPACE_NAV, can).map((item) => {
-    if (item.href === '/builder') return { ...item, children: childrenFor('design') };
-    if (item.href === '/analytics') return { ...item, children: childrenFor('operate') };
-    if (item.href === `${EVIDENCE_ROOT}/overview`) return { ...item, children: evidenceChildren };
-    return item;
-  });
-}
-
-/** Account/admin destinations surfaced inside the user menu, not global nav. */
-export const ACCOUNT_ADMIN_HREFS = ['/teams', '/admin/platform-readiness'] as const;
-
-export function accountAdminNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
-  return visible(
-    MANAGE_NAV.filter((item) => (ACCOUNT_ADMIN_HREFS as readonly string[]).includes(item.href)),
-    can,
-  );
+  return visible(WORKSPACE_NAV, can);
 }
 
 export function utilityNavigation(can: (permission: Permission) => boolean): AppNavItem[] {
   return visible(UTILITY_NAV, can);
 }
-
 
 export interface NavGroup {
   id: NavGroupId;

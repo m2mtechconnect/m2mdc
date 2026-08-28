@@ -29,24 +29,33 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
     .toBe(expected);
 }
 
-async function auditGroupedDestinations(
+async function expectEvidenceContext(
   page: import('@playwright/test').Page,
-  parentName: string,
-  childHrefs: readonly string[],
+  expectedPath: string,
 ) {
-  for (const href of childHrefs) {
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-    const trigger = page.getByRole('button', { name: parentName });
-    await expect(trigger, `${parentName} group is rendered`).toBeVisible();
-    await trigger.click();
-    const menu = page.getByRole('menu');
-    await expect(menu, `${parentName} menu opens`).toBeVisible();
-    const link = menu.locator(`a[href="${href}"]`);
-    await expect(link, `${parentName} exposes ${href}`).toBeVisible();
-    await link.click();
-    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(href);
-  }
+  await expect
+    .poll(
+      () => {
+        const current = new URL(page.url());
+        return {
+          pathname: current.pathname,
+          facility: current.searchParams.get('facility'),
+          scenario: current.searchParams.get('scenario'),
+          mode: current.searchParams.get('mode'),
+          runPresent: Boolean(current.searchParams.get('run')),
+          tick: current.searchParams.get('tick'),
+        };
+      },
+      { timeout: 5_000, message: 'Evidence route must resolve complete reproducible provenance' },
+    )
+    .toEqual({
+      pathname: expectedPath,
+      facility: 'aura-reference-facility',
+      scenario: 'cooling_degradation',
+      mode: 'SIMULATED',
+      runPresent: true,
+      tick: '0',
+    });
 }
 
 test.describe('AURA DC authenticated navigation real-click matrix', () => {
@@ -61,17 +70,15 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     ];
 
     for (const item of matrix) {
-      const link = page.getByRole('link', { name: item.name }).first();
+      const candidate = page.getByRole('link', { name: item.name }).first();
+      if (!(await candidate.isVisible().catch(() => false))) {
+        await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
+      }
+      const link = page.getByRole('link', { name: item.name }).filter({ visible: true }).first();
       await expect(link, `${item.name} is a visible link`).toBeVisible();
       await link.click();
       if (item.name === 'Evidence') {
-        await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(item.path);
-        const evidenceUrl = new URL(page.url());
-        expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
-        expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
-        expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
-        expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
-        expect(evidenceUrl.searchParams.get('tick')).toBe('0');
+        await expectEvidenceContext(page, item.path);
       } else {
         await expectPath(page, item.path);
       }
@@ -82,29 +89,32 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('desktop Design & Build child destinations are real links', async ({ context, page, guard }) => {
+  test('supporting workspace routes remain reachable but outside global navigation', async ({ context, page, guard }) => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 1400, height: 900 });
     await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Design & Build', ['/builder', '/manage/facilities', '/blueprint', '/manage/integrations', '/settings/ai']);
-    expect(guard.anyExternalCompleted()).toBe(false);
-  });
 
-  test('desktop Operations and Platform Admin child destinations are real links', async ({ context, page, guard }) => {
-    test.setTimeout(120_000);
-    await page.setViewportSize({ width: 1400, height: 900 });
-    await installSessionAndOpen(context, page);
-    await auditGroupedDestinations(page, 'Operations', ['/analytics', '/app/agents', '/deployments']);
+    const supportingRoutes = [
+      '/manage/facilities',
+      '/blueprint',
+      '/manage/integrations',
+      '/settings/ai',
+      '/app/agents',
+      '/deployments',
+      '/admin/platform-readiness',
+    ] as const;
 
-    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
-    await page.getByRole('button', { name: 'Platform Administration' }).click();
-    const platformMenu = page.getByRole('menu');
-    await expect(platformMenu.getByRole('menuitem', { name: 'Platform Administration', exact: true })).toBeVisible();
-    const readinessLink = platformMenu.getByRole('menuitem', { name: 'Platform readiness', exact: true });
-    await expect(readinessLink).toBeVisible();
-    await readinessLink.click();
-    await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe('/admin/platform-readiness');
+    for (const href of supportingRoutes) {
+      await page.goto(href, { waitUntil: 'domcontentloaded' });
+      await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
+      await expect(page.locator('header').first(), `${href} remains inside the authenticated shell`).toBeVisible();
+      await page.getByRole('button', { name: 'Toggle mobile menu' }).click();
+      const drawer = page.locator('#mobile-nav-sheet');
+      await expect(drawer).toBeVisible();
+      await expect(drawer.locator(`a[href="${href}"]`), `${href} is not promoted globally`).toHaveCount(0);
+      await page.keyboard.press('Escape');
+      await expect(drawer).toBeHidden();
+    }
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });
@@ -119,6 +129,20 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await drawer.getByRole('link', { name: 'Simulation' }).first().click();
     await expectPath(page, '/simulation');
     await expect(drawer).toBeHidden();
+
+    // Simulation intentionally opens its workspace inspector on mobile. Close
+    // that independent dialog before exercising the global navigation trigger.
+    const workspaceInspector = page.getByTestId('workspace-inspector-drawer');
+    await expect(workspaceInspector).toBeVisible({ timeout: 5_000 });
+    await page.keyboard.press('Escape');
+    await expect(workspaceInspector).toBeHidden();
+
+    const trigger = page.getByRole('button', { name: 'Toggle mobile menu' });
+    await trigger.click();
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(trigger).toBeFocused();
 
     expect(guard.anyExternalCompleted()).toBe(false);
   });
@@ -136,15 +160,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
-    await expect
-      .poll(() => new URL(page.url()).pathname, { timeout: 5_000 })
-      .toBe('/evidence/overview');
-    const evidenceUrl = new URL(page.url());
-    expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
-    expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
-    expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
-    expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
-    expect(evidenceUrl.searchParams.get('tick')).toBe('0');
+    await expectEvidenceContext(page, '/evidence/overview');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();
     expect(nestedInteractive, 'dashboard must not nest links and buttons').toBe(0);

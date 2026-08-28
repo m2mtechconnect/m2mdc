@@ -72,17 +72,6 @@ function currentPath(page: Page): string {
   return u.pathname + u.search;
 }
 
-async function clickGroupedDestination(page: Page, parentName: string, href: string): Promise<void> {
-  // A route change can happen before Radix finishes the previous menu's close
-  // animation. Reopening during that transition races the trigger and can leave
-  // the next menu visually closed even though navigation is healthy.
-  await expect(page.getByRole('menu')).toBeHidden().catch(() => {});
-  await page.getByRole('button', { name: parentName }).click();
-  const menu = page.getByRole('menu');
-  await expect(menu).toBeVisible();
-  await menu.locator(`a[href="${href}"]`).click();
-}
-
 guardedTest.describe('AURA DC full-surface deep-link coverage', () => {
   for (const route of DEEP_LINK_ROUTES) {
     guardedTest(`deep-link ${route} mounts inside authenticated shell`, async ({ context, page, guard }) => {
@@ -168,14 +157,14 @@ guardedTest.describe('AURA DC pilot isolation', () => {
 });
 
 guardedTest.describe('AURA DC browser back/forward preserves navigation', () => {
-  guardedTest('back and forward step through canonical Manage history', async ({ context, page, guard }) => {
+  guardedTest('back and forward preserve canonical supporting-route history', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
     await openAuthed(context, page, '/dashboard');
 
-    await clickGroupedDestination(page, 'Design & Build', '/manage/facilities');
+    await page.goto('/manage/facilities', { waitUntil: 'domcontentloaded' });
     await expect.poll(() => new URL(page.url()).pathname).toBe('/manage/facilities');
 
-    await clickGroupedDestination(page, 'Operations', '/app/agents');
+    await page.goto('/app/agents', { waitUntil: 'domcontentloaded' });
     await expect.poll(() => new URL(page.url()).pathname).toBe('/app/agents');
 
     await page.goBack({ waitUntil: 'domcontentloaded' });

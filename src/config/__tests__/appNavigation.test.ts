@@ -73,12 +73,12 @@ describe('canonical navigation', () => {
   it('matches nested lifecycle workspace routes', () => {
     const build = WORKSPACE_NAV[1];
     expect(isNavItemActive(build, '/builder/session-abc')).toBe(true);
-    expect(isNavItemActive(build, '/blueprint/abc')).toBe(false);
+    expect(isNavItemActive(build, '/blueprint/abc')).toBe(true);
     expect(isNavItemActive(MANAGE_NAV.find((item) => item.href === '/blueprint')!, '/blueprint/abc')).toBe(true);
 
     const operate = WORKSPACE_NAV[2];
     expect(isNavItemActive(operate, '/analytics/system/abc')).toBe(true);
-    expect(isNavItemActive(operate, '/deployments/abc')).toBe(false);
+    expect(isNavItemActive(operate, '/deployments/abc')).toBe(true);
     expect(isNavItemActive(MANAGE_NAV.find((item) => item.href === '/deployments')!, '/deployments/abc')).toBe(true);
 
     const evidence = WORKSPACE_NAV[4];
@@ -90,8 +90,9 @@ describe('canonical navigation', () => {
     // Write-level callers see the write-oriented surfaces...
     expect(visibleManageNav((p) => p === 'twin.edit').map((i) => i.name)).toEqual([
       'Connections',
-      'Marketplace',
     ]);
+    expect(MANAGE_NAV.map((i) => i.href)).not.toContain('/marketplace');
+    expect(navGroups(() => true).flatMap((group) => group.items.map((i) => i.href))).not.toContain('/marketplace');
     // ...and read-only personas discover the surfaces they report on.
     expect(visibleManageNav((p) => p === 'twin.view').map((i) => i.name)).toEqual([
       'Facilities',

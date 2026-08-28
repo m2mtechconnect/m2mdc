@@ -8,6 +8,10 @@ interface PublishedReleaseFingerprint {
   buildId: string;
 }
 
+// Keep the customer-facing release channel stable. Exact stale-bundle detection
+// uses the signed build fingerprint below rather than this presentation label.
+const PUBLIC_RELEASE_CHANNEL = 'pilot';
+
 function isPublishedReleaseFingerprint(value: unknown): value is PublishedReleaseFingerprint {
   if (!value || typeof value !== 'object') return false;
   const candidate = value as Partial<PublishedReleaseFingerprint>;
@@ -80,7 +84,7 @@ export function BuildVersion() {
 
   return (
     <div className="flex items-center gap-2 text-xs text-muted-foreground">
-      <span>v{currentBuild.appVersion}</span>
+      <span>v{PUBLIC_RELEASE_CHANNEL}</span>
       {showRefreshPrompt && (
         <button
           onClick={() => window.location.reload()}

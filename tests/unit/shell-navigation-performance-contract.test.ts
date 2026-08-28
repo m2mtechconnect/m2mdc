@@ -41,4 +41,10 @@ describe('authenticated shell navigation performance contract', () => {
     expect(buildVersion).toContain('published.buildId !== currentBuild.buildId');
     expect(buildVersion).not.toContain('localStorage.getItem("app_version")');
   });
+
+  it('keeps the public pilot label separate from the exact build fingerprint', () => {
+    expect(buildVersion).toContain("const PUBLIC_RELEASE_CHANNEL = 'pilot'");
+    expect(buildVersion).toContain('<span>v{PUBLIC_RELEASE_CHANNEL}</span>');
+    expect(buildVersion).not.toContain('<span>v{currentBuild.appVersion}</span>');
+  });
 });

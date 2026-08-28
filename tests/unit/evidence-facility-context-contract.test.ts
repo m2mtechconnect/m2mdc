@@ -42,7 +42,7 @@ describe('evidence facility context', () => {
   it('states the active facility in the Evidence shell header', () => {
     const shell = readFileSync('src/pages/dsx/EvidenceBetaShell.tsx', 'utf8');
     expect(shell).toContain('dsx-active-facility');
-    expect(shell).toContain('Facility: not selected');
+    expect(shell).toContain('Demonstration facility: Evidence Beta Site (active facility not selected)');
     expect(shell).toContain('activeTwin?.id === facilityId');
   });
 

@@ -51,7 +51,7 @@ describe('P1 Batch A managed AI runtime truth contract', () => {
     expect(aiSettings).toContain("'Verified healthy'");
     expect(aiSettings).toContain("'Verification incomplete'");
     expect(aiSettings).toContain("'Verified available'");
-    expect(aiSettings).toContain("'Server-owned runtime health probe'");
+    expect(aiSettings).toContain('Server-owned runtime health probe');
     expect(aiSettings).toContain("runtime?.groundingSearch.available === true ? 'Available' : 'Not exposed'");
     expect(aiSettings).toContain('Runtime health evidence');
     expect(aiSettings).toContain("health?.managedAi.status === 'ok'");

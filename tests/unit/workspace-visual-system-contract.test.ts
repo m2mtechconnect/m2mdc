@@ -203,7 +203,7 @@ describe('backend-to-UI capability parity', () => {
   it('renders lifecycle order Readiness -> Activation -> Evidence on /deploy', () => {
     const deploy = read('src/pages/Deploy.tsx');
     const readiness = deploy.indexOf('Activation readiness');
-    const execution = deploy.indexOf('title="Configuration activation"');
+    const execution = deploy.indexOf('<DCCard title="Configuration activation"');
     const evidence = deploy.indexOf('DeploymentEvidenceCard systemId');
     expect(readiness).toBeGreaterThan(-1);
     expect(execution).toBeGreaterThan(readiness);

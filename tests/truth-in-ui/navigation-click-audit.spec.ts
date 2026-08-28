@@ -29,6 +29,35 @@ async function expectPath(page: import('@playwright/test').Page, expected: strin
     .toBe(expected);
 }
 
+async function expectEvidenceContext(
+  page: import('@playwright/test').Page,
+  expectedPath: string,
+) {
+  await expect
+    .poll(
+      () => {
+        const current = new URL(page.url());
+        return {
+          pathname: current.pathname,
+          facility: current.searchParams.get('facility'),
+          scenario: current.searchParams.get('scenario'),
+          mode: current.searchParams.get('mode'),
+          runPresent: Boolean(current.searchParams.get('run')),
+          tick: current.searchParams.get('tick'),
+        };
+      },
+      { timeout: 5_000, message: 'Evidence route must resolve complete reproducible provenance' },
+    )
+    .toEqual({
+      pathname: expectedPath,
+      facility: 'aura-reference-facility',
+      scenario: 'cooling_degradation',
+      mode: 'SIMULATED',
+      runPresent: true,
+      tick: '0',
+    });
+}
+
 test.describe('AURA DC authenticated navigation real-click matrix', () => {
   test('desktop header links navigate with React Router anchors', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 900 });
@@ -49,13 +78,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
       await expect(link, `${item.name} is a visible link`).toBeVisible();
       await link.click();
       if (item.name === 'Evidence') {
-        await expect.poll(() => new URL(page.url()).pathname, { timeout: 5_000 }).toBe(item.path);
-        const evidenceUrl = new URL(page.url());
-        expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
-        expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
-        expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
-        expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
-        expect(evidenceUrl.searchParams.get('tick')).toBe('0');
+        await expectEvidenceContext(page, item.path);
       } else {
         await expectPath(page, item.path);
       }
@@ -110,10 +133,9 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     // Simulation intentionally opens its workspace inspector on mobile. Close
     // that independent dialog before exercising the global navigation trigger.
     const workspaceInspector = page.getByTestId('workspace-inspector-drawer');
-    if (await workspaceInspector.isVisible().catch(() => false)) {
-      await page.keyboard.press('Escape');
-      await expect(workspaceInspector).toBeHidden();
-    }
+    await expect(workspaceInspector).toBeVisible({ timeout: 5_000 });
+    await page.keyboard.press('Escape');
+    await expect(workspaceInspector).toBeHidden();
 
     const trigger = page.getByRole('button', { name: 'Toggle mobile menu' });
     await trigger.click();
@@ -138,15 +160,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
-    await expect
-      .poll(() => new URL(page.url()).pathname, { timeout: 5_000 })
-      .toBe('/evidence/overview');
-    const evidenceUrl = new URL(page.url());
-    expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
-    expect(evidenceUrl.searchParams.get('scenario')).toBe('cooling_degradation');
-    expect(evidenceUrl.searchParams.get('mode')).toBe('SIMULATED');
-    expect(evidenceUrl.searchParams.get('run')).toBeTruthy();
-    expect(evidenceUrl.searchParams.get('tick')).toBe('0');
+    await expectEvidenceContext(page, '/evidence/overview');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();
     expect(nestedInteractive, 'dashboard must not nest links and buttons').toBe(0);

@@ -16,7 +16,10 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { installSupabaseMock } from './_setup/supabase-mock';
 
-const ROUTE = '/evidence';
+// Exercise the canonical workspace directly. Starting from the retired index
+// races its redirect and can transiently replace the rendered shell with the
+// route-level Suspense fallback on slower tablet/mobile runs.
+const ROUTE = '/evidence/overview';
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },

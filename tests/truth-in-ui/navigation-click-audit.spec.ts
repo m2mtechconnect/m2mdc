@@ -13,7 +13,9 @@ async function installSessionAndOpen(
   page: import('@playwright/test').Page,
   path = '/dashboard',
 ) {
-  const mock = await installSupabaseMock(context);
+  // This journey verifies the authorized Builder surface, so model the
+  // server-owned tenant membership and active_org_id contract explicitly.
+  const mock = await installSupabaseMock(context, { withActiveOrganization: true });
   await page.goto(path, { waitUntil: 'domcontentloaded' });
   await expect
     .poll(() => mock.profileHits(), { timeout: 5_000, message: 'approval-gate profile query must be issued' })

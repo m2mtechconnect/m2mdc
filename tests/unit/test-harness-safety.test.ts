@@ -221,6 +221,15 @@ describe('test harness safety guards', () => {
     expect(isSupabaseRequest(new URL('https://project-ref.supabase.co/rest/v1/profiles'))).toBe(true);
   });
 
+  it('requires tenant-aware journeys to opt into a server-owned active organization', () => {
+    const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
+    const navigation = repositoryFile('tests/truth-in-ui/navigation-click-audit.spec.ts');
+
+    expect(mock).toContain('withActiveOrganization?: boolean');
+    expect(mock).toContain("pathname.startsWith('/rest/v1/rpc/active_org_id')");
+    expect(navigation).toContain('installSupabaseMock(context, { withActiveOrganization: true })');
+  });
+
   it('provides a declared Node 20 WebSocket transport for test-only Supabase clients', () => {
     const helper = repositoryFile('tests/helpers/testSupabaseClient.ts');
     const packageJson = repositoryFile('package.json');

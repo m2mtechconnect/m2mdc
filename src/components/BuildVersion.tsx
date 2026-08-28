@@ -27,6 +27,11 @@ export function BuildVersion() {
   const currentBuild = getBuildFingerprint();
 
   useEffect(() => {
+    // release.json is emitted only for production builds. Polling for it from
+    // the Vite development server creates a false 404 on every full-page test
+    // navigation and cannot provide a meaningful stale-release signal.
+    if (!import.meta.env.PROD) return;
+
     let active = true;
     let notified = false;
 

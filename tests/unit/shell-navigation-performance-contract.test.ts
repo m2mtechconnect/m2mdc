@@ -35,6 +35,7 @@ describe('authenticated shell navigation performance contract', () => {
   });
 
   it('detects a stale open tab from the canonical release fingerprint', () => {
+    expect(buildVersion).toContain('if (!import.meta.env.PROD) return');
     expect(buildVersion).toContain('`/release.json?build=${encodeURIComponent(currentBuild.buildId)}&check=${Date.now()}`');
     expect(buildVersion).toContain("cache: 'no-store'");
     expect(buildVersion).toContain('published.sha !== currentBuild.commitSha');

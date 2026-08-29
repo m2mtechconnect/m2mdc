@@ -2,14 +2,15 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "d8b5774c428595aebd665081c43aadedf7978f06",
-    "workflowRunId": 33198830967,
-    "artifactId": 9696967963,
-    "artifactZipSha256": "0bd7af07629d480916ff4e3d1d7365e9d0a05c3b045bfb1122b8f5c5f559d0b1"
+    "sha": "bdc14d2f639b1a4fe8f2d21af25751dc83d92bbe",
+    "workflowRunId": 33259373330,
+    "artifactId": 9716827680,
+    "artifactZipSha256": "a7b3f0442faa5841ed0f0cf9b6ac4ded017136d08b72d4e0e6c62bc26b8bdb8f"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
+    "Operations desktop/mobile and Compliance desktop were visibly reviewed from exact-head artifact 9716827680 after PR #121 introduced intentional source-conditional and unavailable-state copy through src/config/pagePositioning.ts. Layout, responsive reflow, provenance, disabled export state and navigation remained coherent; the three reviewed fingerprints were approved without changing application code.",
     "All 20 lifecycle screenshots were generated successfully at source 5bce67e07c08945630f4e138fb9d30afff32e6ee. The two changed activation screenshots were manually reviewed before approval; the remaining reviewed fingerprints retained their prior approval.",
     "The reviewed activation change adds the manifest-backed Managed AI readiness tile and keeps raw model identifiers behind the approved customer-facing model label.",
     "Phase 2 adds an explicit first-run Builder facility gate. The reviewed state shows the lifecycle shell and a single Create facility handoff without fabricated facility values.",
@@ -57,14 +58,14 @@
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "ea43ea416b474f2b512ad807210cfd497d18fd9b114c530492a6651a9737823d",
+      "sha256": "6d5c97c14a8eee514ac8eeb06f7ac9a3e38d88d1591082120b1de2d404f29287",
       "width": 375,
       "height": 5530
     },
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "7d5ba2ab443fd48631b116941fafb225b053be04f24579b9f66a9bff5c14ee57",
+      "sha256": "ed28ccdbc36daf36a43d2bce934892171566fbf1709accd6aa41763f375410e4",
       "width": 1280,
       "height": 720
     },
@@ -106,7 +107,7 @@
     {
       "file": "compliance-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887",
+      "sha256": "92c39de2c7187da1deba8c02896ca78affe17fdb7b7376775821ffe4fa76b494",
       "width": 1280,
       "height": 720
     },

@@ -5,8 +5,11 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ThemeProvider } from 'next-themes';
 import PublicAppRoutes, { publicRouteFallback } from './PublicAppRoutes';
 
+const loadAuthenticatedSessionApp = () => import('./AuthenticatedSessionApp');
+const loadRuntimeAppProviders = () => import('./RuntimeAppProviders');
+
 const AuthenticatedSessionApp = lazy(() => import('./AuthenticatedSessionApp'));
-const RuntimeAppProviders = lazy(() => import('./RuntimeAppProviders'));
+const RuntimeAppProviders = lazy(loadRuntimeAppProviders);
 
 /**
  * Supabase browser sessions are persisted under an sb-*-auth-token key. Reading
@@ -68,6 +71,14 @@ function RouteEntry() {
   const protectedEntry = !PUBLIC_PATHS.has(pathname);
   const needsSessionResolution = persistedSession || protectedEntry;
   const returnTo = `${pathname}${search}${hash}`;
+
+  // These modules are siblings in the protected-route dependency graph. Start
+  // both requests before React enters the provider Suspense boundary so a cold
+  // authenticated load does not fetch RuntimeAppProviders first and only then
+  // discover AuthenticatedSessionApp. Dynamic imports remain module-cached;
+  // this changes scheduling only and does not make an authorization decision.
+  void loadRuntimeAppProviders();
+  if (needsSessionResolution) void loadAuthenticatedSessionApp();
 
   return (
     <Suspense fallback={publicRouteFallback}>

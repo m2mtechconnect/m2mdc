@@ -32,7 +32,7 @@ describe('authenticated shell navigation performance contract', () => {
 
   it('does not leave the previous workspace visible while a new route suspends', () => {
     expect(app).toContain('<BrowserRouter useTransitions={false}>');
-    expect(shell).toContain('<Suspense\n                    key={location.pathname}');
+    expect(shell).toMatch(/<Suspense\s+key=\{location\.pathname\}/);
     expect(shell).toContain('Loading workspace...');
   });
 

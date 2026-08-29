@@ -7,6 +7,7 @@ import { useAutoLogout } from '@/hooks/useAutoLogout';
 import BoundedLoading from '@/components/shared/BoundedLoading';
 import PublicAppRoutes, { withPublicRouteFallback } from './PublicAppRoutes';
 
+const loadApprovedUserRouter = () => import('./ApprovedUserRouter');
 const ApprovedUserRouter = lazy(() => import('./ApprovedUserRouter'));
 const PendingApproval = lazy(() => import('./pages/PendingApproval'));
 const InviteAccept = lazy(() => import('./pages/InviteAccept'));
@@ -99,6 +100,10 @@ export default function AuthenticatedSessionApp({
         return;
       }
 
+      // Approval remains the fail-closed gate. Warming the approved-user
+      // router in parallel only removes a post-approval chunk waterfall; the
+      // module is not rendered until the server-owned approval result passes.
+      void loadApprovedUserRouter().catch(() => undefined);
       const result = await fetchProfileFields(user.id, 'is_approved');
       if (cancelled) return;
       if (result.status === 'error') {

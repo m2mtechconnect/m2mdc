@@ -41,10 +41,7 @@ async function expectWorkspaceCommitted(
   workspace: 'dashboard' | 'builder' | 'operations' | 'simulation' | 'evidence',
 ) {
   const marker = workspace === 'dashboard'
-    ? page.getByText(
-        'The AURA operating surface for data centre command, operations and day-to-day workspace navigation.',
-        { exact: true },
-      )
+    ? page.getByTestId('facility-highlights').getByRole('heading', { level: 1 })
     : workspace === 'builder'
       // The mocked organization is intentionally empty. A successful Builder
       // navigation therefore commits the tenant-scoped first-facility state;

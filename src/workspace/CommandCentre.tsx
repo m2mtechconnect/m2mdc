@@ -14,6 +14,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
+import { stackCopy } from '@/config/auraStackManifest';
 
 /**
  * The Command Centre reads the configured Blueprint model and deterministic
@@ -26,6 +27,8 @@ const COMMAND_CENTRE_PROVENANCE = {
   connection: 'demo',
   note: 'Deterministic scenario engine over the configured Blueprint. Not measured telemetry.',
 } as const;
+
+const COMMAND_CENTRE_CAPABILITY = stackCopy('platform.command');
 
 import { deriveKpis, formatKpi, formatPower, useFacilityModel, type KpiKey } from './facilityModel';
 import { evidenceHrefForKpi } from './kpiDrilldown';
@@ -213,6 +216,7 @@ export default function CommandCentre() {
       <div className="dashboard-shell min-w-0 space-y-4">
         {/* Screen 1 - decisions. */}
         <FacilityHighlights
+          workspaceLabel={COMMAND_CENTRE_CAPABILITY.label}
           facilityName={facility.name}
           location={facility.city}
           tier={facility.tier}

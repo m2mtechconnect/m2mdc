@@ -11,7 +11,6 @@ import { resolve } from 'node:path';
 const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
 
 const PRIMARY_SURFACES = [
-  'src/workspace/CommandCentre.tsx',
   'src/pages/Connections.tsx',
   'src/pages/dsx/EvidenceBetaShell.tsx',
   // Final visual parity pass: designer, simulation, runtime and learning.
@@ -48,6 +47,13 @@ describe('AURA shared workspace visual system', () => {
     const source = read(file);
     expect(source).toContain('@/components/workspace-system');
     expect(source).toContain('<WorkspaceHeader');
+  });
+
+  it('keeps Command Center on one facility-led hero while retaining manifest semantics', () => {
+    const source = read('src/workspace/CommandCentre.tsx');
+    expect(source).toContain('<FacilityHighlights');
+    expect(source).toContain("stackCopy('platform.command')");
+    expect(source).not.toContain('<WorkspaceHeader');
   });
 
   it.each(MANIFEST_BACKED)('%s renders the manifest capability %s', (file, capabilityId) => {

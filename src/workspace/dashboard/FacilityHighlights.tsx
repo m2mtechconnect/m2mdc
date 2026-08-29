@@ -33,6 +33,7 @@ import {
 import { type KpiInterpretation, type KpiState } from './kpiInterpretation';
 
 interface Props {
+  workspaceLabel: string;
   facilityName: string;
   location: string;
   tier: string;
@@ -59,6 +60,7 @@ const STATE_UI: Record<KpiState, { Icon: typeof Info; className: string }> = {
 };
 
 export function FacilityHighlights({
+  workspaceLabel,
   facilityName,
   location,
   tier,
@@ -77,6 +79,7 @@ export function FacilityHighlights({
   return (
     <section
       aria-labelledby="facility-highlights-heading"
+      aria-label={`${workspaceLabel}: ${facilityName}`}
       data-testid="facility-highlights"
       className="v2-panel min-w-0 overflow-hidden p-0"
     >

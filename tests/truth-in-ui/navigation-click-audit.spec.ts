@@ -196,7 +196,7 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     expect(guard.anyExternalCompleted()).toBe(false);
   });
 
-  test('dashboard primary actions are real links', async ({ context, page, guard }) => {
+  test('dashboard primary actions and workspace links are real', async ({ context, page, guard }) => {
     await page.setViewportSize({ width: 1600, height: 1000 });
     await installSessionAndOpen(context, page);
 
@@ -208,7 +208,10 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await expectPath(page, '/blueprint/aura-reference-facility');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
-    await page.getByRole('link', { name: /^View Evidence$/i }).first().click();
+    await page
+      .getByTestId('primary-navigation')
+      .getByRole('link', { name: /^Evidence$/i })
+      .click();
     await expectEvidenceContext(page, '/evidence/overview');
 
     const nestedInteractive = await page.locator('main a button, main button a').count();

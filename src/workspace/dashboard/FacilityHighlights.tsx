@@ -18,7 +18,6 @@ import {
   FileSearch,
   Info,
   Play,
-  Plus,
   TriangleAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -46,6 +45,7 @@ interface Props {
   kpis: KpiInterpretation[];
   evidenceHrefForKpi: (kpi: KpiInterpretation) => string;
   onSelectKpi: (kpi: KpiInterpretation) => void;
+  provenance: ReactNode;
   assumptions: ReactNode;
 }
 
@@ -71,6 +71,7 @@ export function FacilityHighlights({
   kpis,
   evidenceHrefForKpi,
   onSelectKpi,
+  provenance,
   assumptions,
 }: Props) {
   return (
@@ -89,20 +90,23 @@ export function FacilityHighlights({
           </span>
           <div className="min-w-0">
             <p className="v2-label hidden sm:block">
-              Data centre facility
+              Command Center · Data centre facility
             </p>
-            <h2
+            <h1
               id="facility-highlights-heading"
               className="v2-command-title mt-0.5 break-words"
             >
               {facilityName}
-            </h2>
+            </h1>
             <p className="mt-1 break-words text-[14px] text-muted-foreground">
               {location} · {tier} design
               {isFallback && ' · Reference model'}
               <span className="hidden sm:inline"> · Simulated design baseline · Synthetic inputs</span>
               {hasRecordedRun ? ` · Calculated ${calculatedAt}` : ' · No simulation run recorded'}
             </p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              {provenance}
+            </div>
           </div>
         </div>
 
@@ -119,22 +123,10 @@ export function FacilityHighlights({
               Start simulation
             </Link>
           </Button>
-          <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal min-[1280px]:inline-flex">
-            <Link to="/manage/facilities?create=true" data-testid="command-create-facility">
-              <Plus className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
-              New facility
-            </Link>
-          </Button>
           <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal sm:inline-flex">
             <Link to={blueprintHref}>
               <Boxes className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
               Open Blueprint
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal sm:inline-flex">
-            <Link to={evidenceHref}>
-              <FileSearch className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
-              View Evidence
             </Link>
           </Button>
           <DropdownMenu>
@@ -149,13 +141,13 @@ export function FacilityHighlights({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild className="min-[1280px]:hidden">
+              <DropdownMenuItem asChild>
                 <Link to="/manage/facilities?create=true">New facility</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild className="sm:hidden">
                 <Link to={blueprintHref}>Open Blueprint</Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild className="sm:hidden">
+              <DropdownMenuItem asChild>
                 <Link to={evidenceHref}>View Evidence</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>

@@ -12,8 +12,6 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { LayoutDashboard } from 'lucide-react';
-import { CapabilityChips, WorkspaceHeader } from '@/components/workspace-system';
 import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
 
@@ -213,32 +211,8 @@ export default function CommandCentre() {
   return (
     <div className="aura-workspace-theme min-w-0 bg-background py-4" data-testid="command-centre">
       <div className="dashboard-shell min-w-0 space-y-4">
-        <WorkspaceHeader
-          eyebrow="Command Center"
-          title={facility.name}
-          icon={LayoutDashboard}
-          capabilityId="platform.command"
-          badges={
-            <>
-              <ProvenanceBadge meta={COMMAND_CENTRE_PROVENANCE} />
-              <span className="aura-ws-chip">
-                <span className="aura-ws-chip-dot" data-status="SIMULATED" aria-hidden="true" />
-                Operating mode: Simulated
-              </span>
-              <span className="aura-ws-chip">
-                {facility.city} · Tier {facility.tier}
-              </span>
-              <span className="aura-ws-chip">
-                {latestRun ? `Last run ${calculatedAt}` : RUN_UNAVAILABLE_LABEL}
-              </span>
-            </>
-          }
-          meta={<CapabilityChips surface="readiness" limit={4} />}
-        />
-
         {/* Screen 1 - decisions. */}
         <FacilityHighlights
-
           facilityName={facility.name}
           location={facility.city}
           tier={facility.tier}
@@ -251,6 +225,7 @@ export default function CommandCentre() {
           kpis={primaryKpis}
           evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key, facility.id)}
           onSelectKpi={setMetricKpi}
+          provenance={<ProvenanceBadge meta={COMMAND_CENTRE_PROVENANCE} />}
           assumptions={assumptions}
         />
 

@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "bdc14d2f639b1a4fe8f2d21af25751dc83d92bbe",
-    "workflowRunId": 33259373330,
-    "artifactId": 9716827680,
-    "artifactZipSha256": "a7b3f0442faa5841ed0f0cf9b6ac4ded017136d08b72d4e0e6c62bc26b8bdb8f"
+    "sha": "960a6f542ba711646a698123b47db6a043bab108",
+    "workflowRunId": 33272669880,
+    "artifactId": 9720588644,
+    "artifactZipSha256": "a7904b50a9814d2563fae3ed7a096b04754bae552f3747086d861ca3c189c788"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
@@ -31,7 +31,8 @@
     "2026-08-27 persona-authority qualification explicitly models a tenant owner. Six deterministic changed surfaces were reviewed from workflow 33028128765 and explicitly approved by the owner: Teams renders the organization owner snapshot, Connections renders the full tenant control plane, and Command Center / Operations mobile layouts remain unclipped with no page-level horizontal overflow.",
     "2026-08-27 navigation consolidation updates the reviewed desktop lifecycle shell fingerprints for the shared permission-aware Design & Build, Operations and Evidence group triggers. All 21 Playwright visual scenarios passed before the exact fingerprint check; unchanged mobile and responsive fingerprints remain pinned.",
     "2026-08-27 exact-head remediation review inspected all 20 generated screenshots from Visual Regression workflow 33136149911 at source 3b2d772606c62e73d0aba3721fe55a50bf2efffa before updating fingerprints. The reviewed changes consolidate the five lifecycle workspaces, retire Marketplace from the global experience, preserve honest simulated/unavailable runtime labels, clarify organization-scoped access, and keep desktop/mobile layouts free of blocking clipping, overlap or contradictory navigation.",
-    "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged."
+    "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged.",
+    "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact."
   ],
   "screenshots": [
     {
@@ -121,16 +122,16 @@
     {
       "file": "dashboard-hero-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "3347c9314d175c0c91c4ba807f3942e370e3262a4c786bda7d4a9b9240497b87",
+      "sha256": "3a7ee081211c89422b667638806d862a2ec3d502d46debb46d69dd715204809e",
       "width": 1280,
       "height": 720
     },
     {
       "file": "dashboard-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "26dd89474ced1aa05088a6f8ec83ef1d8082513d7d7575d21fa4bcc147bc195a",
+      "sha256": "3b2e7198af7ecaaa133c8e7f8c4384af28e3f03485645f39a62779fa1e1384dd",
       "width": 375,
-      "height": 2357
+      "height": 1945
     },
     {
       "file": "deployments-light-chromium-linux.png",

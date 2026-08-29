@@ -205,10 +205,30 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
 
         if (!cancelled) setUserId(user.id);
 
-        const { data: roleRows, error: rolesError } = await supabase
-          .from('user_roles')
-          .select('role, scope, expires_at')
-          .eq('user_id', user.id);
+        // Generated Supabase types intentionally lag additive enterprise
+        // migrations on stacked branches. Keep this compatibility cast local
+        // to the tenant resolver rather than weakening the generated client.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const tenantDb = supabase as any;
+
+        // These reads share the same verified caller but do not depend on one
+        // another. Resolve them concurrently to remove three serial network
+        // round trips from every cold authorization bootstrap. The results are
+        // still validated independently and every failure remains fail-closed.
+        const [rolesResult, membershipsResult, activeOrgResult] = await Promise.all([
+          supabase
+            .from('user_roles')
+            .select('role, scope, expires_at')
+            .eq('user_id', user.id),
+          tenantDb
+            .from('org_memberships')
+            .select('org_id, role, status, is_default')
+            .eq('user_id', user.id)
+            .eq('status', 'active'),
+          tenantDb.rpc('active_org_id'),
+        ]);
+
+        const { data: roleRows, error: rolesError } = rolesResult;
 
         if (rolesError) {
           if (!cancelled) {
@@ -223,17 +243,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
           console.error('Unmapped platform authorization labels ignored:', platformAuthorization.unmapped);
         }
 
-        // Generated Supabase types intentionally lag additive enterprise
-        // migrations on stacked branches. Keep this compatibility cast local
-        // to the tenant resolver rather than weakening the generated client.
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tenantDb = supabase as any;
-
-        const { data: rawMemberships, error: membershipsError } = await tenantDb
-          .from('org_memberships')
-          .select('org_id, role, status, is_default')
-          .eq('user_id', user.id)
-          .eq('status', 'active');
+        const { data: rawMemberships, error: membershipsError } = membershipsResult;
 
         if (membershipsError) {
           if (!cancelled) {
@@ -276,7 +286,7 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
             };
           });
 
-        const { data: resolvedActiveOrgId, error: activeOrgError } = await tenantDb.rpc('active_org_id');
+        const { data: resolvedActiveOrgId, error: activeOrgError } = activeOrgResult;
         if (activeOrgError) {
           if (!cancelled) {
             resetAuthorization();
@@ -364,7 +374,14 @@ export const RBACProvider = ({ children }: { children: ReactNode }) => {
     armBudget();
     void fetchAuthorization();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // fetchAuthorization() above already owns the initial server-verified
+      // bootstrap. Supabase also emits INITIAL_SESSION immediately after the
+      // listener is registered; starting a second identical query chain here
+      // doubled cold-load authorization traffic and introduced a resolution
+      // race without adding any security evidence.
+      if (event === 'INITIAL_SESSION') return;
+
       if (session?.user) {
         setUserId(session.user.id);
         setResolution({ status: 'loading' });

@@ -106,6 +106,8 @@ describe('test harness safety guards', () => {
     expect(workflow).toContain('Generate fresh current-head screenshots for human review');
     expect(workflow).toContain('Fresh screenshots are review evidence only. This job never commits or pushes baselines.');
     expect(workflow).toContain('Enforce visual gate');
+    expect(workflow).toContain("- 'src/config/**/*.ts'");
+    expect(workflow).not.toContain("- 'src/config/appNavigation.ts'");
     expect(workflow).not.toContain('update-snapshots');
     expect(workflow).not.toMatch(/git\s+(?:commit|push)\b/);
     expect(config).toContain("testDir: './tests/visual'");

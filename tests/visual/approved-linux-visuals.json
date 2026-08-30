@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "960a6f542ba711646a698123b47db6a043bab108",
-    "workflowRunId": 33272669880,
-    "artifactId": 9720588644,
-    "artifactZipSha256": "a7904b50a9814d2563fae3ed7a096b04754bae552f3747086d861ca3c189c788"
+    "sha": "f5f1bb88235dc5ee67de9b0182192585b787394d",
+    "workflowRunId": 33291409607,
+    "artifactId": 9726093184,
+    "artifactZipSha256": "4e5a9b80b856a3e9a0f3c3a9f1ee52a759a930202b88e48edd192ce49655e16b"
   },
   "notes": [
     "AURA global application surfaces are light-theme by product contract.",
@@ -32,92 +32,93 @@
     "2026-08-27 navigation consolidation updates the reviewed desktop lifecycle shell fingerprints for the shared permission-aware Design & Build, Operations and Evidence group triggers. All 21 Playwright visual scenarios passed before the exact fingerprint check; unchanged mobile and responsive fingerprints remain pinned.",
     "2026-08-27 exact-head remediation review inspected all 20 generated screenshots from Visual Regression workflow 33136149911 at source 3b2d772606c62e73d0aba3721fe55a50bf2efffa before updating fingerprints. The reviewed changes consolidate the five lifecycle workspaces, retire Marketplace from the global experience, preserve honest simulated/unavailable runtime labels, clarify organization-scoped access, and keep desktop/mobile layouts free of blocking clipping, overlap or contradictory navigation.",
     "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged.",
-    "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact."
+    "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact.",
+    "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract."
   ],
   "screenshots": [
     {
       "file": "activation-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "8e7e3cf19e1d66061aad2ca7d27b758f6f36559b419b2a413f8668158deae544",
+      "sha256": "3e0fabd2cf431eb535bdb54ad2bc2ba84950580a6dd9baaedb7efa3061d62bfa",
       "width": 1280,
-      "height": 1682
+      "height": 1633
     },
     {
       "file": "activation-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e2a96feb9f86200aefc7c3faa63fde76966005a83849a125121c96c82b386f78",
+      "sha256": "97f8707d3c8b866c58395d53c1eca4a3115ad684ad7b80cf494b024e2a27fb68",
       "width": 375,
-      "height": 3053
+      "height": 3004
     },
     {
       "file": "ai-runtime-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "cb0ac861638a12559989b429a53e6c09dc6e72bc103a02af64e000ce82f37b58",
+      "sha256": "f5bb9576158030ed62e482d3993e9de96b078808566ae0cd5a900644a3405a27",
       "width": 1280,
-      "height": 906
+      "height": 857
     },
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "6d5c97c14a8eee514ac8eeb06f7ac9a3e38d88d1591082120b1de2d404f29287",
+      "sha256": "5102caeb668bbd28269e71f67a02b6dbffef544fb66f2107e2fa0784f1085bb7",
       "width": 375,
-      "height": 5530
+      "height": 5481
     },
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "ed28ccdbc36daf36a43d2bce934892171566fbf1709accd6aa41763f375410e4",
+      "sha256": "32d4eaac0ef18db738caee39914f4b079094e8dfc7d20e7ea2734f9a1c10d146",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-first-run-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "96b501e1297d54bf41a07ca13118ba18609094cccf4c9cee41f56b8f37f574dc",
+      "sha256": "166a853a2e3639d1d5c33a588850222ef1a4e4a0ae808a311f3ed982cda38e88",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "7c67597561ff3395a49f906d3f4702479caa2fca7e736fbb303e711356d7c3b0",
+      "sha256": "52d2128bf2f11afa463eea1c6e9acc8d45b7a606b2e8fb228133756b1abdefc3",
       "width": 375,
-      "height": 2476
+      "height": 2427
     },
     {
       "file": "builder-step1-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "bbda618493c29513b5e4e109c96e35a5ad0ee936516181c5b0c109dfd5ae400c",
+      "sha256": "d23a4fad778c60a640afc69b891d9530ef2730e626add228c7dec04c68f9032c",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step2-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "a54ac773b610501878792c414cab9884348d73547051e86546efd852213f20c4",
+      "sha256": "415bdc528446be21194970739a00aa8aed0b56a918697f863edb07f7082b10cd",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step5-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "3d4382bb8623bb0faac56eadbd5a8c182759f1822900fa5d864bd8e535f368c7",
+      "sha256": "39e94c090f6d1220a336cd0675fbfa31f9f78f09a142c7e8501a0a6f5c97b70a",
       "width": 1280,
       "height": 720
     },
     {
       "file": "compliance-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "92c39de2c7187da1deba8c02896ca78affe17fdb7b7376775821ffe4fa76b494",
+      "sha256": "60ae257bbff48d818afae27e7f524a15c58b8c58327857f28fc4d1b543deba24",
       "width": 1280,
       "height": 720
     },
     {
       "file": "connections-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "ce85c3106fa70756e7e3ed116b0c3ac3e7dd992f071ccb865904e05fd584b20f",
+      "sha256": "4c214543663839958d915c6a824138126d9903770ba5e3213127421ceb5cb1fc",
       "width": 375,
-      "height": 2780
+      "height": 2731
     },
     {
       "file": "dashboard-hero-light-chromium-linux.png",
@@ -136,21 +137,21 @@
     {
       "file": "deployments-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "ebd31f53bc9e8bcb78d6910b34fdb2145e3c47102cad345d6a074bef2bf6776b",
+      "sha256": "eb2b018f2a4d66bb6499939f28ef90a93dab31132367fec4c37b84196ed55ee9",
       "width": 1280,
       "height": 720
     },
     {
       "file": "evidence-overview-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "9af09aa88343316838da26a363e0f54af292e5111a28df1a36651f3f6e408564",
+      "sha256": "c1473dd43a9ed5e1ca342f665d02f475d88ca2d8f3458871837f32151ac2c28e",
       "width": 1280,
       "height": 720
     },
     {
       "file": "integrations-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "38e98dc05569677b7b6ad8c049469eaba2d6436723a1e6f97bd85bf34c027b63",
+      "sha256": "6c93f116d18cf140530433ec35276dd1e9d7073b05974e15c023fd35c7d450bf",
       "width": 1280,
       "height": 720
     },
@@ -163,17 +164,18 @@
     {
       "file": "simulation-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "4e686a104ba593a12ec2de1cec231fdbd5296a76e90242f256ef65065e4f73b0",
+      "sha256": "d42809e7a3ee57cff80b6f395e082f856733e9e13950b1b1eddf540922bb43b9",
       "width": 375,
       "height": 667
     },
     {
       "file": "teams-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "70534c9d19146efc1c7848cfeac2a3fa2d1c8295f7098761147d1436aaa36575",
+      "sha256": "21e76bb3a490c9cfb0a130b88c11cb20155a58b8b544d33183a36fa0c7966b39",
       "width": 1280,
       "height": 720
     }
   ]
 }
+
 

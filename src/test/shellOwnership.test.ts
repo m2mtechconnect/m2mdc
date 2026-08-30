@@ -9,7 +9,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { MANAGE_NAV, WORKSPACE_NAV } from "@/config/appNavigation";
 
 const SRC = join(process.cwd(), "src");
@@ -23,7 +23,10 @@ function walk(dir: string, out: string[] = []): string[] {
   }
   return out;
 }
-const files = walk(SRC).map((f) => ({ rel: f.slice(f.indexOf("src/")), body: readFileSync(f, "utf8") }));
+const files = walk(SRC).map((f) => ({
+  rel: `src/${relative(SRC, f).replace(/\\/g, '/')}`,
+  body: readFileSync(f, "utf8"),
+}));
 const appFiles = files.filter((f) => !/\.(test|spec)\.tsx?$/.test(f.rel));
 
 describe("global shell ownership", () => {

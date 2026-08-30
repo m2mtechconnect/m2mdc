@@ -170,6 +170,15 @@ test.describe('DSX Evidence Beta — clickable card destinations', () => {
       await expect(page.getByTestId('dsx-workspace-title')).toBeVisible({ timeout: 15_000 });
 
       const name = route || '(index)';
+      if (!route) {
+        // The index is a redirect contract, not a separate workspace. Keep it
+        // in the sweep, but wait for the canonical Overview instruments before
+        // auditing its duplicate entry.
+        await expect(page).toHaveURL(/\/evidence\/overview(?:[/?#]|$)/, { timeout: 15_000 });
+        await expect(
+          page.locator('[data-testid^="dsx-metric-"][data-testid$="-open"]').first(),
+        ).toBeVisible({ timeout: 15_000 });
+      }
       const clicked =
         (await auditMetricTiles(page, name, failures)) +
         (await auditConstraints(page, name, failures)) +

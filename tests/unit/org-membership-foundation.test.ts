@@ -6,7 +6,7 @@ const migrationPath = path.resolve(
   process.cwd(),
   'supabase/migrations/20260823220500_org_membership_foundation.sql',
 );
-const sql = fs.readFileSync(migrationPath, 'utf8');
+const sql = fs.readFileSync(migrationPath, 'utf8').replace(/\r\n/g, '\n');
 
 describe('enterprise tenancy foundation migration', () => {
   it('keeps the legacy tenant bridge intact', () => {

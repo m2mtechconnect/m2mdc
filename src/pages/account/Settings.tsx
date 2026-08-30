@@ -3,7 +3,7 @@
  * Admin-only features for workspace configuration
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DCCard, DCSectionHeader } from "@/components/dc-ui";
 import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 import { useRBAC } from "@/contexts/RBACContext";
+import {
+  INVITABLE_ORGANIZATION_ROLES,
+  ORGANIZATION_ROLE_LABELS,
+} from "@/auth/organizationAuthorization";
 
 interface OrganizationData {
   id: string;
@@ -31,22 +35,21 @@ interface OrganizationData {
   sso_enabled: boolean;
 }
 
-const industries = [
-  'Technology',
-  'Finance',
-  'Healthcare',
-  'Manufacturing',
-  'Retail',
-  'Education',
-  'Government',
-  'Other',
+const STANDARD_INDUSTRIES = [
+  { value: 'technology', label: 'Technology' },
+  { value: 'finance', label: 'Finance' },
+  { value: 'healthcare', label: 'Healthcare' },
+  { value: 'manufacturing', label: 'Manufacturing' },
+  { value: 'retail', label: 'Retail' },
+  { value: 'education', label: 'Education' },
+  { value: 'government', label: 'Government' },
+  { value: 'other', label: 'Other' },
 ];
 
-const defaultRoles = [
-  { value: 'engineer', label: 'Engineer' },
-  { value: 'data_analyst', label: 'Data Analyst' },
-  { value: 'manager', label: 'Manager' },
-];
+const DEFAULT_ROLE_OPTIONS = INVITABLE_ORGANIZATION_ROLES.map((value) => ({
+  value,
+  label: ORGANIZATION_ROLE_LABELS[value],
+}));
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -56,6 +59,7 @@ export default function Settings() {
   const { can, loading: rbacLoading, activeOrgId } = useRBAC();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('general');
   const [organization, setOrganization] = useState<OrganizationData | null>(null);
   const [formData, setFormData] = useState({
     name: '',
@@ -63,6 +67,25 @@ export default function Settings() {
     industry: '',
     default_role: 'engineer',
   });
+
+  // Persisted values are authoritative. A registry update must not make an
+  // existing organization value render blank or silently rewrite it.
+  const industryOptions = useMemo(() => {
+    if (!formData.industry || STANDARD_INDUSTRIES.some((option) => option.value === formData.industry)) {
+      return STANDARD_INDUSTRIES;
+    }
+    return [{ value: formData.industry, label: formData.industry }, ...STANDARD_INDUSTRIES];
+  }, [formData.industry]);
+
+  const defaultRoleOptions = useMemo(() => {
+    if (!formData.default_role || DEFAULT_ROLE_OPTIONS.some((option) => option.value === formData.default_role)) {
+      return DEFAULT_ROLE_OPTIONS;
+    }
+    return [
+      { value: formData.default_role, label: `Current legacy role (${formData.default_role})` },
+      ...DEFAULT_ROLE_OPTIONS,
+    ];
+  }, [formData.default_role]);
 
   // Workspace mutation authority comes from the canonical effective-permission
   // resolver, which combines the platform and active-organization planes
@@ -208,7 +231,7 @@ export default function Settings() {
             </div>
           </DCCard>
         ) : (
-          <Tabs defaultValue="general" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="general">
                 <Building2 className="mr-2 h-4 w-4" />
@@ -261,9 +284,9 @@ export default function Settings() {
                         <SelectValue placeholder="Select industry" />
                       </SelectTrigger>
                       <SelectContent>
-                        {industries.map(industry => (
-                          <SelectItem key={industry} value={industry.toLowerCase()}>
-                            {industry}
+                        {industryOptions.map((industry) => (
+                          <SelectItem key={industry.value} value={industry.value}>
+                            {industry.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -297,7 +320,7 @@ export default function Settings() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {defaultRoles.map(role => (
+                        {defaultRoleOptions.map(role => (
                           <SelectItem key={role.value} value={role.value}>
                             {role.label}
                           </SelectItem>
@@ -332,12 +355,13 @@ export default function Settings() {
                     <div className="space-y-1">
                       <Label>Single Sign-On (SSO)</Label>
                       <p className="text-sm text-muted-foreground">
-                        Enable SSO authentication
+                        UNAVAILABLE - an identity provider is not configured for this workspace.
                       </p>
                     </div>
                     <Switch
                       checked={organization.sso_enabled}
                       disabled
+                      aria-label="Single sign-on (unavailable)"
                     />
                   </div>
 
@@ -397,7 +421,7 @@ export default function Settings() {
         )}
 
         {/* Actions */}
-        {organization && isAdmin && (
+        {organization && isAdmin && activeTab === 'general' && (
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"

@@ -170,25 +170,6 @@ export default function IntelligenceDashboard() {
   const complianceKpi = useKpi('compliance_accuracy');
   const agentsKpi = useKpi('agents_deployed');
 
-  // Fetch operations overview
-  const { data: opsOverview } = useQuery({
-    queryKey: ['ops-overview', facility],
-    queryFn: async () => {
-      try {
-        return await invokeEdgeFunction(`ops-overview?env=${facility}`, undefined, { logErrors: false });
-      } catch (err) {
-        logger.debug('ops-overview unavailable, using empty fallback', {
-          component: 'IntelligenceDashboard',
-          metadata: { facility, error: (err as Error)?.message },
-        });
-        // Truthful unavailable state: the request failed, this is not "no data".
-        return { unavailable: true, data: { overview: null } };
-      }
-    },
-    retry: false,
-    staleTime: 60_000,
-  });
-
   // Fetch systems
   const { data: systemsData } = useQuery({
     queryKey: ['ops-systems', facility],
@@ -410,15 +391,6 @@ export default function IntelligenceDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="w-full min-w-0 px-0 py-6 max-w-[1600px] mx-auto">
-        {(opsOverview?.unavailable || systemsData?.unavailable) && (
-          <div
-            role="status"
-            className="mb-4 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground"
-          >
-            Operational telemetry service is unavailable in this environment. Charts below
-            show simulated model values only; no live facility data was retrieved.
-          </div>
-        )}
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 min-w-0">
           <div className="min-w-0">

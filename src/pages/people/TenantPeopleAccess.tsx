@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Building2, RefreshCw, Shield, UserPlus, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRBAC } from '@/contexts/RBACContext';
-import { ORGANIZATION_ROLE_PERMISSIONS, type OrganizationRole } from '@/auth/organizationAuthorization';
+import {
+  INVITABLE_ORGANIZATION_ROLES,
+  ORGANIZATION_ROLE_LABELS,
+  ORGANIZATION_ROLE_PERMISSIONS,
+  type OrganizationRole,
+} from '@/auth/organizationAuthorization';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,33 +61,6 @@ interface TenantPeopleSnapshot {
   invites: TenantInvite[];
 }
 
-const ROLE_LABELS: Record<OrganizationRole, string> = {
-  owner: 'Owner',
-  admin: 'Administrator',
-  operator: 'Operator',
-  engineer: 'Engineer',
-  manager: 'Manager',
-  executive: 'Executive',
-  security_admin: 'Security Admin',
-  compliance: 'Compliance',
-  data_analyst: 'Data Analyst',
-  support: 'Support',
-  viewer: 'Viewer',
-};
-
-const INVITABLE_ROLES: OrganizationRole[] = [
-  'admin',
-  'security_admin',
-  'manager',
-  'engineer',
-  'operator',
-  'executive',
-  'compliance',
-  'data_analyst',
-  'support',
-  'viewer',
-];
-
 function roleSummary(role: OrganizationRole): string {
   if (role === 'owner') return 'Organization ownership and tenant administration';
   const permissions = ORGANIZATION_ROLE_PERMISSIONS[role];
@@ -122,8 +100,8 @@ export default function TenantPeopleAccess() {
   };
 
   const availableRoles = useMemo(() => {
-    if (organizationRole === 'owner') return INVITABLE_ROLES;
-    return INVITABLE_ROLES.filter((role) => role !== 'admin' && role !== 'security_admin');
+    if (organizationRole === 'owner') return INVITABLE_ORGANIZATION_ROLES;
+    return INVITABLE_ORGANIZATION_ROLES.filter((role) => role !== 'admin' && role !== 'security_admin');
   }, [organizationRole]);
 
   const refresh = useCallback(async () => {
@@ -265,7 +243,7 @@ export default function TenantPeopleAccess() {
           <div>
             <div className="v2-label">Your tenant role</div>
             <div className="mt-1 text-sm font-medium text-foreground">
-              {organizationRole ? ROLE_LABELS[organizationRole] : 'Platform context'}
+              {organizationRole ? ORGANIZATION_ROLE_LABELS[organizationRole] : 'Platform context'}
             </div>
           </div>
         </Panel>
@@ -300,7 +278,7 @@ export default function TenantPeopleAccess() {
                         <div className="truncate text-xs text-muted-foreground">{member.email ?? 'Email unavailable'}</div>
                       </div>
                     </td>
-                    <td><Badge variant={member.role === 'owner' ? 'default' : 'outline'}>{ROLE_LABELS[member.role]}</Badge></td>
+                    <td><Badge variant={member.role === 'owner' ? 'default' : 'outline'}>{ORGANIZATION_ROLE_LABELS[member.role]}</Badge></td>
                     <td className="text-sm text-muted-foreground">{roleSummary(member.role)}</td>
                     <td className="text-sm text-muted-foreground">{new Date(member.joinedAt).toLocaleDateString()}</td>
                     {canManage && (
@@ -341,7 +319,7 @@ export default function TenantPeopleAccess() {
                       <div key={invite.id} className="v2-subpanel flex flex-wrap items-center justify-between gap-3 p-3">
                         <div className="min-w-0">
                           <div className="truncate text-sm font-medium text-foreground">{invite.email}</div>
-                          <div className="text-xs text-muted-foreground">{ROLE_LABELS[invite.role]} · expires {new Date(invite.expiresAt).toLocaleString()}</div>
+                          <div className="text-xs text-muted-foreground">{ORGANIZATION_ROLE_LABELS[invite.role]} · expires {new Date(invite.expiresAt).toLocaleString()}</div>
                         </div>
                         <Badge variant={state === 'Expired' ? 'secondary' : 'outline'}>{state}</Badge>
                       </div>
@@ -386,7 +364,7 @@ export default function TenantPeopleAccess() {
                     {availableRoles.map((role) => (
                       <SelectItem key={role} value={role}>
                         <div>
-                          <div>{ROLE_LABELS[role]}</div>
+                          <div>{ORGANIZATION_ROLE_LABELS[role]}</div>
                           <div className="text-xs text-muted-foreground">{roleSummary(role)}</div>
                         </div>
                       </SelectItem>
@@ -419,7 +397,7 @@ export default function TenantPeopleAccess() {
                 {availableRoles.map((role) => (
                   <SelectItem key={role} value={role}>
                     <div>
-                      <div>{ROLE_LABELS[role]}</div>
+                      <div>{ORGANIZATION_ROLE_LABELS[role]}</div>
                       <div className="text-xs text-muted-foreground">{roleSummary(role)}</div>
                     </div>
                   </SelectItem>

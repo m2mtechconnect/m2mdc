@@ -9,7 +9,8 @@ import {
   storageKeyForSupabaseUrl,
 } from '../truth-in-ui/_setup/supabase-mock';
 
-const repositoryFile = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
+const repositoryFile = (path: string) => readFileSync(join(process.cwd(), path), 'utf8')
+  .replace(/\r\n/g, '\n');
 
 function workflowJobBlocks(workflow: string): string[] {
   const jobsStart = workflow.indexOf('\njobs:\n');

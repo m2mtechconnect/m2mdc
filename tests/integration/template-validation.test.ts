@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { describeWithBackend } from '../_setup/backendSuite';
 import { createClient } from '@supabase/supabase-js';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'http://localhost:54321';
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || '';
@@ -31,10 +33,16 @@ describeWithBackend('Template Validation Integration Tests', () => {
       expect(data?.checks.secrets).toBeDefined();
     });
 
-    it('should fail validation with clear message when secrets missing', async () => {
-      // This test would need a separate environment without secrets
-      // In production, mock the environment or use a test environment
-      expect(true).toBe(true); // Placeholder
+    it('fails validation with a clear message when no AI provider is configured', () => {
+      const source = readFileSync(
+        resolve(process.cwd(), 'supabase/functions/template-validate/index.ts'),
+        'utf8',
+      );
+
+      expect(source).toContain("if (!lovableApiKey && !useExternalGoogle)");
+      expect(source).toContain("errors.push('Missing LOVABLE_API_KEY - AI features will not work')");
+      expect(source).toContain('checks.secrets = false');
+      expect(source).toContain('valid: errors.length === 0');
     });
 
     it('should check vector index configuration', async () => {

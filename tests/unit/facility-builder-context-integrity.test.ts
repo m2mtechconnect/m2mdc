@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
-const read = (path: string) => readFileSync(path, 'utf8');
+const read = (path: string) => readFileSync(path, 'utf8').replace(/\r\n/g, '\n');
 
 describe('facility builder context integrity', () => {
   it('persists the validated twin in both canonical and config fields', () => {

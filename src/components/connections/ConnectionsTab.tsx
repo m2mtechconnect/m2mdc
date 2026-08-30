@@ -26,7 +26,6 @@ interface Props {
   isAdmin: boolean;
   testingConnectionId?: string | null;
   onOpen: (id: string) => void;
-  onAdd: () => void;
   onTest: (id: string) => void;
   onMap: (id: string) => void;
   onCredential: (id: string) => void;
@@ -38,7 +37,6 @@ export function ConnectionsTab({
   isAdmin,
   testingConnectionId = null,
   onOpen,
-  onAdd,
   onTest,
   onMap,
   onCredential,
@@ -133,12 +131,8 @@ export function ConnectionsTab({
                 ? 'Add a connection to bind a facility, gateway or platform source to this tenant. Configuration alone never reports a healthy status: a server-side check must pass and data must arrive.'
                 : 'Clear the search or status filter to see all configured connections.'}
             </p>
-            {rows.length === 0 && (
-              isAdmin ? (
-                <Button className="h-10" onClick={onAdd}>Add connection</Button>
-              ) : (
-                <p className="text-sm text-muted-foreground">Ask a user with twin edit access to add or configure a connection.</p>
-              )
+            {rows.length === 0 && !isAdmin && (
+              <p className="text-sm text-muted-foreground">Ask a user with twin edit access to add or configure a connection.</p>
             )}
           </div>
         </Panel>

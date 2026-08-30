@@ -38,6 +38,7 @@ import {
 import { COPILOT } from "@/ux";
 import { useAuraV2Theme } from "@/components/v2";
 import { preloadPrimaryWorkspace } from '@/routing/primaryWorkspaceLoaders';
+import { routeUsesShellOperatingState } from '@/components/capability/operatingStateRoute';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -333,7 +334,9 @@ export function Layout({ children }: LayoutProps) {
         </nav>
       </div>
 
-      <OperatingStateBar srOnly={pageOwnsOperatingState} />
+      {routeUsesShellOperatingState(location.pathname) && !pageOwnsOperatingState ? (
+        <OperatingStateBar />
+      ) : null}
 
 
       <Sheet
@@ -472,7 +475,10 @@ export function Layout({ children }: LayoutProps) {
         className={
           fullBleed
             ? "flex-1 w-full min-w-0 min-h-0 overflow-hidden"
-            : "flex-1 w-full min-w-0 mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
+            // Reserve the authenticated workspace before lazy route content
+            // commits. Without this floor the global footer briefly enters the
+            // first viewport, then moves by a full panel height (CLS > 0.1).
+            : "flex-1 w-full min-w-0 min-h-[calc(100svh-3.5rem)] mx-auto max-w-[1920px] px-3 sm:px-4 md:px-5 lg:px-6"
         }
       >
         {children}

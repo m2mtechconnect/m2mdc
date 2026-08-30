@@ -25,8 +25,18 @@ import type {
   TwinVisualizationState
 } from '../types';
 
-// Generate rack layout based on capacity
-function generateRackLayout(capacityKw: number, scenarioEvents: any[] = []): {
+/** Stable FNV-1a-derived fraction for presentation metrics. */
+export function stableVisualizationFraction(seed: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0) / 0xffffffff;
+}
+
+// Generate rack layout based on capacity and stable facility identity.
+function generateRackLayout(capacityKw: number, seed: string, scenarioEvents: any[] = []): {
   racks: RackVisual[];
   rows: RowVisual[];
 } {
@@ -53,9 +63,9 @@ function generateRackLayout(capacityKw: number, scenarioEvents: any[] = []): {
 
     for (let i = 0; i < racksPerRow && racks.length < rackCount; i++) {
       const rackId = `rack-${r + 1}-${i + 1}`;
-      const baseUtil = 40 + Math.random() * 50;
-      const baseTemp = 20 + Math.random() * 10;
-      const basePower = 15 + Math.random() * 25;
+      const baseUtil = 40 + stableVisualizationFraction(`${seed}|${rackId}|utilization`) * 50;
+      const baseTemp = 20 + stableVisualizationFraction(`${seed}|${rackId}|temperature`) * 10;
+      const basePower = 15 + stableVisualizationFraction(`${seed}|${rackId}|power`) * 25;
       
       const isAffected = affectedRackIds.has(rackId);
       
@@ -161,7 +171,7 @@ function generateThermalZones(rows: RowVisual[], racks: RackVisual[]): ThermalZo
 }
 
 // Generate network topology
-function generateNetworkTopology(racks: RackVisual[]): {
+function generateNetworkTopology(racks: RackVisual[], seed: string): {
   nodes: NetworkNodeVisual[];
   links: NetworkLinkVisual[];
 } {
@@ -197,7 +207,7 @@ function generateNetworkTopology(racks: RackVisual[]): {
       from: `tor-${rowId}`,
       to: 'core-sw-1',
       bandwidthGbps: 25,
-      utilizationPercent: 40 + Math.random() * 30,
+      utilizationPercent: 40 + stableVisualizationFraction(`${seed}|${rowId}|network`) * 30,
       degraded: false
     });
   });
@@ -218,12 +228,14 @@ export function useTwinVisualizationData(): TwinVisualizationState {
     let capacityKw = 500;
     let facilityName = 'Data Centre Twin';
     let carbonIntensity = 30;
+    let visualizationSeed = 'data-centre-twin';
     
     if (activeTwin) {
       // Real twin selected via header dropdown - EXCLUSIVE source
       capacityKw = activeTwin.capacity_kw || 500;
       facilityName = activeTwin.name || 'Data Centre Twin';
       carbonIntensity = activeTwin.carbon_intensity || 30;
+      visualizationSeed = activeTwin.id || facilityName;
     } else if (isPreviewMode && recommendation) {
       // Preview mode from scanner - derive capacity from capacityTier
       const tierToKw: Record<string, number> = {
@@ -237,24 +249,26 @@ export function useTwinVisualizationData(): TwinVisualizationState {
         ? `${recommendation.companyName} Sovereign Green AI Data Centre Twin` 
         : 'Preview Twin';
       carbonIntensity = recommendation.kpiTargets?.carbonIntensityTargetGPerKwh || 30;
+      visualizationSeed = recommendation.companyName || facilityName;
     } else {
       // Fallback to builder store ONLY when no twin selected (sandbox mode)
       const overview = builderState.overview;
       capacityKw = overview?.capacityKw || 500;
       facilityName = overview?.twinName || 'Data Centre Twin';
       carbonIntensity = (overview as any)?.carbonIntensityGCo2PerKwh || 30;
+      visualizationSeed = overview?.twinName || facilityName;
     }
     
     // Use simulation events if simulation is active
     const scenarioEvents = simulation.isSimulating ? simulation.events : [];
     
     // Generate base layout
-    const layout = generateRackLayout(capacityKw, scenarioEvents);
+    const layout = generateRackLayout(capacityKw, visualizationSeed, scenarioEvents);
     const rows = layout.rows;
     let racks = layout.racks;
     let powerSegments = generatePowerSegments(racks);
     let thermalZones = generateThermalZones(rows, racks);
-    const { nodes: networkNodes, links: networkLinks } = generateNetworkTopology(racks);
+    const { nodes: networkNodes, links: networkLinks } = generateNetworkTopology(racks, visualizationSeed);
     
     // CRITICAL: Apply simulation effects when simulation is running
     if (simulation.isSimulating) {
@@ -296,7 +310,9 @@ export function useTwinVisualizationData(): TwinVisualizationState {
     
     const events: SimulationEventVisual[] = simulation.events.map((e, idx) => ({
       id: e.id || `event-${idx}`,
-      timestamp: new Date(Date.now() + e.timestamp * 1000).toISOString(),
+      // The engine supplies simulation-relative seconds, not wall-clock time.
+      // Keep that distinction explicit and stable across reloads.
+      timestamp: `T+${e.timestamp}s`,
       timeSeconds: e.timestamp,
       label: e.title || 'Event',
       severity: severityMap[e.severity] || 'info',

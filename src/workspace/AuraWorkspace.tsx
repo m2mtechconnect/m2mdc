@@ -310,7 +310,12 @@ export default function AuraWorkspace() {
               <SheetDescription className="sr-only">
                 Inspect the selected facility asset and move through the guided simulation workflow.
               </SheetDescription>
-              <ContextPanel facility={facility} assets={assets} overrides={overrides} onClose={closePanel} />
+              {/*
+                SheetContent already owns the overlay close control. Supplying
+                ContextPanel.onClose here rendered a second, overlapping X.
+                The docked inspector above still owns its explicit close.
+              */}
+              <ContextPanel facility={facility} assets={assets} overrides={overrides} />
             </SheetContent>
           </Sheet>
         )}

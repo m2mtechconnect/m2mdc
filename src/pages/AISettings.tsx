@@ -112,16 +112,19 @@ function AISettingsPage() {
   const [loading, setLoading] = useState(true);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [failedAction, setFailedAction] = useState<'load' | 'health' | null>(null);
 
   async function loadRuntime() {
     setLoading(true);
     setError(null);
+    setFailedAction(null);
     try {
       const data = await invokeEdgeFunction('ai-config', {});
       setRuntime(normalizeRuntimeConfig(data));
     } catch (cause) {
       setRuntime(normalizeRuntimeConfig(null));
       setError(cause instanceof Error ? cause.message : 'Managed AI readiness could not be loaded.');
+      setFailedAction('load');
     } finally {
       setLoading(false);
     }
@@ -136,6 +139,7 @@ function AISettingsPage() {
     if (checking) return;
     setChecking(true);
     setError(null);
+    setFailedAction(null);
     try {
       const data = await invokeEdgeFunction('copilot-health', {});
       setHealth(normalizeHealthStatus(data));
@@ -144,6 +148,7 @@ function AISettingsPage() {
       setHealth(normalizeHealthStatus(null));
       setHealthCheckedAt(new Date());
       setError(cause instanceof Error ? cause.message : 'Managed AI health check failed.');
+      setFailedAction('health');
     } finally {
       setChecking(false);
     }
@@ -186,9 +191,20 @@ function AISettingsPage() {
       </div>
 
       {error && (
-        <div role="alert" className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          <span>{error}</span>
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+          <div className="flex min-w-0 items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{error}</span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void (failedAction === 'health' ? runHealthCheck() : loadRuntime())}
+            disabled={loading || checking}
+          >
+            {failedAction === 'health' ? 'Retry health check' : 'Retry loading readiness'}
+          </Button>
         </div>
       )}
 

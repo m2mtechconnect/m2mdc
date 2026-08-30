@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 const sql = fs.readFileSync(
   path.resolve(process.cwd(), 'supabase/migrations/20260824031500_tenant_aware_default_twin_provisioning.sql'),
   'utf8',
-);
+).replace(/\r\n/g, '\n');
 
 describe('tenant-aware default twin provisioning', () => {
   it('never creates an orphan privileged starter twin', () => {

@@ -74,7 +74,7 @@ export default function PeopleAccessLayout({ children }: PeopleAccessLayoutProps
       <nav aria-label="Breadcrumb" className="mb-3 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
         <Link to="/dashboard" className="hover:text-foreground">Command Center</Link>
         <ChevronRight className="h-3 w-3" aria-hidden />
-        <span>Govern</span>
+        <span>Administration</span>
         <ChevronRight className="h-3 w-3" aria-hidden />
         <span className="text-foreground">People &amp; Access</span>
         {current && (

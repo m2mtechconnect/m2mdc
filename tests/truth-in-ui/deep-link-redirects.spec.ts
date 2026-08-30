@@ -10,8 +10,8 @@
  *   3. A destination-declared hash wins; otherwise the incoming hash survives.
  *   4. No redirect loop: the main frame never revisits a pathname it has
  *      already left, and the whole hop completes in at most two navigations.
- *   5. No double-render: exactly one application shell (one page-content
- *      region, one operating-state bar, one facility switcher) after landing.
+ *   5. No double-render: exactly one page-content region, the route's exact
+ *      operating-state ownership, and no duplicated facility switcher.
  *   6. Redirects are history-replacing, so Back leaves the app rather than
  *      bouncing through the alias again.
  *
@@ -96,15 +96,16 @@ async function runHop(page: Page, from: string, requireShell = true): Promise<Ho
   };
 }
 
-async function assertSingleShell(page: Page, label: string) {
+async function assertSingleShell(page: Page, label: string, finalPath: string) {
   await expect(
     page.locator("[data-testid='page-content']"),
     `${label}: exactly one page-content region (no double-render)`,
   ).toHaveCount(1);
+  const expectedOperatingStateBars = finalPath === '/dashboard' ? 1 : 0;
   await expect(
     page.locator("[data-testid='operating-state-bar']"),
-    `${label}: exactly one operating-state bar`,
-  ).toHaveCount(1);
+    `${label}: exact operating-state ownership for ${finalPath}`,
+  ).toHaveCount(expectedOperatingStateBars);
   // Stage 7E: the facility switcher lives in the page header and only renders
   // for multi-facility users, so at most one may exist anywhere on the page.
   const switchers = await page.locator("[data-testid='facility-switcher']").count();
@@ -175,7 +176,7 @@ test.describe('deep-link alias and redirect harness', () => {
       }
 
       assertNoLoop(result, sample, maxHops);
-      await assertSingleShell(page, sample);
+      await assertSingleShell(page, sample, result.finalPath);
 
       // `replace` semantics: the alias entry must not remain in history.
       expect(
@@ -187,13 +188,10 @@ test.describe('deep-link alias and redirect harness', () => {
 
   for (const alias of PARAM_ALIASES) {
     test(`${alias.sample} rebuilds parameters into ${alias.expected}`, async ({ page }) => {
-      // Known gap: the twin-management surface does not mount the shell under
-      // the mocked session (it renders only against seeded twin data), so the
-      // shell assertion is scoped out for these two hops and covered by the
-      // runtime sweep instead. URL correctness and loop-freedom still apply.
-      const result = await runHop(page, `${alias.sample}?${QUERY}`, false);
+      const result = await runHop(page, `${alias.sample}?${QUERY}`);
       expect(result.finalPath, `${alias.sample}: canonical destination`).toBe(alias.expected);
       assertNoLoop(result, alias.sample);
+      await assertSingleShell(page, alias.sample, result.finalPath);
     });
   }
 

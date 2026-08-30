@@ -26,6 +26,7 @@ const DEFAULT_PORT = FACADE_ON ? 8092 : 8091;
 const PORT = Number(process.env.AURA_TRUTH_PORT ?? DEFAULT_PORT);
 const FACADE_ENV = FACADE_ON ? 'VITE_AURA_SIM_FACADE_DCPANEL=on ' : '';
 const PLAYWRIGHT_BASE_URL = process.env.PLAYWRIGHT_BASE_URL?.trim();
+const PLAYWRIGHT_EXECUTABLE_PATH = process.env.PLAYWRIGHT_EXECUTABLE_PATH?.trim();
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
@@ -57,7 +58,13 @@ export default defineConfig({
     // which is missing libglib on the CI image). Playwright ships both
     // under PLAYWRIGHT_BROWSERS_PATH; `channel: 'chromium'` selects the
     // full build.
-    use: { ...devices['Desktop Chrome'], channel: 'chromium', reducedMotion: 'reduce' },
+    use: {
+      ...devices['Desktop Chrome'],
+      ...(PLAYWRIGHT_EXECUTABLE_PATH
+        ? { launchOptions: { executablePath: PLAYWRIGHT_EXECUTABLE_PATH } }
+        : { channel: 'chromium' as const }),
+      reducedMotion: 'reduce',
+    },
   }],
   webServer: PLAYWRIGHT_BASE_URL
     ? undefined

@@ -1,22 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
-import { execSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { repositoryFilesContaining } from '../../../tests/helpers/repositorySearch';
 
 const root = process.cwd();
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8');
 
 function grep(pattern: string): string[] {
-  try {
-    return execSync(`rg -l --glob '!**/types.ts' ${JSON.stringify(pattern)} src`, {
-      cwd: root,
-      encoding: 'utf8',
-    })
-      .split('\n')
-      .filter(Boolean);
-  } catch {
-    return [];
-  }
+  return repositoryFilesContaining({
+    roots: ['src'],
+    pattern: new RegExp(pattern),
+    exclude: (path) => path.endsWith('/types.ts'),
+  });
 }
 
 describe('Phase 10 - connection identity is single-sourced', () => {

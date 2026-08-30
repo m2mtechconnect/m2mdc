@@ -4,18 +4,17 @@
  *
  * Model-loading contract:
  *   loading  -> the 3D renderer is initialising (bounded to LOAD_TIMEOUT_MS)
- *   ready    -> the 3D renderer produced a drawing surface
+ *   ready    -> the resolved 3D scene completed its first render frame
  *   degraded -> 3D was not usable in time, the 2D floor plan is shown instead
  *   error    -> the renderer threw; the 2D floor plan is shown with a retry
  * The canvas can never remain in `loading` indefinitely.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Box, Grid2x2, Loader2, Maximize2, Minus, Plus, RefreshCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { SimulationErrorBoundary } from '@/components/twin-visualization/SimulationErrorBoundary';
-import { DataCenter3DScene } from '@/components/twin-visualization/DataCenter3DScene';
 import { useDesignScenario } from './useDesignScenario';
 import type { ShellMode } from '@/components/twin-visualization/DataHall';
 import { useTwinVisualizationData } from '@/components/twin-visualization/hooks/useTwinVisualizationData';
@@ -34,6 +33,15 @@ import {
 import { FacilityFloorPlan } from './FacilityFloorPlan';
 import { buildRackGrid } from './dashboard/rackModel';
 import { type FacilityDefinition } from './facilityModel';
+
+// The WebGL renderer and validated GLB path are intentionally opt-in. Keeping
+// this import lazy prevents several megabytes of scene/runtime work from
+// blocking the initial Blueprint or Simulation workspace interaction.
+const DataCenter3DScene = lazy(() =>
+  import('@/components/twin-visualization/DataCenter3DScene').then((module) => ({
+    default: module.DataCenter3DScene,
+  })),
+);
 
 /** Hard ceiling on the 3D initialisation window. */
 const LOAD_TIMEOUT_MS = 8000;
@@ -56,11 +64,13 @@ export function FacilityCanvas({ facility }: Props) {
   const selectedAssetId = useWorkspaceStore((s) => s.selectedAssetId);
 
   const rackGrid = useMemo(() => buildRackGrid(facility), [facility]);
-  const [viewMode, setViewMode] = useState<ViewMode>('3d');
-  const [modelState, setModelState] = useState<ModelState>('loading');
+  // The deterministic 2D plan is immediately usable. Users can request the
+  // heavier 3D renderer explicitly; its existing bounded loading contract
+  // and truthful fallback remain unchanged.
+  const [viewMode, setViewMode] = useState<ViewMode>('2d');
+  const [modelState, setModelState] = useState<ModelState>('ready');
   const [attempt, setAttempt] = useState(0);
   const [zoom, setZoom] = useState(1);
-  const hostRef = useRef<HTMLDivElement | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [legendOpen, setLegendOpen] = useState(false);
   // Yield the bottom-left zone while a KPI evidence tooltip occupies it.
@@ -104,43 +114,27 @@ export function FacilityCanvas({ facility }: Props) {
     setAttempt((a) => a + 1);
   }, []);
 
-  // Bounded readiness probe: a drawing surface or an explicit renderer
-  // fallback must appear inside LOAD_TIMEOUT_MS, otherwise we degrade to 2D.
+  // Bounded readiness contract: the child reports its first meaningful frame.
+  // A canvas node can exist while Suspense still renders nothing, so DOM
+  // presence must never dismiss this loading state.
   useEffect(() => {
-    if (viewMode !== '3d') return;
-    setModelState('loading');
-    let done = false;
-
-    const poll = window.setInterval(() => {
-      const host = hostRef.current;
-      if (!host) return;
-      if (host.querySelector('canvas')) {
-        done = true;
-        window.clearInterval(poll);
-        window.clearTimeout(timeout);
-        setModelState('ready');
-      } else if (host.querySelector('[role="status"]')) {
-        // The renderer decided it cannot run (WebGL unavailable / software).
-        done = true;
-        window.clearInterval(poll);
-        window.clearTimeout(timeout);
-        setModelState('degraded');
-        setViewMode('2d');
-      }
-    }, 250);
-
+    if (viewMode !== '3d' || modelState !== 'loading') return;
     const timeout = window.setTimeout(() => {
-      if (done) return;
-      window.clearInterval(poll);
       setModelState('degraded');
       setViewMode('2d');
     }, LOAD_TIMEOUT_MS);
 
-    return () => {
-      window.clearInterval(poll);
-      window.clearTimeout(timeout);
-    };
-  }, [viewMode, attempt]);
+    return () => window.clearTimeout(timeout);
+  }, [viewMode, attempt, modelState]);
+
+  const handleSceneReady = useCallback(() => {
+    setModelState((state) => (state === 'loading' ? 'ready' : state));
+  }, []);
+
+  const handleSceneUnavailable = useCallback(() => {
+    setModelState('degraded');
+    setViewMode('2d');
+  }, []);
 
   const contract = overlayContract(activeOverlay as never);
   const showLoading = viewMode === '3d' && modelState === 'loading';
@@ -151,32 +145,36 @@ export function FacilityCanvas({ facility }: Props) {
   return (
     <TooltipProvider delayDuration={200}>
     <div className="v2-tech-zone relative h-full min-h-0 w-full min-w-0 overflow-hidden" data-testid="facility-model-canvas">
-      <div ref={hostRef} className="h-full w-full" data-model-state={modelState}>
+      <div className="h-full w-full" data-model-state={modelState}>
         {viewMode === '3d' ? (
           <SimulationErrorBoundary
             key={attempt}
             fallbackMessage="The facility model could not be rendered in this browser."
             onReset={retry}
           >
-            <DataCenter3DScene
-              racks={data.racks}
-              rows={data.rows}
-              powerSegments={data.powerSegments}
-              thermalZones={data.thermalZones}
-              events={[]}
-              mode="blueprint"
-              fill
-              hostChromeTop
-              activeOverlay={activeOverlay as never}
-              selectedAssetId={selectedAssetId}
-              onRackClick={handleSelect}
-              shellMode={shellMode}
-              onShellModeChange={(mode) => setViewParam('shell', mode === 'off' ? null : mode)}
-              showLabels={showLabels}
-              onShowLabelsChange={(next) => setViewParam('labels', next ? null : 'off')}
-              designScenarioId={designScenarioId}
-              facilityGeometry={facilityGeometry}
-            />
+            <Suspense fallback={null}>
+              <DataCenter3DScene
+                racks={data.racks}
+                rows={data.rows}
+                powerSegments={data.powerSegments}
+                thermalZones={data.thermalZones}
+                events={[]}
+                mode="blueprint"
+                fill
+                hostChromeTop
+                activeOverlay={activeOverlay as never}
+                selectedAssetId={selectedAssetId}
+                onRackClick={handleSelect}
+                shellMode={shellMode}
+                onShellModeChange={(mode) => setViewParam('shell', mode === 'off' ? null : mode)}
+                showLabels={showLabels}
+                onShowLabelsChange={(next) => setViewParam('labels', next ? null : 'off')}
+                designScenarioId={designScenarioId}
+                facilityGeometry={facilityGeometry}
+                onSceneReady={handleSceneReady}
+                onSceneUnavailable={handleSceneUnavailable}
+              />
+            </Suspense>
           </SimulationErrorBoundary>
         ) : (
           <FacilityFloorPlan

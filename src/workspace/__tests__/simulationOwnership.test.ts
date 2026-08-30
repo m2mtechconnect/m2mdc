@@ -8,7 +8,7 @@ function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) return walk(full);
-    return /\.tsx?$/.test(entry) ? [full] : [];
+    return /\.tsx?$/.test(entry) ? [full.replace(/\\/g, '/')] : [];
   });
 }
 

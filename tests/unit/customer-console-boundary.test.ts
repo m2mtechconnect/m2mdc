@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
+const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8')
+  .replace(/\r\n/g, '\n');
 
 const remediation = read('supabase/migrations/20260824003000_enterprise_audit_remediation.sql');
 const inviteFunction = read('supabase/functions/teams-invite/index.ts');

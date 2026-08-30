@@ -1,110 +1,38 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Account Settings Page', () => {
+test.describe('Account settings', () => {
+  test('navigates from the user menu using the current Preferences label', async ({ page }) => {
+    await page.goto('/dashboard');
+    await page.getByRole('button', { name: 'User menu' }).click();
+    await page.getByRole('menuitem', { name: 'Preferences' }).click();
+
+    await expect(page).toHaveURL(/\/account\/settings$/);
+    await expect(page.getByRole('heading', { name: 'Workspace settings' })).toBeVisible();
+  });
+
   test.beforeEach(async ({ page }) => {
-    // Navigate to app and wait for auth
-    await page.goto('/');
-    await page.waitForTimeout(1000);
-  });
-
-  test('should navigate to settings page from user menu', async ({ page }) => {
-    // Click user avatar menu
-    await page.click('[data-testid="user-menu-trigger"], button[aria-label*="account"], button:has-text("Account")').catch(() => {});
-    
-    // Wait for menu to open
-    await page.waitForTimeout(500);
-    
-    // Click Settings menu item
-    await page.click('text=Settings').catch(async () => {
-      await page.click('[role="menuitem"]:has-text("Settings")');
-    });
-    
-    // Verify navigation
-    await expect(page).toHaveURL(/\/account\/settings/);
-  });
-
-  test('should load and display workspace settings', async ({ page }) => {
     await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    
-    // Wait for settings page to load
-    await page.waitForSelector('h1:has-text("Workspace Settings")', { timeout: 5000 });
-    
-    // Check for settings tabs
-    await expect(page.locator('text=General')).toBeVisible();
-    await expect(page.locator('text=Security')).toBeVisible();
-    await expect(page.locator('text=Notifications')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Workspace settings' })).toBeVisible();
   });
 
-  test('should display workspace information in general tab', async ({ page }) => {
-    await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    
-    // Wait for form to load
-    await page.waitForTimeout(2000);
-    
-    // Click general tab (should be default)
-    await page.click('text=General').catch(() => {});
-    
-    // Check for workspace info fields
-    await expect(page.locator('text=Workspace Information')).toBeVisible();
-    await expect(page.locator('label:has-text("Workspace Name")')).toBeVisible();
+  test('general is the only tab with workspace save actions', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: 'General' })).toHaveAttribute('aria-selected', 'true');
+    await expect(page.getByLabel('Workspace Name')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save Changes' })).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Security' }).click();
+    await expect(page.getByText('Access and security')).toBeVisible();
+    await expect(page.getByRole('switch', { name: 'Multi-factor authentication (unavailable)' })).toBeDisabled();
+    await expect(page.getByRole('switch', { name: 'Single sign-on (unavailable)' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Save Changes' })).toHaveCount(0);
+
+    await page.getByRole('tab', { name: 'Notifications' }).click();
+    await expect(page.getByText('Notification Preferences')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save Changes' })).toHaveCount(0);
   });
 
-  test('should show admin badge for admin users', async ({ page }) => {
-    await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    
-    // Check if admin badge or notice is visible
-    const adminNotice = page.locator('text=Admin access required, text=administrator');
-    const isAdmin = await adminNotice.count() > 0;
-    
-    // Test passes if page loads - admin status varies by user
-    expect(isAdmin).toBeDefined();
-  });
-
-  test('should update workspace settings as admin', async ({ page }) => {
-    await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(2000);
-    
-    // Try to update workspace name
-    const workspaceNameInput = page.locator('input[id="workspace_name"]');
-    
-    if (await workspaceNameInput.isEnabled()) {
-      await workspaceNameInput.clear();
-      await workspaceNameInput.fill('Updated Workspace');
-      
-      // Click save button
-      await page.click('button:has-text("Save Changes")');
-      
-      // Wait for success or error message
-      await page.waitForTimeout(2000);
-    }
-  });
-
-  test('should display security settings', async ({ page }) => {
-    await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    
-    // Click security tab
-    await page.click('text=Security');
-    await page.waitForTimeout(1000);
-    
-    // Check for security options
-    await expect(page.locator('text=Access & Security')).toBeVisible();
-    await expect(page.locator('text=Multi-Factor Authentication')).toBeVisible();
-  });
-
-  test('should display notifications settings', async ({ page }) => {
-    await page.goto('/account/settings');
-    await page.waitForLoadState('networkidle');
-    
-    // Click notifications tab
-    await page.click('text=Notifications');
-    await page.waitForTimeout(1000);
-    
-    // Check for notification options
-    await expect(page.locator('text=Notification Preferences')).toBeVisible();
+  test('renders the organization values already persisted by the backend', async ({ page }) => {
+    await expect(page.getByRole('combobox', { name: 'Industry' })).not.toHaveText('');
+    await expect(page.getByRole('combobox', { name: 'Default role for new members' })).not.toHaveText('');
   });
 });

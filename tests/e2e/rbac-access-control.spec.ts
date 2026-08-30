@@ -3,16 +3,16 @@ import { test, expect } from '@playwright/test';
 test.describe('Access Control Page - Admin Only', () => {
   test.beforeEach(async ({ page }) => {
     // Assume user is already logged in (handled by auth setup)
-    await page.goto('/account/access-control');
+    await page.goto('/teams/access-control');
   });
 
   test('should display access control page for admin users', async ({ page }) => {
     // Check for page title
-    await expect(page.getByRole('heading', { name: /Access Control & RBAC/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^Access control$/i })).toBeVisible();
     
     // Check for key UI elements
     await expect(page.getByRole('button', { name: /Grant Role/i })).toBeVisible();
-    await expect(page.getByText(/Role Permissions/i)).toBeVisible();
+    await expect(page.getByText(/Platform role permissions/i)).toBeVisible();
     await expect(page.getByText(/Current User Roles/i)).toBeVisible();
   });
 
@@ -21,7 +21,7 @@ test.describe('Access Control Page - Admin Only', () => {
     // Implementation depends on your auth setup
     // await switchToNonAdminUser(page);
     
-    await page.goto('/account/access-control');
+    await page.goto('/teams/access-control');
     
     // Should see access denied message
     await expect(page.getByText(/Access Denied/i)).toBeVisible();
@@ -30,14 +30,10 @@ test.describe('Access Control Page - Admin Only', () => {
 
   test('should display role descriptions', async ({ page }) => {
     // Check for role descriptions
-    await expect(page.getByText(/Viewer/i)).toBeVisible();
-    await expect(page.getByText(/Operator/i)).toBeVisible();
     await expect(page.getByText(/Admin/i)).toBeVisible();
     
     // Check for permission descriptions
-    await expect(page.getByText(/View agents and their status/i)).toBeVisible();
-    await expect(page.getByText(/Start\/stop\/restart agents/i)).toBeVisible();
-    await expect(page.getByText(/Full administrative control within this organization/i)).toBeVisible();
+    await expect(page.getByText(/Agent-scoped Viewer, Operator, and Admin grants/i)).toBeVisible();
   });
 
   test('should display current user roles table', async ({ page }) => {
@@ -51,7 +47,7 @@ test.describe('Access Control Page - Admin Only', () => {
 
 test.describe('Grant Role Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/account/access-control');
+    await page.goto('/teams/access-control');
   });
 
   test('should open grant role dialog', async ({ page }) => {
@@ -94,16 +90,16 @@ test.describe('Grant Role Flow', () => {
     await expect(submitButton).toBeDisabled();
   });
 
-  test('should successfully grant an organization-wide viewer role', async ({ page }) => {
+  test('should successfully grant a platform-wide admin role', async ({ page }) => {
     await page.getByRole('button', { name: /Grant Role/i }).click();
     
     // Fill in form
     await page.getByLabel(/User Email/i).fill('testuser@example.com');
     
-    await page.getByLabel(/Role/i).click();
-    await page.getByRole('option', { name: /Viewer/i }).click();
-    
-    // Organization-wide scope is the default; backend scope value remains `global` for compatibility.
+    await page.getByLabel(/^Role$/i).click();
+    await page.getByRole('option', { name: /^Admin$/i }).click();
+
+    // Platform-wide is the default. Organization membership is managed separately.
     
     // Submit
     await page.getByRole('button', { name: /^Grant Role$/i }).click();
@@ -115,12 +111,12 @@ test.describe('Grant Role Flow', () => {
 
 test.describe('Revoke Role Flow', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/account/access-control');
+    await page.goto('/teams/access-control');
   });
 
   test('should show revoke confirmation dialog', async ({ page }) => {
     // Find first revoke button in the table
-    const revokeButtons = page.getByRole('button').filter({ hasText: '' }); // Trash icon
+    const revokeButtons = page.getByRole('button', { name: /^Revoke .* role from /i });
     const firstRevokeButton = revokeButtons.first();
     
     if (await firstRevokeButton.isVisible()) {
@@ -135,7 +131,7 @@ test.describe('Revoke Role Flow', () => {
   });
 
   test('should cancel revoke operation', async ({ page }) => {
-    const revokeButtons = page.getByRole('button').filter({ hasText: '' });
+    const revokeButtons = page.getByRole('button', { name: /^Revoke .* role from /i });
     const firstRevokeButton = revokeButtons.first();
     
     if (await firstRevokeButton.isVisible()) {
@@ -204,7 +200,7 @@ test.describe('Access Denied Scenarios', () => {
     await page.waitForLoadState('networkidle');
     
     const hasError = await page.getByText(/not found|access denied|permission denied/i).isVisible();
-    const isRedirected = page.url() !== `/app/agents/${unauthorizedAgentId}/manage`;
+    const isRedirected = new URL(page.url()).pathname !== `/app/agents/${unauthorizedAgentId}/manage`;
     
     expect(hasError || isRedirected).toBe(true);
   });
@@ -215,25 +211,14 @@ test.describe('Access Denied Scenarios', () => {
     
     await page.goto('/app/agents');
     await page.waitForLoadState('networkidle');
-    
-    // Look for any permission error messages
-    const errorToast = page.locator('[role="alert"]').filter({ hasText: /permission/i });
-    
-    if (await errorToast.isVisible()) {
-      // Error message should be user-friendly
-      const errorText = await errorToast.textContent();
-      expect(errorText).not.toContain('SQL');
-      expect(errorText).not.toContain('RLS');
-      expect(errorText).not.toContain('policy');
-    }
+
+    const bodyText = await page.locator('body').innerText();
+    expect(bodyText).not.toMatch(/SQLSTATE|row-level security|violates .* policy/i);
   });
 });
 
 test.describe('RBAC Smoke Tests', () => {
   test('should load agents list without errors', async ({ page }) => {
-    await page.goto('/app/agents');
-    await page.waitForLoadState('networkidle');
-    
     // Page should load without console errors
     const errors: string[] = [];
     page.on('console', msg => {
@@ -241,8 +226,9 @@ test.describe('RBAC Smoke Tests', () => {
         errors.push(msg.text());
       }
     });
-    
-    await page.waitForTimeout(2000);
+
+    await page.goto('/app/agents');
+    await page.waitForLoadState('networkidle');
     
     // Check for RBAC-related errors
     const rbacErrors = errors.filter(e => 
@@ -258,7 +244,7 @@ test.describe('RBAC Smoke Tests', () => {
     // This test checks that RBAC pages require authentication
     // For now, just verify the page loads (auth is assumed to be handled globally)
     
-    await page.goto('/account/access-control');
+    await page.goto('/teams/access-control');
     await page.waitForLoadState('networkidle');
     
     // Should either show the page or redirect to auth

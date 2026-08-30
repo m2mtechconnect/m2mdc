@@ -64,10 +64,38 @@ export const ORGANIZATION_ROLE_PERMISSIONS: Record<OrganizationRole, readonly Pe
   viewer: [...VIEWER_BASE],
 };
 
-const ORGANIZATION_ROLE_LABELS = new Set<string>(Object.keys(ORGANIZATION_ROLE_PERMISSIONS));
+export const ORGANIZATION_ROLE_LABELS: Record<OrganizationRole, string> = {
+  owner: 'Owner',
+  admin: 'Administrator',
+  operator: 'Operator',
+  engineer: 'Engineer',
+  manager: 'Manager',
+  executive: 'Executive',
+  security_admin: 'Security Admin',
+  compliance: 'Compliance',
+  data_analyst: 'Data Analyst',
+  support: 'Support',
+  viewer: 'Viewer',
+};
+
+/** Roles that may be assigned to a member inside an organization. */
+export const INVITABLE_ORGANIZATION_ROLES: readonly OrganizationRole[] = [
+  'admin',
+  'security_admin',
+  'manager',
+  'engineer',
+  'operator',
+  'executive',
+  'compliance',
+  'data_analyst',
+  'support',
+  'viewer',
+];
+
+const ORGANIZATION_ROLE_KEYS = new Set<string>(Object.keys(ORGANIZATION_ROLE_PERMISSIONS));
 
 export function isOrganizationRole(value: string): value is OrganizationRole {
-  return ORGANIZATION_ROLE_LABELS.has(value);
+  return ORGANIZATION_ROLE_KEYS.has(value);
 }
 
 export function organizationPermissions(role: OrganizationRole | null): Set<Permission> {

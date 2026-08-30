@@ -287,6 +287,10 @@ export async function installSupabaseMock(
         id: organizationId,
         name: 'AURA Truth Organization',
         domain: 'aura.local',
+        industry: 'AI data centre validation',
+        default_role: 'viewer',
+        mfa_enabled: false,
+        sso_enabled: false,
       }] : []));
     }
 

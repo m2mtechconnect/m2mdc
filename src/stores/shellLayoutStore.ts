@@ -9,8 +9,8 @@ interface ShellLayoutState {
   setFullBleed: (fullBleed: boolean) => void;
   /**
    * A page can take ownership of the operating-state truth line and surface it
-   * inside its own record header. The shell keeps the bar mounted (single
-   * source of the status region) but renders it for assistive tech only.
+   * inside its own record header. The shell suppresses its copy so assistive
+   * technology does not receive duplicate or cross-route state either.
    */
   pageOwnsOperatingState: boolean;
   setPageOwnsOperatingState: (owns: boolean) => void;

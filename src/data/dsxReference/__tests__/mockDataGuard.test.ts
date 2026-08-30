@@ -8,8 +8,8 @@
  * it only counts non-deterministic value generation inside `src/`.
  */
 import { describe, it, expect } from 'vitest';
-import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { repositoryFilesContaining } from '../../../../tests/helpers/repositorySearch';
 
 const SNAPSHOT = JSON.parse(
   readFileSync('docs/dsx-reference-data/cutover/legacy-baseline-snapshot.json', 'utf8'),
@@ -18,19 +18,12 @@ const SNAPSHOT = JSON.parse(
 /** Frozen ceiling. This number may go DOWN as pages migrate, never up. */
 const BASELINE_RANDOM_FILES: number = SNAPSHOT.counts.files_with_nondeterministic_random;
 
-function rgFiles(pattern: string, extraArgs: string[] = []): string {
-  const result = spawnSync('rg', ['-l', pattern, 'src', ...extraArgs], { encoding: 'utf8' });
-  if (result.status === 0) return result.stdout;
-  if (result.status === 1) return '';
-  throw new Error(result.stderr || `rg failed with status ${result.status ?? 'unknown'}`);
+function sourceFilesContaining(pattern: RegExp, exclude?: (path: string) => boolean): string[] {
+  return repositoryFilesContaining({ roots: ['src'], pattern, exclude });
 }
 
 function filesWithNondeterministicRandom(): string[] {
-  const out = rgFiles('Math\\.random\\(');
-  return out
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
+  return sourceFilesContaining(/Math\.random\(/)
     // Test files and test-only fixtures are excluded from production bundles.
     .filter((f) => !/__tests__|\.test\.|\.spec\./.test(f));
 }
@@ -54,10 +47,10 @@ describe('synthetic data ratchet', () => {
   });
 
   it('never commits raw NVIDIA source material into the repository', () => {
-    const leaked = rgFiles(
-      'CONFIGURATOR_OPTIONS|SIMULATION_OPTIONS',
-      ['--glob', '!src/data/dsxReference/**'],
-    ).trim();
-    expect(leaked, `Raw NVIDIA source symbols leaked into: ${leaked}`).toBe('');
+    const leaked = sourceFilesContaining(
+      /CONFIGURATOR_OPTIONS|SIMULATION_OPTIONS/,
+      (path) => path.startsWith('src/data/dsxReference/'),
+    );
+    expect(leaked, `Raw NVIDIA source symbols leaked into: ${leaked.join(', ')}`).toEqual([]);
   });
 });

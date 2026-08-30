@@ -1,20 +1,17 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
-import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
+import { repositoryFilesContaining } from '../../../tests/helpers/repositorySearch';
 
 const root = process.cwd();
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8');
 
 function grep(pattern: string): string[] {
-  const result = spawnSync('rg', ['-l', '--glob', '!**/types.ts', pattern, 'src'], {
-    cwd: root,
-    encoding: 'utf8',
+  return repositoryFilesContaining({
+    roots: ['src'],
+    pattern: new RegExp(pattern),
+    exclude: (path) => path.endsWith('/types.ts'),
   });
-  if (result.status !== 0 && result.status !== 1) {
-    throw new Error(result.stderr || `rg failed with status ${result.status ?? 'unknown'}`);
-  }
-  return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
 describe('Phase 10 - connection identity is single-sourced', () => {

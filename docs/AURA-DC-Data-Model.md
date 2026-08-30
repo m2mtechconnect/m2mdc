@@ -1,5 +1,11 @@
 # AURA DC — Canonical Data Model
 
+> **Superseded planning document.** The statement below that no tenant or
+> organization entities exist is no longer true. Do not use this file as the
+> current schema contract. Use the generated Supabase types plus
+> `docs/architecture/aura-current-state-2026-08-30.md` at the exact reviewed
+> commit.
+
 Status: PLANNED (Phase 1). No entity below exists with a `tenant_id` today.
 
 ## Entities

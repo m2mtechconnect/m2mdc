@@ -244,15 +244,19 @@ export default function Deploy() {
       setError(message);
 
       if (deploymentId && actorId && systemId) {
-        await appendDeploymentEvent({
-          deploymentId,
-          systemId,
-          actorId,
-          sequence: 99,
-          stage: 'activation-failed',
-          status: 'failed',
-          detail: { message },
-        });
+        try {
+          await appendDeploymentEvent({
+            deploymentId,
+            systemId,
+            actorId,
+            sequence: 99,
+            stage: 'activation-failed',
+            status: 'failed',
+            detail: { message },
+          });
+        } catch (evidenceError) {
+          console.error('[Deploy] Failed to append activation failure evidence', evidenceError);
+        }
         try {
           await closeDeployment({ deploymentId, status: 'failed', errorMessage: message });
         } catch (closeError) {

@@ -4,6 +4,22 @@
   "policy": "explicit-promotion-only",
   "promotions": [
     {
+      "function": "ai-config",
+      "production_disposition": "production-allowlisted",
+      "consumer_files": [
+        "src/pages/AISettings.tsx"
+      ],
+      "consumer_count": 1,
+      "verify_jwt_gateway": true,
+      "local_getUser_or_getClaims": true,
+      "uses_shared_auth_helper": true,
+      "checks_role_or_admin": false,
+      "checks_is_approved": false,
+      "webhook_signature_verification": false,
+      "uses_service_role_key": false,
+      "evidence": "Authenticated AI settings readiness probe: the browser supplies no provider, project, model, region or credential selector; the gateway requires JWT verification and the handler independently authenticates through requireCaller before returning only server-owned, provider-neutral capability state. The function performs no mutation and does not use service-role credentials."
+    },
+    {
       "function": "teams-invite",
       "production_disposition": "production-allowlisted",
       "consumer_files": [

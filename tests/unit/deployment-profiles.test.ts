@@ -3,7 +3,8 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { AURA_DEPLOYMENT_OFFERINGS, deploymentOffering } from '../../src/deployment/deploymentProfiles';
 
-const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8');
+const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(), relativePath), 'utf8')
+  .replace(/\r\n/g, '\n');
 const migration = read('supabase/migrations/20260823233000_organization_deployment_profiles.sql');
 const remediation = read('supabase/migrations/20260824003000_enterprise_audit_remediation.sql');
 const builder = read('src/components/builder/dc-steps/DCStep5Deploy.tsx');

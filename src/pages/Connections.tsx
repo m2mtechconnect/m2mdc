@@ -241,7 +241,6 @@ export default function Connections() {
           isAdmin={isAdmin}
           testingConnectionId={testingConnectionId}
           onOpen={setDetailId}
-          onAdd={() => setWizardOpen(true)}
           onTest={handleTest}
           onMap={handleMap}
           onCredential={setCredentialFor}

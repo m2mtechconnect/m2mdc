@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useRBAC } from '@/contexts/RBACContext';
-import type { AnyRole } from '@/auth/permissions';
+import { GLOBAL_ROLE_PERMISSIONS, type AnyRole, type Permission } from '@/auth/permissions';
 import { DCCard, DCSectionHeader } from '@/components/dc-ui';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,7 @@ import { Shield, UserPlus, Trash2, Info, AlertTriangle } from 'lucide-react';
 type UserRole = {
   id: string;
   user_id: string;
-  role: 'admin' | 'operator' | 'viewer' | 'owner';
+  role: AnyRole;
   scope: string | null;
   granted_by: string | null;
   granted_at: string;
@@ -57,9 +57,7 @@ type GrantableRole = Extract<
   | 'data_analyst' | 'marketing' | 'sales' | 'support' | 'finance'
 >;
 
-const GRANTABLE_ROLES: ReadonlyArray<{ value: GrantableRole; label: string }> = [
-  { value: 'viewer', label: 'Viewer (Read-only)' },
-  { value: 'operator', label: 'Operator (Run agents)' },
+const PLATFORM_GRANTABLE_ROLES: ReadonlyArray<{ value: GrantableRole; label: string }> = [
   { value: 'admin', label: 'Admin (Full control)' },
   { value: 'executive', label: 'Executive (Read-only oversight)' },
   { value: 'manager', label: 'Manager (Operate and view members)' },
@@ -71,6 +69,38 @@ const GRANTABLE_ROLES: ReadonlyArray<{ value: GrantableRole; label: string }> = 
   { value: 'sales', label: 'Sales (Read-only)' },
   { value: 'support', label: 'Support (Read-only)' },
 ];
+
+const AGENT_GRANTABLE_ROLES: ReadonlyArray<{ value: GrantableRole; label: string }> = [
+  { value: 'viewer', label: 'Viewer (Read-only)' },
+  { value: 'operator', label: 'Operator (Run agent)' },
+  { value: 'admin', label: 'Admin (Manage agent)' },
+];
+
+const PERMISSION_LABELS: Partial<Record<Permission, string>> = {
+  'platform.view_admin_console': 'admin console',
+  'authz.view_assignments': 'view role grants',
+  'authz.manage_assignments': 'manage role grants',
+  'tenant.view_members': 'view organization members',
+  'twin.view': 'view twins',
+  'twin.edit': 'edit twins',
+  'twin.delete': 'delete twins',
+  'agent.view': 'view agents',
+  'agent.operate': 'operate agents',
+  'agent.administer': 'administer agents',
+  'deployment.view': 'view deployments',
+  'deployment.execute': 'execute deployments',
+  'analytics.view': 'view analytics',
+  'analytics.export': 'export analytics',
+};
+
+function platformRoleSummary(role: GrantableRole): string {
+  const permissions = GLOBAL_ROLE_PERMISSIONS[role];
+  if (permissions.length === 0) return 'Shell admission only; no platform product permissions';
+  return permissions
+    .map((permission) => PERMISSION_LABELS[permission])
+    .filter((label): label is string => Boolean(label))
+    .join(' · ');
+}
 
 export default function AccessControl() {
   /*
@@ -91,7 +121,7 @@ export default function AccessControl() {
 
   // Form state
   const [userEmail, setUserEmail] = useState('');
-  const [role, setRole] = useState<GrantableRole>('viewer');
+  const [role, setRole] = useState<GrantableRole>('admin');
   const [scope, setScope] = useState<'global' | 'agent'>('global');
   const [agentId, setAgentId] = useState('');
 
@@ -175,7 +205,7 @@ export default function AccessControl() {
       toast.success('Role granted successfully');
       setIsGrantDialogOpen(false);
       setUserEmail('');
-      setRole('viewer');
+      setRole('admin');
       setScope('global');
       setAgentId('');
     },
@@ -232,7 +262,7 @@ export default function AccessControl() {
       <DCSectionHeader
         as="h1"
         title="Access control"
-        subtitle="Manage user roles and permissions within the active organization"
+        subtitle="Manage audited platform and agent-scoped role grants. Organization membership is managed separately under People and Access."
         icon={<Shield className="h-5 w-5 text-info" />}
         action={!canManageAssignments ? (
           <Badge variant="outline">Read-only</Badge>
@@ -248,7 +278,7 @@ export default function AccessControl() {
               <DialogHeader>
                 <DialogTitle>Grant User Role</DialogTitle>
                 <DialogDescription>
-                  Assign a role to a user with optional scope restrictions
+                  Assign an audited platform-wide or agent-scoped role grant. This does not change organization membership.
                 </DialogDescription>
               </DialogHeader>
 
@@ -267,11 +297,11 @@ export default function AccessControl() {
                 <div className="space-y-2">
                   <Label htmlFor="role">Role</Label>
                   <Select value={role} onValueChange={(v) => setRole(v as GrantableRole)}>
-                    <SelectTrigger>
+                    <SelectTrigger id="role" aria-label="Role">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {GRANTABLE_ROLES.map((option) => (
+                      {(scope === 'global' ? PLATFORM_GRANTABLE_ROLES : AGENT_GRANTABLE_ROLES).map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -282,13 +312,23 @@ export default function AccessControl() {
 
                 <div className="space-y-2">
                   <Label htmlFor="scope">Scope</Label>
-                  <Select value={scope} onValueChange={(v) => setScope(v as any)}>
-                    <SelectTrigger>
+                  <Select
+                    value={scope}
+                    onValueChange={(value) => {
+                      const nextScope = value as 'global' | 'agent';
+                      setScope(nextScope);
+                      const nextOptions = nextScope === 'global' ? PLATFORM_GRANTABLE_ROLES : AGENT_GRANTABLE_ROLES;
+                      if (!nextOptions.some((option) => option.value === role)) {
+                        setRole(nextOptions[0].value);
+                      }
+                    }}
+                  >
+                    <SelectTrigger id="scope" aria-label="Scope">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="global">Organization-wide (All agents)</SelectItem>
-                      <SelectItem value="agent">Specific Agent</SelectItem>
+                      <SelectItem value="global">Platform-wide</SelectItem>
+                      <SelectItem value="agent">Specific agent</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -297,7 +337,7 @@ export default function AccessControl() {
                   <div className="space-y-2">
                     <Label htmlFor="agent">Agent</Label>
                     <Select value={agentId} onValueChange={setAgentId}>
-                      <SelectTrigger>
+                      <SelectTrigger id="agent" aria-label="Agent">
                         <SelectValue placeholder="Select an agent" />
                       </SelectTrigger>
                       <SelectContent>
@@ -328,42 +368,27 @@ export default function AccessControl() {
         )}
       />
 
-      {/* Role Descriptions */}
-      <DCCard title="Role Permissions" icon={<Info className="h-4 w-4 text-info" />}>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Badge variant="secondary">Viewer</Badge>
-              <p className="text-sm text-muted-foreground">
-                • View agents and their status<br />
-                • Access logs and metrics<br />
-                • Cannot run or modify agents
+      {/* The guide is derived from the same platform permission authority as the shell. */}
+      <DCCard title="Platform role permissions" icon={<Info className="h-4 w-4 text-info" />}>
+        <div className="grid gap-2 md:grid-cols-2">
+          {PLATFORM_GRANTABLE_ROLES.map((option) => (
+            <div key={option.value} className="rounded-md border border-border p-3">
+              <Badge variant="secondary">{option.label}</Badge>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {platformRoleSummary(option.value)}
               </p>
             </div>
-            <div className="space-y-2">
-              <Badge variant="secondary">Operator</Badge>
-              <p className="text-sm text-muted-foreground">
-                • All viewer permissions<br />
-                • Start/stop/restart agents<br />
-                • Run simulations<br />
-                • Cannot delete or manage permissions
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Badge variant="secondary">Admin</Badge>
-              <p className="text-sm text-muted-foreground">
-                • All operator permissions<br />
-                • Delete agents<br />
-                • Manage user roles<br />
-                • Full administrative control within this organization
-              </p>
-            </div>
-          </div>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-muted-foreground">
+          Agent-scoped Viewer, Operator, and Admin grants are evaluated only for the selected agent.
+        </p>
       </DCCard>
 
       {/* User Roles Table */}
       <DCCard 
         title="Current User Roles" 
-        subtitle={`${userRoles?.length || 0} role assignments in this organization`}
+        subtitle={`${userRoles?.length || 0} audited platform or agent-scoped assignments`}
       >
           {rolesLoading ? (
             <div className="flex justify-center py-8">
@@ -423,11 +448,11 @@ export default function AccessControl() {
                         <Tooltip>
                           <TooltipTrigger>
                             <Badge variant="outline">
-                              {userRole.scope === 'global' || !userRole.scope ? 'Organization-wide' : 'Agent-scoped'}
+                              {userRole.scope === 'global' || !userRole.scope ? 'Platform-wide' : 'Agent-scoped'}
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent>
-                            {userRole.scope === 'global' || !userRole.scope ? 'All agents in the active organization' : userRole.scope}
+                            {userRole.scope === 'global' || !userRole.scope ? 'Applies across the platform according to the role permission registry' : userRole.scope}
                           </TooltipContent>
                         </Tooltip>
                       </TooltipProvider>
@@ -450,6 +475,7 @@ export default function AccessControl() {
                           <Button 
                             variant="ghost" 
                             size="sm"
+                            aria-label={`Revoke ${userRole.role} role from ${userRole.profiles?.email ?? 'user'}`}
                             onClick={() => setSelectedRole(userRole)}
                           >
                             <Trash2 className="h-4 w-4" />

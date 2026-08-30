@@ -168,6 +168,10 @@ interface DataCenter3DSceneProps {
   facilityGeometry?: FacilityGeometryMode;
   /** Overhead infrastructure detail. Defaults to Essential. */
   infrastructure?: InfrastructureLevel;
+  /** Fired after the resolved scene has completed its first render frame. */
+  onSceneReady?: () => void;
+  /** Fired when the renderer has determined that the 3D scene is unavailable. */
+  onSceneUnavailable?: () => void;
 }
 
 interface CanvasMountBoundaryProps {
@@ -321,6 +325,24 @@ function CameraController({
     if (!settled || autoOrbiting) {
       invalidate();
     }
+  });
+
+  return null;
+}
+
+/**
+ * A mounted canvas is not proof that meaningful scene content rendered.
+ * This signal lives inside Suspense and fires once from the render loop, so
+ * hosts can keep a visible loading state until the resolved scene produces a
+ * frame rather than merely detecting the canvas element.
+ */
+function SceneReadySignal({ onReady }: { onReady?: () => void }) {
+  const reported = useRef(false);
+
+  useFrame(() => {
+    if (reported.current) return;
+    reported.current = true;
+    onReady?.();
   });
 
   return null;
@@ -646,6 +668,7 @@ function Scene({
 }
 
 export function DataCenter3DScene(props: DataCenter3DSceneProps) {
+  const onSceneUnavailable = props.onSceneUnavailable;
   const [capability, setCapability] = useState<WebGLCapabilityReport>(() => ({
     status: 'ok',
     reason: 'Pending detection.',
@@ -665,6 +688,12 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
   useEffect(() => {
     if (props.infrastructure) setInfrastructure(props.infrastructure);
   }, [props.infrastructure]);
+
+  useEffect(() => {
+    if (capability.status !== 'ok' || runtimeError) {
+      onSceneUnavailable?.();
+    }
+  }, [capability.status, runtimeError, onSceneUnavailable]);
 
   const reducedMotion = usePrefersReducedMotion();
 
@@ -1045,6 +1074,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
                 canary={canary}
                 infrastructure={infrastructure}
               />
+              <SceneReadySignal onReady={props.onSceneReady} />
             </Suspense>
           </Canvas>
         </CanvasMountBoundary>

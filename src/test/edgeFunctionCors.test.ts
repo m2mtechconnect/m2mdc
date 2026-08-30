@@ -5,18 +5,19 @@ import { evaluateCorsOrigin, handleCorsPreflightRequest } from '../../supabase/f
 
 const BROWSERLESS_ENTRYPOINTS = new Set(['zapier-webhook', 'zapier-webhook-trigger']);
 const FUNCTIONS_DIR = 'supabase/functions';
+const normalizedPath = (path: string) => path.replace(/\\/g, '/');
 
 function allTypeScriptFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((name) => {
     const path = join(directory, name);
     if (statSync(path).isDirectory()) return allTypeScriptFiles(path);
-    return path.endsWith('.ts') || path.endsWith('.tsx') ? [path] : [];
+    return path.endsWith('.ts') || path.endsWith('.tsx') ? [normalizedPath(path)] : [];
   });
 }
 
 function functionEntrypoints(): string[] {
   return readdirSync(FUNCTIONS_DIR)
-    .map((name) => join(FUNCTIONS_DIR, name, 'index.ts'))
+    .map((name) => normalizedPath(join(FUNCTIONS_DIR, name, 'index.ts')))
     .filter((path) => {
       try { return statSync(path).isFile(); } catch { return false; }
     });

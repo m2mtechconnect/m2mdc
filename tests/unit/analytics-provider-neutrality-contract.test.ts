@@ -36,7 +36,9 @@ describe('analytics provider-neutrality contract', () => {
 
   it('preserves the truthful unavailable-state handling', () => {
     expect(SOURCE).toContain('unavailable: true');
-    expect(SOURCE).toContain('opsOverview?.unavailable');
+    expect(SOURCE).toContain('const dataTrust: DataTrustState | null = null');
+    expect(SOURCE).toContain('<DataTrustStrip state={dataTrust} />');
+    expect(SOURCE).not.toContain("queryKey: ['ops-overview'");
   });
 
   it('keeps the reference band qualifier on accelerator utilisation', () => {

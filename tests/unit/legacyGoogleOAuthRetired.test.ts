@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
 /**
@@ -13,16 +13,15 @@ import { existsSync } from 'node:fs';
  */
 describe('legacy Google OAuth retirement', () => {
   const grep = (pattern: string, paths: string) => {
-    try {
-      return execSync(`rg -l --hidden -g '!node_modules' -g '!*.md' -g '!legacyGoogleOAuthRetired.test.ts' '${pattern}' ${paths}`, {
-        cwd: process.cwd(),
-        encoding: 'utf8',
-      })
-        .split('\n')
-        .filter(Boolean);
-    } catch {
-      return [];
+    const result = spawnSync(
+      'rg',
+      ['-l', '--hidden', '-g', '!node_modules', '-g', '!*.md', '-g', '!legacyGoogleOAuthRetired.test.ts', pattern, ...paths.split(' ')],
+      { cwd: process.cwd(), encoding: 'utf8' },
+    );
+    if (result.status !== 0 && result.status !== 1) {
+      throw new Error(result.stderr || `rg failed with status ${result.status ?? 'unknown'}`);
     }
+    return result.stdout.split(/\r?\n/).filter(Boolean);
   };
 
   it('has no edge function source directory', () => {

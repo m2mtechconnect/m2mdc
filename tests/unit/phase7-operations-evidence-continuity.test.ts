@@ -45,8 +45,9 @@ describe('Phase 7 operations and evidence continuity', () => {
   });
 
   it('fails closed when operations sources are unavailable instead of fabricating telemetry', () => {
-    expect(analytics).toContain("return { unavailable: true, data: { overview: null } }");
     expect(analytics).toContain("return { unavailable: true, data: { systems: [], total: 0, page: 1, pageSize: 50 } }");
     expect(analytics).toContain('const dataTrust: DataTrustState | null = null');
+    expect(analytics).toContain('<DataTrustStrip state={dataTrust} />');
+    expect(analytics).not.toContain("queryKey: ['ops-overview'");
   });
 });

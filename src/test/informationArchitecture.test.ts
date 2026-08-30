@@ -20,7 +20,8 @@ import { MANAGE_NAV, SUPPORT_NAV, WORKSPACE_NAV, type AppNavItem } from '@/confi
 import { ROUTE_ALIASES } from '@/config/routeAliases';
 import { SURFACE_MATRIX } from '@/data/dataset/surfaceRegistry';
 
-const shell = readFileSync(join(process.cwd(), 'src/AuthenticatedShell.tsx'), 'utf8');
+const shell = readFileSync(join(process.cwd(), 'src/AuthenticatedShell.tsx'), 'utf8')
+  .replace(/\r\n/g, '\n');
 
 /**
  * Route patterns the shell mounts, with nested children resolved against

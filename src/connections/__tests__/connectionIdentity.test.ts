@@ -1,22 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'node:fs';
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import { resolve } from 'node:path';
 
 const root = process.cwd();
 const read = (p: string) => readFileSync(resolve(root, p), 'utf8');
 
 function grep(pattern: string): string[] {
-  try {
-    return execSync(`rg -l --glob '!**/types.ts' ${JSON.stringify(pattern)} src`, {
-      cwd: root,
-      encoding: 'utf8',
-    })
-      .split('\n')
-      .filter(Boolean);
-  } catch {
-    return [];
+  const result = spawnSync('rg', ['-l', '--glob', '!**/types.ts', pattern, 'src'], {
+    cwd: root,
+    encoding: 'utf8',
+  });
+  if (result.status !== 0 && result.status !== 1) {
+    throw new Error(result.stderr || `rg failed with status ${result.status ?? 'unknown'}`);
   }
+  return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
 describe('Phase 10 - connection identity is single-sourced', () => {

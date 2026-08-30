@@ -174,17 +174,19 @@
   },
   {
     "function": "ai-config",
-    "deployed": true,
-    "consumer_files": [],
-    "consumer_count": 0,
-    "verify_jwt_gateway": true,
-    "local_getUser_or_getClaims": false,
-    "uses_shared_auth_helper": false,
+      "deployed": true,
+      "consumer_files": [
+        "src/pages/AISettings.tsx"
+      ],
+      "consumer_count": 1,
+      "verify_jwt_gateway": true,
+      "local_getUser_or_getClaims": true,
+      "uses_shared_auth_helper": true,
     "checks_role_or_admin": false,
     "checks_is_approved": false,
     "webhook_signature_verification": false,
     "uses_service_role_key": false,
-    "production_disposition": "unknown-blocked"
+      "production_disposition": "production-allowlisted"
   },
   {
     "function": "ai-systems",

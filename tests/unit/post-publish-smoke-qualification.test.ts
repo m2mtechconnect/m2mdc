@@ -133,6 +133,32 @@ describe('automatic on-publish execution contract', () => {
     expect(script).toContain('--only-if-new-publish');
   });
 
+  it('waits for the exact publishing SHA and serializes evidence writes', () => {
+    expect(workflow).toContain('group: aura-post-publish-smoke-evidence');
+    expect(workflow).toContain('cancel-in-progress: false');
+    expect(workflow).toContain(
+      "AURA_EXPECTED_SHA: ${{ inputs.expected_sha || github.event.workflow_run.head_sha }}",
+    );
+    expect(workflow).toContain(
+      "AURA_RELEASE_WAIT_MS: ${{ github.event_name == 'workflow_run' && '600000' || '0' }}",
+    );
+    expect(script).toContain('const RELEASE_WAIT_MS = parseBoundedMs(');
+    expect(script).toContain('[WAIT] release-fingerprint');
+    expect(script.indexOf('await checkReleaseFingerprint()')).toBeLessThan(
+      script.indexOf("await checkPublicShell('/')"),
+    );
+  });
+
+  it('measures route-specific meaningful content and includes Simulation', () => {
+    expect(script).toContain("{ id: 'simulation', path: '/simulation?step=inspect' }");
+    expect(script).toContain("return page.getByTestId('aura-workspace')");
+    expect(script).toContain('async function openMeaningfulRoute');
+    expect(script).toContain('MEANINGFUL_ROUTE_BUDGET_MS');
+    expect(script).not.toMatch(
+      /for \(const route of AUTHENTICATED_ROUTES\)[\s\S]{0,500}waitForTimeout\(2000\)/,
+    );
+  });
+
   it('stores evidence artifacts and regenerates the supervisor registry', () => {
     expect(script).toContain('docs/evidence/post-publish-smoke');
     expect(script).toContain('POST_PUBLISH_SMOKE_REGISTRY');

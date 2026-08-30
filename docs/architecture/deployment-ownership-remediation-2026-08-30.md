@@ -119,9 +119,24 @@ Observed results:
   fixture: **pass**.
 
 This proves the migration against the relevant prior deployment schema and the
-persona policy contract. It does not replace a clean full migration replay or a
-production-like data-volume/locking test. Those remain required before applying
-the migration to production.
+persona policy contract.
+
+### Production-like volume and lock-budget rehearsal
+
+The same exact migration body was then rehearsed in the unpublished sandbox
+with 20,000 organization-owned deployment rows and 40,000 matching event rows.
+The transaction enforced a 5-second lock timeout and a 90-second statement
+timeout. The ownership backfill completed, all five foreign keys validated, no
+row counts changed, no deployment retained a null organization, and the entire
+schema plus every fixture rolled back cleanly. The first synthetic fixture used
+an event status rejected by the sandbox check constraint; that transaction
+failed before migration execution and rolled back. The corrected fixture used
+the allowed `succeeded` status and returned `PASS_ROLLED_BACK`.
+
+This closes the production-like volume/locking rehearsal for the affected
+tables. It does not replace a clean full migration replay from an empty
+disposable Supabase stack. That replay remains required before applying the
+migration to production.
 
 ## Deferred, explicit follow-ups
 

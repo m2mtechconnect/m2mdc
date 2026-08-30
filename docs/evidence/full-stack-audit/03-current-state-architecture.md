@@ -1,2 +1,8 @@
 # Current-State Architecture
+
+> **Historical audit snapshot; superseded.** Its route, table, function and
+> tenancy counts must not be reused for current recommendations. See
+> `docs/architecture/aura-current-state-2026-08-30.md` and run
+> `npm run audit:architecture` at the exact commit under review.
+
 Browser (React 18 + Vite 5 SPA, 24 routes) -> Supabase JS client -> PostgREST/Postgres (113 tables, 284 policies, RLS everywhere) and Supabase Auth. 157 Deno Edge Functions exist; only 50 are reachable from the frontend. Simulation, KPI, carbon and financial engines execute in the browser. Omniverse Kit and DSX clients exist but their transports are disabled and fail closed. RAG functions return 501. There is no application server, no queue, no worker tier, no time-series store, no event bus, and one environment shared by preview and production. Trust boundary is therefore browser -> Postgres RLS: RLS is the only enforcement layer for user data, and it is per-user, not per-tenant.

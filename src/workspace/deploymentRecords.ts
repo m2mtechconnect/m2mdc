@@ -25,7 +25,7 @@ export interface DeploymentEventRecord {
   stage: string;
   status: DeploymentEventStatus;
   detail: Record<string, unknown>;
-  actor_id: string | null;
+  actor_id: string;
   occurred_at: string;
 }
 
@@ -40,7 +40,8 @@ export interface DeploymentRecord {
   runtime_url: string | null;
   health: string | null;
   error_message: string | null;
-  deployed_by: string | null;
+  deployed_by: string;
+  org_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -125,7 +126,9 @@ export async function appendDeploymentEvent(params: {
     detail: (params.detail ?? {}) as never,
   }]);
 
-  if (error) console.error('[deploymentRecords] event append failed', error.message);
+  // An activation cannot be reported as successful when its immutable evidence
+  // failed to persist. Let the caller record a truthful failed terminal state.
+  if (error) throw error;
 }
 
 /** Records the terminal database state without inferring runtime evidence. */

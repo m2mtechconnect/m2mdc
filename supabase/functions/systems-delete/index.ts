@@ -77,6 +77,32 @@ serve(createHandler({
       };
     }
 
+    // Deployment events are immutable enterprise evidence. Never make a hard
+    // system delete responsible for erasing that history. The FK added by the
+    // deployment-ownership migration independently enforces this invariant.
+    const { count: deploymentCount, error: deploymentCheckError } = await supabase
+      .from('deployments')
+      .select('id', { count: 'exact', head: true })
+      .eq('system_id', systemId);
+
+    if (deploymentCheckError) {
+      log("Deployment history check failed", { error: deploymentCheckError.message });
+      throw {
+        code: 'DATABASE_ERROR',
+        message: 'Failed to verify deployment history before deletion',
+        status: 500,
+      };
+    }
+
+    if ((deploymentCount ?? 0) > 0) {
+      log("Cannot delete system with deployment evidence", { systemId, deploymentCount });
+      throw {
+        code: ErrorCodes.CONFLICT,
+        message: 'Cannot delete a system with deployment evidence. Archive it to preserve the audit trail.',
+        status: 409,
+      };
+    }
+
     log("Starting cascading delete");
 
     // Delete related records (non-blocking for performance)
@@ -84,7 +110,6 @@ serve(createHandler({
       supabase.from('agent_conversations').delete().eq('agent_id', systemId),
       supabase.from('agent_runs').delete().eq('agent_id', systemId),
       supabase.from('agent_exports').delete().eq('agent_id', systemId),
-      supabase.from('deployments').delete().eq('system_id', systemId),
       supabase.from('roi_assumptions').delete().eq('system_id', systemId),
       supabase.from('roi_snapshots').delete().eq('system_id', systemId),
       supabase.from('system_integrations').delete().eq('system_id', systemId),

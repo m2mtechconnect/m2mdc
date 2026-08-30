@@ -1,5 +1,11 @@
 # AURA DC — Architecture
 
+> **Superseded planning document.** This file describes a target architecture,
+> not the implemented production topology. Do not use it for current-state,
+> security or deployment claims. Use
+> `docs/architecture/aura-current-state-2026-08-30.md` and regenerate
+> `npm run audit:architecture` from the exact commit being reviewed.
+
 ## Target architecture
 
 ```mermaid

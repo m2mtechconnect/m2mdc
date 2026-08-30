@@ -29,6 +29,13 @@ on:
 permissions:
   contents: write
 
+# Every run writes to the same immutable evidence history. Serialising the
+# workflow prevents schedule, publish and manual runs from racing the
+# evidence-branch lease while still allowing every requested run to finish.
+concurrency:
+  group: aura-post-publish-smoke-evidence
+  cancel-in-progress: false
+
 jobs:
   smoke:
     runs-on: ubuntu-latest
@@ -48,7 +55,12 @@ jobs:
       - name: Run read-only post-publish smoke
         env:
           AURA_SMOKE_TARGET: ${{ inputs.target || 'https://auradc.m2mtechconnect.com' }}
-          AURA_EXPECTED_SHA: ${{ inputs.expected_sha }}
+          # A publish-triggered run is bound to the exact main SHA that caused
+          # the production mirror. The smoke script waits for /release.json to
+          # reach this SHA before it evaluates any production route.
+          AURA_EXPECTED_SHA: ${{ inputs.expected_sha || github.event.workflow_run.head_sha }}
+          AURA_RELEASE_WAIT_MS: ${{ github.event_name == 'workflow_run' && '600000' || '0' }}
+          AURA_RELEASE_POLL_MS: '5000'
           AURA_SMOKE_TRIGGER: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'schedule' && 'scheduled' || 'automatic-on-publish' }}
           # Optional authenticated plane. When these secrets are absent the
           # suite fails closed and records BLOCKED_BY_AUTH.

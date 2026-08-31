@@ -13,3 +13,7 @@ export * from './portabilityMatrix';
 export * from './releaseProfiles';
 export * from './smokeQualification';
 export * from './multicloudEvidence';
+export * from './knowledge/engineeringKnowledgeTypes';
+export * from './knowledge/evidenceGuardrails';
+export * from './knowledge/auraEngineeringKnowledge';
+export * from './evals/runSupervisorEngineeringEvals';

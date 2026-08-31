@@ -135,6 +135,35 @@ export const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
     regressionCaseRef: null,
     note: 'Feature library only; governance forbids direct merge. Smallest relevant changes are reconstructed onto current remediation branches.',
   },
+  {
+    id: 'ks-engineering-knowledge-corpus',
+    kind: 'repository-file',
+    title: 'Engineering knowledge corpus (governed retrieval grounding)',
+    ref: 'src/supervisor/knowledge/auraEngineeringKnowledge.ts',
+    disposition: 'accepted',
+    redactionState: 'approved-redacted',
+    regressionCaseRef: 'tests/unit/aura-engineering-knowledge-contract.test.ts',
+    note: 'Version-pinned, citation-oriented corpus. Conceptual guidance only; restricted claims stay behind the evidence guardrails.',
+  },
+  {
+    id: 'ks-adr-governed-ui-synthetic-data',
+    kind: 'architecture-decision',
+    title: 'ADR-0010 governed UI patterns and synthetic evaluation data',
+    ref: 'docs/adr/0010-governed-ui-patterns-and-synthetic-evaluation-data.md',
+    disposition: 'accepted',
+    redactionState: 'approved-redacted',
+    regressionCaseRef: null,
+  },
+  {
+    id: 'ks-supervisor-engineering-evals',
+    kind: 'test-report',
+    title: 'Supervisor engineering evaluation suite (synthetic data class)',
+    ref: 'src/supervisor/evals/supervisor-engineering-evals.json',
+    disposition: 'accepted',
+    redactionState: 'approved-redacted',
+    regressionCaseRef: 'tests/unit/supervisor-engineering-evals.test.ts',
+    note: 'Synthetic evaluation cases only; never telemetry or tenant data.',
+  },
 ];
 
 /** A source may be indexed only when reviewed, redacted and not rejected. */

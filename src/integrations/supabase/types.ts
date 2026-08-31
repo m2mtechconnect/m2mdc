@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.17"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -2778,7 +2778,7 @@ export type Database = {
           system_id: string
         }
         Update: {
-          actor_id?: string | null
+          actor_id?: string
           deployment_id?: string
           detail?: Json
           id?: string
@@ -2794,6 +2794,13 @@ export type Database = {
             columns: ["deployment_id"]
             isOneToOne: false
             referencedRelation: "deployments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deployment_events_system_id_fkey"
+            columns: ["system_id"]
+            isOneToOne: false
+            referencedRelation: "agents"
             referencedColumns: ["id"]
           },
         ]
@@ -2889,7 +2896,7 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          deployed_by?: string | null
+          deployed_by?: string
           error_message?: string | null
           grounding?: boolean | null
           health?: string | null
@@ -2913,13 +2920,6 @@ export type Database = {
           },
           {
             foreignKeyName: "deployments_system_id_fkey"
-            columns: ["system_id"]
-            isOneToOne: false
-            referencedRelation: "agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "deployment_events_system_id_fkey"
             columns: ["system_id"]
             isOneToOne: false
             referencedRelation: "agents"

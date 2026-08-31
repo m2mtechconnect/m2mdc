@@ -23,9 +23,19 @@ function names(source) {
   return [...source.matchAll(/^      ([a-zA-Z0-9_]+): \{/gm)].map((match) => match[1]).sort();
 }
 
-const generated = readFileSync(typesPath, 'utf8').replaceAll('\r\n', '\n');
+function normalizedFile(path) {
+  return readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
+}
+
+function hashList(values) {
+  return sha256(values.join('\n'));
+}
+
+const generated = normalizedFile(typesPath);
+const migrations = readdirSync(migrationsPath).filter((name) => name.endsWith('.sql')).sort();
+const migrationContents = migrations.map((name) => `${name}\0${normalizedFile(resolve(migrationsPath, name))}`);
 const manifest = {
-  schema: 'aura.schema-truth.v1',
+  schema: 'aura.schema-truth.v2',
   sourceSha: '64da468804a426dcdd356912c4a68ba60f73bdf7',
   generatedTypes: {
     path: 'src/integrations/supabase/types.ts',
@@ -34,7 +44,8 @@ const manifest = {
     views: names(section(generated, '    Views: {', '    Functions: {')),
     functions: names(section(generated, '    Functions: {', '    Enums: {')),
   },
-  migrations: readdirSync(migrationsPath).filter((name) => name.endsWith('.sql')).sort(),
+  migrations,
+  migrationContentsSha256: hashList(migrationContents),
 };
 
 const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
@@ -43,7 +54,11 @@ if (manifest.generatedTypes.sha256 !== baseline.generatedTypesSha256) failures.p
 if (manifest.generatedTypes.tables.length !== baseline.tableCount) failures.push('generated table count drift');
 if (manifest.generatedTypes.views.length !== baseline.viewCount) failures.push('generated view count drift');
 if (manifest.generatedTypes.functions.length !== baseline.functionCount) failures.push('generated function count drift');
-if (manifest.migrations.length !== baseline.migrationCount || sha256(manifest.migrations.join('\n')) !== baseline.migrationsSha256) failures.push('migration inventory drift');
+if (hashList(manifest.generatedTypes.tables) !== baseline.tableNamesSha256) failures.push('generated table name drift');
+if (hashList(manifest.generatedTypes.views) !== baseline.viewNamesSha256) failures.push('generated view name drift');
+if (hashList(manifest.generatedTypes.functions) !== baseline.functionNamesSha256) failures.push('generated function name drift');
+if (manifest.migrations.length !== baseline.migrationCount || hashList(manifest.migrations) !== baseline.migrationsSha256) failures.push('migration inventory drift');
+if (manifest.migrationContentsSha256 !== baseline.migrationContentsSha256) failures.push('migration content drift');
 
 let deployed = { status: 'not-provided', reason: 'No read-only deployed metadata snapshot was supplied.' };
 if (deployedArg) {

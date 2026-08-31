@@ -8,7 +8,9 @@ This layer compares three authorities without treating any one as sufficient:
 2. generated Supabase client types;
 3. an optional read-only deployed metadata snapshot.
 
-`node scripts/schema-truth/verify-schema-truth.mjs` verifies repository drift. Pass
+`node scripts/schema-truth/verify-schema-truth.mjs` verifies exact generated-object
+names, the generated-type file, the migration filename inventory, and normalized
+SQL contents. This makes edits to immutable historical migrations fail closed. Pass
 `--deployed=<snapshot.json>` only for an authorized metadata-only export containing
 sorted `tables`, `views`, and `functions` arrays. Absence of deployed metadata is
 reported as `not-provided`, never inferred as matching.

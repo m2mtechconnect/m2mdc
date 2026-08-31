@@ -17,7 +17,8 @@ and rollback evidence are recorded at one exact SHA.
 
 ## Drift contract
 
-Migration inventory and generated-type checksum are pinned in
+Migration filenames, normalized migration contents, exact generated-object names,
+and the generated-type checksum are pinned in
 `docs/architecture/schema-truth/exact-head-manifest.json`. Deployed metadata is a
 separate optional input and missing evidence remains explicit. Any difference fails
 the comparator; it never updates the baseline automatically.

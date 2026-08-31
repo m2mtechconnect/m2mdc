@@ -1,0 +1,10 @@
+{
+  "schema": "aura.schema-truth.v1",
+  "sourceSha": "64da468804a426dcdd356912c4a68ba60f73bdf7",
+  "generatedTypesSha256": "c35d8dbbb2fec0916f24470691d0fa89d62dbf88587c0e60bb73fc9fa3da0295",
+  "tableCount": 140,
+  "viewCount": 5,
+  "functionCount": 49,
+  "migrationCount": 87,
+  "migrationsSha256": "b4e4e066aebfec07cdf2f9e2239e61567069b9aaf08f03640859d400cf5f40d5"
+}

@@ -1,0 +1,200 @@
+{
+  "suite": "supervisor-engineering-evals",
+  "version": "1.0.0",
+  "dataClass": "synthetic-evaluation-data",
+  "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
+  "cases": [
+    {
+      "id": "eval-01",
+      "title": "PUE and cooling efficiency query grounds in efficiency-metrics guidance",
+      "kind": "retrieval",
+      "input": { "query": "How should we model PUE and cooling efficiency for a data centre twin?" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["simulation-engineering"],
+        "topEntryId": "se-pue-efficiency-metrics",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-02",
+      "title": "Discrete-event workload study query grounds in simulation engineering",
+      "kind": "retrieval",
+      "input": { "query": "discrete event simulation methodology for workload scheduling and calibration" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["simulation-engineering"],
+        "minCitations": 1
+      }
+    },
+    {
+      "id": "eval-03",
+      "title": "USD composition query grounds in the composition-model entry",
+      "kind": "retrieval",
+      "input": { "query": "How do USD layers and composition arcs resolve prim opinions?" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["openusd-assets"],
+        "topEntryId": "usd-composition-model",
+        "minCitations": 1
+      }
+    },
+    {
+      "id": "eval-04",
+      "title": "Asset packaging query with a domain filter grounds in asset structure",
+      "kind": "retrieval",
+      "input": {
+        "query": "asset payload referencing and instancing pipeline structure",
+        "domains": ["openusd-assets"]
+      },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["openusd-assets"],
+        "topEntryId": "usd-asset-structure",
+        "minCitations": 1
+      }
+    },
+    {
+      "id": "eval-05",
+      "title": "Dashboard provenance query grounds in truth-first UI patterns",
+      "kind": "retrieval",
+      "input": { "query": "dashboard provenance labeling and truth states for enterprise UI" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["ui-ux-patterns"],
+        "topEntryId": "ux-truth-first-dashboards",
+        "minCitations": 1
+      }
+    },
+    {
+      "id": "eval-06",
+      "title": "Synthetic data labelling query grounds in synthetic-data governance",
+      "kind": "retrieval",
+      "input": { "query": "how must synthetic demo fixture data be labeled before export" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["synthetic-data-governance"],
+        "topEntryId": "sdg-synthetic-data-labeling",
+        "minCitations": 1
+      }
+    },
+    {
+      "id": "eval-07",
+      "title": "Out-of-corpus query returns explicit no-grounding, never fabrication",
+      "kind": "retrieval",
+      "input": { "query": "quantum blockchain nft staking metaverse" },
+      "expect": { "grounding": "no-grounding" }
+    },
+    {
+      "id": "eval-08",
+      "title": "Vendor integration claim without evidence is blocked",
+      "kind": "guardrail",
+      "input": {
+        "statement": "AURA is integrated with the OpenDC runtime simulator.",
+        "evidence": []
+      },
+      "expect": {
+        "status": "blocked",
+        "violationCategories": ["integration"],
+        "detectedCategories": ["integration"]
+      }
+    },
+    {
+      "id": "eval-09",
+      "title": "Calibration claim without a calibration record is blocked",
+      "kind": "guardrail",
+      "input": {
+        "statement": "The thermal model is calibrated against measured site telemetry.",
+        "evidence": []
+      },
+      "expect": {
+        "status": "blocked",
+        "violationCategories": ["calibration"],
+        "detectedCategories": ["calibration"]
+      }
+    },
+    {
+      "id": "eval-10",
+      "title": "Deployment claim with a valid deployment-log artifact is allowed",
+      "kind": "guardrail",
+      "input": {
+        "statement": "The facility service was successfully deployed to production.",
+        "evidence": [
+          {
+            "artifactRef": "docs/release/deploy-log-builders-create-2026-08-30.md",
+            "kind": "deployment-log",
+            "sha256": null,
+            "performedAt": "2026-08-30T18:05:00Z"
+          }
+        ]
+      },
+      "expect": {
+        "status": "pass",
+        "violationCategories": [],
+        "detectedCategories": ["deployment"]
+      }
+    },
+    {
+      "id": "eval-11",
+      "title": "Schema-safety claim backed by the wrong artifact class stays blocked",
+      "kind": "guardrail",
+      "input": {
+        "statement": "The tenant migration is safe to apply.",
+        "evidence": [
+          {
+            "artifactRef": "docs/release/deploy-log-builders-create-2026-08-30.md",
+            "kind": "deployment-log",
+            "sha256": null,
+            "performedAt": "2026-08-30T18:05:00Z"
+          }
+        ]
+      },
+      "expect": {
+        "status": "blocked",
+        "violationCategories": ["schema-safety"],
+        "detectedCategories": ["schema-safety"]
+      }
+    },
+    {
+      "id": "eval-12",
+      "title": "Production-readiness claim with release qualification is allowed",
+      "kind": "guardrail",
+      "input": {
+        "statement": "The pilot cohort release is production ready.",
+        "evidence": [
+          {
+            "artifactRef": "docs/release/qualification-enterprise-pilot-2026-08-31.json",
+            "kind": "release-qualification",
+            "sha256": null,
+            "performedAt": "2026-08-31T09:00:00Z"
+          }
+        ]
+      },
+      "expect": {
+        "status": "pass",
+        "violationCategories": [],
+        "detectedCategories": ["production-readiness"]
+      }
+    },
+    {
+      "id": "eval-13",
+      "title": "Neutral engineering prose makes no restricted claims and passes",
+      "kind": "guardrail",
+      "input": {
+        "statement": "USD layers compose opinions under a deterministic strength ordering.",
+        "evidence": []
+      },
+      "expect": {
+        "status": "pass",
+        "violationCategories": [],
+        "detectedCategories": []
+      }
+    },
+    {
+      "id": "eval-14",
+      "title": "Corpus checksum and version pin hold",
+      "kind": "corpus-integrity",
+      "expect": { "checksumMatches": true, "versionPinned": true }
+    }
+  ]
+}

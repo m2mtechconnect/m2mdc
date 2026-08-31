@@ -2,12 +2,13 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "f5f1bb88235dc5ee67de9b0182192585b787394d",
-    "workflowRunId": 33291409607,
-    "artifactId": 9726093184,
-    "artifactZipSha256": "4e5a9b80b856a3e9a0f3c3a9f1ee52a759a930202b88e48edd192ce49655e16b"
+    "sha": "923f938b1aecbe08da200e915561ac9360be6052",
+    "workflowRunId": 33383837407,
+    "artifactId": 9754888225,
+    "artifactZipSha256": "1e4a74f7a60598bca8e843ee8a007ab7d0e9e633174888a59ddbcb73986b6b74"
   },
   "notes": [
+    "PR #127 exact-head review approved intentional changes on analytics desktop/mobile, Builder deployment readiness, and Connections desktop/mobile. The reviewed artifact showed one readiness heading, corrected Connections ownership, visible provenance labels without trend overlap, and no duplicate inspector close control.",
     "AURA global application surfaces are light-theme by product contract.",
     "Scoped NOC dark styling is a separate component contract and is not represented as a global user-selectable dark mode.",
     "Operations desktop/mobile and Compliance desktop were visibly reviewed from exact-head artifact 9716827680 after PR #121 introduced intentional source-conditional and unavailable-state copy through src/config/pagePositioning.ts. Layout, responsive reflow, provenance, disabled export state and navigation remained coherent; the three reviewed fingerprints were approved without changing application code.",
@@ -60,14 +61,14 @@
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "5102caeb668bbd28269e71f67a02b6dbffef544fb66f2107e2fa0784f1085bb7",
+      "sha256": "e3722225474479585444fa0e31b113f92eaf3a811d2b4e814b1c1a09fa50fefc",
       "width": 375,
-      "height": 5481
+      "height": 5553
     },
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "32d4eaac0ef18db738caee39914f4b079094e8dfc7d20e7ea2734f9a1c10d146",
+      "sha256": "343dc1d5bc19f869a3ea6a01d5fe81f561f7fb379443125939f6609f0710fe48",
       "width": 1280,
       "height": 720
     },
@@ -102,7 +103,7 @@
     {
       "file": "builder-step5-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "39e94c090f6d1220a336cd0675fbfa31f9f78f09a142c7e8501a0a6f5c97b70a",
+      "sha256": "e86d74cd0b6ac5840fe97a7fdedb38b6d810da9b9e52e86424dee0c8184845b2",
       "width": 1280,
       "height": 720
     },
@@ -116,7 +117,7 @@
     {
       "file": "connections-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "4c214543663839958d915c6a824138126d9903770ba5e3213127421ceb5cb1fc",
+      "sha256": "ec763bc8410fcee6e23967a29c597a88eaad26438fbb92a441178ec1c94baa5f",
       "width": 375,
       "height": 2731
     },
@@ -151,7 +152,7 @@
     {
       "file": "integrations-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "6c93f116d18cf140530433ec35276dd1e9d7073b05974e15c023fd35c7d450bf",
+      "sha256": "4650d023a65f8cc2b5c8d6e35c5d14c11742082e6b3f82968acadc95f0d3489b",
       "width": 1280,
       "height": 720
     },

@@ -37,6 +37,17 @@ describe('facility builder context integrity', () => {
     expect(checklist).not.toContain('All critical checks passed! Ready for deployment.');
   });
 
+  it('keeps one deployment-readiness heading and facility-specific guidance', () => {
+    const step = read('src/components/builder/steps/Step5Deploy.tsx');
+    const warnings = read('src/components/builder/step5/deploy/DeploymentWarnings.tsx');
+    const checklist = read('src/components/builder/step5/deploy/ReadinessChecklist.tsx');
+    expect(step.match(/title="Deployment Readiness"/g)).toHaveLength(1);
+    expect(checklist).toContain('Pre-flight checks');
+    expect(checklist).not.toContain('<CardTitle className="text-lg">Deployment Readiness</CardTitle>');
+    expect(warnings).toContain('facility and twin outcomes');
+    expect(warnings).not.toContain('track agent performance');
+  });
+
   it('hands the active facility to Blueprint and Simulation', () => {
     const source = read('src/components/builder/steps/Step5Deploy.tsx');
     expect(source).toContain("blueprintId: activeTwin?.id ?? builderId ?? 'unavailable'");

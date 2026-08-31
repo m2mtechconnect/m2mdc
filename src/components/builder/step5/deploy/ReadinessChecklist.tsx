@@ -62,7 +62,7 @@ export function ReadinessChecklist({
         status: (builderState?.workflow?.integrations?.length > 0) ? 'ok' : 'warning',
         tooltip: builderState?.workflow?.integrations?.length > 0
           ? `${builderState.workflow.integrations.length} integration(s) connected`
-          : 'No integrations configured - agent may have limited capabilities',
+          : 'No integrations configured - the facility twin may have limited capabilities',
         fixStep: 3,
         icon: Plug
       },
@@ -92,7 +92,7 @@ export function ReadinessChecklist({
         status: builderState?.kpis?.length > 0 ? 'ok' : 'warning',
         tooltip: builderState?.kpis?.length > 0
           ? `${builderState.kpis.length} KPI(s) defined`
-          : 'Consider adding KPIs to track agent performance',
+          : 'Consider adding KPIs to track facility and twin outcomes',
         fixStep: undefined,
         icon: Target
       },
@@ -156,7 +156,7 @@ export function ReadinessChecklist({
             <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <CardTitle className="text-lg">Deployment Readiness</CardTitle>
+                  <CardTitle className="text-lg">Pre-flight checks</CardTitle>
                   <div className="flex gap-2">
                     {okCount > 0 && (
                       <Badge variant="secondary" className="bg-success/10 text-success">

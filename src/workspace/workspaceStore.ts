@@ -112,7 +112,15 @@ export const useWorkspaceStore = create<WorkspaceState>()(
       handoff: null,
       assumptionsReviewed: false,
 
-      setTool: (activeTool) => set({ activeTool, panelOpen: true }),
+      // A real workflow-step change opens the inspector. Re-applying the
+      // already-active step (for example during URL or role synchronisation)
+      // must preserve an explicit user dismissal instead of reopening it.
+      setTool: (activeTool) =>
+        set((state) =>
+          state.activeTool === activeTool
+            ? { activeTool }
+            : { activeTool, panelOpen: true },
+        ),
       setRoleView: (roleView) => set({ roleView }),
       selectAsset: (selectedAssetId) => set({ selectedAssetId, panelOpen: true }),
       setPanelOpen: (panelOpen) => set({ panelOpen }),

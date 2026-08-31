@@ -290,7 +290,7 @@ export default function Connections() {
   return (
     <div className="min-w-0 space-y-5 pb-10" data-testid="connections-page">
       <WorkspaceHeader
-        eyebrow="Operations · Control plane"
+        eyebrow="Design & Build · Connections"
         title="Connections"
         icon={Cable}
         capabilityId="connections.enterprise"

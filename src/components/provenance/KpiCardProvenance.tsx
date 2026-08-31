@@ -67,12 +67,13 @@ export function KpiCardProvenance({
       <KpiCard
         {...rest}
         value={displayValue}
+        className="pt-12"
       />
       <div
         className="pointer-events-auto absolute right-2 top-2 z-10"
         aria-label={`${rest.label} provenance`}
       >
-        <ProvenanceBadge meta={badgeMeta} compact />
+        <ProvenanceBadge meta={badgeMeta} />
       </div>
       {metric.isStale && (
         <div

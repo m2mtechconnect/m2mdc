@@ -48,4 +48,14 @@ describe('useWorkflowStep against a real router', () => {
     expect(result.current.search).toContain('step=simulate');
     expect(result.current.state.notice).toContain('completed run');
   });
+
+  it('preserves an explicit inspector dismissal when the active step is synchronised again', () => {
+    useWorkspaceStore.setState({ activeTool: 'inspect', panelOpen: false, runs: [] });
+
+    act(() => useWorkspaceStore.getState().setTool('inspect'));
+    expect(useWorkspaceStore.getState().panelOpen).toBe(false);
+
+    act(() => useWorkspaceStore.getState().setTool('configure'));
+    expect(useWorkspaceStore.getState().panelOpen).toBe(true);
+  });
 });

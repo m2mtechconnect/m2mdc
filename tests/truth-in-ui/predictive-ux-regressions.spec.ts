@@ -37,6 +37,22 @@ test.describe('predictive defect-family regressions', () => {
     await expect(trigger).toBeFocused();
   });
 
+  test('docked inspector stays closed after the active URL step synchronises', async ({ context, page }) => {
+    test.setTimeout(45_000);
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openAuthorized(context, page, '/simulation?step=inspect');
+
+    const panel = page.getByTestId('workspace-context-panel');
+    await expect(panel).toBeVisible({ timeout: 10_000 });
+    await panel.getByRole('button', { name: 'Close context panel' }).click();
+    await expect(panel).toBeHidden();
+
+    const trigger = page.getByRole('button', { name: 'Inspector' });
+    await expect(trigger).toBeFocused();
+    await page.waitForTimeout(250);
+    await expect(panel).toBeHidden();
+  });
+
   test('saved organization values render and only the General tab owns page save actions', async ({ context, page }) => {
     test.setTimeout(45_000);
     await openAuthorized(context, page, '/account/settings');

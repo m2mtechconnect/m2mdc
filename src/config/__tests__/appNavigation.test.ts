@@ -165,6 +165,7 @@ describe('page positioning', () => {
     expect(positioningFor('/dashboard')!.title).toBe('AI Factory Overview');
     expect(positioningFor('/simulation')!.title).toBe('Simulation Studio');
     expect(positioningFor('/builder')!.title).toBe('OpenUSD Asset Pipeline');
+    expect(positioningFor('/manage/integrations')!.breadcrumb).toEqual(['Design & Build', 'Connections']);
   });
 
   it('does not describe simulated-only Operations as measured telemetry', () => {

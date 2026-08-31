@@ -75,7 +75,7 @@ export const PAGE_POSITIONING: PagePositioning[] = [
     title: 'Connections',
     purpose:
       'Connect facility systems, edge gateways, twin runtimes, storage and enterprise workflows to AURA.',
-    breadcrumb: ['Manage', 'Connections'],
+    breadcrumb: ['Design & Build', 'Connections'],
     capabilityId: 'integrations',
   },
   {

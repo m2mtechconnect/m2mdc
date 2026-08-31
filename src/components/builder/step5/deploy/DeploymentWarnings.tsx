@@ -35,7 +35,7 @@ export function DeploymentWarnings({
   if (!builderState?.workflow?.actions?.length) {
     warnings.push({
       id: 'no-workflows',
-      message: 'No workflows configured. Your agent needs at least one workflow to function.',
+      message: 'No workflows configured. This facility twin needs at least one workflow to function.',
       severity: 'critical',
       fixStep: 4,
       icon: GitBranch
@@ -68,7 +68,7 @@ export function DeploymentWarnings({
   if (!builderState?.kpis?.length) {
     warnings.push({
       id: 'no-kpis',
-      message: 'No KPIs defined. Add KPIs to track agent performance over time.',
+      message: 'No KPIs defined. Add KPIs to track facility and twin outcomes over time.',
       severity: 'warning',
       fixStep: 5,
       icon: Target

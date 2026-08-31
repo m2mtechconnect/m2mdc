@@ -34,6 +34,7 @@ describe('IntelligenceDashboard KPI strip — provenance wrapper', () => {
     expect(tile).toHaveAttribute('data-provenance', 'simulated');
     // The provenance badge is rendered as a sibling with a descriptive aria-label.
     expect(within(tile).getByLabelText(/Provenance: Simulation/)).toBeInTheDocument();
+    expect(within(tile).getByText('Simulation')).toBeVisible();
   });
 
   it('tags demo-fallback tiles with data-provenance="demo"', () => {
@@ -50,6 +51,7 @@ describe('IntelligenceDashboard KPI strip — provenance wrapper', () => {
     const tile = screen.getByTestId('metric-gpu-utilization');
     expect(tile).toHaveAttribute('data-provenance', 'demo');
     expect(within(tile).getByLabelText(/Provenance: Demo data/)).toBeInTheDocument();
+    expect(within(tile).getByText('Demo data')).toBeVisible();
   });
 
   it('never fabricates a value when the metric is null (renders Not available)', () => {

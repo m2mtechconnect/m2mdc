@@ -45,6 +45,25 @@ function routedTwinId(): string | undefined {
   return value || undefined;
 }
 
+/**
+ * Read the server-authored error message from a failed function invocation.
+ * Returns only the `error.message` string produced by our own Edge Function
+ * error contract; never headers, tokens, or the request payload.
+ */
+async function readServerErrorMessage(error: unknown): Promise<string | null> {
+  const context = (error as { context?: unknown })?.context;
+  if (!context || typeof (context as Response).json !== 'function') return null;
+  try {
+    const body = await (context as Response).clone().json();
+    const message = body?.error?.message;
+    return typeof message === 'string' && message.trim() ? message : null;
+  } catch {
+    return null;
+  }
+}
+
+
+
 export const builderService = {
   /**
    * Create a new builder draft. The canonical Build route carries the facility

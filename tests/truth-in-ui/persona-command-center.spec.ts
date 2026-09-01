@@ -8,7 +8,86 @@ interface DashboardAuthorization {
   withActiveOrganization: boolean;
   platformRole?: AnyRole | null;
   organizationRole?: OrganizationRole;
+  simulationRuns?: unknown[];
+  decisionRecords?: unknown[];
 }
+
+const HANDOFF_RUN_ID = '00000000-0000-4000-8000-000000000101';
+const HANDOFF_RUN_KEY = 'SIM-HANDOFF-001';
+const HANDOFF_KPIS = {
+  pue: 1.31,
+  itLoadKw: 7400,
+  gpuUtilization: 82,
+  thermalStability: 91,
+  coolingEfficiency: 88,
+  capacityHeadroom: 18,
+  carbonIntensity: 42,
+  energyCostPerMwh: 81,
+  sovereigntyScore: 96,
+};
+
+const HANDOFF_RECOMMENDATIONS = [
+  {
+    id: 'rec-reviewed',
+    title: 'Keep the thermal guardrail',
+    rationale: 'The simulated temperature margin narrows during the workload surge.',
+    subsystem: 'Cooling',
+    signal: 'medium',
+  },
+  {
+    id: 'rec-pending',
+    title: 'Escalate capacity planning',
+    rationale: 'The simulated headroom is below the facility planning target.',
+    subsystem: 'Capacity',
+    signal: 'strong',
+  },
+];
+
+const HANDOFF_RUN = {
+  id: HANDOFF_RUN_ID,
+  run_key: HANDOFF_RUN_KEY,
+  run_label: HANDOFF_RUN_KEY,
+  scenario_key: 'ai-training-surge',
+  scenario_name: 'AI training surge',
+  twin_id: '00000000-0000-4000-8000-000000000201',
+  started_at: '2026-09-01T12:00:00.000Z',
+  finished_at: '2026-09-01T12:02:00.000Z',
+  baseline_kpis: HANDOFF_KPIS,
+  final_kpis: { ...HANDOFF_KPIS, capacityHeadroom: 11 },
+  events: [],
+  input_snapshot: {
+    facilityId: '00000000-0000-4000-8000-000000000201',
+    facilityName: 'AURA Truth Facility',
+    overrides: {
+      coolingSetpointC: 24,
+      gpuPowerCapPct: 100,
+      workloadDensityPct: 82,
+      renewableMixPct: 60,
+    },
+    baseline: HANDOFF_KPIS,
+  },
+  output_snapshot: {
+    result: { ...HANDOFF_KPIS, capacityHeadroom: 11 },
+    events: [],
+    recommendations: HANDOFF_RECOMMENDATIONS,
+  },
+  execution_origin: 'client-browser',
+  validation_status: 'client-produced-unverified',
+  verification_level: 'client-generated-unverified',
+};
+
+const HANDOFF_DECISION = {
+  id: '00000000-0000-4000-8000-000000000301',
+  run_id: HANDOFF_RUN_ID,
+  recommendation_id: 'rec-reviewed',
+  outcome: 'rejected',
+  rationale: 'The recommendation requires a verified thermal model before approval.',
+  approver: 'manager@aura.local',
+  decided_at: '2026-09-01T12:10:00.000Z',
+  snapshot_hash: 'sha256:truth-suite-snapshot',
+  decision_hash: 'sha256:truth-suite-decision',
+  evidence_schema_version: '2.0.0',
+};
 
 async function openDashboard(
   context: import('@playwright/test').BrowserContext,
@@ -93,6 +172,39 @@ test.describe('persona-prioritized Command Center', () => {
 
     await page.goto('/builder');
     await expect(page).toHaveURL(/\/dashboard$/);
+    expect(guard.anyExternalCompleted(), 'no external request may complete').toBe(false);
+  });
+
+  test('manager opens the tenant decision queue with durable run evidence intact', async ({ context, page, guard }) => {
+    const panel = await openDashboard(context, page, {
+      withActiveOrganization: true,
+      platformRole: null,
+      organizationRole: 'manager',
+      simulationRuns: [HANDOFF_RUN],
+      decisionRecords: [HANDOFF_DECISION],
+    });
+
+    await expect(panel).toHaveAttribute('data-persona-family', 'executive_manager');
+    await expect(panel.getByText('1 decision awaiting review')).toBeVisible();
+    await expect(panel.getByTestId('persona-action-decision-queue')).toHaveAttribute(
+      'href',
+      new RegExp(`step=decide&run=${HANDOFF_RUN_KEY}$`),
+    );
+
+    await panel.getByTestId('persona-action-decision-queue').click();
+    await expect(page).toHaveURL(new RegExp(`/simulation\\?.*step=decide.*run=${HANDOFF_RUN_KEY}`));
+    const workspace = page.getByTestId('aura-workspace');
+    await expect(workspace).toBeVisible();
+    await expect(page.getByTestId('workspace-context-panel').getByText('Review and record')).toBeVisible();
+    await expect(page.getByText(`Recommendations for run ${HANDOFF_RUN_KEY}.`)).toBeVisible();
+    await expect(page.getByTestId('decision-evidence-rec-reviewed')).toContainText(
+      'The recommendation requires a verified thermal model before approval.',
+    );
+    await expect(page.getByText('Escalate capacity planning')).toBeVisible();
+
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await expect(page).toHaveURL(new RegExp(`step=decide.*run=${HANDOFF_RUN_KEY}`));
+    await expect(page.getByTestId('decision-evidence-rec-reviewed')).toBeVisible();
     expect(guard.anyExternalCompleted(), 'no external request may complete').toBe(false);
   });
 

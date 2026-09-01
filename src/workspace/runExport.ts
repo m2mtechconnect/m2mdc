@@ -39,6 +39,17 @@ function recordFor(run: WorkspaceRun, key: KpiKey, phase: 'baseline' | 'result')
 /** Build the canonical export payload for one recorded run. */
 export function buildRunExportPayload(run: WorkspaceRun): ExportPayload {
   const keys = Object.keys(KPI_DESCRIPTORS) as KpiKey[];
+  const decisionRecords: ExportRecord[] = (run.decisionRecords ?? []).map((decision) => ({
+    metricId: `decision.${decision.id}`,
+    metricName: `Decision: ${decision.recommendationId}`,
+    value: decision.outcome,
+    unit: null,
+    provenance: 'simulated',
+    source: `public.decision_records:${decision.id}`,
+    observedAt: decision.decidedAt,
+    stale: false,
+    description: `Recorded by ${decision.approver}. Rationale: ${decision.rationale}. Evidence schema ${decision.evidenceSchemaVersion}; snapshot ${decision.snapshotHash}; decision ${decision.decisionHash ?? 'legacy-unavailable'}.`,
+  }));
   return {
     schemaVersion: '1.0.0',
     surface: RUN_EXPORT_SURFACE,
@@ -47,12 +58,17 @@ export function buildRunExportPayload(run: WorkspaceRun): ExportPayload {
     records: [
       ...keys.map((k) => recordFor(run, k, 'baseline')),
       ...keys.map((k) => recordFor(run, k, 'result')),
+      ...decisionRecords,
     ],
     note: `Facility ${run.facilityName}. Scenario ${run.scenarioLabel}. Run started ${run.startedAt}, completed ${run.completedAt}.`,
     operatingState: buildExportOperatingState({
       simulationRunId: run.id,
       scenario: run.scenarioLabel,
       calculationTimestamp: run.completedAt,
+      humanReviewStatus:
+        decisionRecords.length > 0
+          ? `${decisionRecords.length} append-only decision record${decisionRecords.length === 1 ? '' : 's'}`
+          : 'Not reviewed',
     }),
   };
 }

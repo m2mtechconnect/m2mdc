@@ -7,22 +7,39 @@ const runs = read('src/workspace/runPersistence.ts');
 const decisions = read('src/workspace/decisionPersistence.ts');
 const panel = read('src/workspace/panels/DecidePanel.tsx');
 const endpoint = read('supabase/functions/record-decision/index.ts');
+const lifecycle = read('supabase/functions/run-lifecycle/index.ts');
 const store = read('src/workspace/workspaceStore.ts');
+const handoffMigration = read('supabase/migrations/20260901093000_cross_persona_decision_handoff.sql');
+const dashboard = read('src/workspace/CommandCentre.tsx');
 
 describe('Phase 5 simulation and decision continuity', () => {
   it('persists browser simulations as active-org preview evidence only', () => {
-    expect(runs).toContain("rpc('active_org_id')");
-    expect(runs).toContain('tenant_id: tenantId');
-    expect(runs).toContain("lifecycle_status: 'succeeded'");
-    expect(runs).toContain("run_intent: 'preview'");
-    expect(runs).toContain("verification_level: 'client-produced-unverified'");
-    expect(runs).toContain("execution_origin: 'client-browser'");
+    expect(runs).toContain("supabase.functions.invoke('run-lifecycle'");
+    expect(runs).toContain("requestedIntent: 'preview'");
+    expect(runs).toContain("requestedProvider: 'aura-deterministic-browser'");
+    expect(lifecycle).toContain("const SERVER_VERIFIABLE_PROVIDERS: string[] = []");
+    expect(lifecycle).toContain('const runIntent = verifiable');
+    expect(lifecycle).toContain('tenant_id: activeOrgId');
   });
 
   it('hydrates durable decision outcomes back into workspace runs', () => {
     expect(runs).toContain("from('decision_records')");
     expect(runs).toContain("outcome === 'approved'");
     expect(runs).toContain("outcome === 'escalated'");
+    expect(runs).toContain('decisionRecords');
+    expect(dashboard).toContain('useDurableWorkspaceRuns(facility.id)');
+  });
+
+  it('allows active members to read the tenant handoff without widening write authority', () => {
+    expect(handoffMigration).toContain('CREATE POLICY simulation_runs_org_read');
+    expect(handoffMigration).toContain('CREATE POLICY decision_records_org_read');
+    expect(handoffMigration).toContain('DROP POLICY IF EXISTS "simulation_runs_select_admin"');
+    expect(handoffMigration).toContain('DROP POLICY IF EXISTS "simulation_runs_select_own"');
+    expect(handoffMigration).toContain('DROP POLICY IF EXISTS "decision_records_select_own"');
+    expect(handoffMigration.match(/public\.active_org_id\(\)/g)).toHaveLength(2);
+    expect(handoffMigration.match(/public\.is_org_member\(tenant_id, auth\.uid\(\)\)/g)).toHaveLength(2);
+    expect(handoffMigration.match(/tenant_id IS NULL OR tenant_id = user_id/g)).toHaveLength(2);
+    expect(handoffMigration).not.toMatch(/FOR (?:INSERT|UPDATE|DELETE|ALL)/);
   });
 
   it('derives decision tenant and authority server-side', () => {

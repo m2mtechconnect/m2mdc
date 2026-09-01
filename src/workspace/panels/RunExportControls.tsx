@@ -33,7 +33,7 @@ export function RunExportControls({ run }: { run: WorkspaceRun | null }) {
         ))}
       </div>
       <p id="run-export-reason" className="text-[11px] text-muted-foreground">
-        {disabled ? reason : 'Includes baseline and scenario KPIs with per-metric provenance.'}
+        {disabled ? reason : 'Includes baseline and scenario KPIs plus the available append-only decision evidence.'}
       </p>
     </div>
   );

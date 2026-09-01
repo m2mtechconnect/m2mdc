@@ -57,6 +57,9 @@ const SERVER_VERIFIABLE_PROVIDERS: string[] = [];
 const CreateSchema = z.object({
   op: z.literal("create"),
   twinId: z.string().uuid(),
+  // Optional for canonical callers created before the workspace exposed a
+  // stable human-readable run key.
+  runKey: z.string().min(1).max(200).optional(),
   scenarioKey: z.string().min(1).max(200),
   scenarioName: z.string().max(300).optional(),
   scenarioType: z.enum(["operational", "design"]).default("operational"),
@@ -170,6 +173,8 @@ serve(
           twin_id: input.twinId,
           user_id: userId,
           tenant_id: activeOrgId,
+          run_key: input.runKey ?? null,
+          run_label: input.runKey ?? null,
           scenario_key: input.scenarioKey,
           scenario_name: input.scenarioName ?? input.scenarioKey,
           scenario_type: input.scenarioType,

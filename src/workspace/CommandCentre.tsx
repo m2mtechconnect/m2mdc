@@ -44,6 +44,7 @@ import { FacilityPlanCard, type CanvasOverlayId } from './dashboard/FacilityPlan
 import { RecentSimulations } from './dashboard/RecentSimulations';
 import { StatusSnapshot, buildSnapshotRows } from './dashboard/StatusSnapshot';
 import { MetricQuickView } from './dashboard/MetricQuickView';
+import { useDurableWorkspaceRuns } from './useDurableWorkspaceRuns';
 import { buildRackGrid } from './dashboard/rackModel';
 import { PersonaPriorityPanel } from './dashboard/PersonaPriorityPanel';
 import {
@@ -72,6 +73,7 @@ export default function CommandCentre() {
     resolution,
   } = useRBAC();
   const overrides = useWorkspaceStore((s) => s.overrides);
+  useDurableWorkspaceRuns(facility.id);
   const runs = useWorkspaceStore((s) => s.runs);
   const [searchParams, setSearchParams] = useSearchParams();
 

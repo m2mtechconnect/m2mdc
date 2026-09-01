@@ -61,7 +61,7 @@ describe('persona-prioritized Command Center', () => {
 
     expect(actions[0]).toMatchObject({
       id: 'review-run',
-      href: '/simulation?twin=facility-1&run=run-1&review=pending',
+      href: '/simulation?twin=facility-1&step=decide&run=run-1',
     });
   });
 

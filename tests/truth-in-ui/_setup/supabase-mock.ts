@@ -159,6 +159,9 @@ export async function installSupabaseMock(
     platformRole?: AnyRole | null;
     withActiveOrganization?: boolean;
     organizationRole?: OrganizationRole;
+    /** Tenant-scoped durable fixtures for cross-persona journey tests. */
+    simulationRuns?: unknown[];
+    decisionRecords?: unknown[];
   } = {},
 ): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
@@ -308,6 +311,16 @@ export async function installSupabaseMock(
 
     if (pathname.startsWith('/rest/v1/rpc/set_active_org')) {
       return fulfillJson(JSON.stringify(opts.withActiveOrganization ? organizationId : null));
+    }
+
+    if (pathname.startsWith('/rest/v1/simulation_runs')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.simulationRuns ?? []));
+    }
+
+    if (pathname.startsWith('/rest/v1/decision_records')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.decisionRecords ?? []));
     }
 
     // ---- RPC / other REST --------------------------------------

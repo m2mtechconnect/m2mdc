@@ -1,6 +1,6 @@
 # AURA DC persona and journey map
 
-Status: approved presentation contract; persona-prioritized Command Center implemented without an authorization, route or navigation change
+Status: approved presentation contract; persona-prioritized Command Center and the first durable cross-persona decision handoff are implemented on the review branch
 
 Baseline: `cde1d9050d81795e8afce43d28f9b9e680afc939`
 
@@ -34,9 +34,9 @@ Marketing, sales and support remain specialist platform entitlements. They are n
 | Family | Permission and route tests | Complete job test | Live evidence |
 | --- | --- | --- | --- |
 | Owner / Administrator | Implemented | Partial | Owner/admin access paths observed; complete workspace handoff not yet qualified. |
-| Facility Engineer / Operator | Implemented | Partial | Landing, simulation route, reload and platform denial pass; persisted run-to-operation handoff is incomplete. |
-| Executive / Manager | Implemented | Partial | Landing, evidence route, reload and twin-mutation denial pass; durable decision handoff is incomplete. |
-| Compliance / Analyst | Implemented | Partial | Landing, evidence route, reload and connection-edit denial pass; claim-to-export persistence is incomplete. |
+| Facility Engineer / Operator | Implemented | Partial | Browser-created simulations now use the trusted run-lifecycle boundary and hydrate the tenant queue; live server persistence still requires disposable-environment qualification. |
+| Executive / Manager | Implemented | Partial | A manager can open a tenant run in the canonical Review step, see prior decision evidence, reload, and retain the queue; production RLS and Edge deployment remain unverified. |
+| Compliance / Analyst | Implemented | Partial | Decision evidence is now included in bounded run exports; a complete live claim-to-export journey remains incomplete. |
 | Viewer / Pilot | Implemented | Partial | Organization viewer and sealed pilot landing, reload, recovery and direct-route denial pass; live access-request persistence is incomplete. |
 
 The Command Center browser matrix now exercises each family with authoritative
@@ -54,6 +54,31 @@ viewer label remains an evaluation scope and is never described as platform
 authority.
 
 Permission/route coverage must not be reported as golden-journey coverage. A golden journey must complete a real persona job, exercise persisted state, prove the outcome and include a negative case.
+
+## Durable decision-handoff invariant
+
+The first shared job spine is now encoded as an implementation and regression
+contract:
+
+1. A browser simulation requests creation and lifecycle transitions through
+   `run-lifecycle`; the browser does not label its deterministic preview as a
+   server-validated outcome.
+2. Authorized members of the active organization may read the same completed
+   `simulation_runs` and append-only `decision_records`; write authority is not
+   broadened by the tenant read policy.
+3. Command Center and Simulation hydrate from the same tenant-qualified run
+   queue. A decision-queue URL uses `step=decide` and a stable run key, and that
+   URL remains authoritative across hydration and reload.
+4. The Review panel renders the latest decision plus its rationale, actor,
+   timestamp and snapshot hash. Run export preserves the full decision chain.
+5. Unverified browser previews may be rejected or escalated but cannot be
+   approved. The trusted `record-decision` boundary remains authoritative for
+   identity, tenant, role and immutable evidence fields.
+
+This invariant is covered by unit, behaviour and isolated browser tests. It is
+not yet proof that the new migration and updated Edge Function are deployed or
+that two real identities can complete the journey against live RLS. That is the
+next controlled qualification step.
 
 ## Golden journeys to qualify
 
@@ -79,5 +104,5 @@ The presentation family is resolved from the active organization role first, the
 | Routes | Command Center, Simulation, Evidence, Account Settings and Pilot Overview; direct denial for platform admin, Builder, Connections and Simulation | Durable write/handoff routes for each job |
 | Viewport | Desktop Chrome at 1280 × 900 | Narrow-screen, zoom/reflow and assistive-technology pass |
 | Interaction states | Landing context, prioritized action, meaningful route content, reload/resume, empty pilot state, recovery and denial | Slow, failed, cancelled and backend-conflict states |
-| Backend boundaries | Mocked verified identity, platform grants, organization membership, active organization and fail-closed route guards | Live RLS, RPC/Edge Function, persistence, audit record and tenant-isolation evidence |
+| Backend boundaries | Mocked verified identity, active organization, tenant-shared run/decision hydration, trusted run lifecycle, append-only decision evidence and fail-closed route guards | Apply the pending migration and Edge update to disposable QA; prove live persistence, cross-role RLS, audit record and cross-tenant denial |
 | Release evidence | Exact isolated branch qualified before atomic commit | Push/PR, deployed fingerprint and post-publish production observation |

@@ -52,8 +52,8 @@ function action(
 
 function reviewRunHref(context: PersonaCommandContext): string {
   return context.latestRunId
-    ? `${context.simulationHref}&run=${encodeURIComponent(context.latestRunId)}&review=pending`
-    : `${context.simulationHref}&review=pending`;
+    ? `${context.simulationHref}&step=decide&run=${encodeURIComponent(context.latestRunId)}`
+    : `${context.simulationHref}&step=decide`;
 }
 
 function candidatesFor(

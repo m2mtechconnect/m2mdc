@@ -64,7 +64,7 @@ export default defineConfig({
     stdout: 'pipe',
     stderr: 'pipe',
     env: {
-      // Safe loopback placeholders only — never real credentials.
+      // Safe loopback placeholders only - never real credentials.
       VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
       VITE_SUPABASE_PUBLISHABLE_KEY: 'safe-placeholder-anon-key',
       // INTENTIONALLY tagger-ON: explicitly neutralize any disable flag a

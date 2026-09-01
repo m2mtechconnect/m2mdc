@@ -55,7 +55,8 @@ export const builderService = {
     goal?: string;
     industry?: string;
     department?: string;
-    type?: string;
+    /** Backend contract value only; normalize through `@/lib/builder/buildKind`. */
+    type?: BuildKind;
     template_id?: string;
     twin_id?: string;
   }): Promise<{ id: string; builder: Builder }> {

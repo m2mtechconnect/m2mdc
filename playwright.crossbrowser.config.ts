@@ -37,6 +37,10 @@ export default defineConfig({
   ],
   webServer: {
     command: `npx vite --port ${PORT} --strictPort`,
+    // Tagger off for automated runs: its per-JSX-call-site ref injection
+    // floods console.error and breaks console-cleanliness assertions
+    // (see scripts/componentTaggerPolicy.ts).
+    env: { AURA_DISABLE_COMPONENT_TAGGER: '1' },
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

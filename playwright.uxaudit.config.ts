@@ -8,5 +8,6 @@ export default defineConfig({
   reporter: [['line']],
   use: { baseURL: `http://localhost:${PORT}`, trace: 'off', screenshot: 'off', video: 'off' },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], channel: 'chromium' } }],
-  webServer: { command: `npx vite --port ${PORT} --strictPort`, url: `http://localhost:${PORT}`, reuseExistingServer: true, timeout: 120_000 },
+  // Tagger off for automated runs (see scripts/componentTaggerPolicy.ts).
+  webServer: { command: `npx vite --port ${PORT} --strictPort`, env: { AURA_DISABLE_COMPONENT_TAGGER: '1' }, url: `http://localhost:${PORT}`, reuseExistingServer: true, timeout: 120_000 },
 });

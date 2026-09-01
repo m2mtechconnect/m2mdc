@@ -76,7 +76,7 @@ describe('corpus entry invariants', () => {
     }
   });
 
-  it('covers all four knowledge domains', () => {
+  it('covers every declared knowledge domain', () => {
     const domains = new Set(ENGINEERING_KNOWLEDGE_CORPUS.map((e) => e.domain));
     for (const domain of ENGINEERING_KNOWLEDGE_DOMAINS) {
       expect(domains.has(domain)).toBe(true);

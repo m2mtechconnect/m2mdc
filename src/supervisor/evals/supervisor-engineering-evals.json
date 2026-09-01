@@ -1,6 +1,6 @@
 {
   "suite": "supervisor-engineering-evals",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "dataClass": "synthetic-evaluation-data",
   "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
   "cases": [
@@ -205,6 +205,66 @@
         "grounding": "grounded",
         "domains": ["ui-ux-patterns"],
         "topEntryId": "ux-persona-family-golden-journeys",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-16",
+      "title": "Stale exact-head evidence retrieves fail-closed release guidance",
+      "kind": "retrieval",
+      "input": { "query": "stale source commit missing deployed schema snapshot release gate" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-exact-head-evidence-integrity",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-17",
+      "title": "RLS policy without table grants retrieves reachability guidance",
+      "kind": "retrieval",
+      "input": { "query": "RLS policy exists but authenticated role grant privilege is missing" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-database-reachability-matrix",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-18",
+      "title": "Service role and trigger context retrieves actor-bound guidance",
+      "kind": "retrieval",
+      "input": { "query": "service credential security definer trigger current user actor transaction" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-actor-context-and-definer-boundaries",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-19",
+      "title": "Ambient cloud test configuration retrieves harness guidance",
+      "kind": "retrieval",
+      "input": { "query": "test harness ambient cloud environment import helper stderr errors" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-harness-and-journey-observability",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-20",
+      "title": "Cross-persona durable handoff retrieves journey observability guidance",
+      "kind": "retrieval",
+      "input": { "query": "persona durable handoff reload revocation denial end to end job" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-harness-and-journey-observability",
         "minCitations": 2
       }
     }

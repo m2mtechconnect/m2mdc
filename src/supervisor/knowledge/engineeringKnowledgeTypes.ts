@@ -24,6 +24,7 @@ export const ENGINEERING_KNOWLEDGE_DOMAINS = [
   'openusd-assets',
   'ui-ux-patterns',
   'synthetic-data-governance',
+  'platform-assurance',
 ] as const;
 
 export type EngineeringKnowledgeDomain = (typeof ENGINEERING_KNOWLEDGE_DOMAINS)[number];
@@ -33,6 +34,7 @@ export const ENGINEERING_KNOWLEDGE_DOMAIN_LABEL: Record<EngineeringKnowledgeDoma
   'openusd-assets': 'OpenUSD & asset structure',
   'ui-ux-patterns': 'Governed UI/UX patterns',
   'synthetic-data-governance': 'Synthetic-data governance',
+  'platform-assurance': 'Platform assurance and defect prevention',
 };
 
 export type KnowledgeCitationKind =

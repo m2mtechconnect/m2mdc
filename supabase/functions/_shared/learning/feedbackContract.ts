@@ -14,6 +14,9 @@
 export const FEEDBACK_DATA_CLASS = 'consented-feedback-candidate' as const;
 export const FEEDBACK_MAX_NOTE_LENGTH = 500;
 export const FEEDBACK_DEFAULT_RETENTION_DAYS = 90;
+export const FEEDBACK_MIN_RETENTION_DAYS = 1;
+export const FEEDBACK_MAX_RETENTION_DAYS = 365;
+export const FEEDBACK_TRUNCATION_MARKER = '…';
 
 export const FEEDBACK_VERDICTS = ['helpful', 'not-helpful', 'incorrect', 'unsafe'] as const;
 export type FeedbackVerdict = (typeof FEEDBACK_VERDICTS)[number];
@@ -71,7 +74,9 @@ export function redactFeedbackText(input: unknown): RedactionResult {
     rule.pattern.lastIndex = 0;
   }
   if (text.length > FEEDBACK_MAX_NOTE_LENGTH) {
-    text = `${text.slice(0, FEEDBACK_MAX_NOTE_LENGTH)}…`;
+    // The bound includes the truncation marker: the retained note can never
+    // exceed FEEDBACK_MAX_NOTE_LENGTH characters.
+    text = `${text.slice(0, FEEDBACK_MAX_NOTE_LENGTH - FEEDBACK_TRUNCATION_MARKER.length)}${FEEDBACK_TRUNCATION_MARKER}`;
     reasons.push('truncated');
   }
   return { text, reasons };
@@ -91,12 +96,26 @@ export interface FeedbackCandidate {
   capturedAt: string;
 }
 
+/**
+ * Retention must fail closed: only a safe integer inside the explicit bound is
+ * accepted. NaN, Infinity, negatives, zero, fractions and excessive values are
+ * rejected rather than retained.
+ */
+export function isValidRetentionDays(value: unknown): value is number {
+  return (
+    typeof value === 'number' &&
+    Number.isSafeInteger(value) &&
+    value >= FEEDBACK_MIN_RETENTION_DAYS &&
+    value <= FEEDBACK_MAX_RETENTION_DAYS
+  );
+}
+
 export interface FeedbackCandidateInput {
   consent: boolean;
   responseProvenanceRef: unknown;
   verdict: unknown;
   note?: unknown;
-  retentionDays?: number;
+  retentionDays?: unknown;
   capturedAt?: string;
 }
 
@@ -115,6 +134,8 @@ export function buildFeedbackCandidate(input: FeedbackCandidateInput): FeedbackC
   if (typeof input.verdict !== 'string' || !FEEDBACK_VERDICTS.includes(input.verdict as FeedbackVerdict)) {
     rejected.push('unknown-verdict');
   }
+  const retentionDays = input.retentionDays === undefined ? FEEDBACK_DEFAULT_RETENTION_DAYS : input.retentionDays;
+  if (!isValidRetentionDays(retentionDays)) rejected.push('invalid-retention-days');
   if (rejected.length > 0) return { candidate: null, rejected };
 
   const redaction = redactFeedbackText(input.note);
@@ -126,7 +147,7 @@ export function buildFeedbackCandidate(input: FeedbackCandidateInput): FeedbackC
       redactedNote: redaction.text,
       redactionReasons: redaction.reasons,
       dataClass: FEEDBACK_DATA_CLASS,
-      retentionDays: input.retentionDays ?? FEEDBACK_DEFAULT_RETENTION_DAYS,
+      retentionDays,
       deletionRequestedAt: null,
       capturedAt: input.capturedAt ?? new Date().toISOString(),
     },

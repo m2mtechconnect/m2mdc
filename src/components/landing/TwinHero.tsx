@@ -176,8 +176,11 @@ export function TwinHero() {
                   decoding="async"
                   className="w-full h-full object-cover object-top"
                   loading="eager"
-                  fetchPriority="high"
-
+                  // React 18 DOM does not recognize camelCase `fetchPriority`
+                  // (React 19 API); it must reach the DOM as the lowercase
+                  // attribute or React emits a console.error per mount, which
+                  // fails the truth suite's console-cleanliness assertions.
+                  {...{ fetchpriority: 'high' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
               </div>

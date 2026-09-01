@@ -16,6 +16,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   COMPONENT_TAGGER_DISABLE_FLAG,
+  LOVABLE_DEV_SERVER_FLAG,
+  componentTaggerOptions,
+  isLovableDevServer,
   shouldEnableComponentTagger,
 } from '../../scripts/componentTaggerPolicy';
 
@@ -48,5 +51,41 @@ describe('component-tagger activation policy', () => {
 
   it('exposes the exact flag name the Playwright web servers set', () => {
     expect(COMPONENT_TAGGER_DISABLE_FLAG).toBe('AURA_DISABLE_COMPONENT_TAGGER');
+  });
+});
+
+/**
+ * Activation-parity coverage: lovable-tagger defaults both features to
+ * LOVABLE_DEV_SERVER === 'true', so the AURA build must declare the options
+ * explicitly instead of inheriting a hidden vendor precondition.
+ */
+describe('component-tagger activation options', () => {
+  it('local interactive development: plugin enabled, jsxSource on, tailwindConfig off', () => {
+    const env = {};
+    expect(shouldEnableComponentTagger('development', env)).toBe(true);
+    expect(componentTaggerOptions(env)).toEqual({ jsxSource: true, tailwindConfig: false });
+  });
+
+  it("Lovable dev server: tailwindConfig on only for LOVABLE_DEV_SERVER === 'true'", () => {
+    expect(componentTaggerOptions({ [LOVABLE_DEV_SERVER_FLAG]: 'true' }))
+      .toEqual({ jsxSource: true, tailwindConfig: true });
+    for (const value of ['TRUE', '1', 'yes', '', ' true ']) {
+      expect(componentTaggerOptions({ [LOVABLE_DEV_SERVER_FLAG]: value }).tailwindConfig).toBe(false);
+    }
+  });
+
+  it('automated runs: the disable flag still wins regardless of the vendor flag', () => {
+    const env = {
+      [COMPONENT_TAGGER_DISABLE_FLAG]: '1',
+      [LOVABLE_DEV_SERVER_FLAG]: 'true',
+    };
+    expect(shouldEnableComponentTagger('development', env)).toBe(false);
+  });
+
+  it('exposes the exact vendor flag name and always tags JSX source when enabled', () => {
+    expect(LOVABLE_DEV_SERVER_FLAG).toBe('LOVABLE_DEV_SERVER');
+    expect(isLovableDevServer({})).toBe(false);
+    expect(componentTaggerOptions({}).jsxSource).toBe(true);
+    expect(componentTaggerOptions({ [LOVABLE_DEV_SERVER_FLAG]: 'true' }).jsxSource).toBe(true);
   });
 });

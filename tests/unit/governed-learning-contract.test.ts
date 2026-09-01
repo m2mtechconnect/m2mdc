@@ -134,8 +134,10 @@ describe('response provenance', () => {
     expect(record.schema).toBe(RESPONSE_PROVENANCE_SCHEMA);
     expect(record.path).toBe('truth');
     expect(record.model).toBeNull();
+    expect(record.provider).toBeNull();
+    expect(record.modelVersion).toBeNull();
     expect(record.tokens).toEqual({ input: null, output: null });
-    expect(record.limitations.join(' ')).toContain('no model was invoked');
+    expect(record.limitations.join(' ')).toContain('no provider and no model were invoked');
   });
 
   it('records the model path and never claims availability from configuration', () => {
@@ -146,6 +148,7 @@ describe('response provenance', () => {
       latencyMs: 900,
     });
     expect(record.model).toBe(modelPolicy.model);
+    expect(record.provider).toBe(modelPolicy.provider);
     expect(record.modelAvailabilityEvidence).toBe('not-verified');
     expect(record.lessonIds).toEqual(['viewport-evidence-exact-tuple.v1']);
     expect(record.limitations.join(' ')).toContain('not evidence that the model is available');
@@ -187,10 +190,43 @@ describe('consented feedback candidates', () => {
     );
   });
 
-  it('bounds the retained note length', () => {
+  it('bounds the retained note length including the truncation marker', () => {
     const result = redactFeedbackText('x'.repeat(FEEDBACK_MAX_NOTE_LENGTH + 200));
-    expect(result.text.length).toBeLessThanOrEqual(FEEDBACK_MAX_NOTE_LENGTH + 1);
+    expect(result.text.length).toBeLessThanOrEqual(FEEDBACK_MAX_NOTE_LENGTH);
+    expect(result.text.endsWith('…')).toBe(true);
     expect(result.reasons).toContain('truncated');
+
+    const exact = redactFeedbackText('y'.repeat(FEEDBACK_MAX_NOTE_LENGTH));
+    expect(exact.text.length).toBe(FEEDBACK_MAX_NOTE_LENGTH);
+    expect(exact.reasons).not.toContain('truncated');
+
+    const over = redactFeedbackText('z'.repeat(FEEDBACK_MAX_NOTE_LENGTH + 1));
+    expect(over.text.length).toBeLessThanOrEqual(FEEDBACK_MAX_NOTE_LENGTH);
+    expect(over.reasons).toContain('truncated');
+  });
+
+  it('fails closed on invalid retention values and accepts only the safe range', () => {
+    for (const bad of [0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, FEEDBACK_MAX_RETENTION_DAYS + 1, '90', null]) {
+      expect(isValidRetentionDays(bad)).toBe(false);
+      const result = buildFeedbackCandidate({
+        consent: true,
+        responseProvenanceRef: 'prov-1',
+        verdict: 'helpful',
+        retentionDays: bad,
+      });
+      expect(result.candidate).toBeNull();
+      expect(result.rejected).toContain('invalid-retention-days');
+    }
+    for (const good of [FEEDBACK_MIN_RETENTION_DAYS, FEEDBACK_DEFAULT_RETENTION_DAYS, FEEDBACK_MAX_RETENTION_DAYS]) {
+      expect(isValidRetentionDays(good)).toBe(true);
+      const result = buildFeedbackCandidate({
+        consent: true,
+        responseProvenanceRef: 'prov-1',
+        verdict: 'helpful',
+        retentionDays: good,
+      });
+      expect(result.candidate?.retentionDays).toBe(good);
+    }
   });
 
   it('rejects a candidate when consent is false', () => {
@@ -225,7 +261,15 @@ describe('consented feedback candidates', () => {
 
 describe('promotion contract', () => {
   const greenGates = MANDATORY_GATES.map((gate) => ({ gate, status: 'passed' as const }));
-  const baseline = { ref: 'baseline', totalCases: 11, passedCases: 11, groundedCitationRate: 1 };
+  const caseIds = Array.from({ length: 11 }, (_, i) => `case-${i + 1}`);
+  const snapshot = (ref: string, results: { id: string; outcome: 'passed' | 'failed' }[]) => ({
+    ref,
+    totalCases: results.length,
+    passedCases: results.filter((r) => r.outcome === 'passed').length,
+    groundedCitationRate: 1,
+    caseResults: results,
+  });
+  const baseline = snapshot('baseline', caseIds.map((id) => ({ id, outcome: 'passed' as const })));
   const rollout = { stage: 'canary' as const, percentage: 5, rollbackTarget: 'baseline', approver: 'reviewer' };
 
   it('promotes only when every gate is green and nothing regressed', () => {
@@ -285,7 +329,10 @@ describe('promotion contract', () => {
 
     const regression = evaluatePromotion({
       baseline,
-      candidate: { ...baseline, ref: 'candidate', passedCases: 10 },
+      candidate: snapshot('candidate', [
+        ...caseIds.slice(0, 10).map((id) => ({ id, outcome: 'passed' as const })),
+        { id: caseIds[10], outcome: 'failed' as const },
+      ]),
       gates: greenGates,
       promptVersion: 'p',
       policyVersion: 'q',
@@ -294,6 +341,75 @@ describe('promotion contract', () => {
     });
     expect(regression.decision).toBe('blocked');
     expect(regression.truthRegressions).toBe(1);
+    expect(regression.regressedCaseIds).toEqual(['case-11']);
+  });
+
+  it('blocks a per-case regression that aggregate counts would hide', () => {
+    // Candidate adds three new passing cases while one baseline-passing case
+    // regresses: passedCases RISES from 11 to 13 yet promotion must block.
+    const candidateSnapshot = snapshot('candidate', [
+      ...caseIds.slice(0, 10).map((id) => ({ id, outcome: 'passed' as const })),
+      { id: caseIds[10], outcome: 'failed' as const },
+      { id: 'case-new-1', outcome: 'passed' as const },
+      { id: 'case-new-2', outcome: 'passed' as const },
+      { id: 'case-new-3', outcome: 'passed' as const },
+    ]);
+    expect(candidateSnapshot.passedCases).toBeGreaterThan(baseline.passedCases);
+
+    const decision = evaluatePromotion({
+      baseline,
+      candidate: candidateSnapshot,
+      gates: greenGates,
+      promptVersion: 'p',
+      policyVersion: 'q',
+      lessonIds: [],
+      rollout,
+    });
+    expect(decision.decision).toBe('blocked');
+    expect(decision.truthRegressions).toBe(1);
+    expect(decision.regressedCaseIds).toEqual(['case-11']);
+    expect(decision.reasons.join(' ')).toContain('case-11');
+  });
+
+  it('rejects duplicate case ids and inconsistent totals', () => {
+    const duplicated = {
+      ref: 'candidate',
+      totalCases: 11,
+      passedCases: 11,
+      groundedCitationRate: 1,
+      caseResults: [
+        ...caseIds.slice(0, 10).map((id) => ({ id, outcome: 'passed' as const })),
+        { id: caseIds[0], outcome: 'passed' as const },
+      ],
+    };
+    const dupDecision = evaluatePromotion({
+      baseline,
+      candidate: duplicated,
+      gates: greenGates,
+      promptVersion: 'p',
+      policyVersion: 'q',
+      lessonIds: [],
+      rollout,
+    });
+    expect(dupDecision.decision).toBe('blocked');
+    expect(dupDecision.reasons.join(' ')).toContain('duplicate case id');
+
+    const inconsistent = {
+      ...baseline,
+      ref: 'candidate',
+      passedCases: 12,
+    };
+    const inconsistentDecision = evaluatePromotion({
+      baseline,
+      candidate: inconsistent,
+      gates: greenGates,
+      promptVersion: 'p',
+      policyVersion: 'q',
+      lessonIds: [],
+      rollout,
+    });
+    expect(inconsistentDecision.decision).toBe('blocked');
+    expect(inconsistentDecision.reasons.join(' ')).toContain('does not match its case evidence');
   });
 
   it('blocks rollout metadata without a rollback target or approver', () => {

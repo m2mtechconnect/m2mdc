@@ -26,6 +26,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from './_setup/fixtures';
 import { mockKit } from './_setup/kit-mock';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { probeFocusIndicators } from './_setup/focus-probe';
+
 
 // Contrast-focused rule set. Kept narrow so violations are
 // unambiguous and merge-blocking.
@@ -111,124 +113,11 @@ function summarize(results: Awaited<ReturnType<typeof runContrast>>) {
   }));
 }
 
-/**
- * Walks up to `max` focusable elements via Tab and asserts each one
- * paints a visible focus indicator (outline, box-shadow, or border
- * change) versus its resting state.
- *
- * Returns the list of selectors that failed the check so failures
- * are actionable in CI logs.
- */
-async function probeFocusIndicators(
-  page: import('@playwright/test').Page,
-  max = 12,
-): Promise<Array<{ selector: string; reason: string }>> {
-  return page.evaluate(async (limit) => {
-    const focusables = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        [
-          'a[href]:not([tabindex="-1"])',
-          'button:not([disabled]):not([tabindex="-1"])',
-          'input:not([disabled]):not([type="hidden"]):not([tabindex="-1"])',
-          'select:not([disabled]):not([tabindex="-1"])',
-          'textarea:not([disabled]):not([tabindex="-1"])',
-          '[role="button"]:not([aria-disabled="true"]):not([tabindex="-1"])',
-          '[role="link"]:not([tabindex="-1"])',
-          '[role="menuitem"]:not([tabindex="-1"])',
-          '[tabindex]:not([tabindex="-1"])',
-        ].join(','),
-      ),
-    ).filter((el) => {
-      const rect = el.getBoundingClientRect();
-      const style = window.getComputedStyle(el);
-      return (
-        rect.width > 0 &&
-        rect.height > 0 &&
-        style.visibility !== 'hidden' &&
-        style.display !== 'none' &&
-        style.pointerEvents !== 'none'
-      );
-    });
+// `probeFocusIndicators` now lives in `_setup/focus-probe.ts` so every
+// focus-ring spec shares one bounded implementation: a frame that never
+// commits is reported as a named failure instead of hanging the
+// `page.evaluate` until the Playwright timeout.
 
-    function fingerprint(el: HTMLElement): string {
-      const s = window.getComputedStyle(el);
-      // Include pseudo-element in case focus ring is rendered via ::after/::before.
-      const before = window.getComputedStyle(el, '::before');
-      const after = window.getComputedStyle(el, '::after');
-      return [
-        s.outlineStyle, s.outlineWidth, s.outlineColor, s.outlineOffset,
-        s.boxShadow, s.borderColor, s.borderWidth, s.backgroundColor,
-        before.boxShadow, before.outlineStyle, before.content,
-        after.boxShadow, after.outlineStyle, after.content,
-      ].join('|');
-    }
-
-    function selectorFor(el: HTMLElement): string {
-      if (el.id) return `#${el.id}`;
-      const role = el.getAttribute('role');
-      const label = el.getAttribute('aria-label');
-      const text = (el.textContent || '').trim().slice(0, 40);
-      const parts = [el.tagName.toLowerCase()];
-      if (role) parts.push(`[role="${role}"]`);
-      if (label) parts.push(`[aria-label="${label}"]`);
-      else if (text) parts.push(`:has-text("${text}")`);
-      return parts.join('');
-    }
-
-    const failures: Array<{ selector: string; reason: string }> = [];
-    const sample = focusables.slice(0, limit);
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-
-    for (const el of sample) {
-      // Force :focus-visible by simulating keyboard entry.
-      el.blur();
-      const resting = fingerprint(el);
-      // dispatch a keydown to hint focus-visible heuristics in Chromium
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
-      el.focus({ preventScroll: true });
-      // Give the browser a paint tick.
-      await new Promise((r) => requestAnimationFrame(() => r(null)));
-      // If focus never landed on this element (e.g. Radix roving-tabindex
-      // widgets like Tabs redirect focus to the active item; anchors
-      // without href are not focusable), it cannot render a :focus ring
-      // and is not a legitimate failure of the app's focus styles.
-      if (document.activeElement !== el || !el.isConnected) {
-        continue;
-      }
-      const focused = fingerprint(el);
-
-      if (resting === focused) {
-        failures.push({
-          selector: selectorFor(el),
-          reason: 'no visible outline/box-shadow/border change on focus',
-        });
-        continue;
-      }
-
-      // Additional check: outline explicitly suppressed and no box-shadow ring.
-      const s = window.getComputedStyle(el);
-      const noOutline = s.outlineStyle === 'none' || parseFloat(s.outlineWidth) === 0;
-      const noShadowRing =
-        !s.boxShadow || s.boxShadow === 'none' || !/(rgb|hsl|#)/i.test(s.boxShadow);
-      if (noOutline && noShadowRing) {
-        // Only flag if resting also had no ring — otherwise the diff above already validated it.
-        const rs = resting.split('|');
-        const restingHadShadow = rs[4] && rs[4] !== 'none';
-        if (!restingHadShadow) {
-          failures.push({
-            selector: selectorFor(el),
-            reason: 'focus state suppresses outline with no replacement ring',
-          });
-        }
-      }
-    }
-
-    if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
-      previouslyFocused.focus();
-    }
-    return failures;
-  }, max);
-}
 
 async function auditSurface(
   page: import('@playwright/test').Page,

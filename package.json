@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "test:a11y": "playwright test --config=playwright.truth.config.ts axe-a11y.spec.ts",
     "test:truth": "playwright test --config=playwright.truth.config.ts",
+    "test:perf": "playwright test --config=playwright.perf.config.ts",
     "test:route-stress": "playwright test --config=playwright.route-stress.config.ts",
     "audit:architecture": "node scripts/audit-architecture-inventory.mjs --summary",
     "verify:architecture-governance": "node scripts/audit-architecture-inventory.mjs --check --summary",

@@ -108,7 +108,7 @@ async function probeFocusInside(
         const other = items.find((el) => el !== selected) as HTMLElement;
         selected.setAttribute('data-selected', 'true');
         other.setAttribute('data-selected', 'false');
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
         const selBg = window.getComputedStyle(selected).backgroundColor;
         const otherBg = window.getComputedStyle(other).backgroundColor;
         if (selBg === otherBg) {
@@ -157,7 +157,7 @@ async function probeFocusInside(
         // ring statically instead of relying on a blur/focus diff.
         if (document.activeElement === el || el.hasAttribute('cmdk-input')) {
           el.focus({ preventScroll: true });
-          await new Promise((r) => requestAnimationFrame(() => r(null)));
+          await window.__auraWaitForFrame!();
           const s = window.getComputedStyle(el);
           const hasOutline =
             s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
@@ -177,7 +177,7 @@ async function probeFocusInside(
         el.blur();
         // Force a paint before reading resting styles so a prior
         // iteration's focus ring can fully clear.
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
         const resting = fingerprint(el);
 
         // cmdk items use aria-selected + roving tabindex; simulate the
@@ -188,7 +188,7 @@ async function probeFocusInside(
           el.setAttribute('data-selected', 'true');
           el.setAttribute('aria-selected', 'true');
         }
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
 
         if (!el.isConnected) continue;
         // Roving-tabindex items where focus never landed: skip cleanly.

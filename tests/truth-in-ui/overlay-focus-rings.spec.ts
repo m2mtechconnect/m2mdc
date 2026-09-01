@@ -98,7 +98,7 @@ async function probeFocusInside(
           new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
         );
         el.focus({ preventScroll: true });
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
         // Roving-tabindex / detached nodes: not a legitimate failure.
         if (document.activeElement !== el || !el.isConnected) continue;
         const focused = fingerprint(el);

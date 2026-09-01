@@ -341,7 +341,9 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       const industry = params.get('industry') || prefilled?.industry || '';
       const department = params.get('department') || prefilled?.department || '';
       const template = params.get('template') || '';
-      const type = params.get('type') as 'agent' | 'process_twin' | '3d_twin' | null;
+      // Unknown ?type= values are rejected, never cast: the backend contract
+      // accepts only the three canonical build kinds.
+      const type = normalizeBuildKind(params.get('type'));
 
       console.log('🆕 [STORE] Creating new draft', { 
         goal, 

@@ -1,6 +1,7 @@
 import { AgentBlueprint, TemplateSourceEntry } from "@/types/agentBlueprint";
 import type { ValidatedTemplate } from '@/lib/templates/unifiedTemplateService';
 import { autoRepairWorkflow, validateRepairedWorkflow } from '@/lib/validation/workflowAutoRepair';
+import { resolveTemplateBuildKind } from '@/lib/builder/buildKind';
 
 /**
  * Converts a validated template into an AgentBlueprint for the Builder

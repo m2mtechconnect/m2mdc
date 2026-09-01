@@ -6,6 +6,7 @@
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { WorkflowRoleView } from '@/config/personaJourneyModel';
 import { DEFAULT_OVERRIDES, type ConfigOverrides, type FacilityDefinition, type KpiKey } from './facilityModel';
 import {
   WORKSPACE_SCENARIOS,
@@ -18,7 +19,7 @@ import { idempotencyKeyFor, loadServerRuns, persistRun } from './runPersistence'
 
 export type WorkspaceTool = 'inspect' | 'configure' | 'simulate' | 'compare' | 'decide' | 'assist';
 
-export type RoleView = 'engineer' | 'operator' | 'executive' | 'compliance';
+export type RoleView = WorkflowRoleView;
 
 export const WORKFLOW_STEPS: Array<{ tool: WorkspaceTool; label: string }> = [
   { tool: 'inspect', label: 'Inspect' },

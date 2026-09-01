@@ -1,6 +1,6 @@
 {
   "suite": "supervisor-engineering-evals",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "dataClass": "synthetic-evaluation-data",
   "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
   "cases": [
@@ -195,6 +195,18 @@
       "title": "Corpus checksum and version pin hold",
       "kind": "corpus-integrity",
       "expect": { "checksumMatches": true, "versionPinned": true }
+    },
+    {
+      "id": "eval-15",
+      "title": "Persona and golden-journey query keeps presentation separate from authorization",
+      "kind": "retrieval",
+      "input": { "query": "persona family golden journey authorization workflow view" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["ui-ux-patterns"],
+        "topEntryId": "ux-persona-family-golden-journeys",
+        "minCitations": 2
+      }
     }
   ]
 }

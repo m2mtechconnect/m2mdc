@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { PERSONA_FAMILY_IDS } from '@/config/personaJourneyModel';
 import fixture from '../fixtures/enterprise-qa-organization.json';
 
 describe('enterprise QA organization fixture', () => {
@@ -16,6 +17,9 @@ describe('enterprise QA organization fixture', () => {
       'operator', 'compliance', 'data_analyst', 'viewer',
     ]));
     expect(fixture.personas.find((persona) => persona.key === 'owner')?.required).toBe(true);
+    expect(new Set(fixture.personas.map((persona) => persona.persona_family))).toEqual(
+      new Set(PERSONA_FAMILY_IDS),
+    );
   });
 
   it('provides relevant facility, provenance and negative-path states', () => {

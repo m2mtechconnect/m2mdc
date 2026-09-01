@@ -148,6 +148,7 @@ describe('knowledge registry integration', () => {
     'src/supervisor/knowledge/auraEngineeringKnowledge.ts',
     'docs/adr/0010-governed-ui-patterns-and-synthetic-evaluation-data.md',
     'src/supervisor/evals/supervisor-engineering-evals.json',
+    'docs/ux/persona-journey-map.md',
   ];
 
   it.each(expectedRefs)('indexes %s as an ingestible source', (ref) => {

@@ -161,12 +161,19 @@ async function auditSurface(
 test.describe('a11y — color contrast + focus indicators (public)', () => {
   for (const surface of PUBLIC_SURFACES) {
     test(`${surface.name} — contrast + focus rings`, async ({ page, guard }) => {
+      // Parity with the auth-gated block below. This is audit-work headroom,
+      // not budget relief: the focus probe is frame-bounded and reports a
+      // stall as a named failure, so a slow surface can no longer hide here.
+      // The twin surfaces pay a one-time WebGL scene build on top of a full
+      // axe pass, which does not fit the suite-wide 20s default.
+      test.setTimeout(60_000);
       if (
         surface.path.includes('data-centre-twin') ||
         surface.path.includes('twin-preview')
       ) {
         await mockKit(page, 'network-unavailable');
       }
+
       await page.goto(surface.path, { waitUntil: 'domcontentloaded' });
       await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {});
       await auditSurface(page, surface);

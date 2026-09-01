@@ -30,6 +30,10 @@ const PLAYWRIGHT_EXECUTABLE_PATH = process.env.PLAYWRIGHT_EXECUTABLE_PATH?.trim(
 
 export default defineConfig({
   testDir: './tests/truth-in-ui',
+  // Wall-clock performance budgets are production budgets and must not be
+  // measured against this unbundled dev server. They run in
+  // `playwright.perf.config.ts` against `vite build` + `vite preview`.
+  testIgnore: /authenticated-performance\.spec\.ts$/,
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,

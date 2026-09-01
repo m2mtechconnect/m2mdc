@@ -59,9 +59,11 @@ async function keyboardFocus(page: Page, selector: string) {
   // The contract is visual: allow Chromium to commit the focus paint before
   // reading computed styles. This does not retry the interaction or relax the
   // assertion; it observes the result after the next rendered frame.
-  await page.evaluate(() => new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-  }));
+  // Bounded: two committed frames, or a reported miss — never an open-ended wait.
+  await page.evaluate(async () => {
+    await window.__auraWaitForFrame!();
+    await window.__auraWaitForFrame!();
+  });
 }
 
 async function assertVisibleFocusRing(page: Page, selector: string, label: string) {

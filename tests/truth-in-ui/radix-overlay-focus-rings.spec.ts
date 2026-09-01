@@ -85,7 +85,7 @@ async function probeFocusInside(
       for (const el of sample) {
         el.blur();
         // Force paint so any prior focus ring clears.
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
         const resting = fingerprint(el);
 
         // Roving-tabindex menuitems (DropdownMenu) reject direct
@@ -99,7 +99,7 @@ async function probeFocusInside(
         ) {
           el.setAttribute('data-highlighted', '');
         }
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        await window.__auraWaitForFrame!();
 
         if (!el.isConnected) continue;
         const isHighlighted = el.hasAttribute('data-highlighted');

@@ -13,6 +13,8 @@
 import { test as base, expect, type BrowserContext } from '@playwright/test';
 import { installNetworkGuard, type NetworkGuardHandle } from './network-guard';
 import { installDeterministicClock } from './clock';
+import { installFrameBudget } from './focus-probe';
+
 
 type Fixtures = {
   guard: NetworkGuardHandle;
@@ -39,8 +41,12 @@ export const test = base.extend<Fixtures>({
   context: async ({ context }, use) => {
     const handle = await installNetworkGuard(context as BrowserContext);
     (context as unknown as Record<symbol, NetworkGuardHandle>)[GUARD_KEY] = handle;
+    // Bounded frame helper for focus probes — installed before the first
+    // navigation so no `page.evaluate` can hang on a frame that never commits.
+    await installFrameBudget(context as BrowserContext);
     await use(context);
   },
+
   page: async ({ page }, use) => {
     // Clock is per-page — install it before the first navigation.
     await installDeterministicClock(page);

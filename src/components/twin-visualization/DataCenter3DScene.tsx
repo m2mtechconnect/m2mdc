@@ -218,16 +218,50 @@ interface CameraControllerProps {
  * so it does not need a 60fps loop competing with the dashboard for the main
  * thread. In `demand` mode nothing renders unless something invalidates, so
  * this drives a fixed low cadence that still animates the overlay pulses.
+ *
+ * The cadence is a decorative animation, so it is suspended when the operator
+ * prefers reduced motion and while the document is hidden. Suspending it does
+ * not make the scene stale: it always renders once on mount, and every state,
+ * camera or interaction change still calls `invalidate()` through r3f's own
+ * demand path. A continuous loop that renders identical frames only starves
+ * the main thread (measurably: ~1s frames on software GL, which blocks timers
+ * and rAF for anything else on the page).
  */
-function FrameRateGovernor({ fps }: { fps: number }) {
+function FrameRateGovernor({ fps, paused = false }: { fps: number; paused?: boolean }) {
   const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
-    const interval = window.setInterval(() => invalidate(), Math.round(1000 / fps));
+    // Always commit at least one frame, even when the cadence is suspended.
     invalidate();
-    return () => window.clearInterval(interval);
-  }, [fps, invalidate]);
+    if (paused) return;
+
+    let interval = 0;
+    const start = () => {
+      if (interval) return;
+      interval = window.setInterval(() => invalidate(), Math.round(1000 / fps));
+    };
+    const stop = () => {
+      if (!interval) return;
+      window.clearInterval(interval);
+      interval = 0;
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') stop();
+      else {
+        invalidate();
+        start();
+      }
+    };
+
+    onVisibility();
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      stop();
+    };
+  }, [fps, invalidate, paused]);
   return null;
 }
+
 
 function CameraController({ 
   targetDistance, 

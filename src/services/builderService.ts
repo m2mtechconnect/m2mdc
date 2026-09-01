@@ -72,7 +72,11 @@ export const builderService = {
 
       if (error) {
         console.error('[builderService] Create failed:', error);
-        throw new Error(`Failed to create builder: ${error.message || 'Unknown error'}`);
+        // Surface the server's own structured error message when present.
+        // Only the server-authored `error.message` is used; no headers,
+        // tokens, payload echo or stack detail is exposed.
+        const serverMessage = await readServerErrorMessage(error);
+        throw new Error(`Failed to create builder: ${serverMessage || error.message || 'Unknown error'}`);
       }
 
       if (!data || !data.data) {

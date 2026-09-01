@@ -67,6 +67,8 @@ describe('additive provenance SSE event', () => {
       sessionId: 's1',
       onToken: () => {},
       onProvenance: (p) => seen.push(p),
+      onComplete: () => {},
+      onError: () => {},
     });
     expect(seen).toHaveLength(1);
     expect(seen[0].schema).toBe('aura.response-provenance.v1');

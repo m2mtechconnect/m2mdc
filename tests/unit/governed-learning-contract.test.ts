@@ -34,8 +34,12 @@ import {
 } from '../../supabase/functions/_shared/learning/responseProvenance';
 import {
   FEEDBACK_MAX_NOTE_LENGTH,
+  FEEDBACK_MIN_RETENTION_DAYS,
+  FEEDBACK_MAX_RETENTION_DAYS,
+  FEEDBACK_DEFAULT_RETENTION_DAYS,
   buildFeedbackCandidate,
   isFeedbackRuntimeInjectable,
+  isValidRetentionDays,
   redactFeedbackText,
 } from '../../supabase/functions/_shared/learning/feedbackContract';
 import { evaluatePromotion, MANDATORY_GATES } from '@/supervisor/learning/promotionContract';

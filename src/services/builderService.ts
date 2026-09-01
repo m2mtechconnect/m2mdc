@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { BuildKind } from "@/lib/builder/buildKind";
 
 export interface BuilderConfig {
   source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank' | 'facility';

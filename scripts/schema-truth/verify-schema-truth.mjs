@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -7,6 +8,29 @@ const typesPath = resolve(root, 'src/integrations/supabase/types.ts');
 const migrationsPath = resolve(root, 'supabase/migrations');
 const baselinePath = resolve(root, 'docs/architecture/schema-truth/exact-head-manifest.json');
 const deployedArg = process.argv.find((arg) => arg.startsWith('--deployed='));
+const deployedEnv = process.env.AURA_DEPLOYED_SCHEMA_SNAPSHOT;
+const repositoryOnly = process.argv.includes('--repository-only');
+
+function gitOutput(args) {
+  return execFileSync('git', ['-c', `safe.directory=${root}`, '-C', root, ...args], {
+    encoding: 'utf8',
+  }).trim();
+}
+
+function auditedHeadSha() {
+  return gitOutput(['rev-parse', 'HEAD']);
+}
+
+function schemaSourceSha() {
+  return gitOutput([
+    'log',
+    '-1',
+    '--format=%H',
+    '--',
+    'src/integrations/supabase/types.ts',
+    'supabase/migrations',
+  ]);
+}
 
 function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -36,7 +60,8 @@ const migrations = readdirSync(migrationsPath).filter((name) => name.endsWith('.
 const migrationContents = migrations.map((name) => `${name}\0${normalizedFile(resolve(migrationsPath, name))}`);
 const manifest = {
   schema: 'aura.schema-truth.v2',
-  sourceSha: 'a448801c78bf064c3acd80f8566833fcdb47e139',
+  auditedHeadSha: auditedHeadSha(),
+  sourceSha: schemaSourceSha(),
   generatedTypes: {
     path: 'src/integrations/supabase/types.ts',
     sha256: sha256(generated),
@@ -50,6 +75,7 @@ const manifest = {
 
 const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
 const failures = [];
+if (manifest.sourceSha !== baseline.sourceSha) failures.push('schema source commit drift');
 if (manifest.generatedTypes.sha256 !== baseline.generatedTypesSha256) failures.push('generated type checksum drift');
 if (manifest.generatedTypes.tables.length !== baseline.tableCount) failures.push('generated table count drift');
 if (manifest.generatedTypes.views.length !== baseline.viewCount) failures.push('generated view count drift');
@@ -60,19 +86,45 @@ if (hashList(manifest.generatedTypes.functions) !== baseline.functionNamesSha256
 if (manifest.migrations.length !== baseline.migrationCount || hashList(manifest.migrations) !== baseline.migrationsSha256) failures.push('migration inventory drift');
 if (manifest.migrationContentsSha256 !== baseline.migrationContentsSha256) failures.push('migration content drift');
 
-let deployed = { status: 'not-provided', reason: 'No read-only deployed metadata snapshot was supplied.' };
-if (deployedArg) {
-  const deployedPath = resolve(process.cwd(), deployedArg.slice('--deployed='.length));
+const deployedInput = deployedArg?.slice('--deployed='.length) || deployedEnv || null;
+if (repositoryOnly && deployedInput) {
+  failures.push('repository-only mode cannot accept a deployed snapshot');
+}
+
+let deployed = repositoryOnly
+  ? { status: 'skipped', reason: 'Repository-only mode does not qualify a deployed environment.' }
+  : { status: 'not-provided', reason: 'A read-only deployed metadata snapshot is required.' };
+
+if (!repositoryOnly && !deployedInput) {
+  failures.push('deployed metadata snapshot required');
+}
+
+if (!repositoryOnly && deployedInput) {
+  const deployedPath = resolve(process.cwd(), deployedInput);
   if (!existsSync(deployedPath)) failures.push(`deployed snapshot not found: ${deployedPath}`);
   else {
     const snapshot = JSON.parse(readFileSync(deployedPath, 'utf8'));
-    deployed = { status: 'compared', path: deployedArg.slice('--deployed='.length) };
+    deployed = { status: 'compared', path: deployedInput };
+    if (snapshot.schema !== 'aura.deployed-schema.v1') {
+      failures.push('deployed snapshot schema invalid');
+    }
+    if (snapshot.sourceSha !== manifest.auditedHeadSha) {
+      failures.push('deployed snapshot source commit drift');
+    }
+    if (typeof snapshot.capturedAt !== 'string' || Number.isNaN(Date.parse(snapshot.capturedAt))) {
+      failures.push('deployed snapshot capture time invalid');
+    }
     for (const key of ['tables', 'views', 'functions']) {
+      if (!Array.isArray(snapshot[key])) {
+        failures.push(`deployed snapshot ${key} missing`);
+        continue;
+      }
       const actual = [...(snapshot[key] ?? [])].sort();
       if (JSON.stringify(actual) !== JSON.stringify(manifest.generatedTypes[key])) failures.push(`deployed ${key} drift`);
     }
   }
 }
 
-console.log(JSON.stringify({ ...manifest, deployed, verdict: failures.length ? 'FAIL' : 'PASS', failures }, null, 2));
+const verdict = failures.length ? 'FAIL' : repositoryOnly ? 'PASS_REPOSITORY_ONLY' : 'PASS';
+console.log(JSON.stringify({ ...manifest, mode: repositoryOnly ? 'repository-only' : 'release', deployed, verdict, failures }, null, 2));
 if (failures.length) process.exitCode = 1;

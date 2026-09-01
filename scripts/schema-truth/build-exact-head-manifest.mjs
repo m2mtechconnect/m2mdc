@@ -11,10 +11,12 @@
  *   node scripts/schema-truth/build-exact-head-manifest.mjs --write    # rewrite the manifest
  *   node scripts/schema-truth/build-exact-head-manifest.mjs --check    # exit 1 on divergence
  *
- * The audited HEAD is pinned in SOURCE_SHA below and is recorded in the manifest
- * so a reviewer can tie the baseline to one exact commit.
+ * `sourceSha` is derived from the latest commit that changed either generated
+ * types or migration history. This avoids a self-referential commit hash while
+ * still failing when schema artifacts advance beyond the committed pin.
  */
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -23,12 +25,25 @@ const typesPath = resolve(root, 'src/integrations/supabase/types.ts');
 const migrationsPath = resolve(root, 'supabase/migrations');
 const manifestPath = resolve(root, 'docs/architecture/schema-truth/exact-head-manifest.json');
 
-/**
- * Audited HEAD whose generated types were verified, read-only, against the
- * connected live database metadata (public tables, views and Data-API functions
- * matched exactly, with no object present on only one side).
- */
-export const SOURCE_SHA = 'a448801c78bf064c3acd80f8566833fcdb47e139';
+export function gitOutput(args) {
+  return execFileSync('git', ['-c', `safe.directory=${root}`, '-C', root, ...args], {
+    encoding: 'utf8',
+  }).trim();
+}
+
+/** Latest commit that changed a Schema Truth source artifact. */
+export function schemaSourceSha() {
+  const sha = gitOutput([
+    'log',
+    '-1',
+    '--format=%H',
+    '--',
+    'src/integrations/supabase/types.ts',
+    'supabase/migrations',
+  ]);
+  if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('Unable to derive schema source commit.');
+  return sha;
+}
 
 export function sha256(value) {
   return createHash('sha256').update(value).digest('hex');
@@ -68,7 +83,7 @@ export function buildManifest() {
 
   return {
     schema: 'aura.schema-truth.v2',
-    sourceSha: SOURCE_SHA,
+    sourceSha: schemaSourceSha(),
     generatedTypesSha256: sha256(generated),
     tableCount: tables.length,
     tableNamesSha256: hashList(tables),

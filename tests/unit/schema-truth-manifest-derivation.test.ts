@@ -16,6 +16,7 @@ const GENERATOR = 'scripts/schema-truth/build-exact-head-manifest.mjs';
 const MANIFEST = 'docs/architecture/schema-truth/exact-head-manifest.json';
 const VERIFIER = 'scripts/schema-truth/verify-schema-truth.mjs';
 const TYPES = 'src/integrations/supabase/types.ts';
+const ROOT = resolve('.');
 
 const read = (path: string) => readFileSync(path, 'utf8').replaceAll('\r\n', '\n');
 const sha256 = (value: string) => createHash('sha256').update(value).digest('hex');
@@ -77,17 +78,34 @@ describe('Schema Truth manifest derivation', () => {
 
   it('pins the baseline to one audited commit shared with the verifier', () => {
     const manifest = JSON.parse(read(MANIFEST));
+    const expectedSourceSha = execFileSync(
+      'git',
+      [
+        '-c',
+        `safe.directory=${ROOT}`,
+        'log',
+        '-1',
+        '--format=%H',
+        '--',
+        'src/integrations/supabase/types.ts',
+        'supabase/migrations',
+      ],
+      { encoding: 'utf8' },
+    ).trim();
 
     expect(manifest.schema).toBe('aura.schema-truth.v2');
-    expect(manifest.sourceSha).toMatch(/^[a-f0-9]{40}$/);
-    expect(read(VERIFIER)).toContain(`sourceSha: '${manifest.sourceSha}'`);
-    expect(read(GENERATOR)).toContain(`SOURCE_SHA = '${manifest.sourceSha}'`);
+    expect(manifest.sourceSha).toBe(expectedSourceSha);
+    expect(read(VERIFIER)).toContain("failures.push('schema source commit drift')");
+    expect(read(GENERATOR)).toContain('export function schemaSourceSha()');
   });
 
   it('keeps the gate wired and unskipped', () => {
     const packageJson = JSON.parse(read('package.json'));
 
     expect(packageJson.scripts['verify:schema-truth']).toBe(`node ${VERIFIER}`);
+    expect(packageJson.scripts['verify:schema-truth:repository']).toBe(
+      `node ${VERIFIER} --repository-only`,
+    );
     expect(packageJson.scripts['verify:fast']).toContain('verify:schema-truth');
     expect(read(VERIFIER)).toContain('process.exitCode = 1');
   });

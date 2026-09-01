@@ -17,6 +17,7 @@
     "audit:architecture": "node scripts/audit-architecture-inventory.mjs --summary",
     "verify:architecture-governance": "node scripts/audit-architecture-inventory.mjs --check --summary",
     "verify:schema-truth": "node scripts/schema-truth/verify-schema-truth.mjs",
+    "verify:schema-truth:repository": "node scripts/schema-truth/verify-schema-truth.mjs --repository-only",
     "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
     "smoke:post-publish": "node scripts/post-publish-smoke.mjs",
     "test": "vitest run",

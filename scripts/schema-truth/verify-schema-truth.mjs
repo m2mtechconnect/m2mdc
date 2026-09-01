@@ -36,7 +36,7 @@ const migrations = readdirSync(migrationsPath).filter((name) => name.endsWith('.
 const migrationContents = migrations.map((name) => `${name}\0${normalizedFile(resolve(migrationsPath, name))}`);
 const manifest = {
   schema: 'aura.schema-truth.v2',
-  sourceSha: '64da468804a426dcdd356912c4a68ba60f73bdf7',
+  sourceSha: 'a448801c78bf064c3acd80f8566833fcdb47e139',
   generatedTypes: {
     path: 'src/integrations/supabase/types.ts',
     sha256: sha256(generated),

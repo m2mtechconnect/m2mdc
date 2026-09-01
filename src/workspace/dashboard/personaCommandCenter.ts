@@ -1,7 +1,20 @@
-import type { Permission } from '@/auth/permissions';
+import { isPlatformRole, type AnyRole, type Permission } from '@/auth/permissions';
 import type { PersonaFamilyId } from '@/config/personaJourneyModel';
 
 export type PersonaScope = 'organization' | 'platform' | 'personal';
+
+/**
+ * Resolve presentation scope without converting tenant-only global labels
+ * into platform authority. Global owner is the explicit bootstrap exception.
+ */
+export function resolvePersonaScope(
+  hasActiveOrganization: boolean,
+  primaryRole: AnyRole | null,
+): PersonaScope {
+  if (hasActiveOrganization) return 'organization';
+  if (primaryRole && (isPlatformRole(primaryRole) || primaryRole === 'owner')) return 'platform';
+  return 'personal';
+}
 
 export interface PersonaCommandContext {
   scope: PersonaScope;
@@ -19,7 +32,8 @@ export interface PersonaCommandAction {
   id: string;
   label: string;
   href: string;
-  requiredPermission: Permission;
+  /** Null only for authenticated, non-privileged recovery routes. */
+  requiredPermission: Permission | null;
 }
 
 export interface PersonaCurrentWork {
@@ -31,7 +45,7 @@ function action(
   id: string,
   label: string,
   href: string,
-  requiredPermission: Permission,
+  requiredPermission: Permission | null,
 ): PersonaCommandAction {
   return { id, label, href, requiredPermission };
 }
@@ -88,6 +102,9 @@ function candidatesFor(
       ];
     case 'viewer_pilot':
       return [
+        ...(context.scope === 'personal'
+          ? [action('access-status', 'Review access status', '/account/settings', null)]
+          : []),
         action('blueprint', 'Review permitted facility context', context.blueprintHref, 'twin.view'),
         action('evidence', 'Review permitted evidence', context.evidenceHref, 'analytics.view'),
         action('simulation', 'Explore recorded scenarios', context.simulationHref, 'twin.view'),
@@ -102,7 +119,7 @@ export function buildPersonaCommandActions(
   context: PersonaCommandContext,
 ): PersonaCommandAction[] {
   return candidatesFor(family, context)
-    .filter((candidate) => permissions.has(candidate.requiredPermission))
+    .filter((candidate) => candidate.requiredPermission === null || permissions.has(candidate.requiredPermission))
     .filter((candidate, index, all) => all.findIndex((item) => item.href === candidate.href) === index)
     .slice(0, 3);
 }

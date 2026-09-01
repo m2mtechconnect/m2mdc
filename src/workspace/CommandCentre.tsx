@@ -49,7 +49,7 @@ import { PersonaPriorityPanel } from './dashboard/PersonaPriorityPanel';
 import {
   buildPersonaCommandActions,
   buildPersonaCurrentWork,
-  type PersonaScope,
+  resolvePersonaScope,
 } from './dashboard/personaCommandCenter';
 
 /** Primary highlights cells, in scanning order. */
@@ -172,11 +172,7 @@ export default function CommandCentre() {
     platformRole: authorization.primaryRole,
     isPilot: resolution.status === 'pilot',
   });
-  const personaScope: PersonaScope = activeOrganization
-    ? 'organization'
-    : authorization.primaryRole
-      ? 'platform'
-      : 'personal';
+  const personaScope = resolvePersonaScope(Boolean(activeOrganization), authorization.primaryRole);
   const personaScopeLabel = activeOrganization
     ? `${activeOrganization.orgName} organization`
     : personaScope === 'platform'

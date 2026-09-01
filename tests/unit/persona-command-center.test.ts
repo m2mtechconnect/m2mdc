@@ -3,6 +3,7 @@ import type { Permission } from '@/auth/permissions';
 import {
   buildPersonaCommandActions,
   buildPersonaCurrentWork,
+  resolvePersonaScope,
   type PersonaCommandContext,
 } from '@/workspace/dashboard/personaCommandCenter';
 
@@ -29,7 +30,10 @@ describe('persona-prioritized Command Center', () => {
     );
 
     expect(actions.map((item) => item.id)).toEqual(['readiness', 'people-access']);
-    expect(actions.every((item) => permissions('analytics.view', 'tenant.view_members').has(item.requiredPermission))).toBe(true);
+    expect(actions.every((item) => (
+      item.requiredPermission === null
+      || permissions('analytics.view', 'tenant.view_members').has(item.requiredPermission)
+    ))).toBe(true);
     expect(actions.length).toBeLessThanOrEqual(3);
   });
 
@@ -75,7 +79,25 @@ describe('persona-prioritized Command Center', () => {
     }).title).toBe('Workspace setup requires attention');
   });
 
-  it('does not expose actions when the current scope grants no supporting permission', () => {
+  it('gives a grant-less pilot one safe recovery action without granting product access', () => {
+    expect(buildPersonaCommandActions('viewer_pilot', permissions(), {
+      ...baseContext,
+      scope: 'personal',
+    })).toEqual([{
+      id: 'access-status',
+      label: 'Review access status',
+      href: '/account/settings',
+      requiredPermission: null,
+    }]);
+
     expect(buildPersonaCommandActions('viewer_pilot', permissions(), baseContext)).toEqual([]);
+  });
+
+  it('does not describe tenant-only global labels as platform scope', () => {
+    expect(resolvePersonaScope(false, 'viewer')).toBe('personal');
+    expect(resolvePersonaScope(false, 'operator')).toBe('personal');
+    expect(resolvePersonaScope(false, 'owner')).toBe('platform');
+    expect(resolvePersonaScope(false, 'admin')).toBe('platform');
+    expect(resolvePersonaScope(true, 'admin')).toBe('organization');
   });
 });

@@ -83,6 +83,28 @@ export default function PilotOverview() {
           ))}
         </ul>
       )}
+
+      <aside
+        aria-labelledby="pilot-access-heading"
+        className="rounded border border-border bg-card p-4 space-y-2"
+        data-testid="pilot-access-status"
+      >
+        <h2 id="pilot-access-heading" className="text-sm font-semibold">
+          Access status: read-only pilot
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          An organization administrator must assign an active membership before
+          design, simulation, operations, or evidence workspaces become available.
+        </p>
+        <button
+          type="button"
+          className="text-sm px-3 py-1.5 rounded border border-border hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+          data-testid="pilot-refresh-access"
+          onClick={() => window.location.reload()}
+        >
+          Refresh access
+        </button>
+      </aside>
     </section>
   );
 }

@@ -34,10 +34,24 @@ Marketing, sales and support remain specialist platform entitlements. They are n
 | Family | Permission and route tests | Complete job test | Live evidence |
 | --- | --- | --- | --- |
 | Owner / Administrator | Implemented | Partial | Owner/admin access paths observed; complete workspace handoff not yet qualified. |
-| Facility Engineer / Operator | Implemented | Partial | Inspect and simulation surfaces observed; approved operational handoff is incomplete. |
-| Executive / Manager | Implemented | Missing | No complete evidence-to-decision-to-handoff golden journey. |
-| Compliance / Analyst | Implemented | Missing | No complete claim-to-export golden journey. |
-| Viewer / Pilot | Implemented | Partial | Pilot isolation exists; approval, denial and return path need full qualification. |
+| Facility Engineer / Operator | Implemented | Partial | Landing, simulation route, reload and platform denial pass; persisted run-to-operation handoff is incomplete. |
+| Executive / Manager | Implemented | Partial | Landing, evidence route, reload and twin-mutation denial pass; durable decision handoff is incomplete. |
+| Compliance / Analyst | Implemented | Partial | Landing, evidence route, reload and connection-edit denial pass; claim-to-export persistence is incomplete. |
+| Viewer / Pilot | Implemented | Partial | Organization viewer and sealed pilot landing, reload, recovery and direct-route denial pass; live access-request persistence is incomplete. |
+
+The Command Center browser matrix now exercises each family with authoritative
+organization or platform grants, a persona-prioritized landing state, a primary
+read-only or operational route, reload/resume, and a direct-URL denial. These
+are browser and authorization fixtures, not proof of production persistence or
+live tenant data; the complete-job column remains unchanged until the durable
+backend handoffs below are qualified.
+
+Grant-less approved users remain in the sealed Pilot shell. That shell now
+states the authoritative read-only access condition, names organization
+membership as the required next step, offers an access refresh, and proves that
+direct product URLs return to the same stable status. A tenant-only global
+viewer label remains an evaluation scope and is never described as platform
+authority.
 
 Permission/route coverage must not be reported as golden-journey coverage. A golden journey must complete a real persona job, exercise persisted state, prove the outcome and include a negative case.
 
@@ -56,3 +70,14 @@ Each journey has a required negative case in `src/config/personaJourneyModel.ts`
 This branch establishes the presentation contract, annotates the QA fixture, makes the browser test click the actual five-workspace navigation and prioritizes Command Center current work and permitted actions for the resolved family. It does not reorder, hide or rename navigation; change permissions; introduce a second role source; or publish a deployment.
 
 The presentation family is resolved from the active organization role first, then the platform role, with pilot as an explicit viewer/pilot state. The resolved family never creates permissions; every displayed action is filtered through the existing canonical permission set and remains protected by route and backend authorization.
+
+## Qualification coverage appendix
+
+| Category | Covered in this gate | Still required |
+| --- | --- | --- |
+| Personas | Owner/admin, engineer/operator, executive/manager, compliance/analyst, organization viewer, tenant-only global viewer and sealed pilot | Production-representative named test accounts |
+| Routes | Command Center, Simulation, Evidence, Account Settings and Pilot Overview; direct denial for platform admin, Builder, Connections and Simulation | Durable write/handoff routes for each job |
+| Viewport | Desktop Chrome at 1280 × 900 | Narrow-screen, zoom/reflow and assistive-technology pass |
+| Interaction states | Landing context, prioritized action, meaningful route content, reload/resume, empty pilot state, recovery and denial | Slow, failed, cancelled and backend-conflict states |
+| Backend boundaries | Mocked verified identity, platform grants, organization membership, active organization and fail-closed route guards | Live RLS, RPC/Edge Function, persistence, audit record and tenant-isolation evidence |
+| Release evidence | Exact isolated branch qualified before atomic commit | Push/PR, deployed fingerprint and post-publish production observation |

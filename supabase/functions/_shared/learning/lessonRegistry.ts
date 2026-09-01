@@ -10,7 +10,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-01.1';
+export const LESSON_REGISTRY_VERSION = '2026-09-01.2';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -53,6 +53,41 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     dataClass: 'reviewed-lesson',
     reviewedBy: 'AURA engineering review',
     reviewedAt: '2026-09-01T00:00:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'ref-transparency-dev-instrumentation.v1',
+    version: 1,
+    title:
+      'Ref transparency for Slot/asChild/clone consumers; a dev-server-only warning flood is an environment finding first',
+    status: 'active',
+    origin: 'confirmed-miss',
+    invariant:
+      'An app-owned function component consumed by Slot/asChild, cloneElement or any ref-bearing parent must be ref-transparent through React.forwardRef, with correct element and ref types and the ref reaching the real DOM node. A console warning flood that appears only under a development-mode tooling server - with zero page errors and a clean production-mode run of the same head - is an environment finding caused by the instrumentation, not an application defect, until a production-mode reproduction proves otherwise. The remediation is environment policy that disables the instrumentation for automated runs; console filtering, warning suppression, relaxed assertions, retries and skips are never acceptable remediations.',
+    guidance:
+      'When a console warning flood names refs on function components across the whole tree, first check whether it appears only under a development-mode tooling server: compare a production-mode run of the same head and the pageerror count. If only the dev server floods and page errors are zero, treat it as an environment finding and correct the environment policy; never filter console output, relax assertions, or add retries and skips. If a warning survives with the instrumentation off, use its Check-the-render-method frame to name the app-owned recipient, convert that component to React.forwardRef with the ref forwarded to the real DOM node, and sweep every sibling consumed by Slot, asChild, cloneElement or another ref-bearing parent in the same change.',
+    citations: [
+      'scripts/componentTaggerPolicy.ts',
+      'vite.config.ts#shouldEnableComponentTagger',
+      'playwright.truth.config.ts#AURA_DISABLE_COMPONENT_TAGGER',
+      'tests/unit/component-tagger-policy.test.ts',
+      'tests/harness-negative/tagger-flood-reproduction.spec.ts',
+    ],
+    triggers: [
+      'forwardref',
+      'function components cannot be given refs',
+      'warning flood',
+      'console warning',
+      'ref transparency',
+      'aschild',
+      'slot',
+      'cloneelement',
+      'component tagger',
+      'dev instrumentation',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-01T16:00:00.000Z',
     supersedes: null,
   } as AuraLesson),
 ]);

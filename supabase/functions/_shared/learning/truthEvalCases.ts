@@ -183,6 +183,19 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
     lessonId: 'run-id-untrusted-locator.v1',
     expect: { active: true, invariantMustMention: ['locator', 'rls', 'service role'] },
   },
+  {
+    id: 'lesson-ref-transparency-active',
+    kind: 'lesson-integrity',
+    title: 'The ref-transparency / dev-instrumentation lesson is active and encodes the mechanism',
+    lessonId: 'ref-transparency-dev-instrumentation.v1',
+    expect: {
+      active: true,
+      // The mechanism, not the wording: ref transparency via forwardRef,
+      // dev-instrumentation floods are environment findings, and console
+      // filtering is never a remediation.
+      invariantMustMention: ['forwardref', 'instrumentation', 'environment finding', 'filtering'],
+    },
+  },
 ];
 
 /**

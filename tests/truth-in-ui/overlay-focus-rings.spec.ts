@@ -39,6 +39,12 @@ async function probeFocusInside(
     async ({ containerSelector, limit }) => {
       const container = document.querySelector<HTMLElement>(containerSelector);
       if (!container) return [{ selector: containerSelector, reason: 'overlay container not found' }];
+      const waitFrame = window.__auraWaitForFrame;
+      if (!waitFrame) {
+        throw new Error(
+          'focus-probe: window.__auraWaitForFrame is not installed; the bounded frame fixture must run before navigation',
+        );
+      }
 
       const focusables = Array.from(
         container.querySelectorAll<HTMLElement>(
@@ -91,14 +97,30 @@ async function probeFocusInside(
       const failures: Array<{ selector: string; reason: string }> = [];
       const sample = focusables.slice(0, limit);
 
-      for (const el of sample) {
+      for (let index = 0; index < sample.length; index += 1) {
+        const el = sample[index];
         el.blur();
         const resting = fingerprint(el);
         document.body.dispatchEvent(
           new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }),
         );
         el.focus({ preventScroll: true });
-        await window.__auraWaitForFrame!();
+        // FAIL-CLOSED bounded paint tick: a frame that does not commit rejects
+        // with a named FrameCommitStallError (label, ordinal, bound, elapsed).
+        // It is recorded as a blocking failure and the style assertions below
+        // are skipped for this element — a missed frame can never pass.
+        try {
+          await waitFrame(
+            `${selectorFor(el)} (sample ${index + 1}/${sample.length})`,
+            { ordinal: 1 },
+          );
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(el),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
         // Roving-tabindex / detached nodes: not a legitimate failure.
         if (document.activeElement !== el || !el.isConnected) continue;
         const focused = fingerprint(el);

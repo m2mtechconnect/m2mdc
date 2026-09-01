@@ -1,6 +1,6 @@
 # AURA DC persona and journey map
 
-Status: proposed presentation contract; no authorization, route or navigation change
+Status: approved presentation contract; persona-prioritized Command Center implemented without an authorization, route or navigation change
 
 Baseline: `cde1d9050d81795e8afce43d28f9b9e680afc939`
 
@@ -53,6 +53,6 @@ Each journey has a required negative case in `src/config/personaJourneyModel.ts`
 
 ## Information-architecture boundary
 
-This branch only establishes the presentation contract, annotates the QA fixture and makes the browser test click the actual five-workspace navigation. It does not reorder, hide or rename navigation; change permissions; introduce a second role source; or publish a deployment.
+This branch establishes the presentation contract, annotates the QA fixture, makes the browser test click the actual five-workspace navigation and prioritizes Command Center current work and permitted actions for the resolved family. It does not reorder, hide or rename navigation; change permissions; introduce a second role source; or publish a deployment.
 
-The next visible change should be a persona-prioritized Command Center within the existing five-workspace shell. That change requires explicit approval of the proposed presentation map before implementation.
+The presentation family is resolved from the active organization role first, then the platform role, with pilot as an explicit viewer/pilot state. The resolved family never creates permissions; every displayed action is filtered through the existing canonical permission set and remains protected by route and backend authorization.

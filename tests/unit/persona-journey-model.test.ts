@@ -7,6 +7,7 @@ import {
   PERSONA_FAMILIES,
   PERSONA_FAMILY_IDS,
   PLATFORM_ROLE_PERSONA_FAMILY,
+  resolvePersonaFamily,
   WORKFLOW_ROLE_VIEW_IDS,
   WORKFLOW_VIEW_PERSONA_FAMILY,
 } from '@/config/personaJourneyModel';
@@ -45,6 +46,29 @@ describe('persona journey presentation model', () => {
       expect(family).not.toHaveProperty('permissions');
       expect(family).not.toHaveProperty('role');
     }
+  });
+
+  it('prioritizes active organization presentation without granting authority', () => {
+    expect(resolvePersonaFamily({
+      organizationRole: 'compliance',
+      platformRole: 'admin',
+      isPilot: false,
+    })).toBe('compliance_analyst');
+    expect(resolvePersonaFamily({
+      organizationRole: null,
+      platformRole: 'engineer',
+      isPilot: false,
+    })).toBe('engineer_operator');
+    expect(resolvePersonaFamily({
+      organizationRole: null,
+      platformRole: null,
+      isPilot: true,
+    })).toBe('viewer_pilot');
+    expect(resolvePersonaFamily({
+      organizationRole: null,
+      platformRole: 'support',
+      isPilot: false,
+    })).toBeNull();
   });
 
   it('defines one complete golden journey and negative case per family', () => {

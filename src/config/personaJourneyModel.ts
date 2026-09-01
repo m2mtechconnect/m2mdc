@@ -105,6 +105,31 @@ export const SPECIAL_GLOBAL_ROLE_PERSONA_FAMILY: Partial<Record<AnyRole, Persona
   viewer: 'viewer_pilot',
 };
 
+export interface PersonaFamilyResolutionInput {
+  organizationRole: OrganizationRole | null;
+  platformRole: AnyRole | null;
+  isPilot: boolean;
+}
+
+/**
+ * Resolve presentation only. Active organization membership takes priority
+ * because it defines the current customer context. This function never
+ * returns permissions and must not be used as an authorization check.
+ */
+export function resolvePersonaFamily({
+  organizationRole,
+  platformRole,
+  isPilot,
+}: PersonaFamilyResolutionInput): PersonaFamilyId | null {
+  if (organizationRole) return ORGANIZATION_ROLE_PERSONA_FAMILY[organizationRole];
+  if (isPilot) return 'viewer_pilot';
+  if (!platformRole) return null;
+  if (platformRole in PLATFORM_ROLE_PERSONA_FAMILY) {
+    return PLATFORM_ROLE_PERSONA_FAMILY[platformRole as PlatformRole];
+  }
+  return SPECIAL_GLOBAL_ROLE_PERSONA_FAMILY[platformRole] ?? null;
+}
+
 export const WORKFLOW_ROLE_VIEW_IDS = ['engineer', 'operator', 'executive', 'compliance'] as const;
 export type WorkflowRoleView = (typeof WORKFLOW_ROLE_VIEW_IDS)[number];
 

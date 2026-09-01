@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import { componentTagger } from "lovable-tagger";
+import { shouldEnableComponentTagger } from "./scripts/componentTaggerPolicy";
 import { seoBuildGate } from "./scripts/seoBuildGate";
 import {
   assertProductionFingerprint,

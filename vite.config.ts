@@ -91,7 +91,10 @@ export default defineConfig(({ mode }) => {
       // attaches a callback ref to every JSX element, and React 18 warns
       // "Function components cannot be given refs" once per JSX call site,
       // flooding console-cleanliness gates (see scripts/componentTaggerPolicy).
-      shouldEnableComponentTagger(mode) && componentTagger(),
+      // Options are passed EXPLICITLY: lovable-tagger otherwise defaults both
+      // features to LOVABLE_DEV_SERVER === 'true' and silently no-ops.
+      shouldEnableComponentTagger(mode) && componentTagger(componentTaggerOptions()),
+
       mode !== "development"
         && productionFingerprint
         && releaseFingerprintPlugin(productionFingerprint),

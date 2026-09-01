@@ -23,7 +23,8 @@ export interface AssistantTokenUsage {
 export interface AssistantResponseProvenance {
   schema: typeof RESPONSE_PROVENANCE_SCHEMA;
   path: AssistantAnswerPath;
-  provider: string;
+  /** Null on the deterministic truth path: no provider was invoked. */
+  provider: string | null;
   model: string | null;
   modelVersion: string | null;
   modelAvailabilityEvidence: 'not-verified';
@@ -64,7 +65,9 @@ export function buildResponseProvenance(input: BuildResponseProvenanceInput): As
   };
 
   if (input.path === 'truth') {
-    limitations.push('Deterministic truth path: no model was invoked, so model and token usage are not applicable.');
+    limitations.push(
+      'Deterministic truth path: no provider and no model were invoked, so provider, model, model version and token usage are not applicable.',
+    );
   } else {
     if (tokens.input === null && tokens.output === null) {
       limitations.push('Token usage was not supplied by the streaming provider response.');
@@ -78,7 +81,7 @@ export function buildResponseProvenance(input: BuildResponseProvenanceInput): As
   return {
     schema: RESPONSE_PROVENANCE_SCHEMA,
     path: input.path,
-    provider: input.policy.provider,
+    provider: input.path === 'truth' ? null : input.policy.provider,
     model: input.path === 'truth' ? null : input.policy.model,
     modelVersion: input.path === 'truth' ? null : input.policy.modelVersion,
     modelAvailabilityEvidence: 'not-verified',

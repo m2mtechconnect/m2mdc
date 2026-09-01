@@ -34,12 +34,56 @@ export interface GateResult {
   detail?: string;
 }
 
+export const EVAL_CASE_OUTCOMES = ['passed', 'failed', 'skipped', 'errored'] as const;
+export type EvalCaseOutcome = (typeof EVAL_CASE_OUTCOMES)[number];
+
+/** Immutable per-case identity and outcome evidence. */
+export interface EvalCaseResult {
+  id: string;
+  outcome: EvalCaseOutcome;
+}
+
 export interface EvalSnapshot {
   /** Identifier of the evaluated artifact (commit SHA, suite run id). */
   ref: string;
   totalCases: number;
   passedCases: number;
   groundedCitationRate: number;
+  /**
+   * Per-case evidence. Regressions are computed from case identity, never
+   * inferred from aggregate counts: a candidate that adds new passing cases
+   * can never mask a baseline-passing case that now fails.
+   */
+  caseResults: readonly EvalCaseResult[];
+}
+
+function snapshotIntegrityReasons(label: string, snapshot: EvalSnapshot): string[] {
+  const reasons: string[] = [];
+  const ids = snapshot.caseResults.map((c) => c.id);
+  if (ids.length === 0) {
+    reasons.push(`${label} snapshot carries no per-case evidence`);
+    return reasons;
+  }
+  const duplicates = [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
+  if (duplicates.length > 0) {
+    reasons.push(`${label} snapshot has duplicate case id(s): ${duplicates.join(', ')}`);
+  }
+  const uniqueCount = new Set(ids).size;
+  if (snapshot.totalCases !== uniqueCount) {
+    reasons.push(`${label} snapshot totalCases (${snapshot.totalCases}) does not match its case evidence (${uniqueCount})`);
+  }
+  const passed = snapshot.caseResults.filter((c) => c.outcome === 'passed').length;
+  if (snapshot.passedCases !== passed) {
+    reasons.push(`${label} snapshot passedCases (${snapshot.passedCases}) does not match its case evidence (${passed})`);
+  }
+  if (snapshot.groundedCitationRate < 0 || snapshot.groundedCitationRate > 1) {
+    reasons.push(`${label} snapshot groundedCitationRate is out of range`);
+  }
+  return reasons;
+}
+
+function passedIds(snapshot: EvalSnapshot): Set<string> {
+  return new Set(snapshot.caseResults.filter((c) => c.outcome === 'passed').map((c) => c.id));
 }
 
 export interface RolloutMetadata {
@@ -65,6 +109,8 @@ export interface PromotionDecision {
   reasons: readonly string[];
   gateSummary: Readonly<Record<MandatoryGate, GateStatus>>;
   truthRegressions: number;
+  /** Baseline-passing cases that are not passing in the candidate. */
+  regressedCaseIds: readonly string[];
   groundedCitationDelta: number;
   rollout: RolloutMetadata;
   evaluatedAt: string;
@@ -98,11 +144,19 @@ export function evaluatePromotion(candidate: PromotionCandidate, evaluatedAt?: s
     if (status !== 'passed') reasons.push(`gate ${gate} is ${status}`);
   }
 
-  const truthRegressions = Math.max(
-    0,
-    candidate.baseline.passedCases - candidate.candidate.passedCases,
-  );
-  if (truthRegressions > 0) reasons.push(`${truthRegressions} evaluation case regression(s) against baseline`);
+  reasons.push(...snapshotIntegrityReasons('baseline', candidate.baseline));
+  reasons.push(...snapshotIntegrityReasons('candidate', candidate.candidate));
+
+  const candidatePassed = passedIds(candidate.candidate);
+  const regressedCaseIds = [...passedIds(candidate.baseline)]
+    .filter((id) => !candidatePassed.has(id))
+    .sort();
+  const truthRegressions = regressedCaseIds.length;
+  if (truthRegressions > 0) {
+    reasons.push(
+      `${truthRegressions} evaluation case regression(s) against baseline: ${regressedCaseIds.join(', ')}`,
+    );
+  }
 
   const groundedCitationDelta =
     candidate.candidate.groundedCitationRate - candidate.baseline.groundedCitationRate;
@@ -125,6 +179,7 @@ export function evaluatePromotion(candidate: PromotionCandidate, evaluatedAt?: s
     reasons: Object.freeze([...reasons]),
     gateSummary: Object.freeze({ ...gateSummary }),
     truthRegressions,
+    regressedCaseIds: Object.freeze([...regressedCaseIds]),
     groundedCitationDelta,
     rollout: Object.freeze({ ...candidate.rollout }),
     evaluatedAt: evaluatedAt ?? new Date().toISOString(),

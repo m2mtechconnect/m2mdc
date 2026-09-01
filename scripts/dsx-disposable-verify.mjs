@@ -239,13 +239,17 @@ function checkEnvIdentity(env, findings) {
   });
 }
 
-export async function verifyDisposable(env = process.env) {
+export async function verifyDisposable(env = process.env, options = {}) {
+  const writeAudit = (entry) => appendAuditEntry({
+    ...entry,
+    ...(options.auditLogPath ? { logPath: options.auditLogPath } : {}),
+  });
   const findings = [];
   checkEnvIdentity(env, findings);
   if (!findings.every((f) => f.pass)) {
     for (const f of findings) {
       try {
-        appendAuditEntry({
+        writeAudit({
           kind: "verify_check",
           action: f.check,
           decision: f.pass ? "allowed" : "blocked",
@@ -256,7 +260,7 @@ export async function verifyDisposable(env = process.env) {
       } catch { /* ignore */ }
     }
     try {
-      appendAuditEntry({
+      writeAudit({
         kind: "verify_run",
         action: "aborted",
         decision: "blocked",
@@ -275,7 +279,7 @@ export async function verifyDisposable(env = process.env) {
   const allowed = findings.every((f) => f.pass);
   for (const f of findings) {
     try {
-      appendAuditEntry({
+      writeAudit({
         kind: "verify_check",
         action: f.check,
         decision: f.pass ? "allowed" : "blocked",
@@ -286,7 +290,7 @@ export async function verifyDisposable(env = process.env) {
     } catch { /* ignore */ }
   }
   try {
-    appendAuditEntry({
+    writeAudit({
       kind: "verify_run",
       action: "completed",
       decision: allowed ? "allowed" : "blocked",

@@ -1,6 +1,6 @@
 {
   "suite": "supervisor-engineering-evals",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "dataClass": "synthetic-evaluation-data",
   "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
   "cases": [
@@ -304,6 +304,78 @@
         "status": "pass",
         "violationCategories": [],
         "detectedCategories": []
+      }
+    },
+    {
+      "id": "eval-24",
+      "title": "Windows Vitest shebang failure retrieves portable qualification guidance",
+      "kind": "retrieval",
+      "input": { "query": "Windows Vitest invalid unexpected token Node mjs shebang transform" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-25",
+      "title": "Promotion ledger and allowlist mismatch retrieves perimeter parity guidance",
+      "kind": "retrieval",
+      "input": { "query": "production perimeter promotion ledger inventory allowlist drift parity" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-26",
+      "title": "Production launcher near miss retrieves narrowly scoped transform guidance",
+      "kind": "retrieval",
+      "input": { "query": "preserve production CLI launcher remove shebang only before test transformation" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-27",
+      "title": "Passing test that mutates a committed audit ledger retrieves evidence-isolation guidance",
+      "kind": "retrieval",
+      "input": { "query": "passing test writes synthetic entries committed append only audit ledger" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 3
+      }
+    },
+    {
+      "id": "eval-28",
+      "title": "Durable fixture output retrieves temporary evidence-path guidance",
+      "kind": "retrieval",
+      "input": { "query": "test fixture persistent evidence output temporary file isolation" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 3
+      }
+    },
+    {
+      "id": "eval-29",
+      "title": "Production log default near miss retrieves test-only injection guidance",
+      "kind": "retrieval",
+      "input": { "query": "production CLI keeps persistent audit default while test injects temporary log path" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 3
       }
     }
   ]

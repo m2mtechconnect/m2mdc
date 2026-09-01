@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, it, expect, beforeEach } from "vitest";
 import { mkdtempSync, readFileSync, appendFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

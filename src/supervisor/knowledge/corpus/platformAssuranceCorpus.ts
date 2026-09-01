@@ -117,4 +117,43 @@ export const PLATFORM_ASSURANCE_CORPUS: EngineeringKnowledgeEntry[] = [
     provenance: 'engineering-guidance',
     tenantScope: 'global',
   },
+  {
+    id: 'pa-portable-qualification-and-perimeter-parity',
+    domain: 'platform-assurance',
+    title: 'Portable qualification, evidence isolation and production-perimeter parity',
+    guidance:
+      'Repository qualification must execute Node utilities in a Node environment on every supported host, ' +
+      'preserve command-line launchers in production source while removing them before test transformation, ' +
+      'and use platform-appropriate directory links or copies in isolated fixtures. Production-perimeter ' +
+      'evidence is consistent only when the effective inventory, additive promotion ledger and executable ' +
+      'allowlist agree exactly; a promotion record alone does not make a function reachable or release-ready. ' +
+      'Tests for append-only logs, manifests or other durable evidence must inject a temporary output path so ' +
+      'synthetic qualification runs never modify the committed evidence they are supposed to verify.',
+    keywords: [
+      'windows', 'portable', 'vitest', 'node', 'shebang', 'transform', 'junction', 'symlink',
+      'perimeter', 'inventory', 'promotion', 'allowlist', 'drift', 'parity',
+      'audit', 'ledger', 'temporary', 'isolation', 'synthetic', 'evidence',
+    ],
+    citations: [
+      {
+        label: 'AURA Node-script test transformer',
+        locator: 'scripts/vitestScriptShebang.ts',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA production perimeter regression suite',
+        locator: 'scripts/__tests__/productionPerimeter.test.ts',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA isolated disposable-verification audit test',
+        locator: 'scripts/__tests__/dsxDisposableVerify.test.ts',
+        kind: 'repository-artifact',
+      },
+    ],
+    restrictedClaimCategories: ['production-readiness'],
+    runtimeIntegrationClaim: 'none',
+    provenance: 'engineering-guidance',
+    tenantScope: 'global',
+  },
 ];

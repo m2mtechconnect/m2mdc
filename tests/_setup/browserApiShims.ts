@@ -11,18 +11,22 @@ type ScrollTarget = Pick<Window, 'dispatchEvent'> & {
  * Position getters and the scroll event keep the shim useful to interaction
  * tests instead of merely silencing the missing-browser-API error.
  */
-export function installWindowScrollShim(target: ScrollTarget = window) {
+export function installWindowScrollShim(target?: ScrollTarget) {
+  const scrollTarget = target
+    ?? (typeof window === 'undefined' ? undefined : window);
+  if (!scrollTarget) return;
+
   let x = 0;
   let y = 0;
 
-  Object.defineProperties(target, {
+  Object.defineProperties(scrollTarget, {
     scrollX: { configurable: true, get: () => x },
     scrollY: { configurable: true, get: () => y },
     pageXOffset: { configurable: true, get: () => x },
     pageYOffset: { configurable: true, get: () => y },
   });
 
-  target.scrollTo = ((first: number | ScrollToOptions, second?: number) => {
+  scrollTarget.scrollTo = ((first: number | ScrollToOptions, second?: number) => {
     if (typeof first === 'number') {
       x = Number.isFinite(first) ? first : x;
       y = Number.isFinite(second) ? (second as number) : y;
@@ -30,6 +34,6 @@ export function installWindowScrollShim(target: ScrollTarget = window) {
       x = Number.isFinite(first.left) ? (first.left as number) : x;
       y = Number.isFinite(first.top) ? (first.top as number) : y;
     }
-    target.dispatchEvent(new Event('scroll'));
+    scrollTarget.dispatchEvent(new Event('scroll'));
   }) as Window['scrollTo'];
 }

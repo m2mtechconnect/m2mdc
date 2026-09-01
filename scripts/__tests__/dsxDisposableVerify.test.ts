@@ -1,4 +1,9 @@
+// @vitest-environment node
+
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { verifyDisposable } from "../dsx-disposable-verify.mjs";
 
 const OK_REF = "disposable-xyz789";
@@ -13,11 +18,24 @@ const baseEnv = () => ({
 });
 
 describe("verifyDisposable", () => {
-  beforeEach(() => vi.stubGlobal("fetch", vi.fn()));
-  afterEach(() => vi.unstubAllGlobals());
+  let auditDir: string;
+  let auditLogPath: string;
+
+  beforeEach(() => {
+    auditDir = mkdtempSync(join(tmpdir(), "dsx-verify-audit-"));
+    auditLogPath = join(auditDir, "audit.jsonl");
+    vi.stubGlobal("fetch", vi.fn());
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    rmSync(auditDir, { recursive: true, force: true });
+  });
+
+  const verify = (env: Record<string, string>) =>
+    verifyDisposable(env, { auditLogPath });
 
   it("aborts early with no network calls when gate fails", async () => {
-    const r = await verifyDisposable({});
+    const r = await verify({});
     expect(r.allowed).toBe(false);
     expect(r.aborted).toBe("identity_or_gate_failed");
     expect((globalThis.fetch as any).mock.calls.length).toBe(0);
@@ -30,7 +48,7 @@ describe("verifyDisposable", () => {
       DSX_DISPOSABLE_URL: "https://psfvrskpnwcshvajzeix.supabase.co",
       DSX_DISPOSABLE_DB_URL: "postgres://x@db.psfvrskpnwcshvajzeix.supabase.co/postgres",
     };
-    const r = await verifyDisposable(env);
+    const r = await verify(env);
     expect(r.allowed).toBe(false);
     expect((globalThis.fetch as any).mock.calls.length).toBe(0);
   });
@@ -55,10 +73,13 @@ describe("verifyDisposable", () => {
         return { status: 401, text: async () => JSON.stringify({ ok: false, error: "unauthorized", request_id: "req_1" }) };
       throw new Error(`unmocked ${u}`);
     });
-    const r = await verifyDisposable(baseEnv());
+    const r = await verify(baseEnv());
     const failed = r.findings.filter((f: any) => !f.pass);
     expect(failed, JSON.stringify(failed)).toEqual([]);
     expect(r.allowed).toBe(true);
+    const auditLines = readFileSync(auditLogPath, "utf8").trim().split("\n");
+    expect(auditLines.length).toBeGreaterThan(1);
+    expect(auditLines.every((line) => JSON.parse(line).target_ref === OK_REF)).toBe(true);
   });
 
   it("fails when dsx-ingest leaks kid/claims", async () => {
@@ -79,7 +100,7 @@ describe("verifyDisposable", () => {
         return { status: 401, text: async () => JSON.stringify({ ok: false, error: "unauthorized", request_id: "r", kid: "leaked" }) };
       throw new Error(u);
     });
-    const r = await verifyDisposable(baseEnv());
+    const r = await verify(baseEnv());
     expect(r.allowed).toBe(false);
     expect(r.findings.find((f: any) => f.check === "dsx_ingest_401_envelope")?.pass).toBe(false);
   });

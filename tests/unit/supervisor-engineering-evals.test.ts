@@ -2,7 +2,7 @@
  * Supervisor engineering evaluation suite contract (ADR-0010).
  *
  * Proves: the suite file exists with the pinned name, declares itself
- * synthetic evaluation data, contains exactly 23 well-formed cases, and
+ * synthetic evaluation data, contains exactly 29 well-formed cases, and
  * every case passes against the deterministic retrieval module and the
  * evidence guardrails.
  */
@@ -35,11 +35,11 @@ describe('suite shape', () => {
     expect(suite!.note.toLowerCase()).toContain('synthetic');
   });
 
-  it('contains exactly 23 cases with unique ids', () => {
+  it('contains exactly 29 cases with unique ids', () => {
     const { suite } = parseEvalSuite(rawSuite);
-    expect(suite!.cases).toHaveLength(23);
+    expect(suite!.cases).toHaveLength(29);
     const ids = suite!.cases.map((c) => c.id);
-    expect(new Set(ids).size).toBe(23);
+    expect(new Set(ids).size).toBe(29);
   });
 
   it('covers retrieval, guardrail and corpus-integrity case kinds', () => {
@@ -75,13 +75,13 @@ describe('suite shape', () => {
 });
 
 describe('evaluation execution', () => {
-  it('all 23 cases pass', () => {
+  it('all 29 cases pass', () => {
     const { suite } = parseEvalSuite(rawSuite);
     const report = runSupervisorEngineeringEvals(suite!);
     const failing = report.results.filter((r) => !r.passed);
     expect(failing.map((r) => ({ id: r.id, failures: r.failures }))).toEqual([]);
-    expect(report.total).toBe(23);
-    expect(report.passed).toBe(23);
+    expect(report.total).toBe(29);
+    expect(report.passed).toBe(29);
     expect(report.failed).toBe(0);
   });
 

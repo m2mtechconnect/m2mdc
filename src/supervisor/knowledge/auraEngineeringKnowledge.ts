@@ -73,10 +73,10 @@ export interface EngineeringCorpusManifest {
 }
 
 export const ENGINEERING_CORPUS_MANIFEST: EngineeringCorpusManifest = {
-  version: '1.2.0',
+  version: '1.4.0',
   pinnedAt: '2026-09-01',
-  checksum: 'fnv1a32:07234234',
-  entryCount: 17,
+  checksum: 'fnv1a32:dc9ca60f',
+  entryCount: 18,
 };
 
 export interface CorpusIntegrityResult {

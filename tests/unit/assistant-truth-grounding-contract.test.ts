@@ -14,17 +14,17 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
-  ALLOWED_VIEWPORT_DISCLOSURES,
-  ALLOWED_VIEWPORT_LIMITATIONS,
-  ALLOWED_VIEWPORT_RENDERERS,
+  CANONICAL_VIEWPORT_SURFACES,
   GROUNDED_FALLBACK_NEXT_STEPS,
   SERVER_CAPABILITY_BASELINE,
   buildEvidencePreamble,
   buildFacilityEvidenceEnvelope,
   chunkForStream,
   classifyTruthQuery,
+  extractCandidateRunId,
   gateStructuredResponse,
   renderTruthAnswer,
+  type VerifiedRunRecord,
 } from '../../supabase/functions/_shared/assistantTruth';
 import { VIEWPORT_SURFACES } from '@/workspace/viewportRegistry';
 import { evaluateRestrictedClaim, RESTRICTED_CLAIM_CATEGORIES } from '@/supervisor/knowledge/evidenceGuardrails';
@@ -100,8 +100,9 @@ describe('production prompt - deterministic grounded answer', () => {
     expect(answer.markdown).toMatch(/not a validated OpenUSD stage/i);
   });
 
-  it('states no simulation run has been recorded', () => {
-    expect(answer.markdown).toMatch(/No simulation run has been recorded/i);
+  it('states the page shows no run without claiming database truth', () => {
+    expect(answer.markdown).toMatch(/current AURA page shows no run/i);
+    expect(answer.markdown).toMatch(/not proof/i);
   });
 
   it('carries at least two visible AURA evidence citations', () => {
@@ -290,14 +291,18 @@ describe('generic model path guardrails', () => {
   });
 });
 
-describe('viewport registry mirror stays in sync', () => {
-  it('every registry disclosure, limitation and renderer is server-known', () => {
+describe('viewport canonical allowlist stays in exact sync with the registry', () => {
+  it('mirrors every registry surface as an exact (id, renderer, disclosure, limitation) tuple', () => {
+    expect(CANONICAL_VIEWPORT_SURFACES).toHaveLength(VIEWPORT_SURFACES.length);
     for (const surface of VIEWPORT_SURFACES) {
-      expect(ALLOWED_VIEWPORT_DISCLOSURES).toContain(surface.disclosure);
-      expect(ALLOWED_VIEWPORT_RENDERERS).toContain(surface.renderer);
-      if (surface.limitation) {
-        expect(ALLOWED_VIEWPORT_LIMITATIONS).toContain(surface.limitation);
-      }
+      const canonical = CANONICAL_VIEWPORT_SURFACES.find((c) => c.id === surface.id);
+      expect(canonical, `missing canonical record for ${surface.id}`).toBeDefined();
+      expect(canonical).toEqual({
+        id: surface.id,
+        renderer: surface.renderer,
+        disclosure: surface.disclosure,
+        limitation: surface.limitation ?? null,
+      });
     }
   });
 });
@@ -332,6 +337,27 @@ describe('edge function and client wiring (static contract)', () => {
   it('both client context paths attach the facility truth block', () => {
     expect(clientSource.split('buildFacilityTruthContext(').length - 1).toBeGreaterThanOrEqual(2);
   });
+
+  it('verifies the candidate run id through the RLS-scoped client before the envelope is built', () => {
+    expect(edgeSource).toContain('extractCandidateRunId(');
+    const lookupIndex = edgeSource.indexOf(".from('simulation_runs')");
+    const envelopeIndex = edgeSource.indexOf('buildFacilityEvidenceEnvelope(');
+    expect(lookupIndex).toBeGreaterThan(-1);
+    expect(envelopeIndex).toBeGreaterThan(-1);
+    expect(lookupIndex).toBeLessThan(envelopeIndex);
+    // The verified record is what grounds the envelope's run provenance.
+    expect(edgeSource).toContain('buildFacilityEvidenceEnvelope(context ?? {}, verifiedRun)');
+  });
+
+  it('run lookup selects only minimal provenance fields and never uses the service role', () => {
+    expect(edgeSource).toContain("select('id, status, started_at, finished_at')");
+    // No tenant/user columns leave the database row into assistant context.
+    expect(edgeSource).not.toMatch(/select\([^)]*(user_id|tenant_id)/);
+    expect(edgeSource).not.toContain('SERVICE_ROLE');
+    // The lookup runs on the caller-scoped client (anon key + caller's
+    // Authorization header), so RLS decides row visibility.
+    expect(edgeSource).toContain("Deno.env.get('SUPABASE_ANON_KEY')");
+  });
 });
 
 describe('evidence guardrails remain fail-closed', () => {
@@ -361,5 +387,179 @@ describe('evidence guardrails remain fail-closed', () => {
       ],
     });
     expect(evaluation.verdict).toBe('blocked-wrong-evidence-kind');
+  });
+});
+
+describe('viewport evidence - exact canonical tuple allowlist', () => {
+  it('rejects a spoofed surface id even when every string is individually canonical', () => {
+    const envelope = buildFacilityEvidenceEnvelope({
+      facilityTruth: {
+        run: null,
+        viewport: {
+          id: 'command-centre-plan-card-copy',
+          renderer: 'svg-2d',
+          disclosure: 'Procedural 2D floor plan of the modelled design',
+          limitation: 'Not a validated OpenUSD stage',
+        },
+      },
+    });
+    expect(envelope.visualization.grounded).toBe(false);
+    expect(envelope.visualization.surfaceId).toBeNull();
+    expect(envelope.rejectedClientClaims).toContain('viewport evidence rejected: unknown surface id');
+    const answer = renderTruthAnswer(PRODUCTION_PROMPT, envelope);
+    expect(answer.markdown).toMatch(/not verified/i);
+    expect(answer.markdown).toMatch(/no grounding/i);
+  });
+
+  it('rejects a cross-surface tuple carried under a known id', () => {
+    const envelope = buildFacilityEvidenceEnvelope({
+      facilityTruth: {
+        run: null,
+        viewport: {
+          // Real id, but the renderer/disclosure tuple of a different surface.
+          id: 'command-centre-plan-card',
+          renderer: 'three-webgl',
+          disclosure:
+            'Procedural 3D preview, except one canary rack rendered from a validated USD-derived GLB',
+          limitation: null,
+        },
+      },
+    });
+    expect(envelope.visualization.grounded).toBe(false);
+    expect(envelope.visualization.surfaceId).toBeNull();
+    expect(
+      envelope.rejectedClientClaims.some((c) =>
+        c.includes('tuple does not match the canonical record for command-centre-plan-card'),
+      ),
+    ).toBe(true);
+    const answer = renderTruthAnswer(PRODUCTION_PROMPT, envelope);
+    expect(answer.markdown).toMatch(/not verified/i);
+    expect(answer.markdown).toMatch(/no grounding/i);
+  });
+
+  it('accepts the exact canonical tuple and cites the canonical surface id', () => {
+    const envelope = buildFacilityEvidenceEnvelope(dashboardContext);
+    expect(envelope.visualization.grounded).toBe(true);
+    expect(envelope.visualization.surfaceId).toBe('command-centre-plan-card');
+    expect(
+      envelope.visualization.citations.some(
+        (c) => c.surface === 'Viewport registry' && c.value === 'command-centre-plan-card',
+      ),
+    ).toBe(true);
+    const answer = renderTruthAnswer(PRODUCTION_PROMPT, envelope);
+    expect(answer.markdown).toContain('command-centre-plan-card');
+  });
+});
+
+describe('run provenance - server verification is the only path to recorded', () => {
+  const RUN_ID = '3f8b0d3e-4c1a-4f4e-9a5d-6b7c8d9e0f1a';
+  const RUN_PROMPT = 'What simulation run produced these results? Cite the provenance.';
+  const verifiedRecord: VerifiedRunRecord = {
+    id: RUN_ID,
+    status: 'completed',
+    startedAt: '2026-09-01T05:00:00.000Z',
+    finishedAt: '2026-09-01T05:05:00.000Z',
+  };
+
+  it('never records a run from a client-supplied facilityTruth id alone', () => {
+    const envelope = buildFacilityEvidenceEnvelope({
+      facilityTruth: { run: { id: RUN_ID, status: 'completed' } },
+    });
+    expect(envelope.run.grounded).toBe(false);
+    expect(envelope.run.recorded).toBe(false);
+    expect(envelope.run.verified).toBe(false);
+    expect(envelope.run.id).toBeNull();
+    expect(envelope.rejectedClientClaims).toContain(
+      'run provenance rejected: client-supplied run id is not server-verified',
+    );
+    const answer = renderTruthAnswer(RUN_PROMPT, envelope);
+    expect(answer.markdown).toMatch(/not verified/i);
+    expect(answer.markdown).toMatch(/no grounding/i);
+    expect(answer.markdown).not.toContain(RUN_ID);
+  });
+
+  it('never records a run from the legacy simulationRun context alone', () => {
+    const envelope = buildFacilityEvidenceEnvelope({
+      simulationRun: { runId: RUN_ID, status: 'completed', startedAt: '2026-09-01T05:00:00.000Z' },
+    });
+    expect(envelope.run.recorded).toBe(false);
+    expect(envelope.run.id).toBeNull();
+    expect(envelope.rejectedClientClaims.some((c) => c.includes('not server-verified'))).toBe(true);
+  });
+
+  it('records and cites a run only from the server-verified record', () => {
+    const envelope = buildFacilityEvidenceEnvelope(
+      { facilityTruth: { run: { id: RUN_ID } } },
+      verifiedRecord,
+    );
+    expect(envelope.run.grounded).toBe(true);
+    expect(envelope.run.recorded).toBe(true);
+    expect(envelope.run.verified).toBe(true);
+    expect(envelope.run.id).toBe(RUN_ID);
+    expect(envelope.run.citation.value).toBe(RUN_ID);
+    expect(envelope.run.persistence).toBe('Server-verified simulation run record');
+    const answer = renderTruthAnswer(RUN_PROMPT, envelope);
+    expect(answer.markdown).toMatch(/server-verified simulation run/i);
+    expect(answer.markdown).toContain(RUN_ID);
+  });
+
+  it('fails closed when the verified record does not match the context id', () => {
+    const envelope = buildFacilityEvidenceEnvelope(
+      { facilityTruth: { run: { id: '00000000-0000-4000-8000-00000000abcd' } } },
+      verifiedRecord,
+    );
+    expect(envelope.run.recorded).toBe(false);
+    expect(envelope.run.verified).toBe(false);
+    expect(envelope.run.id).toBeNull();
+    expect(
+      envelope.rejectedClientClaims.some((c) =>
+        c.includes('verified record does not match the context run id'),
+      ),
+    ).toBe(true);
+  });
+
+  it('treats malformed candidate ids as no locator at all', () => {
+    expect(extractCandidateRunId({ facilityTruth: { run: { id: 'not-a-uuid' } } })).toBeNull();
+    expect(
+      extractCandidateRunId({ simulationRun: { runId: '1; DROP TABLE simulation_runs' } }),
+    ).toBeNull();
+    expect(extractCandidateRunId({ facilityTruth: { run: { id: RUN_ID } } })).toBe(RUN_ID);
+    expect(extractCandidateRunId({ simulationRun: { runId: RUN_ID.toUpperCase() } })).toBe(RUN_ID);
+    expect(extractCandidateRunId({})).toBeNull();
+    expect(extractCandidateRunId(null)).toBeNull();
+  });
+
+  it('describes an explicit run:null as the page showing no run, never database truth', () => {
+    const envelope = buildFacilityEvidenceEnvelope(dashboardContext);
+    expect(envelope.run.grounded).toBe(true);
+    expect(envelope.run.recorded).toBe(false);
+    expect(envelope.run.verified).toBe(false);
+    const answer = renderTruthAnswer('Is there a simulation run recorded for this page?', envelope);
+    expect(answer.markdown).toMatch(/current AURA page shows no run/i);
+    expect(answer.markdown).toMatch(/not proof/i);
+    expect(answer.markdown).not.toMatch(/no simulation run has been recorded/i);
+  });
+
+  it('abstains entirely when no run evidence of any kind is present', () => {
+    const envelope = buildFacilityEvidenceEnvelope({});
+    expect(envelope.run.grounded).toBe(false);
+    expect(envelope.run.recorded).toBe(false);
+    const answer = renderTruthAnswer(RUN_PROMPT, envelope);
+    expect(answer.markdown).toMatch(/not verified/i);
+    expect(answer.markdown).toMatch(/no grounding/i);
+  });
+
+  it('keeps the evidence preamble truthful for each run state', () => {
+    const verified = buildEvidencePreamble(
+      buildFacilityEvidenceEnvelope({ facilityTruth: { run: { id: RUN_ID } } }, verifiedRecord),
+    );
+    expect(verified).toContain(`Server-verified simulation run on record: ${RUN_ID}.`);
+    const pageNull = buildEvidencePreamble(buildFacilityEvidenceEnvelope(dashboardContext));
+    expect(pageNull).toContain('not proof that no database run exists');
+    const spoofed = buildEvidencePreamble(
+      buildFacilityEvidenceEnvelope({ facilityTruth: { run: { id: RUN_ID } } }),
+    );
+    expect(spoofed).toContain('No server-verified simulation run is attached to this context.');
+    expect(spoofed).not.toContain(RUN_ID);
   });
 });

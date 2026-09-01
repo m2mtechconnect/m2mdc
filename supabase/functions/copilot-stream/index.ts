@@ -22,6 +22,10 @@
  * - All structured actions/insights/next steps pass through the
  *   capability-aware gate; the generic model path receives the envelope as a
  *   hard-rule preamble.
+ * - Run provenance: a client-supplied run id is an UNTRUSTED LOCATOR. It is
+ *   verified against public.simulation_runs through the caller's RLS-scoped
+ *   client (never the service role) before the evidence envelope is built;
+ *   only that verified record can ground a recorded run.
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
@@ -32,8 +36,10 @@ import {
   buildFacilityEvidenceEnvelope,
   chunkForStream,
   classifyTruthQuery,
+  extractCandidateRunId,
   gateStructuredResponse,
   renderTruthAnswer,
+  type VerifiedRunRecord,
 } from "../_shared/assistantTruth.ts";
 
 
@@ -68,10 +74,36 @@ serve(async (req) => {
 
     const { query, context, sessionId }: CoPilotStreamRequest = await req.json();
 
+    // Run-id verification: a client-supplied run id is an UNTRUSTED LOCATOR.
+    // It becomes provenance only when the caller's own RLS-scoped client can
+    // read the row back from public.simulation_runs (never the service role,
+    // and only minimal provenance fields - no tenant or user columns).
+    // Missing auth, malformed ids, query errors, and invisible rows all fail
+    // closed to "not verified" inside the evidence builder.
+    const candidateRunId = extractCandidateRunId(context ?? {});
+    let verifiedRun: VerifiedRunRecord | null = null;
+    if (user && candidateRunId) {
+      const { data: runRow, error: runLookupError } = await supabaseClient
+        .from('simulation_runs')
+        .select('id, status, started_at, finished_at')
+        .eq('id', candidateRunId)
+        .maybeSingle();
+      if (runLookupError) {
+        console.warn('[CoPilot] Run provenance lookup failed; run stays not verified');
+      } else if (runRow && typeof runRow.id === 'string') {
+        verifiedRun = {
+          id: runRow.id,
+          status: typeof runRow.status === 'string' ? runRow.status : null,
+          startedAt: typeof runRow.started_at === 'string' ? runRow.started_at : null,
+          finishedAt: typeof runRow.finished_at === 'string' ? runRow.finished_at : null,
+        };
+      }
+    }
+
     // Server-owned deterministic evidence envelope. Built for EVERY request:
     // truth questions are answered from it directly, and every structured
     // suggestion is gated against it. Client context can only downgrade it.
-    const evidenceEnvelope = buildFacilityEvidenceEnvelope(context ?? {});
+    const evidenceEnvelope = buildFacilityEvidenceEnvelope(context ?? {}, verifiedRun);
     if (evidenceEnvelope.rejectedClientClaims.length > 0) {
       console.warn('[CoPilot] Ignored client evidence upgrade attempts:', evidenceEnvelope.rejectedClientClaims);
     }

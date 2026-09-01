@@ -1,13 +1,13 @@
 {
   "schema": "aura.schema-truth.v2",
   "sourceSha": "64da468804a426dcdd356912c4a68ba60f73bdf7",
-  "generatedTypesSha256": "c35d8dbbb2fec0916f24470691d0fa89d62dbf88587c0e60bb73fc9fa3da0295",
+  "generatedTypesSha256": "ee3dab1916cc697bd7c60776b2095067be466530d5c2831f80cc58daeccb8b78",
   "tableCount": 140,
   "tableNamesSha256": "559cfcae3a33fc486ca0c3db776fbd110e1ab21b5bed9427dd545e6044f983cd",
   "viewCount": 5,
   "viewNamesSha256": "d655e183f88659aeb3daddea0a58cf5f66b710f77d2845f4cfebf92c3d97804e",
-  "functionCount": 49,
-  "functionNamesSha256": "61d0ffda194242b58e75acafdffba4ede63e8c1a6752811c7efe21d18f0cbec4",
+  "functionCount": 50,
+  "functionNamesSha256": "ed84c98579e5a803bf42c80c26cc2d4a7a384380ee6167fbe57559ef6296f01e",
   "migrationCount": 87,
   "migrationsSha256": "b4e4e066aebfec07cdf2f9e2239e61567069b9aaf08f03640859d400cf5f40d5",
   "migrationContentsSha256": "cb6ec78bf6604693fc038c48ef940d398fdac09e82c5ced246981af783d83a57"

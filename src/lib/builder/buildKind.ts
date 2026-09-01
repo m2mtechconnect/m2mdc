@@ -62,13 +62,17 @@ export function resolveTemplateBuildKind(input: {
   return DEFAULT_BUILD_KIND;
 }
 
+/**
+ * Explicit facility identity signals. Deliberately narrow: a generic
+ * "Operations" department is NOT a facility signal, so unrelated templates keep
+ * the safe `agent` default.
+ */
 const FACILITY_SIGNALS = [
   'data centre',
   'data center',
   'datacentre',
   'datacenter',
   'facility',
-  'infrastructure operations',
 ];
 
 function isFacilityTemplate(input: {
@@ -83,9 +87,5 @@ function isFacilityTemplate(input: {
     .join(' ')
     .toLowerCase();
 
-  if (FACILITY_SIGNALS.some((signal) => haystack.includes(signal))) return true;
-
-  // Operational twin taxonomy on a template that also declares a physical
-  // facility identity is a digital-twin build, not an agent build.
-  return input.twinType === 'operational' && haystack.includes('operations');
+  return FACILITY_SIGNALS.some((signal) => haystack.includes(signal));
 }

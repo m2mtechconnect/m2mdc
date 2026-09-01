@@ -41,6 +41,9 @@ import {
   renderTruthAnswer,
   type VerifiedRunRecord,
 } from "../_shared/assistantTruth.ts";
+import { renderLessonBlock, retrieveApprovedLessons } from "../_shared/learning/lessonRetrieval.ts";
+import { resolveModelPolicy } from "../_shared/learning/modelPolicy.ts";
+import { buildResponseProvenance } from "../_shared/learning/responseProvenance.ts";
 
 
 interface CoPilotStreamRequest {
@@ -50,6 +53,7 @@ interface CoPilotStreamRequest {
 }
 
 serve(async (req) => {
+  const requestStartedAt = Date.now();
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -117,6 +121,9 @@ serve(async (req) => {
       const truthAnswer = renderTruthAnswer(query ?? '', evidenceEnvelope);
       const gatedTruthStructured = gateStructuredResponse(truthAnswer.structured, evidenceEnvelope, context ?? {});
       const truthEncoder = new TextEncoder();
+      // Deterministic path: no model is invoked, so the provenance record
+      // reports the truth policy with null model and null token usage.
+      const truthPolicy = resolveModelPolicy('truth-grounding');
       const truthStream = new ReadableStream({
         async start(controller) {
           try {
@@ -124,7 +131,17 @@ serve(async (req) => {
               controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'token', content: chunk })}\n\n`));
             }
             controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'structured', data: gatedTruthStructured })}\n\n`));
+            const truthProvenance = buildResponseProvenance({
+              path: 'truth',
+              policy: truthPolicy,
+              lessonIds: [],
+              latencyMs: Date.now() - requestStartedAt,
+              groundedCitationCount: truthAnswer.markdown.match(/\[[^\][]+ · [^\][]+\]/g)?.length ?? 0,
+              rejectedClientClaimCount: evidenceEnvelope.rejectedClientClaims.length,
+            });
+            controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'provenance', data: truthProvenance })}\n\n`));
             controller.enqueue(truthEncoder.encode('data: [DONE]\n\n'));
+
 
             // Preserve memory behavior (only for authenticated users)
             if (user) {
@@ -153,16 +170,29 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // ENFORCE GEMINI 3.X MODEL
-    const model = 'google/gemini-3-pro-preview';
+    // Server-owned, provider-neutral model routing. A browser-supplied model
+    // identifier is never read here.
+    const modelPolicy = resolveModelPolicy('general-assistant');
+    const model = modelPolicy.model as string;
 
     // Fetch persistent memory (only for authenticated users)
     const memory = user ? await fetchMemory(supabaseClient, user.id) : {};
     console.log('[CoPilot] Loaded memory:', Object.keys(memory), 'authenticated:', !!user);
 
+    // Approved lessons: reviewed, active guidance only. Injected BEFORE the
+    // evidence preamble so the preamble remains the final authority.
+    const retrievedLessons = retrieveApprovedLessons(query ?? '');
+    const lessonBlock = renderLessonBlock(retrievedLessons);
+
     // Build context-aware system prompt with memory, always terminated by the
     // authoritative evidence preamble so the model cannot contradict page truth.
-    const systemPrompt = `${buildSystemPrompt(context, memory)}\n\n${buildEvidencePreamble(evidenceEnvelope)}`;
+    const systemPrompt = [
+      buildSystemPrompt(context, memory),
+      lessonBlock,
+      buildEvidencePreamble(evidenceEnvelope),
+    ]
+      .filter((part) => part && part.length > 0)
+      .join('\n\n');
 
     // Stream setup
     const encoder = new TextEncoder();
@@ -182,8 +212,8 @@ serve(async (req) => {
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: query }
               ],
-              temperature: 0.7,
-              max_tokens: 2048,
+              temperature: modelPolicy.temperature ?? 0.7,
+              max_tokens: modelPolicy.maxTokens ?? 2048,
               stream: true,
             })
           });
@@ -200,6 +230,9 @@ serve(async (req) => {
           const decoder = new TextDecoder();
           let buffer = '';
           let accumulatedContent = '';
+          // Token usage is recorded only when the provider supplies it. It is
+          // never estimated: unknown stays null in the provenance record.
+          const usage: { input: number | null; output: number | null } = { input: null, output: null };
 
           while (true) {
             const { done, value } = await reader.read();
@@ -223,6 +256,16 @@ serve(async (req) => {
                   context ?? {},
                 );
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'structured', data: structured })}\n\n`));
+                const modelProvenance = buildResponseProvenance({
+                  path: 'model',
+                  policy: modelPolicy,
+                  lessonIds: retrievedLessons.lessonIds,
+                  latencyMs: Date.now() - requestStartedAt,
+                  tokens: usage,
+                  groundedCitationCount: accumulatedContent.match(/\[[^\][]+ · [^\][]+\]/g)?.length ?? 0,
+                  rejectedClientClaimCount: evidenceEnvelope.rejectedClientClaims.length,
+                });
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'provenance', data: modelProvenance })}\n\n`));
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
                 
                 // Save memory after response (only for authenticated users)
@@ -236,6 +279,12 @@ serve(async (req) => {
 
               try {
                 const parsed = JSON.parse(data);
+                if (parsed?.usage) {
+                  const promptTokens = parsed.usage.prompt_tokens;
+                  const completionTokens = parsed.usage.completion_tokens;
+                  if (typeof promptTokens === 'number') usage.input = promptTokens;
+                  if (typeof completionTokens === 'number') usage.output = completionTokens;
+                }
                 const delta = parsed.choices?.[0]?.delta?.content;
                 if (delta) {
                   accumulatedContent += delta;

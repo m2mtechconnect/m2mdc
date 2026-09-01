@@ -81,6 +81,13 @@ export default defineConfig({
           'VITE_SUPABASE_URL=http://127.0.0.1:54321 ' +
           'VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key ' +
           'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
+          // Dev-only lovable-tagger JSX instrumentation attaches refs to
+          // function components and floods console.error with React's
+          // forwardRef warning (once per JSX call site). This suite asserts
+          // console cleanliness, so the tagger is off for the automated
+          // server. Assertions are unchanged — this is environment policy,
+          // not filtering (see scripts/componentTaggerPolicy.ts).
+          'AURA_DISABLE_COMPONENT_TAGGER=1 ' +
           FACADE_ENV +
           `npx vite --port ${PORT} --strictPort`,
         url: `http://localhost:${PORT}`,

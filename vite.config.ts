@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { fileURLToPath } from "node:url";
 import { componentTagger } from "lovable-tagger";
+import { shouldEnableComponentTagger } from "./scripts/componentTaggerPolicy";
 import { seoBuildGate } from "./scripts/seoBuildGate";
 import {
   assertProductionFingerprint,
@@ -82,7 +83,12 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [
       react(),
-      mode === "development" && componentTagger(),
+      // Dev-only JSX instrumentation. Automated runs that assert console
+      // cleanliness disable it via AURA_DISABLE_COMPONENT_TAGGER: the tagger
+      // attaches a callback ref to every JSX element, and React 18 warns
+      // "Function components cannot be given refs" once per JSX call site,
+      // flooding console-cleanliness gates (see scripts/componentTaggerPolicy).
+      shouldEnableComponentTagger(mode) && componentTagger(),
       mode !== "development"
         && productionFingerprint
         && releaseFingerprintPlugin(productionFingerprint),

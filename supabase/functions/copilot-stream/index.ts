@@ -12,11 +12,29 @@
  * - Tokens: { type: 'token', content: string }
  * - Structured: { type: 'structured', data: {...} }
  * - Done: data: [DONE]
+ *
+ * TRUTH GROUNDING (see ../_shared/assistantTruth.ts):
+ * - Every request builds a server-owned deterministic facility evidence
+ *   envelope. Truth questions (live/simulated/measured, telemetry, OpenUSD /
+ *   SimReady, deployment/readiness, connected/healthy/verified) are answered
+ *   deterministically from that envelope with visible citations, before and
+ *   instead of any generic model recommendation.
+ * - All structured actions/insights/next steps pass through the
+ *   capability-aware gate; the generic model path receives the envelope as a
+ *   hard-rule preamble.
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import {
+  buildEvidencePreamble,
+  buildFacilityEvidenceEnvelope,
+  chunkForStream,
+  classifyTruthQuery,
+  gateStructuredResponse,
+  renderTruthAnswer,
+} from "../_shared/assistantTruth.ts";
 
 
 interface CoPilotStreamRequest {
@@ -50,6 +68,54 @@ serve(async (req) => {
 
     const { query, context, sessionId }: CoPilotStreamRequest = await req.json();
 
+    // Server-owned deterministic evidence envelope. Built for EVERY request:
+    // truth questions are answered from it directly, and every structured
+    // suggestion is gated against it. Client context can only downgrade it.
+    const evidenceEnvelope = buildFacilityEvidenceEnvelope(context ?? {});
+    if (evidenceEnvelope.rejectedClientClaims.length > 0) {
+      console.warn('[CoPilot] Ignored client evidence upgrade attempts:', evidenceEnvelope.rejectedClientClaims);
+    }
+
+    const truthClassification = classifyTruthQuery(query ?? '');
+    if (truthClassification.isTruthQuery) {
+      // Deterministic grounded answer: no model call, citations name the
+      // AURA surfaces, abstains when evidence is missing. Streaming contract
+      // (token events, structured event, [DONE]) is preserved.
+      console.log('[CoPilot] Truth question detected, topics:', truthClassification.topics);
+      const truthAnswer = renderTruthAnswer(query ?? '', evidenceEnvelope);
+      const gatedTruthStructured = gateStructuredResponse(truthAnswer.structured, evidenceEnvelope, context ?? {});
+      const truthEncoder = new TextEncoder();
+      const truthStream = new ReadableStream({
+        async start(controller) {
+          try {
+            for (const chunk of chunkForStream(truthAnswer.markdown)) {
+              controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'token', content: chunk })}\n\n`));
+            }
+            controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'structured', data: gatedTruthStructured })}\n\n`));
+            controller.enqueue(truthEncoder.encode('data: [DONE]\n\n'));
+
+            // Preserve memory behavior (only for authenticated users)
+            if (user) {
+              await saveMemory(supabaseClient, user.id, query, context, truthAnswer.markdown);
+            }
+
+            controller.close();
+          } catch (error) {
+            console.error('Truth stream error:', error);
+            controller.error(error);
+          }
+        }
+      });
+      return new Response(truthStream, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        }
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
@@ -62,8 +128,9 @@ serve(async (req) => {
     const memory = user ? await fetchMemory(supabaseClient, user.id) : {};
     console.log('[CoPilot] Loaded memory:', Object.keys(memory), 'authenticated:', !!user);
 
-    // Build context-aware system prompt with memory
-    const systemPrompt = buildSystemPrompt(context, memory);
+    // Build context-aware system prompt with memory, always terminated by the
+    // authoritative evidence preamble so the model cannot contradict page truth.
+    const systemPrompt = `${buildSystemPrompt(context, memory)}\n\n${buildEvidencePreamble(evidenceEnvelope)}`;
 
     // Stream setup
     const encoder = new TextEncoder();
@@ -116,8 +183,13 @@ serve(async (req) => {
 
               const data = line.slice(6).trim();
               if (data === '[DONE]') {
-                // Send structured response
-                const structured = generateStructuredResponse(query, context, accumulatedContent);
+                // Send structured response, gated against the evidence
+                // envelope so no unavailable-capability suggestion leaks.
+                const structured = gateStructuredResponse(
+                  generateStructuredResponse(query, context, accumulatedContent),
+                  evidenceEnvelope,
+                  context ?? {},
+                );
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'structured', data: structured })}\n\n`));
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
                 
@@ -606,43 +678,38 @@ function generateStructuredResponse(query: string, context: any, response: strin
     });
   }
 
-  if (context.activePage === 'template_library') {
-    structured.actions.push({
-      label: 'Browse Templates',
-      handler: '/templates',
-      icon: 'external'
-    });
-  }
+  // Template/Marketplace suggestions are retired and never emitted.
 
   // Generate insights
   if (context.workflowsCount === 0) {
     structured.insights.push('No workflows configured yet. Consider adding a monitoring or automation workflow.');
   }
   if (context.integrationsCount === 0) {
-    structured.insights.push('No integrations connected. Connect data sources to enable rich agent functionality.');
+    structured.insights.push('No integrations are configured for this agent yet.');
   }
   if (context.totalRuns === 0) {
-    structured.insights.push('Agent has not been run yet. Test it with a simulation or deploy to production.');
+    structured.insights.push('This agent has no recorded executions yet.');
   }
 
-  // Generate next steps based on context
+  // Generate next steps based on context (evidence-grounded; capability
+  // verbs like deploy/connect are reserved for verified capabilities).
   if (context.activePage === 'builder') {
     structured.nextSteps = [
       'Complete all 5 builder steps',
-      'Test your agent in the simulation sandbox',
-      'Deploy to a test environment first'
+      'Review the generated blueprint for accuracy',
+      'Check capability availability before planning a release'
     ];
   } else if (context.activePage === 'agent_detail') {
     structured.nextSteps = [
       'Review workflow configurations',
-      'Run a test simulation',
-      'Monitor metrics and logs'
+      'Review recent execution records and logs',
+      'Review metrics for anomalies'
     ];
   } else {
     structured.nextSteps = [
-      'Explore available templates',
-      'Create or configure an agent',
-      'Set up workflows and integrations'
+      'Review the operating mode and provenance indicators on the current page',
+      'Open Evidence to inspect result provenance before acting on any value',
+      'Check capability availability before planning connections or releases'
     ];
   }
 
@@ -948,7 +1015,7 @@ function generateDCStructuredResponse(query: string, context: any, response: str
     ];
   } else {
     structured.nextSteps = [
-      'Monitor real-time KPIs in the dashboard',
+      'Review the modelled KPIs on the dashboard',
       'Review alerts and acknowledge resolved issues',
       'Run simulations to test operational resilience'
     ];
@@ -1084,7 +1151,7 @@ function generateContextualFollowUps(query: string, context: any, response: stri
   else if (queryLower.includes('setup') || queryLower.includes('configure') || queryLower.includes('create')) {
     followUps.push(
       `What configuration options are available?`,
-      `Are there templates I can start from?`,
+      `What configuration matters most for this use case?`,
       `What's the minimum configuration needed to get started?`
     );
   }

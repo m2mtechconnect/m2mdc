@@ -11,6 +11,7 @@ import type { CoPilotContextPayload } from '@/types/copilotContext';
 import { buildDataCentreSystemPrompt, isDataCentreContext } from './dataCentreContext';
 import { getDCDomainContext } from './dcDomainContext';
 import { buildDCSystemPrompt } from './dcSystemPrompt';
+import { buildFacilityTruthContext } from './truthContext';
 
 interface StreamOptions {
   query: string;
@@ -58,9 +59,15 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
     let enhancedContext: any;
     
     if (isCoPilotContextPayload(context)) {
-      // New mode-aware context - pass directly to backend
+      // New mode-aware context - pass through, plus the structured facility
+      // truth block that grounds the server-side evidence envelope.
       console.log('[CoPilot Streaming] Using mode-aware context:', context.mode);
-      enhancedContext = context;
+      enhancedContext = {
+        ...context,
+        facilityTruth: buildFacilityTruthContext(
+          context.mode === 'simulation' ? 'simulation' : 'blueprint'
+        ),
+      };
     } else {
       // Legacy context - apply domain-specific enhancements
       console.log('[CoPilot Streaming] Using legacy context');
@@ -83,8 +90,10 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
         domainSystemPrompt: domainPrompt || undefined,
         isDataCentreDomain: isDCDomain,
         dcDomainContext: dcDomainContext,
+        facilityTruth: buildFacilityTruthContext(context.activePage),
       };
     }
+    
     
     console.log('[CoPilot Streaming] Payload:', { 
       query, 

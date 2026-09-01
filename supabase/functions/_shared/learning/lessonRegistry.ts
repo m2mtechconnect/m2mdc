@@ -10,7 +10,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-01.2';
+export const LESSON_REGISTRY_VERSION = '2026-09-01.3';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({

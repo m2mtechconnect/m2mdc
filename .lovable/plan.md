@@ -1,121 +1,91 @@
-# Phase 1: Governed Machine Learning for the AURA Super Agent
+# Root-cause plan: two reproducing truth-in-UI failures (HEAD a1bbc8e2)
 
-Base commit: `ddd6b11a0185808944482c921a1445ad194e214d`. Source-only. No deployment, no publishing, no navigation change, no new globally visible page.
+Read-only analysis. No files edited, no deploy, no publish, and the isolated DSX job was not touched.
 
-## Recommendation up front
+## Failure 1 — cold `/dashboard` meaningful marker 8189.77 ms vs 6000 ms budget
 
-**Ship code-owned contracts first. No database schema and no new API surface in Phase 1.**
+### What the code actually does
+- `playwright.truth.config.ts` `webServer` starts **`npx vite --port <PORT> --strictPort`** — an unbundled **dev** server. No `build` + `preview` path exists for this suite.
+- `tests/truth-in-ui/authenticated-performance.spec.ts` opens a **fresh page per route** (`context.newPage()`), navigates, and measures wall time until `getByTestId('facility-highlights') h1` is visible. `/dashboard` is the **first** route in `CURRENT_AUTHENTICATED_ROUTES`, so it absorbs the entire first-request cost.
+- The dashboard route is `lazy(loadDashboard)` in `src/AuthenticatedShell.tsx:30`; the marker lives deep in `src/workspace/CommandCentre.tsx` → `src/workspace/dashboard/FacilityHighlights.tsx`. On a cold dev server this route pulls a large module graph that Vite must transform on demand, request by request, before React can commit.
+- The recorded evidence is consistent with this: FCP passed (< 3000 ms — the shell painted early) while the meaningful marker landed 5+ s later. That gap is module-graph acquisition, not a data wait; the Supabase mock is in-process and the network guard blocks egress.
 
-Reasons:
-- The two truth fixes just proven (canonical viewport tuple, server-verified run id) can be made durable today as versioned lessons plus executable eval cases in code, running inside `test:unit`. That closes the regression risk immediately, with zero backend risk.
-- Every ML control we need to prove (routing provenance, redaction, promotion gates) is a pure function. Proving them as code + tests first means the later migration is written against a contract that is already qualified, not the other way round.
-- A feedback/lesson schema written before the contract is settled becomes an applied migration we are not allowed to edit, and it would introduce user-content storage (the highest-risk element) before the redactor has been proven.
+### Mechanism
+**Test harness / cold dev compilation.** The budget is a production readiness budget, but it is measured against a dev server's first-request transform cost. This is not evidence of a product regression, and it is also not evidence of product health — the gate currently measures the wrong artifact.
 
-Risks accepted by deferring schema: no persisted feedback capture yet, lesson authorship stays a code review action rather than an in-product workflow, and the retrieval path reads from a code-owned registry rather than a table. All three are Phase 2 items and none blocks the durability objective.
+Not the mechanism: blocked network (guard would fail the test), continuous rendering (TBT and CLS assertions passed), or an auth/loader stall (`Loading workspace...` count assertion passed).
 
-## What already exists (do not rebuild)
+### Smallest fix that preserves the meaningful-readiness invariant
+Measure the budget against a **production artifact**, keeping every budget number, marker and assertion byte-identical.
 
-- LLM transport: `supabase/functions/_shared/ai-client.ts` — server-owned profiles, browser cannot pick a model. `src/lib/llm/modelResolver.ts` is a client-side display/enforcement helper.
-- Deterministic truth path: `supabase/functions/_shared/assistantTruth.ts` (envelope, canonical viewport surfaces, `extractCandidateRunId`, structured gate, preamble) invoked ahead of the model in `supabase/functions/copilot-stream/index.ts`.
-- Per-user memory: `copilot_memory` read/write inside `copilot-stream`.
-- Deterministic retrieval + guardrails + eval runner: `src/supervisor/knowledge/*`, `src/supervisor/evals/runSupervisorEngineeringEvals.ts` with `supervisor-engineering-evals.json`.
-- Analytics: `src/lib/copilot/analytics.ts` writing `copilot_events`.
+1. Add `playwright.perf.config.ts` that reuses the truth `use` block and fixtures but sets
+   `webServer.command = 'vite build && vite preview --port <PORT> --strictPort'` with the same safe loopback env
+   (`VITE_SUPABASE_URL=http://127.0.0.1:54321`, placeholder anon key, bogus Kit URL), `testMatch: authenticated-performance.spec.ts`, `timeout` raised only to cover the build-free run duration already used by the spec (`test.setTimeout(90_000)` stays in-spec).
+2. Exclude `authenticated-performance.spec.ts` from `playwright.truth.config.ts` (`testIgnore`) so the functional shards no longer run a perf gate against dev output.
+3. Add script `test:perf` and wire it into the release qualification list next to `test:truth`.
 
-## What is missing (Phase 1 fills these, in code)
+Explicitly **not** doing: raising `BUDGETS`, adding sleeps/warmups, retries, or excluding `/dashboard`.
 
-1. No versioned **lesson** object: the truth fixes exist only as implementation plus tests, with no reviewed, activatable, citable record.
-2. No **response provenance record**: provider, model, policy version, prompt version, lesson ids, latency, tokens, truth-path vs model-path are not emitted per response.
-3. No **redaction contract** for candidate feedback.
-4. No **promotion contract**: baseline vs candidate, mandatory gates, thresholds, rollout/rollback metadata.
+### Predictive defect family (analogous consumers)
+Every consumer that asserts a **timing** budget against the dev server inherits the same false signal:
+- `authenticated-performance.spec.ts` second test (`warmPrimaryNavigationMs`, 3500 ms) — same file, same config move.
+- `tests/truth-in-ui/predictive-ux-regressions.spec.ts` and `twin-canvas-mounting.spec.ts` — audit for wall-clock budgets; move any that exist into the perf config in the same change.
+- Non-timing specs stay on the dev config unchanged.
 
-## Phase 1 scope
+## Failure 2 — `axe-contrast-focus.spec.ts` `data-centre-twin (demo)` exceeds the 20 s test timeout inside `probeFocusIndicators`
 
-### A. Lesson contract and registry (new, code-owned)
+### What the code actually does
+- `playwright.truth.config.ts` sets a **global 20 s test timeout**.
+- In `tests/truth-in-ui/axe-contrast-focus.spec.ts`, the **authed** describe block sets `test.setTimeout(60_000)` (line 298). The **public** describe block (line 273), which owns `data-centre-twin (demo)` and `twin-preview`, sets **no per-test timeout** — it runs on 20 s.
+- That surface is the heaviest public route: `/data-centre-twin?demo=true` → `PublicAppRoutes.tsx:56` → `src/pages/PublicDataCentreTwin.tsx` mounts `RBACProvider` + `ActiveTwinProvider` + `CoPilotProvider` + `CoPilotCommandProvider` around `src/pages/DataCentreTwin.tsx`, with `mockKit(page, 'network-unavailable')` forcing the Kit-unavailable branch.
+- The single test body performs, serially: cold dev-server route load, a `networkidle` wait, a **full axe `color-contrast` pass over the whole DOM**, then `probeFocusIndicators` which awaits **one `requestAnimationFrame` per element for up to 12 elements** inside a single `page.evaluate`.
+- The probe has **no per-element deadline and no rAF fallback**. If any single `rAF` is delayed (long frame from the twin surface, or a frame that never schedules), the whole `evaluate` hangs with **no evidence of which element stalled**.
 
-`src/supervisor/learning/lessonTypes.ts`
-- `AuraLesson`: `id`, `version`, `title`, `status: 'draft' | 'active' | 'retired'`, `origin: 'confirmed-miss' | 'review'`, `invariant` (the shared rule), `guidance` (the injectable text), `citations`, `dataClass: 'reviewed-lesson'`, `reviewedBy`, `reviewedAt`, `supersedes`.
-- Hard rule in the type docs and enforced by the registry: a lesson may only add guidance text. It carries no code, no tool, no model selection, no policy or schema change.
+### Mechanism (stated honestly)
+Two mechanisms are in play and only the first is proven from the code:
+1. **Proven — harness budget asymmetry.** The heaviest public surface runs the full contrast + focus audit under a 20 s cap while lighter authed surfaces get 60 s, on top of cold dev compilation (Failure 1's mechanism).
+2. **Unconfirmed — a stalled/long frame inside the probe.** The timeout landed inside `page.evaluate`, but the probe emits nothing on stall, so we cannot currently name the element or distinguish "slow frames" from "rAF never fired". **Do not assert a product defect until step 1 below produces the evidence.**
 
-`src/supervisor/learning/lessonRegistry.ts`
-- Frozen array of lessons, `activeLessons()`, `lessonById()`, integrity check mirroring `verifyCorpusIntegrity` (stable hash over the frozen set).
-- Seeded with exactly two lessons derived from the proven fixes:
-  - `viewport-evidence-exact-tuple.v1` — viewport evidence is accepted only as a complete canonical tuple keyed by a registered surface id; mixed or unknown tuples are rejected, grounded values are copied from the registry.
-  - `run-id-untrusted-locator.v1` — a client-supplied run id is a locator only; provenance requires an RLS-scoped read; `run: null` means the page shows no run, never that the database holds none.
+### Smallest fix that preserves the visible-focus invariant
+1. **Instrument first (evidence, not a workaround).** Make the probe fail *loudly* instead of hanging: give each element a bounded wait implemented as `Promise.race([rAF, setTimeout(budget)])`, and when the fallback wins record `{ selector, reason: 'focus frame did not commit within Nms' }` as a **failure**, plus attach per-element elapsed timings. Sample count stays 12; no assertion is weakened — a stall becomes a named, blocking failure with a selector.
+2. **Re-run the isolated `data-centre-twin (demo)` case** on port 8094-class isolation and read the named stall.
+3. **Then fix the proven owner**: if a specific control on the twin surface stalls the frame (canvas/telemetry work, or `focus()` triggering scroll into a heavy subtree), fix that component; if the run shows only cumulative slowness with all 12 elements committing, the residual cause is cold dev compilation and it is resolved by serving this suite consistently (same artifact question as Failure 1) — not by raising the timeout.
+4. Do **not** add `test.setTimeout(60_000)` to the public block as the fix. It may be added only after step 3 proves the surface is genuinely heavier work rather than stalled work, and then as an explicit, commented parity with the authed block.
 
-### B. Executable evaluation cases (extend the existing runner pattern)
+Explicitly **not** doing: reducing `max` samples, skipping the surface, `waitForTimeout` padding, or converting the assertion to a warning.
 
-`src/supervisor/evals/supervisor-truth-evals.json` + `src/supervisor/evals/runSupervisorTruthEvals.ts`
-- Case kinds: `viewport-claim`, `run-provenance`, `lesson-integrity`, `redaction`, `provenance-record`.
-- Cases assert against the pure functions already in `assistantTruth.ts` (canonical surface acceptance/rejection, `extractCandidateRunId` malformed → null, null-run wording) plus the new modules below.
-- Data class stays `synthetic-evaluation-data`; no telemetry, no tenant rows.
-- Wired into `tests/unit` so `verify:fast` runs it.
+### Predictive defect family (analogous consumers)
+The un-instrumented `await new Promise((r) => requestAnimationFrame(...))`-inside-`evaluate` pattern is duplicated in five specs, each able to hang the same way:
+- `tests/truth-in-ui/axe-contrast-focus.spec.ts:190`
+- `tests/truth-in-ui/radix-overlay-focus-rings.spec.ts:88,102`
+- `tests/truth-in-ui/command-palette-focus-rings.spec.ts:111,160,180,191`
+- `tests/truth-in-ui/overlay-focus-rings.spec.ts:101`
+- `tests/truth-in-ui/dsx-keyboard-focus.spec.ts:63`
+- also `tests/truth-in-ui/_setup/card-activation.ts:76,156` (rAF polling loops)
 
-### C. Response provenance record (shape only, no persistence)
+Consolidation: extract one shared helper `tests/truth-in-ui/_setup/focus-probe.ts` exporting the bounded frame wait (and, if the diff stays small, the whole `probeFocusIndicators`), and have all five specs import it. One mechanism, one place, so the next stall is self-describing everywhere.
 
-`supabase/functions/_shared/responseProvenance.ts`
-- `AssistantResponseProvenance`: `provider`, `model`, `modelVersion`, `policyVersion`, `promptVersion`, `lessonIds[]`, `path: 'truth' | 'model'`, `latencyMs`, `tokens?: { input?: number; output?: number }`, `limitations[]`.
-- `buildResponseProvenance()` pure builder; unknown fields stay `null` and are reported as unavailable, never inferred.
-- Availability rule encoded: a configured model id is not evidence the model is available, healthy or production-ready.
-- `copilot-stream` change is limited to constructing this record and emitting it as one additional SSE event (`{ type: 'provenance', data }`) after the answer. No behavioral change to the truth path, no new request fields, no CORS/JWT/RLS change. Client rendering is optional and out of Phase 1.
-
-### D. Model routing policy (provider-neutral, server-owned)
-
-`supabase/functions/_shared/modelPolicy.ts`
-- Named policies (`truth-grounding`, `general-assistant`) → a profile of `ai-client.ts`, with `policyVersion` and `promptVersion` constants.
-- Resolution stays server-side; no client-supplied model id is ever read. `ai-client.ts` itself is unchanged.
-
-### E. Feedback candidate contract (no table yet)
-
-`src/supervisor/learning/feedbackContract.ts`
-- `FeedbackCandidate`: `consent: true` required by the type, `responseProvenanceRef`, `verdict`, `redactedNote`, `dataClass: 'consented-feedback-candidate'`, `retentionDays`, `deletionRequestedAt`.
-- `redactFeedbackText()`: allowlist-shaped redaction removing emails, bearer/JWT-shaped strings, UUIDs, keys, URLs with credentials, and any free-form remainder beyond a bounded length; returns the redacted string plus the list of redaction reasons.
-- Explicit contract: a candidate is never runtime input. Promotion to a lesson requires human review through section A.
-
-### F. Approved-lesson retrieval
-
-`src/supervisor/learning/lessonRetrieval.ts` (pure) and a mirrored read in `_shared`
-- Only `status: 'active'` lessons may be selected; retrieval returns ids so they land in the provenance record.
-- Injection point is the system-prompt preamble only, and always after the deterministic truth envelope, so the truth path keeps precedence.
-
-### G. Promotion and rollout contract
-
-`src/supervisor/learning/promotionContract.ts`
-- `PromotionCandidate`: baseline ref, candidate ref, prompt/policy/lesson deltas.
-- Mandatory gates: truth suite, authorization/tenant isolation, provenance suite, typecheck, lint, architecture governance, schema truth, build.
-- Regression thresholds: zero truth-case regressions, zero authorization regressions, no drop in grounded-citation rate.
-- `evaluatePromotion()` returns `blocked` with reasons unless every gate passes; result object is immutable evidence (frozen, hashable).
-- Rollout metadata: stage, percentage, rollback target, approver — recorded, not executed.
-
-## Non-goals for Phase 1
-
-Persisted feedback, lesson-authoring UI, embeddings/vector retrieval, automated model switching, any navigation or route change, any deployment.
-
-## Affected surfaces
-
-- Personas: platform admin / engineering reviewer (lesson + promotion authorship). No tenant-persona-visible change.
-- Routes/navigation: none.
-- Components: none required; `src/lib/copilot/streaming.ts` may ignore the new SSE event without change.
-- Edge Functions: `copilot-stream` only (additive provenance event), plus three new `_shared` modules.
-- Tables/policies: none in Phase 1.
-- Secrets: none.
+## Affected files
+- `playwright.truth.config.ts` (add `testIgnore` for the perf spec)
+- `playwright.perf.config.ts` (new)
+- `package.json` (`test:perf` script)
+- `tests/truth-in-ui/_setup/focus-probe.ts` (new shared bounded-frame helper)
+- `tests/truth-in-ui/axe-contrast-focus.spec.ts`, `radix-overlay-focus-rings.spec.ts`, `command-palette-focus-rings.spec.ts`, `overlay-focus-rings.spec.ts`, `dsx-keyboard-focus.spec.ts` (import the helper)
+- Product files: **none yet** — only if step 2 of Failure 2 names a component.
 
 ## Rollback
+Every change is test-harness scoped and additive: revert the branch. `playwright.truth.config.ts` returns to running the perf spec inline; the specs return to their inline rAF waits. No product, schema, auth, route, CORS, provenance or release-fingerprint surface is touched, so there is no runtime rollback.
 
-Everything is additive and code-only. Rollback is reverting the branch; the sole runtime-visible element is one extra SSE event, and `copilot-stream` is not redeployed in Phase 1, so production behavior is unchanged until a separately authorized deploy.
-
-## Qualification commands
-
+## Qualification
 ```
-bun run typecheck
-bun run lint
-bun run verify:architecture-governance
-bun run verify:schema-truth
-bun run test:unit
-bun run build
-bun run verify:fast
+npx tsc -p tsconfig.json --noEmit          # typecheck
+npm run lint
+npm run verify:architecture-governance
+npm run verify:schema-truth
+npm run test:unit
+npm run build                              # + SEO validation
+npm run verify:fast
+npm run test:perf                          # new production-artifact perf gate
+CI=true AURA_TRUTH_PORT=8091 npx playwright test --config=playwright.truth.config.ts --shard=1/4   # then 2/4, 3/4, 4/4
 ```
-Plus the truth lane when the branch is qualified for release: `bun run test:truth`.
-
-## Phase 2 preview (not authorized here)
-
-Additive migrations for `assistant_response_provenance`, `assistant_feedback_candidates`, `assistant_lessons` with per-tenant RLS scoped to authoritative organization membership, explicit GRANTs, retention and deletion jobs, and an admin-only review surface reached through permission-aware account/admin access, not a new global nav entry.
+Each shard runs as a durable background job with an atomic exit file; a timeout, missing browser or unrun shard is BLOCKED, not passed. Report exact passed/failed/skipped counts and durations per shard, and separate pre-existing from new failures.

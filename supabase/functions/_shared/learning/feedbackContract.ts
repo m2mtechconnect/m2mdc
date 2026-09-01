@@ -147,7 +147,7 @@ export function buildFeedbackCandidate(input: FeedbackCandidateInput): FeedbackC
       redactedNote: redaction.text,
       redactionReasons: redaction.reasons,
       dataClass: FEEDBACK_DATA_CLASS,
-      retentionDays,
+      retentionDays: retentionDays as number,
       deletionRequestedAt: null,
       capturedAt: input.capturedAt ?? new Date().toISOString(),
     },

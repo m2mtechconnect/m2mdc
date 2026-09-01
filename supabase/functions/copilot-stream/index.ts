@@ -678,7 +678,8 @@ function generateStructuredResponse(query: string, context: any, response: strin
     });
   }
 
-  // Template/Marketplace suggestions are retired and never emitted.
+  // Retired catalogue suggestion categories are never emitted; the
+  // structured gate (gateStructuredResponse) enforces this fail-closed.
 
   // Generate insights
   if (context.workflowsCount === 0) {

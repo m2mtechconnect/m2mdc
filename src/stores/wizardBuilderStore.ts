@@ -272,7 +272,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           goal: blueprintToUse.description || '',
           industry: blueprintToUse.industry || '',
           department: blueprintToUse.department || '',
-          type: blueprintToUse.type || 'agent', // Default to 'agent' if not specified
+          type: blueprintBuildKind ?? 'agent', // Default to 'agent' if not specified
           template: blueprintToUse.templateId || '',
           workflow: builderState.workflow || initialState.workflow,
           modelConfig: builderState.modelConfig || initialState.modelConfig,

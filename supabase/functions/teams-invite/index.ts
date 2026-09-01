@@ -4,6 +4,11 @@ import { getCorsHeaders } from "../_shared/cors.ts";
 import { callerRejectedResponse, requireCaller } from "../_shared/callerIdentity.ts";
 import { sendOrganizationInviteNotification } from "../_shared/notifications.ts";
 import { enqueueAuraWorkflow } from "../_shared/workflows.ts";
+import {
+  getSupabaseServiceCredential,
+  getSupabaseServiceCredentialKind,
+  createSupabaseServiceClient,
+} from "../_shared/serviceCredential.ts";
 
 const INVITABLE_ROLES = new Set([
   'admin',
@@ -40,6 +45,7 @@ serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
+  let failureStage = 'authentication';
   try {
     const caller = await requireCaller(req);
     const authClient = createClient(
@@ -51,6 +57,7 @@ serve(async (req) => {
     const body = await req.json().catch(() => ({})) as Record<string, unknown>;
     const mode = normalizedMode(body);
 
+    failureStage = 'approval-read';
     const { data: profile, error: profileError } = await authClient
       .from('profiles')
       .select('is_approved')
@@ -74,10 +81,7 @@ serve(async (req) => {
 
       // Privileged client is created only after authentication, approval and
       // the live global platform-owner check all succeed.
-      const serviceClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      );
+      const serviceClient = createSupabaseServiceClient();
 
       if (mode === 'platform_provision') {
         const name = typeof body.name === 'string' ? body.name.trim() : '';
@@ -221,6 +225,7 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'That role cannot be granted through an invite', stage: 'validation' }, 400);
     }
 
+    failureStage = 'active-organization';
     const { data: activeOrgId, error: activeOrgError } = await authClient.rpc('active_org_id');
     if (activeOrgError) throw activeOrgError;
     const orgId = typeof activeOrgId === 'string' ? activeOrgId : '';
@@ -228,6 +233,7 @@ serve(async (req) => {
       return json(corsHeaders, { error: 'Select an organization before inviting members', stage: 'organization' }, 409);
     }
 
+    failureStage = 'membership-read';
     const { data: membership, error: membershipError } = await authClient
       .from('org_memberships')
       .select('role, status')
@@ -248,78 +254,25 @@ serve(async (req) => {
       }, 403);
     }
 
-    const serviceClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
-
-    // Invitations are for adding membership, not for changing an existing
-    // member's role. Role changes go through set_active_org_member_role(), which
-    // applies the tenant-management rules directly and cannot be replayed by an
-    // emailed acceptance token.
-    const [{ data: inviteeProfile, error: inviteeProfileError }, { data: existingInvites, error: existingError }] = await Promise.all([
-      serviceClient.from('profiles').select('user_id').ilike('email', email).limit(1).maybeSingle(),
-      serviceClient
-        .from('team_invites')
-        .select('id, expires_at')
-        .eq('org_id', orgId)
-        .eq('email', email)
-        .eq('status', 'pending')
-        .gt('expires_at', new Date().toISOString())
-        .limit(1),
-    ]);
-    if (inviteeProfileError) throw inviteeProfileError;
-    if (existingError) throw existingError;
-
-    if (inviteeProfile?.user_id) {
-      const { data: inviteeMembership, error: inviteeMembershipError } = await serviceClient
-        .from('org_memberships')
-        .select('status, role')
-        .eq('org_id', orgId)
-        .eq('user_id', inviteeProfile.user_id)
-        .maybeSingle();
-      if (inviteeMembershipError) throw inviteeMembershipError;
-      if (inviteeMembership?.status === 'active') {
-        return json(corsHeaders, {
-          error: 'This account is already an active organization member. Edit the member role in People & Access instead.',
-          stage: 'state',
-        }, 409);
-      }
-    }
-
-    if (existingInvites && existingInvites.length > 0) {
-      return json(corsHeaders, {
-        error: 'An active invitation already exists for this email in the organization',
-        stage: 'state',
-      }, 409);
-    }
-
+    failureStage = 'invite-write';
     const token = crypto.randomUUID();
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    const { data, error } = await serviceClient
-      .from('team_invites')
-      .insert({
-        email,
-        role,
-        invited_by: caller.userId,
-        org_id: orgId,
-        token,
-        expires_at: expiresAt.toISOString(),
-        status: 'pending',
-      })
-      .select('id, email, role, status, invited_by, org_id, expires_at, created_at')
-      .single();
+    const { data: createdInvites, error } = await authClient.rpc('create_org_invite', {
+      _email: email,
+      _role: role,
+      _token: token,
+      _expires_at: expiresAt.toISOString(),
+    });
     if (error) throw error;
+    const data = Array.isArray(createdInvites) ? createdInvites[0] : createdInvites;
+    if (!data?.id) throw new Error('Invitation transaction returned an incomplete result');
 
-    const { data: organization } = await serviceClient
-      .from('organizations')
-      .select('name')
-      .eq('id', orgId)
-      .maybeSingle();
-    const organizationName = typeof organization?.name === 'string' && organization.name.trim()
-      ? organization.name.trim()
+    failureStage = 'organization-read';
+    const organizationName = typeof data.organization_name === 'string' && data.organization_name.trim()
+      ? data.organization_name.trim()
       : 'your organization';
 
+    failureStage = 'notification';
     const notification = await sendOrganizationInviteNotification({
       email,
       organizationName,
@@ -329,6 +282,7 @@ serve(async (req) => {
       inviteId: data.id,
     });
 
+    failureStage = 'workflow';
     const workflow = await enqueueAuraWorkflow({
       name: 'aura/onboarding.invite.created',
       organizationId: orgId,
@@ -350,9 +304,15 @@ serve(async (req) => {
     const rejected = callerRejectedResponse(error, req);
     if (rejected) return rejected;
     console.error('Team invite error:', error);
+    const diagnosticCode = error && typeof error === 'object' && 'code' in error
+      && typeof error.code === 'string'
+      ? error.code
+      : null;
     return json(corsHeaders, {
       error: error instanceof Error ? error.message : 'Failed to process invitation',
-      stage: 'invite',
+      stage: failureStage,
+      diagnosticCode,
+      credentialKind: getSupabaseServiceCredentialKind(),
       requestId: crypto.randomUUID(),
     }, 500);
   }

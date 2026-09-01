@@ -11,9 +11,18 @@ const lifecycle = read('supabase/functions/run-lifecycle/index.ts');
 const store = read('src/workspace/workspaceStore.ts');
 const handoffMigration = read('supabase/migrations/20260901093000_cross_persona_decision_handoff.sql');
 const decisionWriteMigration = read('supabase/migrations/20260901103000_bind_decision_writes_to_active_org.sql');
+const personaReachabilityMigration = read('supabase/migrations/20260901111500_restore_persona_boundary_reachability.sql');
+const twinWriteReachabilityMigration = read('supabase/migrations/20260901122000_restore_twin_write_reachability.sql');
 const dashboard = read('src/workspace/CommandCentre.tsx');
 
 describe('Phase 5 simulation and decision continuity', () => {
+  it('keeps authenticated twin writes reachable only after RLS authorization', () => {
+    expect(twinWriteReachabilityMigration).toContain(
+      'GRANT INSERT, UPDATE, DELETE ON public.data_centre_twins TO authenticated',
+    );
+    expect(twinWriteReachabilityMigration).not.toContain('TO anon');
+  });
+
   it('persists browser simulations as active-org preview evidence only', () => {
     expect(runs).toContain("supabase.functions.invoke('run-lifecycle'");
     expect(runs).toContain("requestedIntent: 'preview'");
@@ -50,6 +59,14 @@ describe('Phase 5 simulation and decision continuity', () => {
     expect(decisionWriteMigration).toContain('GRANT ALL ON public.decision_records TO service_role');
     expect(decisionWriteMigration).not.toMatch(/CREATE POLICY .*FOR INSERT/);
     expect(decisions).toContain("supabase.functions.invoke('record-decision'");
+  });
+
+  it('makes persona authorization records reachable without granting client writes', () => {
+    expect(personaReachabilityMigration).toContain('GRANT SELECT ON public.profiles TO authenticated');
+    expect(personaReachabilityMigration).toContain('GRANT SELECT ON public.org_memberships TO authenticated');
+    expect(personaReachabilityMigration).toContain('GRANT SELECT ON public.organizations TO authenticated');
+    expect(personaReachabilityMigration).not.toMatch(/GRANT (?:INSERT|UPDATE|DELETE|ALL)/);
+    expect(personaReachabilityMigration).not.toContain(' TO anon');
   });
 
   it('derives decision tenant and authority server-side', () => {

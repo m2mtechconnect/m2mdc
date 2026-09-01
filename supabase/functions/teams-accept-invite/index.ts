@@ -48,63 +48,35 @@ serve(async (req) => {
     const token = typeof body?.token === 'string' ? body.token.trim() : '';
     if (!token) return json({ error: 'An invite token is required', stage: 'validation' }, 400);
 
-    // The recipient is authenticated before the privileged client is created.
-    // The service client is then used only to resolve the opaque invite token
-    // and execute the service-role-only transactional acceptance RPC.
-    const serviceClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-    );
-
-    const { data: invite, error: inviteError } = await serviceClient
-      .from('team_invites')
-      .select('id, email, role, status, invited_by, org_id, expires_at')
-      .eq('token', token)
-      .maybeSingle();
-
-    if (inviteError) throw inviteError;
-    if (!invite) return json({ error: 'This invite is not valid', stage: 'lookup' }, 404);
-
-    if (invite.status !== 'pending') {
-      return json({ error: `This invite has already been ${invite.status}`, stage: 'state' }, 409);
-    }
-
-    if (new Date(invite.expires_at).getTime() <= Date.now()) {
-      await serviceClient.from('team_invites').update({ status: 'expired' }).eq('id', invite.id);
-      return json({ error: 'This invite has expired', stage: 'state' }, 410);
-    }
-
-    if (!invite.org_id) {
-      return json({ error: 'This legacy invite is not organization-bound', stage: 'organization' }, 409);
-    }
-
-    const claimEmail = String(user.email ?? '').trim().toLowerCase();
-    if (!claimEmail || claimEmail !== String(invite.email).trim().toLowerCase()) {
-      return json({ error: 'This invite was issued to a different account', stage: 'authorization' }, 403);
-    }
-
-    if (!INVITABLE_ROLES.has(String(invite.role))) {
-      return json({ error: 'That role cannot be granted through an invite', stage: 'authorization' }, 403);
-    }
-
-    const { data: orgId, error: acceptError } = await serviceClient.rpc('accept_org_invite', {
-      _invite_id: invite.id,
-      _user_id: user.id,
+    const { data: acceptedInvites, error: acceptError } = await authClient.rpc('accept_org_invite_token', {
+      _token: token,
     });
-
     if (acceptError) throw acceptError;
+    const accepted = Array.isArray(acceptedInvites) ? acceptedInvites[0] : acceptedInvites;
+    if (!accepted?.organization_id || !INVITABLE_ROLES.has(String(accepted.invited_role))) {
+      throw new Error('Invitation acceptance returned an incomplete result');
+    }
 
     return json({
       success: true,
-      role: invite.role,
-      organizationId: orgId,
+      role: accepted.invited_role,
+      organizationId: accepted.organization_id,
       redirectTo: '/dashboard',
     });
   } catch (error) {
     console.error('Team invite acceptance error:', error);
+    const diagnosticCode = error && typeof error === 'object' && 'code' in error
+      && typeof error.code === 'string'
+      ? error.code
+      : null;
+    const diagnosticMessage = error && typeof error === 'object' && 'message' in error
+      && typeof error.message === 'string'
+      ? error.message
+      : null;
     return json({
-      error: error instanceof Error ? error.message : 'Failed to accept invite',
+      error: diagnosticMessage ?? (error instanceof Error ? error.message : 'Failed to accept invite'),
       stage: 'accept',
+      diagnosticCode,
       requestId: crypto.randomUUID(),
     }, 500);
   }

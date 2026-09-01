@@ -76,11 +76,26 @@ contract:
 5. Unverified browser previews may be rejected or escalated but cannot be
    approved. The trusted `record-decision` boundary remains authoritative for
    identity, tenant, role and immutable evidence fields.
+6. Identity, organization and membership reads require explicit read-only
+   table grants as well as RLS. Those grants make the authorization records
+   reachable; all client writes remain behind guarded server/RPC boundaries.
+7. Invitation replay must reassert column-scoped metadata reads and a
+   service-role-only token/write boundary; migration history alone is not proof
+   that deployed table privileges still match that contract.
+8. Ordinary organization invitation creation and acceptance execute as
+   authenticated, actor-bound database transactions. They recheck active
+   organization, membership role, recipient email, duplicate state and role
+   elevation atomically; Edge orchestration does not receive blanket table
+   authority for this journey.
+9. An RLS policy is not a reachable product capability until its matching table
+   privilege is also present. Exact-head qualification must exercise the real
+   write—not merely assert that the policy text exists.
 
-This invariant is covered by unit, behaviour and isolated browser tests. It is
-not yet proof that the new migration and updated Edge Function are deployed or
-that two real identities can complete the journey against live RLS. That is the
-next controlled qualification step.
+This invariant is covered by unit and behaviour tests and by a disposable live
+Supabase qualification: an Engineer created a tenant run, a Manager read and
+decided it, direct decision insertion was denied, and membership suspension
+removed both read and decision authority. Production deployment remains a
+separate explicit release gate.
 
 ## Golden journeys to qualify
 

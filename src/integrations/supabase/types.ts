@@ -7429,6 +7429,13 @@ export type Database = {
         Args: { _invite_id: string; _user_id: string }
         Returns: string
       }
+      accept_org_invite_token: {
+        Args: { _token: string }
+        Returns: {
+          invited_role: string
+          organization_id: string
+        }[]
+      }
       active_org_id: { Args: never; Returns: string }
       admin_assign_role: {
         Args: {
@@ -7489,6 +7496,41 @@ export type Database = {
       consume_public_intake_quota: {
         Args: { _bucket_key: string; _intake_kind: string; _limit: number }
         Returns: boolean
+      }
+      create_facility_setup: {
+        Args: {
+          _capacity_kw: number
+          _city: string
+          _country: string
+          _name: string
+          _province: string
+          _region_code: string
+          _source?: string
+          _tier: string
+        }
+        Returns: {
+          location_id: string
+          twin_id: string
+        }[]
+      }
+      create_org_invite: {
+        Args: {
+          _email: string
+          _expires_at: string
+          _role: string
+          _token: string
+        }
+        Returns: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          org_id: string
+          organization_name: string
+          role: string
+          status: string
+        }[]
       }
       current_tenant_id: { Args: never; Returns: string }
       delete_secret_from_vault: {

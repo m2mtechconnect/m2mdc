@@ -18,9 +18,11 @@
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createHandler } from "../_shared/handler.ts";
 import { CANONICAL_SCHEMA_VERSION, canonicalHash } from "../_shared/canonicalHash.ts";
+import {
+  createSupabaseServiceClient,
+} from "../_shared/serviceCredential.ts";
 
 /** Lifecycle states of the canonical persisted run. */
 export const LIFECYCLE = [
@@ -98,10 +100,7 @@ const TransitionSchema = z.object({
 const InputSchema = z.discriminatedUnion("op", [CreateSchema, TransitionSchema]);
 
 function admin() {
-  return createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+  return createSupabaseServiceClient();
 }
 
 serve(

@@ -1091,7 +1091,7 @@ export function DataCenter3DScene(props: DataCenter3DSceneProps) {
             }}
           >
             <Suspense fallback={null}>
-              {props.compact ? <FrameRateGovernor fps={12} /> : null}
+              {props.compact ? <FrameRateGovernor fps={12} paused={reducedMotion} /> : null}
               <Scene 
                 {...props} 
                 racks={racks}

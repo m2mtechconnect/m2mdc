@@ -25,6 +25,23 @@
 
 export const COMPONENT_TAGGER_DISABLE_FLAG = 'AURA_DISABLE_COMPONENT_TAGGER';
 
+/**
+ * `lovable-tagger` (1.3.3) defaults BOTH of its features to
+ * `process.env.LOVABLE_DEV_SERVER === 'true'`, so a plugin the AURA policy
+ * selected can still silently no-op outside Lovable's own dev server. That
+ * makes local development and the negative reproduction gate depend on a
+ * hidden vendor precondition. We therefore declare the activation options
+ * EXPLICITLY instead of inheriting vendor defaults.
+ */
+export const LOVABLE_DEV_SERVER_FLAG = 'LOVABLE_DEV_SERVER';
+
+export interface ComponentTaggerOptions {
+  /** JSX source tagging: always on whenever the AURA policy enabled the plugin. */
+  jsxSource: boolean;
+  /** Tailwind-config feature: only inside Lovable's own dev server. */
+  tailwindConfig: boolean;
+}
+
 export function shouldEnableComponentTagger(
   mode: string,
   env: Record<string, string | undefined> = process.env,
@@ -33,3 +50,23 @@ export function shouldEnableComponentTagger(
   const raw = env[COMPONENT_TAGGER_DISABLE_FLAG];
   return raw === undefined || raw.trim() === '';
 }
+
+export function isLovableDevServer(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  return env[LOVABLE_DEV_SERVER_FLAG] === 'true';
+}
+
+/**
+ * Explicit options for an ENABLED tagger. Callers must only use this when
+ * `shouldEnableComponentTagger` returned true.
+ */
+export function componentTaggerOptions(
+  env: Record<string, string | undefined> = process.env,
+): ComponentTaggerOptions {
+  return {
+    jsxSource: true,
+    tailwindConfig: isLovableDevServer(env),
+  };
+}
+

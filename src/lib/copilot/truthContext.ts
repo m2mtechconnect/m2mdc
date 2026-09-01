@@ -15,6 +15,13 @@ import { viewportSurface, type ViewportSurface } from '@/workspace/viewportRegis
 
 export const FACILITY_TRUTH_SCHEMA = 'aura.facility-truth.v1';
 
+/**
+ * Run identity as shown on the current page. The server treats `id` as an
+ * UNTRUSTED LOCATOR only: provenance is re-verified against the platform
+ * database through the caller's RLS-scoped session before any grounded run
+ * claim, and an explicit `run: null` only states that the current page shows
+ * no run - never that no database run exists.
+ */
 export interface FacilityTruthRun {
   id: string;
   calculatedAt: string | null;
@@ -41,7 +48,10 @@ export interface FacilityTruthContext {
   mode: typeof ACTIVE_MODE;
   inputClassification: typeof INPUT_CLASSIFICATION;
   source: typeof SIMULATION_SOURCE;
-  /** Persisted run identity, or null when no run has been recorded. */
+  /**
+   * Run identity shown on the current page, or null when the page shows no
+   * run. Server-verified before it can ground any provenance claim.
+   */
   run: FacilityTruthRun | null;
   /** The viewport surface evidence for the active page, when one exists. */
   viewport: FacilityTruthViewport | null;

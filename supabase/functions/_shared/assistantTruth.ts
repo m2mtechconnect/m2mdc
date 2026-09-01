@@ -117,24 +117,60 @@ export const SERVER_READINESS_BASELINE = {
 };
 
 /* ------------------------------------------------------------------ *
- * Viewport evidence whitelist
+ * Canonical viewport surface allowlist
  *
- * Mirror of src/workspace/viewportRegistry.ts. A client-supplied viewport
- * claim is accepted ONLY when its renderer, disclosure and limitation all
- * match this server-known set; anything else is rejected as ungrounded.
- * tests/unit/assistant-truth-grounding-contract.test.ts keeps the mirror in
- * sync with the registry.
+ * Exact mirror of src/workspace/viewportRegistry.ts, keyed by the canonical
+ * surface id. A client-supplied viewport claim is accepted ONLY when its id
+ * names a canonical record AND its renderer, disclosure and limitation match
+ * that record exactly as a tuple. An unknown id, or a tuple mixed across
+ * surfaces, is rejected as ungrounded - individually-valid strings are never
+ * enough. tests/unit/assistant-truth-grounding-contract.test.ts keeps this
+ * mirror in exact per-record sync with the registry.
  * ------------------------------------------------------------------ */
 
 export const ALLOWED_VIEWPORT_RENDERERS = ['svg-2d', 'three-webgl'] as const;
 export type AllowedViewportRenderer = (typeof ALLOWED_VIEWPORT_RENDERERS)[number];
 
-export const ALLOWED_VIEWPORT_DISCLOSURES: readonly string[] = [
-  'Procedural 3D preview, except one canary rack rendered from a validated USD-derived GLB',
-  'Procedural 2D floor plan of the modelled design',
+export interface CanonicalViewportSurface {
+  id: string;
+  renderer: AllowedViewportRenderer;
+  disclosure: string;
+  limitation: string | null;
+}
+
+const GLB_CANARY_DISCLOSURE =
+  'Procedural 3D preview, except one canary rack rendered from a validated USD-derived GLB';
+
+export const CANONICAL_VIEWPORT_SURFACES: readonly CanonicalViewportSurface[] = [
+  {
+    id: 'workspace-model-viewport',
+    renderer: 'three-webgl',
+    disclosure: GLB_CANARY_DISCLOSURE,
+    limitation: null,
+  },
+  {
+    id: 'command-centre-plan-card',
+    renderer: 'svg-2d',
+    disclosure: 'Procedural 2D floor plan of the modelled design',
+    limitation: 'Not a validated OpenUSD stage',
+  },
+  {
+    id: 'overview-mini-preview',
+    renderer: 'three-webgl',
+    disclosure: GLB_CANARY_DISCLOSURE,
+    limitation: null,
+  },
+  {
+    id: 'twin-visualization-layout',
+    renderer: 'three-webgl',
+    disclosure: GLB_CANARY_DISCLOSURE,
+    limitation: null,
+  },
 ];
 
-export const ALLOWED_VIEWPORT_LIMITATIONS: readonly string[] = ['Not a validated OpenUSD stage'];
+export function canonicalViewportSurface(id: string): CanonicalViewportSurface | null {
+  return CANONICAL_VIEWPORT_SURFACES.find((s) => s.id === id) ?? null;
+}
 
 /* ------------------------------------------------------------------ *
  * Evidence envelope
@@ -163,10 +199,15 @@ export interface FacilityEvidenceEnvelope {
   /** Context capture time, when the client supplied a parseable one. */
   freshness: { observedAt: string | null; grounded: boolean };
   run: {
-    /** True when the context carried a structured run field (even "none"). */
+    /**
+     * True when structured run evidence exists: either a server-verified
+     * record, or an explicit client "run: null" (the page shows no run).
+     */
     grounded: boolean;
-    /** True when a run identity actually exists. */
+    /** True ONLY when a server-verified simulation_runs record exists. */
     recorded: boolean;
+    /** True ONLY when the record came from the RLS-scoped server lookup. */
+    verified: boolean;
     id: string | null;
     status: string | null;
     calculatedAt: string | null;
@@ -182,8 +223,10 @@ export interface FacilityEvidenceEnvelope {
     citation: EvidenceCitation;
   };
   visualization: {
-    /** True only when the client supplied a whitelisted viewport record. */
+    /** True only when the claim matched one exact canonical surface tuple. */
     grounded: boolean;
+    /** The accepted canonical surface id (registry locator), when grounded. */
+    surfaceId: string | null;
     renderer: AllowedViewportRenderer | null;
     disclosure: string | null;
     limitation: string | null;
@@ -213,12 +256,60 @@ function isParseableIso(v: unknown): v is string {
   return typeof v === 'string' && !Number.isNaN(Date.parse(v));
 }
 
+/* ------------------------------------------------------------------ *
+ * Run provenance verification
+ * ------------------------------------------------------------------ */
+
+export const RUN_ID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * Minimal server-verified provenance for one simulation run. Produced ONLY by
+ * the RLS-scoped lookup against public.simulation_runs in the edge function;
+ * never constructed from client input. Deliberately excludes tenant and user
+ * fields so nothing tenant-scoped can leak into an assistant answer.
+ */
+export interface VerifiedRunRecord {
+  id: string;
+  status: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+}
+
+/**
+ * Extract a candidate run id from the untrusted request context. The result
+ * is a LOCATOR ONLY: it must be verified against public.simulation_runs
+ * through the caller's RLS-scoped client before it can ground any claim.
+ * Malformed ids fail closed to null.
+ */
+export function extractCandidateRunId(context: unknown): string | null {
+  const ctx = isRecord(context) ? context : {};
+  const ft = isRecord(ctx.facilityTruth) ? ctx.facilityTruth : null;
+  const fromTruth = ft && isRecord(ft.run) ? asString(ft.run.id, 80) : null;
+  const fromSimulation = isRecord(ctx.simulationRun) ? asString(ctx.simulationRun.runId, 80) : null;
+  const candidate = fromTruth ?? fromSimulation;
+  if (!candidate || !RUN_ID_PATTERN.test(candidate)) return null;
+  return candidate.toLowerCase();
+}
+
+function isVerifiedRunRecord(v: unknown): v is VerifiedRunRecord {
+  return isRecord(v) && typeof v.id === 'string' && RUN_ID_PATTERN.test(v.id);
+}
+
 /**
  * Build the server-owned evidence envelope from an untrusted request context.
- * Structured fields are read through whitelists; free prose is never treated
- * as proof, and no client field can upgrade a server baseline fact.
+ * Structured fields are read through exact server-known allowlists; free
+ * prose is never treated as proof, and no client field can upgrade a server
+ * baseline fact.
+ *
+ * `verifiedRun` is the ONLY path to `run.recorded === true`. It must be the
+ * result of the RLS-scoped public.simulation_runs lookup performed by the
+ * edge function; a client-supplied run id on its own never becomes
+ * provenance.
  */
-export function buildFacilityEvidenceEnvelope(context: unknown): FacilityEvidenceEnvelope {
+export function buildFacilityEvidenceEnvelope(
+  context: unknown,
+  verifiedRun: VerifiedRunRecord | null = null,
+): FacilityEvidenceEnvelope {
   const ctx = isRecord(context) ? context : {};
   const ft = isRecord(ctx.facilityTruth) ? ctx.facilityTruth : null;
   const rejected: string[] = [];
@@ -242,68 +333,92 @@ export function buildFacilityEvidenceEnvelope(context: unknown): FacilityEvidenc
     }
   }
 
-  // Run provenance. Grounded when the context carries a structured run field,
-  // including the explicit "no run recorded" case (run: null).
+  // Run provenance. `recorded` comes ONLY from a server-verified
+  // simulation_runs record (RLS-scoped lookup in the edge function, passed in
+  // as `verifiedRun`). A client-supplied run id is an untrusted locator and
+  // fails closed to not-verified / no-grounding on its own. An explicit
+  // client `run: null` grounds only the page-level statement that the current
+  // AURA page shows no run - never proof about the database.
   let run: FacilityEvidenceEnvelope['run'];
-  const noRunCitation: EvidenceCitation = {
-    surface: 'Run provenance',
-    field: 'Simulation run',
-    value: 'None recorded',
-  };
-  if (ft && isRecord(ft.run) && asString(ft.run.id, 80)) {
+  const candidateRunId = extractCandidateRunId(ctx);
+  const clientClaimsRunId = Boolean(
+    (ft && isRecord(ft.run) && asString(ft.run.id, 80)) ||
+      (isRecord(ctx.simulationRun) && asString(ctx.simulationRun.runId, 80)),
+  );
+  const verifiedMatchesContext =
+    isVerifiedRunRecord(verifiedRun) &&
+    (!clientClaimsRunId ||
+      (candidateRunId !== null && verifiedRun.id.toLowerCase() === candidateRunId));
+  if (isVerifiedRunRecord(verifiedRun) && !verifiedMatchesContext) {
+    rejected.push('run provenance rejected: verified record does not match the context run id');
+  }
+  if (isVerifiedRunRecord(verifiedRun) && verifiedMatchesContext) {
     run = {
       grounded: true,
       recorded: true,
-      id: asString(ft.run.id, 80),
-      status: asString(ft.run.status, 40),
-      calculatedAt: isParseableIso(ft.run.calculatedAt) ? ft.run.calculatedAt : null,
-      persistence: asString(ft.run.persistence, 80),
+      verified: true,
+      id: verifiedRun.id,
+      status: verifiedRun.status ?? null,
+      calculatedAt: isParseableIso(verifiedRun.finishedAt)
+        ? verifiedRun.finishedAt
+        : isParseableIso(verifiedRun.startedAt)
+          ? verifiedRun.startedAt
+          : null,
+      persistence: 'Server-verified simulation run record',
       citation: {
         surface: 'Run provenance',
-        field: 'Simulation run',
-        value: asString(ft.run.id, 80) as string,
+        field: 'Server-verified simulation run',
+        value: verifiedRun.id,
       },
+    };
+  } else if (clientClaimsRunId) {
+    rejected.push('run provenance rejected: client-supplied run id is not server-verified');
+    run = {
+      grounded: false,
+      recorded: false,
+      verified: false,
+      id: null,
+      status: null,
+      calculatedAt: null,
+      persistence: null,
+      citation: { surface: 'Run provenance', field: 'Simulation run', value: 'Not verified' },
     };
   } else if (ft && 'run' in ft && (ft.run === null || ft.run === undefined)) {
     run = {
       grounded: true,
       recorded: false,
+      verified: false,
       id: null,
       status: null,
       calculatedAt: null,
       persistence: null,
-      citation: noRunCitation,
-    };
-  } else if (isRecord(ctx.simulationRun) && asString(ctx.simulationRun.runId, 80)) {
-    run = {
-      grounded: true,
-      recorded: true,
-      id: asString(ctx.simulationRun.runId, 80),
-      status: asString(ctx.simulationRun.status, 40),
-      calculatedAt: isParseableIso(ctx.simulationRun.startedAt) ? ctx.simulationRun.startedAt : null,
-      persistence: 'Simulation context',
       citation: {
-        surface: 'Simulation run panel',
-        field: 'Run ID',
-        value: asString(ctx.simulationRun.runId, 80) as string,
+        surface: 'Run provenance',
+        field: 'Simulation run',
+        value: 'None shown on this page',
       },
     };
   } else {
     run = {
       grounded: false,
       recorded: false,
+      verified: false,
       id: null,
       status: null,
       calculatedAt: null,
       persistence: null,
-      citation: noRunCitation,
+      citation: { surface: 'Run provenance', field: 'Simulation run', value: 'No grounding' },
     };
   }
 
-  // Visualization: accepted only when every field matches the server-known
-  // viewport registry mirror. A non-matching claim is rejected, not softened.
+  // Visualization: accepted only when the claim names a canonical surface id
+  // AND matches that record's exact (id, renderer, disclosure, limitation)
+  // tuple. Unknown ids and cross-surface tuples are rejected, not softened,
+  // and the grounded values are copied from the canonical record - never
+  // echoed from the client strings.
   let visualization: FacilityEvidenceEnvelope['visualization'] = {
     grounded: false,
+    surfaceId: null,
     renderer: null,
     disclosure: null,
     limitation: null,
@@ -311,29 +426,44 @@ export function buildFacilityEvidenceEnvelope(context: unknown): FacilityEvidenc
     citations: [],
   };
   if (ft && isRecord(ft.viewport)) {
-    const renderer = asString(ft.viewport.renderer, 40);
-    const disclosure = asString(ft.viewport.disclosure, 200);
-    const limitation = asString(ft.viewport.limitation, 200);
-    const rendererOk = ALLOWED_VIEWPORT_RENDERERS.includes(renderer as AllowedViewportRenderer);
-    const disclosureOk = disclosure !== null && ALLOWED_VIEWPORT_DISCLOSURES.includes(disclosure);
-    const limitationOk = limitation === null || ALLOWED_VIEWPORT_LIMITATIONS.includes(limitation);
-    if (rendererOk && disclosureOk && limitationOk) {
-      const citations: EvidenceCitation[] = [
-        { surface: 'Facility viewport', field: 'Disclosure', value: disclosure as string },
-      ];
-      if (limitation) {
-        citations.push({ surface: 'Facility viewport', field: 'Limitation', value: limitation });
-      }
-      visualization = {
-        grounded: true,
-        renderer: renderer as AllowedViewportRenderer,
-        disclosure,
-        limitation,
-        validatedOpenUsdStage: false,
-        citations,
-      };
+    const claimedId = asString(ft.viewport.id, 80);
+    const canonical = claimedId ? canonicalViewportSurface(claimedId) : null;
+    if (!canonical) {
+      rejected.push('viewport evidence rejected: unknown surface id');
     } else {
-      rejected.push('viewport evidence rejected: claim does not match the viewport registry');
+      const renderer = asString(ft.viewport.renderer, 40);
+      const disclosure = asString(ft.viewport.disclosure, 200);
+      const limitation = asString(ft.viewport.limitation, 200);
+      const tupleMatches =
+        renderer === canonical.renderer &&
+        disclosure === canonical.disclosure &&
+        limitation === canonical.limitation;
+      if (!tupleMatches) {
+        rejected.push(
+          `viewport evidence rejected: tuple does not match the canonical record for ${canonical.id}`,
+        );
+      } else {
+        const citations: EvidenceCitation[] = [
+          { surface: 'Viewport registry', field: 'Surface', value: canonical.id },
+          { surface: 'Facility viewport', field: 'Disclosure', value: canonical.disclosure },
+        ];
+        if (canonical.limitation) {
+          citations.push({
+            surface: 'Facility viewport',
+            field: 'Limitation',
+            value: canonical.limitation,
+          });
+        }
+        visualization = {
+          grounded: true,
+          surfaceId: canonical.id,
+          renderer: canonical.renderer,
+          disclosure: canonical.disclosure,
+          limitation: canonical.limitation,
+          validatedOpenUsdStage: false,
+          citations,
+        };
+      }
     }
   }
 
@@ -487,18 +617,18 @@ export function renderTruthAnswer(query: string, envelope: FacilityEvidenceEnvel
   }
 
   if (wants('runProvenance') || wants('liveStatus')) {
-    if (envelope.run.recorded && envelope.run.id) {
+    if (envelope.run.recorded && envelope.run.verified && envelope.run.id) {
       const when = envelope.run.calculatedAt ? ` calculated at ${envelope.run.calculatedAt}` : '';
       parts.push(
-        `Result provenance: simulation run ${envelope.run.id}${when} ${formatCitation(envelope.run.citation)}${envelope.run.persistence ? ` (${envelope.run.persistence})` : ''}. Results are simulation output, not measured production telemetry.`,
+        `Result provenance: server-verified simulation run ${envelope.run.id}${when} ${formatCitation(envelope.run.citation)}${envelope.run.persistence ? ` (${envelope.run.persistence})` : ''}. The record was read back from the platform database under the caller's own access rights. Results are simulation output, not measured production telemetry.`,
       );
     } else if (envelope.run.grounded) {
       parts.push(
-        `No simulation run has been recorded ${formatCitation(envelope.run.citation)}, so no result provenance exists yet.`,
+        `The current AURA page shows no run ${formatCitation(envelope.run.citation)}. That statement describes this page context only - it is not proof that no run exists in the database.`,
       );
     } else {
       parts.push(
-        `Run provenance: ${NOT_VERIFIED} - this context did not include a run provenance field, so I cannot confirm whether a run exists (${NO_GROUNDING}).`,
+        `Run provenance: ${NOT_VERIFIED} - this context did not carry a server-verified run record, so I cannot confirm whether a run exists (${NO_GROUNDING}).`,
       );
     }
   }
@@ -679,9 +809,11 @@ export function buildEvidencePreamble(envelope: FacilityEvidenceEnvelope): strin
     `Operating mode: ${envelope.mode} (${envelope.inputClassification}; source: ${envelope.source}).`,
     `Live facility telemetry: not connected, not healthy, not verified.`,
     `Validated OpenUSD stage: none mounted. SimReady-validated assets: none. Accelerated GPU runtime: not connected.`,
-    envelope.run.recorded && envelope.run.id
-      ? `Simulation run on record: ${envelope.run.id}.`
-      : `No simulation run is recorded in this context.`,
+    envelope.run.recorded && envelope.run.verified && envelope.run.id
+      ? `Server-verified simulation run on record: ${envelope.run.id}.`
+      : envelope.run.grounded
+        ? 'The current page context shows no run. That is a page statement, not proof that no database run exists.'
+        : 'No server-verified simulation run is attached to this context.',
     `Production readiness verdict: ${envelope.readiness.productionVerdict}.`,
     '',
     'HARD RULES:',

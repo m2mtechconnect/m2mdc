@@ -90,7 +90,43 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     reviewedAt: '2026-09-01T16:00:00.000Z',
     supersedes: null,
   } as AuraLesson),
+  Object.freeze({
+    id: 'dev-instrumentation-activation-parity.v1',
+    version: 1,
+    title:
+      'Vendor activation preconditions must be declared explicitly in portable qualification',
+    status: 'active',
+    origin: 'confirmed-miss',
+    invariant:
+      'A development-instrumentation plugin must never rely on an undeclared vendor environment precondition. lovable-tagger defaults jsxSource and tailwindConfig to LOVABLE_DEV_SERVER === true, so a plugin the AURA activation policy selected can silently no-op outside the hosted dev server and make a negative reproduction gate environment-dependent. Activation options must therefore be passed explicitly by the build config, and any harness that depends on the instrumentation must declare the same precondition. An environment-only failure may be reclassified only with evidence from an explicit, portable reproduction; it may never be reclassified by console filtering, warning suppression, retries, skips or relaxed assertions. This is governed retrieval and evaluation learning only; it never authorises autonomous model-weight training or self-modification of code, prompts, policies or production configuration.',
+    guidance:
+      'When development-only instrumentation appears to behave differently on two machines or between local development and a qualification gate, check the vendor activation preconditions before concluding anything about the application. State the exact environment variables and options that enable the tooling, pass those options explicitly in the build configuration, and set the same variables in the harness that reproduces the behaviour. Reclassify an environment finding only with an explicit portable reproduction as evidence; never by filtering console output, adding retries or skips, or relaxing an assertion.',
+    citations: [
+      'scripts/componentTaggerPolicy.ts#componentTaggerOptions',
+      'vite.config.ts#componentTaggerOptions',
+      'playwright.tagger-repro.config.ts#LOVABLE_DEV_SERVER',
+      'tests/unit/component-tagger-policy.test.ts',
+      'tests/unit/dev-instrumentation-activation-parity-lesson.test.ts',
+    ],
+    triggers: [
+      'lovable_dev_server',
+      'lovable dev server',
+      'activation parity',
+      'vendor default',
+      'tagger options',
+      'jsxsource',
+      'tailwindconfig',
+      'no-op plugin',
+      'environment precondition',
+      'reproduction gate',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-01T18:00:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
 ]);
+
 
 export const LESSON_REGISTRY: readonly AuraLesson[] = LESSONS;
 

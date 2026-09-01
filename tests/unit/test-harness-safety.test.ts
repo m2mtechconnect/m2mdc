@@ -54,6 +54,20 @@ describe('test harness safety guards', () => {
     }
   });
 
+  it('selects a loopback test backend before imports and creates seed clients lazily', () => {
+    const setup = repositoryFile('tests/setup.ts');
+    const environment = repositoryFile('tests/_setup/safeTestEnvironment.ts');
+    const seeds = repositoryFile('tests/helpers/seedHelpers.ts');
+
+    expect(setup.indexOf('primeSafeTestEnvironment();')).toBeLessThan(
+      setup.indexOf('installLiveBackendGuard();'),
+    );
+    expect(environment).toContain('TEST_SUPABASE_URL: env.TEST_SUPABASE_URL');
+    expect(environment).not.toContain('VITE_SUPABASE_URL: env.VITE_SUPABASE_URL');
+    expect(seeds).toContain('supabase ??= createTestSupabaseClient();');
+    expect(seeds).not.toContain('const supabase = createTestSupabaseClient();');
+  });
+
   it('contains no direct cloud Supabase endpoint in executable E2E tests', () => {
     for (const path of [
       'tests/e2e/auth-security.spec.ts',

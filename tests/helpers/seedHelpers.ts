@@ -9,7 +9,11 @@ import {
   getBrowserTestSession,
 } from './testSupabaseClient';
 
-const supabase = createTestSupabaseClient();
+let supabase: ReturnType<typeof createTestSupabaseClient> | undefined;
+const getSupabase = () => {
+  supabase ??= createTestSupabaseClient();
+  return supabase;
+};
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export interface TestUser {
@@ -54,7 +58,7 @@ export async function createTestUser(email?: string): Promise<TestUser> {
   const userEmail = email || `test-${Date.now()}@example.invalid`;
   const password = `Test-${crypto.randomUUID()}!`;
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await getSupabase().auth.signUp({
     email: userEmail,
     password,
   });
@@ -73,7 +77,7 @@ export async function createTestUser(email?: string): Promise<TestUser> {
  * Signs in a test user
  */
 export async function signInTestUser(email: string, password: string) {
-  const { data, error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await getSupabase().auth.signInWithPassword({
     email,
     password,
   });
@@ -102,7 +106,7 @@ export async function createTestSystems(
     },
   }));
 
-  const { data, error } = await supabase.from('agents').insert(systems).select();
+  const { data, error } = await getSupabase().from('agents').insert(systems).select();
 
   if (error) throw error;
   return data as TestSystem[];
@@ -121,7 +125,7 @@ export async function createTestIntegrations(userId: string, count: number = 3) 
     connect_method: i === 0 ? 'oauth' : 'api_key',
   }));
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('integrations')
     .insert(integrations)
     .select();
@@ -137,7 +141,7 @@ export async function createTestWorkflows(userId: string, systemIds: string[]) {
   const workflows = [];
 
   for (const systemId of systemIds) {
-    const { data: workflow, error: workflowError } = await supabase
+    const { data: workflow, error: workflowError } = await getSupabase()
       .from('workflows')
       .insert({
         system_id: systemId,
@@ -156,7 +160,7 @@ export async function createTestWorkflows(userId: string, systemIds: string[]) {
       { type: 'notify_teams', x: 500, y: 100, config: { channel: 'alerts' } },
     ];
 
-    const { data: createdNodes, error: nodesError } = await supabase
+    const { data: createdNodes, error: nodesError } = await getSupabase()
       .from('workflow_nodes')
       .insert(nodes.map((n) => ({ ...n, workflow_id: workflow.id })))
       .select();
@@ -165,7 +169,7 @@ export async function createTestWorkflows(userId: string, systemIds: string[]) {
 
     // Add edges
     if (createdNodes && createdNodes.length > 1) {
-      await supabase.from('workflow_edges').insert([
+      await getSupabase().from('workflow_edges').insert([
         {
           workflow_id: workflow.id,
           from_node_id: createdNodes[0].id,
@@ -210,7 +214,7 @@ export async function createTestRuns(
     };
   });
 
-  const { data, error } = await supabase.from('agent_runs').insert(runs).select();
+  const { data, error } = await getSupabase().from('agent_runs').insert(runs).select();
 
   if (error) throw error;
   return data;
@@ -227,7 +231,7 @@ export async function createTestKnowledgeSources(userId: string, count: number =
     tags: ['test', `category-${i}`],
   }));
 
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('knowledge_sources')
     .insert(sources)
     .select();
@@ -280,7 +284,7 @@ export async function seedTestEnvironment(
   await createTestKnowledgeSources(user.id, sourcesCount);
 
   // Get templates
-  const { data: templates } = await supabase
+  const { data: templates } = await getSupabase()
     .from('agent_templates')
     .select('*')
     .limit(5);
@@ -322,24 +326,24 @@ export async function cleanupTestData(scope: CleanupTestDataScope) {
     if (agentIds.length === 0) return;
     await assertDeleted(
       'agents',
-      supabase.from('agents').delete().eq('owner_id', userId).in('id', [...agentIds]),
+      getSupabase().from('agents').delete().eq('owner_id', userId).in('id', [...agentIds]),
     );
     return;
   }
 
   // Child workflow and integration records are removed by database cascades.
-  await assertDeleted('workflows', supabase.from('workflows').delete().eq('created_by', userId));
+  await assertDeleted('workflows', getSupabase().from('workflows').delete().eq('created_by', userId));
   await assertDeleted(
     'deployment tracking',
-    supabase.from('deployment_tracking').delete().eq('deployed_by', userId),
+    getSupabase().from('deployment_tracking').delete().eq('deployed_by', userId),
   );
-  await assertDeleted('agent runs', supabase.from('agent_runs').delete().eq('user_id', userId));
-  await assertDeleted('integrations', supabase.from('integrations').delete().eq('user_id', userId));
+  await assertDeleted('agent runs', getSupabase().from('agent_runs').delete().eq('user_id', userId));
+  await assertDeleted('integrations', getSupabase().from('integrations').delete().eq('user_id', userId));
   await assertDeleted(
     'knowledge sources',
-    supabase.from('knowledge_sources').delete().eq('user_id', userId),
+    getSupabase().from('knowledge_sources').delete().eq('user_id', userId),
   );
-  await assertDeleted('agents', supabase.from('agents').delete().eq('owner_id', userId));
+  await assertDeleted('agents', getSupabase().from('agents').delete().eq('owner_id', userId));
 }
 
 /** Creates one agent for an authenticated browser user on the loopback test stack. */

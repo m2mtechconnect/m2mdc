@@ -54,7 +54,14 @@ export interface LessonIntegrityEvalCase {
   expect: { active: boolean; invariantMustMention: string[] };
 }
 
-export type TruthEvalCase =
+export type TruthEvalCase = (
+  | ViewportEvalCase
+  | RunProvenanceEvalCase
+  | NullRunWordingEvalCase
+  | LessonIntegrityEvalCase
+) & { dataClass: typeof TRUTH_EVAL_DATA_CLASS };
+
+type TruthEvalCaseInput =
   | ViewportEvalCase
   | RunProvenanceEvalCase
   | NullRunWordingEvalCase
@@ -63,7 +70,7 @@ export type TruthEvalCase =
 const VALID_UUID = '11111111-2222-4333-8444-555555555555';
 const OTHER_UUID = '99999999-8888-4777-8666-555555555555';
 
-export const TRUTH_EVAL_CASES: readonly TruthEvalCase[] = [
+const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
   {
     id: 'viewport-exact-tuple-accepted',
     kind: 'viewport-claim',
@@ -155,7 +162,11 @@ export const TRUTH_EVAL_CASES: readonly TruthEvalCase[] = [
     query: 'Is this run recorded, and what is its provenance?',
     expect: {
       mustContain: ['shows no run'],
-      mustNotContain: ['no run exists in the database.', 'there are no runs in the database'],
+      mustNotContain: [
+        'there are no runs in the database',
+        'the database contains no run',
+        'no simulation run exists',
+      ],
     },
   },
   {
@@ -173,3 +184,11 @@ export const TRUTH_EVAL_CASES: readonly TruthEvalCase[] = [
     expect: { active: true, invariantMustMention: ['locator', 'rls', 'service role'] },
   },
 ];
+
+/**
+ * Every case is stamped with the synthetic data class: these are authored
+ * fixtures, never telemetry or captured user content.
+ */
+export const TRUTH_EVAL_CASES: readonly TruthEvalCase[] = TRUTH_EVAL_CASE_INPUTS.map(
+  (testCase) => ({ ...testCase, dataClass: TRUTH_EVAL_DATA_CLASS }),
+);

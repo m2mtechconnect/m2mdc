@@ -176,7 +176,7 @@ describe('response provenance', () => {
 describe('consented feedback candidates', () => {
   it('redacts emails, tokens, uuids, credentialed urls and api keys', () => {
     const result = redactFeedbackText(
-      'contact ops@example.com with Bearer abcdefghijklmnop and eyJhbG.ciOiJIUz.zzzz1111 for run 11111111-2222-4333-8444-555555555555 via https://user:secret@host/path key sk-abcdefghijklmnop',
+      'contact ops@example.com with Bearer abcdefghijklmnop and eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjMifQ.c2lnbmF0dXJl for run 11111111-2222-4333-8444-555555555555 via https://user:secret@host/path key sk-abcdefghijklmnop',
     );
     expect(result.text).not.toContain('ops@example.com');
     expect(result.text).not.toContain('secret@host');

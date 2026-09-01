@@ -10,6 +10,7 @@ const endpoint = read('supabase/functions/record-decision/index.ts');
 const lifecycle = read('supabase/functions/run-lifecycle/index.ts');
 const store = read('src/workspace/workspaceStore.ts');
 const handoffMigration = read('supabase/migrations/20260901093000_cross_persona_decision_handoff.sql');
+const decisionWriteMigration = read('supabase/migrations/20260901103000_bind_decision_writes_to_active_org.sql');
 const dashboard = read('src/workspace/CommandCentre.tsx');
 
 describe('Phase 5 simulation and decision continuity', () => {
@@ -40,6 +41,15 @@ describe('Phase 5 simulation and decision continuity', () => {
     expect(handoffMigration.match(/public\.is_org_member\(tenant_id, auth\.uid\(\)\)/g)).toHaveLength(2);
     expect(handoffMigration.match(/tenant_id IS NULL OR tenant_id = user_id/g)).toHaveLength(2);
     expect(handoffMigration).not.toMatch(/FOR (?:INSERT|UPDATE|DELETE|ALL)/);
+  });
+
+  it('keeps decision writes exclusively behind the trusted server boundary', () => {
+    expect(decisionWriteMigration).toContain('DROP POLICY IF EXISTS "decision_records_insert_own"');
+    expect(decisionWriteMigration).toContain('REVOKE INSERT, UPDATE, DELETE ON public.decision_records FROM authenticated, anon');
+    expect(decisionWriteMigration).toContain('GRANT SELECT ON public.decision_records TO authenticated');
+    expect(decisionWriteMigration).toContain('GRANT ALL ON public.decision_records TO service_role');
+    expect(decisionWriteMigration).not.toMatch(/CREATE POLICY .*FOR INSERT/);
+    expect(decisions).toContain("supabase.functions.invoke('record-decision'");
   });
 
   it('derives decision tenant and authority server-side', () => {

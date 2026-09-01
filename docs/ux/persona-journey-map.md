@@ -65,7 +65,9 @@ contract:
    server-validated outcome.
 2. Authorized members of the active organization may read the same completed
    `simulation_runs` and append-only `decision_records`; write authority is not
-   broadened by the tenant read policy.
+   broadened by the tenant read policy. Direct authenticated inserts are
+   revoked; `record-decision` remains the only product write boundary and
+   derives actor, active organization, role and run scope server-side.
 3. Command Center and Simulation hydrate from the same tenant-qualified run
    queue. A decision-queue URL uses `step=decide` and a stable run key, and that
    URL remains authoritative across hydration and reload.

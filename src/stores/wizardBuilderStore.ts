@@ -247,12 +247,13 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         // Create a new draft with blueprint data
         // Note: template_id is only passed if it's a valid UUID
         // Template slugs like "retail_inventory_optimization" are NOT UUIDs
-        const createParams: any = {
-          source: blueprintToUse.source as any,
+        const blueprintBuildKind: BuildKind | null = normalizeBuildKind(blueprintToUse.type);
+        const createParams: Parameters<typeof builderService.create>[0] = {
+          source: blueprintToUse.source,
           goal: blueprintToUse.description,
           industry: blueprintToUse.industry || undefined,
           department: blueprintToUse.department || undefined,
-          type: blueprintToUse.type || undefined,
+          type: blueprintBuildKind ?? undefined,
         };
         
         // Only include template_id if it looks like a UUID (8-4-4-4-12 format)

@@ -1,5 +1,6 @@
 /**
- * Shared, BOUNDED focus-indicator probing for the truth-in-UI suite.
+ * Shared, BOUNDED and FAIL-CLOSED focus-indicator probing for the
+ * truth-in-UI suite.
  *
  * Why this exists: several specs used to `await new Promise((r) =>
  * requestAnimationFrame(() => r(null)))` inside a single
@@ -8,11 +9,18 @@
  * hangs and the test dies on the Playwright timeout with NO evidence of
  * which element stalled.
  *
- * The bounded wait below never hangs: a frame that does not commit
- * within the budget resolves with `committed: false`, which the focus
- * probe records as a NAMED, blocking failure. No assertion is relaxed,
- * no sample is dropped, no timeout is padded — a stall simply becomes
- * self-describing instead of anonymous.
+ * Fail-closed contract (enforced by the in-page helper itself):
+ * `window.__auraWaitForFrame(label, opts)` either RESOLVES with
+ * `{ committed: true }` after a real committed frame, or REJECTS with a
+ * `FrameCommitStallError` naming the stable element/control label, the
+ * frame ordinal (when supplied), the configured bound and the elapsed
+ * time. A missed frame can never be silently ignored by a call site,
+ * because there is no `{ committed: false }` value to ignore — the only
+ * non-committed outcome is a thrown, named error. Call sites either let
+ * that rejection fail the test directly, or catch it and record it as a
+ * named BLOCKING failure (asserted `toEqual([])`), always skipping the
+ * style assertions for the stalled element. No retries, no skips, no
+ * sleeps, no relaxed assertions.
  */
 
 import type { BrowserContext, Page } from '@playwright/test';
@@ -29,33 +37,76 @@ import type { BrowserContext, Page } from '@playwright/test';
  */
 export const FOCUS_FRAME_BUDGET_MS = 1_500;
 
+/** Name carried by the in-page stall rejection. */
+export const FRAME_STALL_ERROR_NAME = 'FrameCommitStallError';
 
-export type FrameResult = { committed: boolean; elapsedMs: number };
+/** The ONLY successful result shape: a committed frame. */
+export type CommittedFrame = { committed: true; elapsedMs: number };
+
+export type FrameWaitOptions = { ordinal?: number; budgetMs?: number };
 
 declare global {
   interface Window {
-    /** Installed by `installFrameBudget`; resolves even if no frame commits. */
-    __auraWaitForFrame?: (budgetMs?: number) => Promise<FrameResult>;
+    /**
+     * Installed by `installFrameBudget`. Resolves `{ committed: true }`
+     * after the next committed frame, or rejects with a
+     * `FrameCommitStallError` that names `label`, the optional frame
+     * `ordinal`, the configured bound and the elapsed time. The label is
+     * REQUIRED so a stall is never anonymous.
+     */
+    __auraWaitForFrame?: (
+      label: string,
+      opts?: FrameWaitOptions,
+    ) => Promise<CommittedFrame>;
   }
 }
 
 const FRAME_BUDGET_INIT = `
 (() => {
   if (window.__auraWaitForFrame) return;
-  window.__auraWaitForFrame = (budgetMs) => new Promise((resolve) => {
-    const budget = typeof budgetMs === 'number' ? budgetMs : ${FOCUS_FRAME_BUDGET_MS};
-    const started = performance.now();
-    let settled = false;
-    let timer = 0;
-    const finish = (committed) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      resolve({ committed, elapsedMs: performance.now() - started });
-    };
-    timer = setTimeout(() => finish(false), budget);
-    requestAnimationFrame(() => finish(true));
-  });
+  window.__auraWaitForFrame = (label, opts) => {
+    const options = opts || {};
+    const budget =
+      typeof options.budgetMs === 'number' ? options.budgetMs : ${FOCUS_FRAME_BUDGET_MS};
+    if (typeof label !== 'string' || label.trim().length === 0) {
+      const err = new Error(
+        '${FRAME_STALL_ERROR_NAME}: __auraWaitForFrame called without a stable element/control label; fail-closed contract requires one',
+      );
+      err.name = '${FRAME_STALL_ERROR_NAME}';
+      return Promise.reject(err);
+    }
+    return new Promise((resolve, reject) => {
+      const started = performance.now();
+      let settled = false;
+      let timer = 0;
+      timer = setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        const elapsed = Math.round(performance.now() - started);
+        const ordinal =
+          typeof options.ordinal === 'number' ? ' (frame ' + options.ordinal + ')' : '';
+        const err = new Error(
+          '${FRAME_STALL_ERROR_NAME}: frame did not commit for "' +
+            label +
+            '"' +
+            ordinal +
+            ' within the configured ' +
+            budget +
+            'ms bound (elapsed ' +
+            elapsed +
+            'ms)',
+        );
+        err.name = '${FRAME_STALL_ERROR_NAME}';
+        reject(err);
+      }, budget);
+      requestAnimationFrame(() => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve({ committed: true, elapsedMs: performance.now() - started });
+      });
+    });
+  };
 })();
 `;
 
@@ -67,13 +118,46 @@ export async function installFrameBudget(target: BrowserContext | Page): Promise
   await target.addInitScript(FRAME_BUDGET_INIT);
 }
 
+/**
+ * Node-side fail-closed wait: awaits `frames` consecutive committed
+ * frames on the page. A stall REJECTS the underlying `page.evaluate`
+ * with the named `FrameCommitStallError` (label + frame ordinal +
+ * bound + elapsed), which fails the calling test immediately — the
+ * result cannot be ignored. Use this instead of inlining
+ * `window.__auraWaitForFrame` calls in spec-level `page.evaluate`s.
+ */
+export async function requireCommittedFrames(
+  page: Page,
+  label: string,
+  frames = 1,
+  budgetMs = FOCUS_FRAME_BUDGET_MS,
+): Promise<void> {
+  await page.evaluate(
+    async ({ label, frames, budget }) => {
+      const waitFrame = window.__auraWaitForFrame;
+      if (!waitFrame) {
+        throw new Error(
+          'focus-probe: window.__auraWaitForFrame is not installed; the bounded frame fixture must run before navigation',
+        );
+      }
+      for (let ordinal = 1; ordinal <= frames; ordinal += 1) {
+        await waitFrame(label, { ordinal, budgetMs: budget });
+      }
+    },
+    { label, frames, budget: budgetMs },
+  );
+}
+
 export type FocusFailure = { selector: string; reason: string };
 
 /**
  * Walks up to `max` focusable elements and asserts each one paints a
  * visible focus indicator (outline, box-shadow or border change) versus
  * its resting state. Returns the failing selectors so CI logs are
- * actionable.
+ * actionable. A frame that does not commit within the budget is
+ * recorded as a named BLOCKING failure for that element (selector,
+ * frame ordinal, bound, elapsed) and its style assertions are skipped —
+ * it can never silently pass.
  */
 export async function probeFocusIndicators(
   page: Page,
@@ -143,19 +227,25 @@ export async function probeFocusIndicators(
     const sample = focusables.slice(0, limit);
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
-    for (const el of sample) {
+    for (let index = 0; index < sample.length; index += 1) {
+      const el = sample[index];
       // Force :focus-visible by simulating keyboard entry.
       el.blur();
       const resting = fingerprint(el);
       // dispatch a keydown to hint focus-visible heuristics in Chromium
       document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
       el.focus({ preventScroll: true });
-      // Bounded paint tick: a frame that never commits is reported, not awaited forever.
-      const frame = await waitForFrame(budget);
-      if (!frame.committed) {
+      // Bounded paint tick: a stall rejects with the named error, which is
+      // recorded as a blocking failure — never awaited forever, never passed.
+      try {
+        await waitForFrame(
+          `${selectorFor(el)} (sample ${index + 1}/${sample.length})`,
+          { ordinal: 1, budgetMs: budget },
+        );
+      } catch (error) {
         failures.push({
           selector: selectorFor(el),
-          reason: `focus frame did not commit within ${budget}ms (waited ${Math.round(frame.elapsedMs)}ms)`,
+          reason: error instanceof Error ? error.message : String(error),
         });
         continue;
       }

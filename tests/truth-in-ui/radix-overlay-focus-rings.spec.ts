@@ -27,6 +27,12 @@ async function probeFocusInside(
       if (!container) {
         return [{ selector: containerSelector, reason: 'overlay container not found' }];
       }
+      const waitFrame = window.__auraWaitForFrame;
+      if (!waitFrame) {
+        throw new Error(
+          'focus-probe: window.__auraWaitForFrame is not installed; the bounded frame fixture must run before navigation',
+        );
+      }
 
       const focusables = Array.from(
         container.querySelectorAll<HTMLElement>(
@@ -82,10 +88,23 @@ async function probeFocusInside(
       const failures: Failure[] = [];
       const sample = focusables.slice(0, limit);
 
-      for (const el of sample) {
+      for (let index = 0; index < sample.length; index += 1) {
+        const el = sample[index];
+        const frameLabel = `${selectorFor(el)} (sample ${index + 1}/${sample.length})`;
         el.blur();
-        // Force paint so any prior focus ring clears.
-        await window.__auraWaitForFrame!();
+        // Force paint so any prior focus ring clears. FAIL-CLOSED: a frame
+        // that does not commit rejects with a named FrameCommitStallError
+        // (label, frame ordinal, bound, elapsed); it is recorded as a
+        // blocking failure and this element's style assertions are skipped.
+        try {
+          await waitFrame(frameLabel, { ordinal: 1 });
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(el),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
         const resting = fingerprint(el);
 
         // Roving-tabindex menuitems (DropdownMenu) reject direct
@@ -99,7 +118,15 @@ async function probeFocusInside(
         ) {
           el.setAttribute('data-highlighted', '');
         }
-        await window.__auraWaitForFrame!();
+        try {
+          await waitFrame(frameLabel, { ordinal: 2 });
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(el),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
 
         if (!el.isConnected) continue;
         const isHighlighted = el.hasAttribute('data-highlighted');

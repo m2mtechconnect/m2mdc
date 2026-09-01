@@ -57,11 +57,17 @@ export default defineConfig({
   webServer: PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command:
-          'VITE_SUPABASE_URL=http://127.0.0.1:54321 ' +
-          'VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key ' +
-          'VITE_OMNIVERSE_KIT_URL=http://kit.aura-truth.local/api ' +
-          `npx vite build && npx vite preview --port ${PORT} --strictPort`,
+        // Cross-platform (Windows cmd + POSIX sh): no inline VAR=value
+        // prefixes in the command — the safe loopback values are passed
+        // via `env`, which Playwright merges over process.env for the
+        // spawned server on every host OS. `&&` chaining is supported by
+        // both cmd.exe and POSIX shells.
+        command: `npx vite build && npx vite preview --port ${PORT} --strictPort`,
+        env: {
+          VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
+          VITE_SUPABASE_PUBLISHABLE_KEY: 'safe-placeholder-anon-key',
+          VITE_OMNIVERSE_KIT_URL: 'http://kit.aura-truth.local/api',
+        },
         url: `http://localhost:${PORT}`,
         reuseExistingServer: !process.env.CI,
         // Covers a cold production build on a shared CI runner.

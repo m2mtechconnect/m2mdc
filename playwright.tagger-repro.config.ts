@@ -74,6 +74,12 @@ export default defineConfig({
       // server always runs the tagger and the flood mechanism stays
       // regression-covered.
       AURA_DISABLE_COMPONENT_TAGGER: '',
+      // Environment parity / defence in depth: lovable-tagger defaults its
+      // features to LOVABLE_DEV_SERVER === 'true'. vite.config.ts now passes
+      // explicit options, but declaring the vendor precondition here keeps
+      // the reproduction portable and self-documenting. No assertion is
+      // relaxed and the tagger stays ON.
+      LOVABLE_DEV_SERVER: 'true',
     },
   },
 });

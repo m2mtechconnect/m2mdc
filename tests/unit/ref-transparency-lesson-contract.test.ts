@@ -44,8 +44,10 @@ describe('ref-transparency lesson registration', () => {
   });
 
   it('the registry version was bumped for the new lesson', () => {
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-01.2');
+    // Bumped again to 2026-09-01.3 when the activation-parity lesson landed.
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-01.3');
   });
+
 
   it('cites the exact policy module, config wiring and both tests', () => {
     const citations = lessonById(LESSON_ID)!.citations;

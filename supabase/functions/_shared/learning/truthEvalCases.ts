@@ -196,7 +196,20 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
       invariantMustMention: ['forwardref', 'instrumentation', 'environment finding', 'filtering'],
     },
   },
+  {
+    id: 'lesson-activation-parity-active',
+    kind: 'lesson-integrity',
+    title: 'The dev-instrumentation activation-parity lesson is active and encodes the mechanism',
+    lessonId: 'dev-instrumentation-activation-parity.v1',
+    expect: {
+      active: true,
+      // Mechanism, not wording: the vendor precondition must be explicit and
+      // an environment finding may only be reclassified with evidence.
+      invariantMustMention: ['lovable_dev_server', 'explicitly', 'evidence', 'filtering'],
+    },
+  },
 ];
+
 
 /**
  * Every case is stamped with the synthetic data class: these are authored

@@ -53,16 +53,27 @@ export default defineConfig({
     },
   }],
   webServer: {
-    // INTENTIONALLY no AURA_DISABLE_COMPONENT_TAGGER: this server must run
-    // the tagger so the flood mechanism stays regression-covered.
-    command:
-      'VITE_SUPABASE_URL=http://127.0.0.1:54321 ' +
-      'VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key ' +
-      `npx vite --port ${PORT} --strictPort`,
+    // Plain, shell-portable command: Windows PowerShell/cmd cannot execute
+    // POSIX inline VAR=value prefixes, so ALL environment for this server
+    // goes through webServer.env below (Playwright merges it over
+    // process.env when spawning the command on every platform).
+    command: `npx vite --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     timeout: 60_000,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      // Safe loopback placeholders only - never real credentials.
+      VITE_SUPABASE_URL: 'http://127.0.0.1:54321',
+      VITE_SUPABASE_PUBLISHABLE_KEY: 'safe-placeholder-anon-key',
+      // INTENTIONALLY tagger-ON: explicitly neutralize any disable flag a
+      // parent shell might have exported. Empty string == absent under
+      // scripts/componentTaggerPolicy.ts (fail-closed policy enables the
+      // tagger only in development with an empty/absent flag), so this
+      // server always runs the tagger and the flood mechanism stays
+      // regression-covered.
+      AURA_DISABLE_COMPONENT_TAGGER: '',
+    },
   },
 });

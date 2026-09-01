@@ -7490,22 +7490,6 @@ export type Database = {
         Args: { _bucket_key: string; _intake_kind: string; _limit: number }
         Returns: boolean
       }
-      create_facility_setup: {
-        Args: {
-          _capacity_kw: number
-          _city: string
-          _country: string
-          _name: string
-          _province: string
-          _region_code: string
-          _source?: string
-          _tier: string
-        }
-        Returns: {
-          location_id: string
-          twin_id: string
-        }[]
-      }
       current_tenant_id: { Args: never; Returns: string }
       delete_secret_from_vault: {
         Args: { vault_id: string }

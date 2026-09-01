@@ -1,97 +1,121 @@
-# Qualification diagnostic — HEAD a448801c (read-only)
+# Phase 1: Governed Machine Learning for the AURA Super Agent
 
-No files were changed, nothing was deployed, published, migrated, or mutated. All findings below come from reading the repository, re-running the verifier locally, and read-only queries against the connected backend.
+Base commit: `ddd6b11a0185808944482c921a1445ad194e214d`. Source-only. No deployment, no publishing, no navigation change, no new globally visible page.
 
-## 1. Exact failing command and assertions
+## Recommendation up front
 
-**Command:** `node scripts/schema-truth/verify-schema-truth.mjs` (invoked by `bun run verify:schema-truth`, which is step 4 of `verify:fast`). Exit code `1`.
+**Ship code-owned contracts first. No database schema and no new API surface in Phase 1.**
 
-**Verdict payload:**
+Reasons:
+- The two truth fixes just proven (canonical viewport tuple, server-verified run id) can be made durable today as versioned lessons plus executable eval cases in code, running inside `test:unit`. That closes the regression risk immediately, with zero backend risk.
+- Every ML control we need to prove (routing provenance, redaction, promotion gates) is a pure function. Proving them as code + tests first means the later migration is written against a contract that is already qualified, not the other way round.
+- A feedback/lesson schema written before the contract is settled becomes an applied migration we are not allowed to edit, and it would introduce user-content storage (the highest-risk element) before the redactor has been proven.
 
-```text
-"verdict": "FAIL",
-"failures": [
-  "generated type checksum drift",
-  "generated function count drift",
-  "generated function name drift"
-]
+Risks accepted by deferring schema: no persisted feedback capture yet, lesson authorship stays a code review action rather than an in-product workflow, and the retrieval path reads from a code-owned registry rather than a table. All three are Phase 2 items and none blocks the durability objective.
+
+## What already exists (do not rebuild)
+
+- LLM transport: `supabase/functions/_shared/ai-client.ts` — server-owned profiles, browser cannot pick a model. `src/lib/llm/modelResolver.ts` is a client-side display/enforcement helper.
+- Deterministic truth path: `supabase/functions/_shared/assistantTruth.ts` (envelope, canonical viewport surfaces, `extractCandidateRunId`, structured gate, preamble) invoked ahead of the model in `supabase/functions/copilot-stream/index.ts`.
+- Per-user memory: `copilot_memory` read/write inside `copilot-stream`.
+- Deterministic retrieval + guardrails + eval runner: `src/supervisor/knowledge/*`, `src/supervisor/evals/runSupervisorEngineeringEvals.ts` with `supervisor-engineering-evals.json`.
+- Analytics: `src/lib/copilot/analytics.ts` writing `copilot_events`.
+
+## What is missing (Phase 1 fills these, in code)
+
+1. No versioned **lesson** object: the truth fixes exist only as implementation plus tests, with no reviewed, activatable, citable record.
+2. No **response provenance record**: provider, model, policy version, prompt version, lesson ids, latency, tokens, truth-path vs model-path are not emitted per response.
+3. No **redaction contract** for candidate feedback.
+4. No **promotion contract**: baseline vs candidate, mandatory gates, thresholds, rollout/rollback metadata.
+
+## Phase 1 scope
+
+### A. Lesson contract and registry (new, code-owned)
+
+`src/supervisor/learning/lessonTypes.ts`
+- `AuraLesson`: `id`, `version`, `title`, `status: 'draft' | 'active' | 'retired'`, `origin: 'confirmed-miss' | 'review'`, `invariant` (the shared rule), `guidance` (the injectable text), `citations`, `dataClass: 'reviewed-lesson'`, `reviewedBy`, `reviewedAt`, `supersedes`.
+- Hard rule in the type docs and enforced by the registry: a lesson may only add guidance text. It carries no code, no tool, no model selection, no policy or schema change.
+
+`src/supervisor/learning/lessonRegistry.ts`
+- Frozen array of lessons, `activeLessons()`, `lessonById()`, integrity check mirroring `verifyCorpusIntegrity` (stable hash over the frozen set).
+- Seeded with exactly two lessons derived from the proven fixes:
+  - `viewport-evidence-exact-tuple.v1` — viewport evidence is accepted only as a complete canonical tuple keyed by a registered surface id; mixed or unknown tuples are rejected, grounded values are copied from the registry.
+  - `run-id-untrusted-locator.v1` — a client-supplied run id is a locator only; provenance requires an RLS-scoped read; `run: null` means the page shows no run, never that the database holds none.
+
+### B. Executable evaluation cases (extend the existing runner pattern)
+
+`src/supervisor/evals/supervisor-truth-evals.json` + `src/supervisor/evals/runSupervisorTruthEvals.ts`
+- Case kinds: `viewport-claim`, `run-provenance`, `lesson-integrity`, `redaction`, `provenance-record`.
+- Cases assert against the pure functions already in `assistantTruth.ts` (canonical surface acceptance/rejection, `extractCandidateRunId` malformed → null, null-run wording) plus the new modules below.
+- Data class stays `synthetic-evaluation-data`; no telemetry, no tenant rows.
+- Wired into `tests/unit` so `verify:fast` runs it.
+
+### C. Response provenance record (shape only, no persistence)
+
+`supabase/functions/_shared/responseProvenance.ts`
+- `AssistantResponseProvenance`: `provider`, `model`, `modelVersion`, `policyVersion`, `promptVersion`, `lessonIds[]`, `path: 'truth' | 'model'`, `latencyMs`, `tokens?: { input?: number; output?: number }`, `limitations[]`.
+- `buildResponseProvenance()` pure builder; unknown fields stay `null` and are reported as unavailable, never inferred.
+- Availability rule encoded: a configured model id is not evidence the model is available, healthy or production-ready.
+- `copilot-stream` change is limited to constructing this record and emitting it as one additional SSE event (`{ type: 'provenance', data }`) after the answer. No behavioral change to the truth path, no new request fields, no CORS/JWT/RLS change. Client rendering is optional and out of Phase 1.
+
+### D. Model routing policy (provider-neutral, server-owned)
+
+`supabase/functions/_shared/modelPolicy.ts`
+- Named policies (`truth-grounding`, `general-assistant`) → a profile of `ai-client.ts`, with `policyVersion` and `promptVersion` constants.
+- Resolution stays server-side; no client-supplied model id is ever read. `ai-client.ts` itself is unchanged.
+
+### E. Feedback candidate contract (no table yet)
+
+`src/supervisor/learning/feedbackContract.ts`
+- `FeedbackCandidate`: `consent: true` required by the type, `responseProvenanceRef`, `verdict`, `redactedNote`, `dataClass: 'consented-feedback-candidate'`, `retentionDays`, `deletionRequestedAt`.
+- `redactFeedbackText()`: allowlist-shaped redaction removing emails, bearer/JWT-shaped strings, UUIDs, keys, URLs with credentials, and any free-form remainder beyond a bounded length; returns the redacted string plus the list of redaction reasons.
+- Explicit contract: a candidate is never runtime input. Promotion to a lesson requires human review through section A.
+
+### F. Approved-lesson retrieval
+
+`src/supervisor/learning/lessonRetrieval.ts` (pure) and a mirrored read in `_shared`
+- Only `status: 'active'` lessons may be selected; retrieval returns ids so they land in the provenance record.
+- Injection point is the system-prompt preamble only, and always after the deterministic truth envelope, so the truth path keeps precedence.
+
+### G. Promotion and rollout contract
+
+`src/supervisor/learning/promotionContract.ts`
+- `PromotionCandidate`: baseline ref, candidate ref, prompt/policy/lesson deltas.
+- Mandatory gates: truth suite, authorization/tenant isolation, provenance suite, typecheck, lint, architecture governance, schema truth, build.
+- Regression thresholds: zero truth-case regressions, zero authorization regressions, no drop in grounded-citation rate.
+- `evaluatePromotion()` returns `blocked` with reasons unless every gate passes; result object is immutable evidence (frozen, hashable).
+- Rollout metadata: stage, percentage, rollback target, approver — recorded, not executed.
+
+## Non-goals for Phase 1
+
+Persisted feedback, lesson-authoring UI, embeddings/vector retrieval, automated model switching, any navigation or route change, any deployment.
+
+## Affected surfaces
+
+- Personas: platform admin / engineering reviewer (lesson + promotion authorship). No tenant-persona-visible change.
+- Routes/navigation: none.
+- Components: none required; `src/lib/copilot/streaming.ts` may ignore the new SSE event without change.
+- Edge Functions: `copilot-stream` only (additive provenance event), plus three new `_shared` modules.
+- Tables/policies: none in Phase 1.
+- Secrets: none.
+
+## Rollback
+
+Everything is additive and code-only. Rollback is reverting the branch; the sole runtime-visible element is one extra SSE event, and `copilot-stream` is not redeployed in Phase 1, so production behavior is unchanged until a separately authorized deploy.
+
+## Qualification commands
+
 ```
+bun run typecheck
+bun run lint
+bun run verify:architecture-governance
+bun run verify:schema-truth
+bun run test:unit
+bun run build
+bun run verify:fast
+```
+Plus the truth lane when the branch is qualified for release: `bun run test:truth`.
 
-**Files involved:**
-- `src/integrations/supabase/types.ts` (generated types, the measured artifact)
-- `docs/architecture/schema-truth/exact-head-manifest.json` (frozen baseline)
-- `scripts/schema-truth/verify-schema-truth.mjs` (comparator, lines 53, 56, 59)
+## Phase 2 preview (not authorized here)
 
-**Expected vs actual:**
-
-| Check | Baseline (manifest) | Actual at HEAD | Result |
-|---|---|---|---|
-| `generatedTypesSha256` | `ee3dab1916cc697bd7c60776b2095067be466530d5c2831f80cc58daeccb8b78` | `c35d8dbbb2fec0916f24470691d0fa89d62dbf88587c0e60bb73fc9fa3da0295` | FAIL |
-| `functionCount` | 50 | 49 | FAIL |
-| `functionNamesSha256` | `ed84c98579e5a803bf42c80c26cc2d4a7a384380ee6167fbe57559ef6296f01e` | mismatch | FAIL |
-| `tableCount` / `tableNamesSha256` | 140 / `559fcae…` | 140 / identical | PASS |
-| `viewCount` / `viewNamesSha256` | 5 / `d655e183…` | 5 / identical | PASS |
-| `migrationCount` / `migrationsSha256` / `migrationContentsSha256` | 87 / `b4e4e066…` / `cb6ec78b…` | identical | PASS |
-
-**Exact delta:** one RPC name. `create_facility_setup` is present in the baseline function list and absent from the current generated types. No other function was added or renamed.
-
-**The single related unit failure:** `tests/unit/schema-truth-layer-contract.test.ts > Schema Truth Layer > matches the exact repository baseline` (line 30) asserts `expect(result.verdict).toBe('PASS')`. It shells out to the same verifier, so it is the same failure surfaced twice, not an independent defect. The other 4 tests in that file pass.
-
-**Second failing file (not schema related):** `tests/unit/test-harness-safety.test.ts` fails at collection with `UnsafeTestBackendError: Test backend configuration rejected: only loopback hosts are permitted`. That is the sandbox `.env` pointing at a remote backend host; the guard is working as designed and it reports "no tests", not a failed assertion.
-
-## 2. Is it pre-existing at base 0ff3f071?
-
-Yes, byte-for-byte identical.
-
-- `src/integrations/supabase/types.ts` at `0ff3f071` hashes to `c35d8dbb…` — the same hash as at `a448801c`.
-- The baseline manifest at `0ff3f071` already declared `functionCount: 50` and `ee3dab19…`.
-- Therefore the verifier fails identically at the base commit; the Builder change did not introduce or worsen it.
-- `git diff 0ff3f071..a448801c` touches only 7 files: `src/lib/builder/buildKind.ts`, `src/lib/builder/templateToBlueprint.ts`, `src/services/builderService.ts`, `src/stores/wizardBuilderStore.ts`, and 3 test files. No generated types, no migrations, no manifest, no Edge Functions.
-
-**Origin:** commit `f39e4e74` ("Work in progress", 2026-09-01 03:57:48 UTC, gpt-engineer-app bot) deleted the 16-line `create_facility_setup` block from `types.ts` and did not update the baseline manifest. That commit predates the Builder work.
-
-## 3. Harmless drift or material mismatch?
-
-It is **two separate facts**, and they point in opposite directions.
-
-**The type drift itself is not harmless-but-cosmetic — the generated types are the accurate side.** Read-only queries against the connected backend `psfvrskpnwcshvajzeix`:
-
-- `create_facility_setup` does **not** exist in `pg_proc` for schema `public` (only `active_org_id` returned from the two-name probe).
-- `supabase_migrations.schema_migrations` has 83 recorded migrations, latest `20260826233511`, and **no row for `20260825013000`** — the migration `supabase/migrations/20260825013000_facility_setup_truth_contract.sql` that defines the function was never applied to this backend.
-
-So the regenerated `types.ts` correctly reflects a backend that lacks the function. The stale artifact is `exact-head-manifest.json`.
-
-**The material problem is upstream of the gate:** `src/facilities/api.ts:42` calls `rpc('create_facility_setup', …)`, reached from `src/pages/manage/Facilities.tsx:111`. Against the current backend that RPC call will fail at runtime, because the function does not exist there. The repository also carries 87 migration files while the backend records 83, and reports 144 public tables / 4 public views live versus 140 / 5 in the generated types — the repo and this backend are not at the same schema point.
-
-The Schema Truth gate is doing exactly its job: fail closed on a repo-vs-backend divergence. Its failure message names the symptom (checksum/count/name drift) rather than the cause (an unapplied migration).
-
-## 4. Smallest safe remediation
-
-Two candidate remediations, in increasing scope. **Do not simply refresh the manifest to make the gate green** — that would encode the divergence as truth and weaken the control point.
-
-**Option A (recommended first step, diagnostic-preserving):** treat the unapplied migration as the defect. Apply `20260825013000_facility_setup_truth_contract.sql` to the backend through the approved migration path, regenerate `types.ts`, then regenerate `exact-head-manifest.json` from the post-migration artifact and confirm `functionCount` returns to 50 with `create_facility_setup` present.
-- Affected: backend schema, `src/integrations/supabase/types.ts`, `docs/architecture/schema-truth/exact-head-manifest.json`.
-- Rollback: the migration's own down path plus `git revert` of the types/manifest commit.
-- Requires explicit migration authorization; out of scope for this diagnostic.
-
-**Option B (repo-only, if the facility-setup contract is intentionally retired):** remove or gate the `create_facility_setup` caller in `src/facilities/api.ts` and `src/pages/manage/Facilities.tsx`, retire the migration file, and re-freeze the manifest against the regenerated types with an ADR note recording why the function count dropped 50 → 49.
-- Affected: those two source files, `supabase/migrations/20260825013000_facility_setup_truth_contract.sql`, `exact-head-manifest.json`, plus an ADR entry.
-- Rollback: single `git revert`; no backend state touched.
-
-**Not recommended:** editing only `exact-head-manifest.json`. It turns the gate green while leaving the live `create_facility_setup` call broken, which is precisely the failure mode the Schema Truth Layer exists to catch.
-
-For `test-harness-safety.test.ts`, the remediation is environmental (run the unit suite with a loopback test backend), not a code change.
-
-## 5. Can the Builder fix be qualified independently?
-
-Yes, without weakening release policy, because the two concerns do not overlap.
-
-- The Builder change is frontend-only and touches no generated type, migration, manifest, Edge Function, route, or policy. The verifier's inputs are byte-identical at `0ff3f071` and `a448801c`.
-- Evidence already collected at HEAD: focused tests 40 passed across `builder-build-kind-contract`, `builder-url-type-contract`, `blueprint-converters`, `template-url-loading`; `tests/unit` 1175 passed / 1 failed, the single failure being the schema-truth baseline assertion; typecheck clean; lint clean; architecture governance clean; production build and SEO checks pass.
-- The honest position for the release record is that `a448801c` is **not fully qualified** — `verify:fast` is red — but the red is a pre-existing gate failure with an identified cause, carried forward unchanged from the base commit. Qualify the Builder fix on that evidence, and track the Schema Truth failure as its own remediation item rather than bypassing, relaxing, or re-baselining the gate to unblock a merge.
-
-## Technical notes
-
-- Verifier comparator lines: `verify-schema-truth.mjs:53` (checksum), `:56` (function count), `:59` (function names). Baseline path is hard-coded at `:8`.
-- The verifier's `deployed` block reports `status: "not-provided"` because no `--deployed=` snapshot was supplied; it never contacts the backend. Repo-vs-backend divergence is therefore invisible to it by design — the backend evidence above came from separate read-only queries.
-- Backend facts verified read-only: `public_tables: 144`, `public_views: 4`, `public_functions: 194`, `sovereign_dc_facilities`/`data_centre_locations`/`data_centre_twins` all present, `create_facility_setup` absent, migration `20260825013000` unrecorded.
+Additive migrations for `assistant_response_provenance`, `assistant_feedback_candidates`, `assistant_lessons` with per-tenant RLS scoped to authoritative organization membership, explicit GRANTs, retention and deletion jobs, and an admin-only review surface reached through permission-aware account/admin access, not a new global nav entry.

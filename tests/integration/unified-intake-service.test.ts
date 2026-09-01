@@ -11,10 +11,24 @@ import {
   startBuilderFromQuestionnaire,
   startBuilderFromUrl,
 } from '@/lib/intake';
+import { expectConsoleError } from '../_setup/unexpectedConsoleGuard';
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
+    functions: {
+      invoke: vi.fn(() => Promise.resolve({
+        data: {
+          snapshot: {
+            title: 'Example',
+            description: 'Example website',
+            content: 'General company information',
+          },
+          keywords: [],
+        },
+        error: null,
+      })),
+    },
     from: vi.fn((table: string) => ({
       insert: vi.fn(() => ({
         select: vi.fn(() => ({
@@ -151,6 +165,7 @@ describe('Unified Intake Service', () => {
     });
 
     it('should handle missing required fields gracefully', async () => {
+      expectConsoleError(/templateId required for template source/);
       const result = await startBuilderFromIntake({
         source: 'template',
         userId: 'test-user',
@@ -173,6 +188,7 @@ describe('Unified Intake Service', () => {
 
   describe('Error Handling', () => {
     it('should return error on invalid source', async () => {
+      expectConsoleError(/Unsupported intake source: invalid/);
       const result = await startBuilderFromIntake({
         source: 'invalid' as any,
         userId: 'test-user',
@@ -183,6 +199,7 @@ describe('Unified Intake Service', () => {
     });
 
     it('should handle conversion failures', async () => {
+      expectConsoleError(/fileJobId required for file source/);
       const result = await startBuilderFromIntake({
         source: 'file',
         userId: 'test-user',

@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SimulationEngine } from '../../SimulationEngine';
 import { PRESET_SCENARIOS } from '../../scenarioRegistry';
+import { expectConsoleError } from '../../../../tests/_setup/unexpectedConsoleGuard';
 
 const baseline: Record<string, number> = {
   avgGpuUtilization: 60,
@@ -43,6 +44,7 @@ describe('SimulationEngine (canonical) — characterization', () => {
   });
 
   it('typed outcome: startScenario returns boolean and transitions status', () => {
+    expectConsoleError(/\[SimulationEngine\] Scenario not found: does-not-exist/);
     const engine = new SimulationEngine(baseline, 'twin-A');
     const started = engine.startScenario(firstScenarioId());
     expect(started).toBe(true);

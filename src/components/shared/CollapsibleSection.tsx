@@ -30,9 +30,9 @@ export function CollapsibleSection({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <Card className="border-border/50">
-        <CollapsibleTrigger className="w-full text-left">
-          <CardHeader className="pb-3 cursor-pointer hover:bg-muted/30 transition-colors">
-            <div className="flex items-center justify-between">
+        <CardHeader className="pb-3 hover:bg-muted/30 transition-colors">
+          <div className="flex items-center gap-2">
+            <CollapsibleTrigger className="flex min-w-0 flex-1 items-center justify-between text-left">
               <div className="flex items-center gap-2">
                 {icon}
                 <CardTitle className="text-base font-semibold">{title}</CardTitle>
@@ -42,17 +42,17 @@ export function CollapsibleSection({
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2">
-                {headerExtra}
+              <span className="ml-2 flex items-center" aria-hidden="true">
                 {isOpen ? (
                   <ChevronUp className="h-4 w-4 text-muted-foreground" />
                 ) : (
                   <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 )}
-              </div>
-            </div>
-          </CardHeader>
-        </CollapsibleTrigger>
+              </span>
+            </CollapsibleTrigger>
+            {headerExtra && <div className="shrink-0">{headerExtra}</div>}
+          </div>
+        </CardHeader>
         
         <CollapsibleContent>
           <CardContent className="pt-0">

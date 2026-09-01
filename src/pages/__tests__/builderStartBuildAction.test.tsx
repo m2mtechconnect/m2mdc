@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { Link, MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom';
+import { expectConsoleError } from '../../../tests/_setup/unexpectedConsoleGuard';
 
 /**
  * Regression coverage for the dead "Start build" control on /builder.
@@ -131,17 +132,21 @@ beforeEach(() => {
   wizardState.builderId = null;
   wizardState.isLoading = false;
   setActiveTwin.mockResolvedValue(undefined);
-  initializeBuilder.mockRejectedValue(new Error('Facility is not available to this user'));
+  initializeBuilder.mockResolvedValue(undefined);
 });
 
 describe('Builder start screen action', () => {
   it('shows the start screen with an actionable control after a failed initialization', async () => {
+    initializeBuilder.mockRejectedValue(new Error('Facility is not available to this user'));
+    expectConsoleError(/\[Builder\] Initialization failed Facility is not available to this user/);
     renderBuilder(CANONICAL);
     expect(await screen.findByRole('button', { name: /build/i })).toBeInTheDocument();
     await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
   });
 
   it('retries initialization in place instead of no-op navigating to the identical URL', async () => {
+    initializeBuilder.mockRejectedValue(new Error('Facility is not available to this user'));
+    expectConsoleError(/\[Builder\] Initialization failed Facility is not available to this user/, 2);
     renderBuilder(CANONICAL);
     const button = await screen.findByRole('button', { name: /build/i });
     await waitFor(() => expect(initializeBuilder).toHaveBeenCalled());
@@ -155,6 +160,8 @@ describe('Builder start screen action', () => {
   });
 
   it('surfaces a visible error on a repeated failure rather than failing silently', async () => {
+    initializeBuilder.mockRejectedValue(new Error('Facility is not available to this user'));
+    expectConsoleError(/\[Builder\] Initialization failed Facility is not available to this user/, 2);
     renderBuilder(CANONICAL);
     const button = await screen.findByRole('button', { name: /build/i });
     await waitFor(() => expect(initializeBuilder).toHaveBeenCalled());

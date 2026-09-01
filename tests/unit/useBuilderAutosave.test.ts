@@ -3,6 +3,7 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave';
 import { useBuilderStore } from '@/stores/builderStore';
 import { useToast } from '@/hooks/use-toast';
+import { expectConsoleError } from '../_setup/unexpectedConsoleGuard';
 
 vi.mock('@/stores/builderStore');
 vi.mock('@/hooks/use-toast');
@@ -155,6 +156,7 @@ describe('useBuilderAutosave', () => {
   });
 
   it('should show error toast only once on autosave failure', async () => {
+    expectConsoleError(/Autosave failed: Network error/);
     const error = new Error('Network error');
     mockSave.mockRejectedValueOnce(error);
 
@@ -194,6 +196,7 @@ describe('useBuilderAutosave', () => {
   });
 
   it('should handle non-Error exceptions in autosave', async () => {
+    expectConsoleError(/Autosave failed: String error/);
     mockSave.mockRejectedValueOnce('String error');
 
     vi.mocked(useBuilderStore).mockImplementation((selector: any) => {
@@ -221,6 +224,8 @@ describe('useBuilderAutosave', () => {
   });
 
   it('should reset error flag on successful save after failure', async () => {
+    expectConsoleError(/Autosave failed: First error/);
+    expectConsoleError(/Autosave failed: Second error/);
     // The debounce is armed by the state-change effect, so each save cycle is
     // driven by an actual edit rather than by advancing timers alone.
     const setState = (systemName: string) => {
@@ -318,6 +323,7 @@ describe('useBuilderAutosave', () => {
     });
 
     it('should show error toast and return false on manual save failure', async () => {
+      expectConsoleError(/Manual save failed: Save failed/);
       const error = new Error('Save failed');
       mockSave.mockRejectedValueOnce(error);
 
@@ -337,6 +343,7 @@ describe('useBuilderAutosave', () => {
     });
 
     it('should handle non-Error exceptions in manual save', async () => {
+      expectConsoleError(/Manual save failed: String error/);
       mockSave.mockRejectedValueOnce('String error');
 
       const { result } = renderHook(() => useBuilderAutosave());

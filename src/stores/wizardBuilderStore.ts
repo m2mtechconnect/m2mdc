@@ -198,7 +198,9 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
               .single();
             
             if (error) {
-              console.error('❌ [STORE] Failed to fetch template from database:', error);
+              if (error.code !== 'PGRST116') {
+                console.error('❌ [STORE] Failed to fetch template from database:', error);
+              }
             } else {
               template = data as any;
             }

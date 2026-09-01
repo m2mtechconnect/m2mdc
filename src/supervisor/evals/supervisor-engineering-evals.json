@@ -1,6 +1,6 @@
 {
   "suite": "supervisor-engineering-evals",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "dataClass": "synthetic-evaluation-data",
   "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
   "cases": [
@@ -266,6 +266,44 @@
         "domains": ["platform-assurance"],
         "topEntryId": "pa-harness-and-journey-observability",
         "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-21",
+      "title": "Passing suite with window.scrollTo stderr retrieves observable harness guidance",
+      "kind": "retrieval",
+      "input": { "query": "passing test suite emits Not implemented window.scrollTo error stderr" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-harness-and-journey-observability",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-22",
+      "title": "Passing suite with rejected promises and retry noise retrieves observable harness guidance",
+      "kind": "retrieval",
+      "input": { "query": "green aggregate tests hide rejected promise retry storm console error" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-harness-and-journey-observability",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-23",
+      "title": "Explicitly asserted failure-path console output is not a readiness claim",
+      "kind": "guardrail",
+      "input": {
+        "statement": "The unit test captures and asserts one expected console error from its failure-path fixture.",
+        "evidence": []
+      },
+      "expect": {
+        "status": "pass",
+        "violationCategories": [],
+        "detectedCategories": []
       }
     }
   ]

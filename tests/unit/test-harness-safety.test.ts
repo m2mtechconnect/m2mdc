@@ -68,6 +68,18 @@ describe('test harness safety guards', () => {
     expect(seeds).not.toContain('const supabase = createTestSupabaseClient();');
   });
 
+  it('installs browser shims and rejects unreviewed console errors globally', () => {
+    const setup = repositoryFile('tests/setup.ts');
+    const guard = repositoryFile('tests/_setup/unexpectedConsoleGuard.ts');
+    const lifecycle = repositoryFile('tests/unit/activeTwinContext-lifecycle.test.tsx');
+
+    expect(setup).toContain('installWindowScrollShim();');
+    expect(setup).toContain('installUnexpectedConsoleGuard();');
+    expect(guard).toContain('collector?.assertClean();');
+    expect(lifecycle).toContain('expectConsoleError(/Failed to fetch twin/i);');
+    expect(lifecycle).not.toContain("vi.spyOn(console, 'error')");
+  });
+
   it('contains no direct cloud Supabase endpoint in executable E2E tests', () => {
     for (const path of [
       'tests/e2e/auth-security.spec.ts',

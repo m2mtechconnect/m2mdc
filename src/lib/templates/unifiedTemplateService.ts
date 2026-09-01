@@ -319,6 +319,7 @@ export async function loadTemplateById(templateId: string): Promise<ValidatedTem
       .single();
     
     if (error) {
+      if (error.code === 'PGRST116') return null;
       console.error('[TemplateService] Error loading template:', error);
       return null;
     }

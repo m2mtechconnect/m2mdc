@@ -2,6 +2,8 @@ import '@testing-library/jest-dom';
 import { beforeAll, afterEach, afterAll, vi } from 'vitest';
 import { installLiveBackendGuard } from './_setup/liveBackendGuard';
 import { primeSafeTestEnvironment } from './_setup/safeTestEnvironment';
+import { installWindowScrollShim } from './_setup/browserApiShims';
+import { installUnexpectedConsoleGuard } from './_setup/unexpectedConsoleGuard';
 
 // Setup files execute before test modules are imported. Select and validate a
 // loopback backend here so imported helpers cannot inherit application/cloud
@@ -12,6 +14,8 @@ primeSafeTestEnvironment();
 // test project (aura-dc-security-test) is proven. Installed at module load,
 // before any test file imports the Supabase client.
 installLiveBackendGuard();
+installWindowScrollShim();
+installUnexpectedConsoleGuard();
 
 // Mock environment variables
 beforeAll(() => {

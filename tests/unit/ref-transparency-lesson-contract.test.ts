@@ -45,7 +45,7 @@ describe('ref-transparency lesson registration', () => {
 
   it('the registry version was bumped for the new lesson', () => {
     // Bumped again when the release-workflow shell-syntax lesson landed.
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.1');
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.2');
   });
 
 

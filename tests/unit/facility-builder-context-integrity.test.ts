@@ -48,9 +48,12 @@ describe('facility builder context integrity', () => {
     expect(warnings).not.toContain('track agent performance');
   });
 
-  it('hands the active facility to Blueprint and Simulation', () => {
+  it('hands the persisted facility binding to Blueprint and Simulation', () => {
     const source = read('src/components/builder/steps/Step5Deploy.tsx');
-    expect(source).toContain("blueprintId: activeTwin?.id ?? builderId ?? 'unavailable'");
-    expect(source).toContain('twinId={activeTwin?.id || "unavailable"}');
+    expect(source).toContain("blueprintId: persistedTwinId ?? builderId ?? 'unavailable'");
+    expect(source).toContain('twinId: persistedTwinId');
+    expect(source).toContain('twinId={persistedTwinId || "unavailable"}');
+    expect(source).toContain('handleBindActiveFacility');
+    expect(source).toContain('Generic agent-run evidence will not be used.');
   });
 });

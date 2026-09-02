@@ -338,7 +338,17 @@ if (existsSync(workflowDir)) {
     if (!p.startsWith('/') && p !== '*') continue;
     const isDevGated = /import\.meta\.env\.DEV/.test(line);
     if (isDevGated) continue;
-    if (prod.has(p) || blocked.has(p) || devOnly.has(p) || redirect.has(p)) continue;
+    // A route classified as production-blocked is not allowed to ship merely
+    // because it appears in the taxonomy. It must be behind the same
+    // build-time DEV guard as a development-only surface. Terminal catch-all
+    // handlers are exempt because they render the production 404 boundary.
+    if (blocked.has(p)) {
+      if (p !== '*' && p !== '/*' && !isDevGated) {
+        fail(`router ships production-blocked route without DEV gate: ${p}`);
+      }
+      continue;
+    }
+    if (prod.has(p) || devOnly.has(p) || redirect.has(p)) continue;
     if (forbiddenRe.some((re) => re.test(p))) continue;
     fail(`router declares unclassified route: ${p}`);
   }

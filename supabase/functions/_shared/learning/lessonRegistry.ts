@@ -9,7 +9,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-02.1';
+export const LESSON_REGISTRY_VERSION = '2026-09-02.2';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -152,6 +152,40 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     dataClass: 'reviewed-lesson',
     reviewedBy: 'AURA engineering review',
     reviewedAt: '2026-09-02T19:32:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'cross-layer-product-truth-parity.v1',
+    version: 1,
+    title: 'A feature is complete only when product identity, data binding, UI, routes and release evidence agree',
+    status: 'active',
+    origin: 'confirmed-miss',
+    invariant:
+      'A successful component test or policy classification never proves end-to-end product truth. For every changed feature, the persisted product identity and facility binding, backend query and authorization path, frontend route mount and navigation, UI labels and unavailable states, synthetic evaluation, production build artifact and runtime journey must describe the same capability. A production-blocked route must be absent from the production build, an unbound facility product must never borrow generic agent evidence, and missing authoritative context must fail closed rather than substitute a demonstration dataset or invented value.',
+    guidance:
+      'Before calling an AURA change complete, build a cross-layer trace from persona intent to persisted identity, authorized data source, API/function, UI state, route/navigation, production artifact and runtime evidence. Test the exact, analogous and adversarial cases. Treat a taxonomy label without a build-time guard, a UI card without a bound dataset, or a passing mocked journey without verified backend evidence as incomplete. Persist every confirmed miss as a focused regression and synthetic lesson evaluation. This governed learning adds reviewed guidance only; it does not perform autonomous model-weight training or change production configuration.',
+    citations: [
+      'scripts/verify-production-perimeter.mjs#NEG-A',
+      'src/dsx/runtime/evidenceFacilityScope.ts',
+      'src/components/builder/steps/Step5Deploy.tsx',
+      'tests/unit/builder-deployment-truth-contract.test.ts',
+      'tests/unit/evidence-facility-context-contract.test.ts',
+    ],
+    triggers: [
+      'end to end',
+      'frontend backend parity',
+      'route blocked',
+      'production perimeter',
+      'facility binding',
+      'demo dataset',
+      'mock data',
+      'ui api mismatch',
+      'super agent missed',
+      'cross layer',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-02T21:15:00.000Z',
     supersedes: null,
   } as AuraLesson),
 ]);

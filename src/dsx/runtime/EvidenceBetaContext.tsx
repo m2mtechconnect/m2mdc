@@ -71,9 +71,11 @@ const Ctx = createContext<EvidenceBetaWorkspace | null>(null);
 export function EvidenceBetaProvider({
   children,
   twins = NO_FACILITY_TWINS,
+  defaultFacilityId = null,
 }: {
   children: ReactNode;
   twins?: readonly DataCentreTwin[];
+  defaultFacilityId?: string | null;
 }) {
   const rt = useEvidenceBeta();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -115,7 +117,14 @@ export function EvidenceBetaProvider({
     requestAnimationFrame(tryFocus);
   }, []);
 
-  const context = useMemo(() => parseContext(searchParams), [searchParams]);
+  const parsedContext = useMemo(() => parseContext(searchParams), [searchParams]);
+  const context = useMemo(
+    () =>
+      !parsedContext.facility_id && defaultFacilityId
+        ? { ...parsedContext, facility_id: defaultFacilityId }
+        : parsedContext,
+    [parsedContext, defaultFacilityId],
+  );
 
   // Deep link restore: a shared scenario id reopens the same scenario once.
   const urlScenario = context.scenario_id;
@@ -163,6 +172,14 @@ export function EvidenceBetaProvider({
     },
     [setSearchParams],
   );
+
+  // A direct Evidence route inherits the authenticated user's active facility.
+  // Explicit deep-link context always wins, and the inherited id is mirrored
+  // into the URL so refresh/back/share preserve the same scope.
+  useEffect(() => {
+    if (parsedContext.facility_id || !defaultFacilityId) return;
+    writeContext({ ...parsedContext, facility_id: defaultFacilityId }, true);
+  }, [parsedContext, defaultFacilityId, writeContext]);
 
   // `setSearchParams` rewrites the URL without a fragment, so a deep link's
   // anchor would be lost the first time context is mirrored into the URL.

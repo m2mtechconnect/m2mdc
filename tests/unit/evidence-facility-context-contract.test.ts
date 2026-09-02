@@ -48,10 +48,15 @@ describe('evidence facility context', () => {
     expect(shell).toContain('dsx-active-facility');
     expect(shell).toContain('facilityScope.headerLabel');
     expect(shell).toContain('evidence-facility-unavailable');
+    expect(shell).toContain('const { twins, activeTwinId } = useActiveTwin()');
+    expect(shell).toContain('defaultFacilityId={activeTwinId}');
   });
 
-  it('supports only the declared demonstration facility and reference alias', () => {
-    expect(resolveEvidenceFacilityScope(null, []).availability).toBe('demonstration');
+  it('fails closed without a facility and supports only the explicit reference alias', () => {
+    const missingScope = resolveEvidenceFacilityScope(null, []);
+    expect(missingScope.availability).toBe('unavailable');
+    expect(missingScope.headerLabel).toMatch(/no active facility selected/i);
+    expect(missingScope.reason).toMatch(/not substituted/i);
     expect(resolveEvidenceFacilityScope(EVIDENCE_REFERENCE_FACILITY_ALIAS, []).availability).toBe('demonstration');
 
     const storedFacility = resolveEvidenceFacilityScope('stored-facility', [
@@ -83,7 +88,7 @@ describe('evidence facility context', () => {
   });
 });
 
-describe('builder hand-off preserves the active twin', () => {
+describe('builder hand-off preserves the persisted twin binding', () => {
   it('serialises the twin id into the simulation hand-off URL', () => {
     const url = buildSimulationHandoffUrl({
       blueprintId: 'bp-1',
@@ -95,11 +100,11 @@ describe('builder hand-off preserves the active twin', () => {
     expect(params.get('state')).toBe('draft');
   });
 
-  it('passes the active twin through from Builder step 5', () => {
+  it('passes the saved twin through from Builder step 5', () => {
     const step5 = readFileSync('src/components/builder/steps/Step5Deploy.tsx', 'utf8');
-    expect(step5).toContain('twinId: activeTwin?.id ?? null');
+    expect(step5).toContain('twinId: persistedTwinId');
     expect(step5).toContain('handleOpenBlueprint');
-    expect(step5).toContain('navigate(`/blueprint/${activeTwin.id}`)');
+    expect(step5).toContain('navigate(`/blueprint/${persistedTwinId}`)');
     expect(step5).not.toContain('window.open(');
   });
 });

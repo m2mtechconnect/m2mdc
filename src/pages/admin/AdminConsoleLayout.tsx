@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Building2, ChevronRight, Database, FileCheck2, Gauge, PackageCheck, Shield, Stethoscope } from 'lucide-react';
+import { Building2, ChevronRight, Database, FileCheck2, Gauge } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRBAC } from '@/contexts/RBACContext';
 import type { Permission } from '@/auth/permissions';
@@ -42,24 +42,6 @@ const ADMIN_NAV: readonly AdminNavItem[] = [
     href: '/admin/dataset-registry',
     matches: ['/admin/dataset-registry'],
     icon: Database,
-  },
-  {
-    label: 'Asset derivatives',
-    href: '/admin/asset-pipeline',
-    matches: ['/admin/asset-pipeline', '/admin/asset-preview', '/admin/asset-validation'],
-    icon: PackageCheck,
-  },
-  {
-    label: 'Reference facility',
-    href: '/admin/reference-facility-validation',
-    matches: ['/admin/reference-facility-validation'],
-    icon: Shield,
-  },
-  {
-    label: 'Twin diagnostics',
-    href: '/twin-debug',
-    matches: ['/twin-debug'],
-    icon: Stethoscope,
   },
 ];
 

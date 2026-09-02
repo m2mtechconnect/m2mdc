@@ -218,6 +218,16 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
       invariantMustMention: ['yaml', 'heredoc', 'column zero', 'contract test'],
     },
   },
+  {
+    id: 'lesson-cross-layer-product-truth-active',
+    kind: 'lesson-integrity',
+    title: 'The cross-layer product-truth lesson is active and encodes the missed mechanism',
+    lessonId: 'cross-layer-product-truth-parity.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['persisted product identity', 'route mount', 'production build', 'fail closed'],
+    },
+  },
 ];
 
 

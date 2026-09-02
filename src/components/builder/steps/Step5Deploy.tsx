@@ -18,6 +18,7 @@ import { DCCard, DCSectionHeader, DCKPITile, DCStatusBadge } from '@/components/
 import { BlueprintReviewSection } from '@/components/blueprint';
 import { buildSimulationHandoffUrl } from '@/simulation/handoff';
 import { builderService } from '@/services/builderService';
+import { resolvePersistedBuildKind } from '@/lib/builder/buildKind';
 import { evaluateBuilderActivationReadiness } from '../../../../supabase/functions/_shared/builderActivationReadiness';
 
 import {
@@ -51,15 +52,24 @@ export function Step5Deploy() {
   const [currentVersion, setCurrentVersion] = useState('1.0.0');
   const [localKPIs, setLocalKPIs] = useState<any[]>([]);
   const [persistedTwinId, setPersistedTwinId] = useState<string | null>(null);
+  const [builderUpdatedAt, setBuilderUpdatedAt] = useState<string | null>(null);
+  const [evidenceRefresh, setEvidenceRefresh] = useState(0);
   const [facilityAvailable, setFacilityAvailable] = useState(false);
   const [readinessEvidenceError, setReadinessEvidenceError] = useState<string | null>('Readiness evidence is still loading.');
 
+  const productKind = useMemo(() => resolvePersistedBuildKind({
+    configType: type,
+    twinId: persistedTwinId,
+    templateId: template,
+  }), [type, persistedTwinId, template]);
+  const isFacilityProduct = productKind === '3d_twin' || productKind === 'process_twin';
+
   const builderState = useMemo(() => ({
-    goal, industry, department, type, template, workflow, modelConfig, kpis: localKPIs,
+    goal, industry, department, type: productKind, template, workflow, modelConfig, kpis: localKPIs,
     connectors: tools.filter(t => t.type === 'integration').map(t => t.name), governance: governanceConfig,
     twin_id: persistedTwinId,
     webhooks: []
-  }), [goal, industry, department, type, template, workflow, modelConfig, localKPIs, tools, governanceConfig, persistedTwinId]);
+  }), [goal, industry, department, productKind, template, workflow, modelConfig, localKPIs, tools, governanceConfig, persistedTwinId]);
 
   useEffect(() => {
     if (!builderId) return;
@@ -70,7 +80,14 @@ export function Step5Deploy() {
         const { builder } = await builderService.get(builderId);
         const savedConfig = builder.config || {};
         const twinId = savedConfig.twin_id || builder.twin_id || null;
+        const savedProductKind = resolvePersistedBuildKind({
+          configType: savedConfig.type,
+          twinId,
+          templateId: savedConfig.template_id,
+        });
+        let nextReadinessEvidenceError: string | null = null;
         setPersistedTwinId(twinId);
+        setBuilderUpdatedAt(builder.updated_at || null);
         setLocalKPIs(Array.isArray(savedConfig.kpis) ? savedConfig.kpis : []);
         setGovernanceConfig({
           auditEnabled: savedConfig.governance?.auditEnabled !== false,
@@ -114,6 +131,12 @@ export function Step5Deploy() {
             events: Array.isArray(run.events) ? run.events.length : 0,
             latency: run.measured_duration_ms || 0,
           })));
+        } else if (savedProductKind === '3d_twin' || savedProductKind === 'process_twin') {
+          // A facility product cannot borrow generic agent-run evidence. The
+          // user must explicitly bind the durable facility identity first.
+          setFacilityAvailable(false);
+          setSimulationHistory([]);
+          nextReadinessEvidenceError = 'This facility draft is not bound to a facility. Bind it before activation evidence can be verified.';
         } else {
           setFacilityAvailable(false);
           const { data: runs, error: runsError } = await supabase
@@ -157,7 +180,7 @@ export function Step5Deploy() {
         } else {
           setVersionHistory([]);
         }
-        setReadinessEvidenceError(null);
+        setReadinessEvidenceError(nextReadinessEvidenceError);
       } catch (err) {
         console.error('[Step5] Failed to load history:', err);
         setReadinessEvidenceError('Persisted readiness evidence could not be verified.');
@@ -165,14 +188,14 @@ export function Step5Deploy() {
     };
     
     loadHistory();
-  }, [builderId]);
+  }, [builderId, evidenceRefresh]);
 
   const readiness = useMemo(() => evaluateBuilderActivationReadiness(builderState, {
     verifiedSimulationCount: simulationHistory.length,
     versionCount: versionHistory.length,
-    facilityAvailable: type !== '3d_twin' && type !== 'process_twin' ? true : facilityAvailable,
+    facilityAvailable: !isFacilityProduct || facilityAvailable,
     evidenceError: readinessEvidenceError,
-  }), [builderState, simulationHistory.length, versionHistory.length, type, facilityAvailable, readinessEvidenceError]);
+  }), [builderState, simulationHistory.length, versionHistory.length, isFacilityProduct, facilityAvailable, readinessEvidenceError]);
 
   const readinessScore = readiness.score;
 
@@ -184,10 +207,14 @@ export function Step5Deploy() {
    * Stage 7H: design surfaces hand off, they never execute. Navigation only.
    */
   const handleOpenInSimulation = () => {
+    if (isFacilityProduct && !persistedTwinId) {
+      toast.error('Bind this draft to a facility before opening Simulation.');
+      return;
+    }
     navigate(
       buildSimulationHandoffUrl({
-        blueprintId: activeTwin?.id ?? builderId ?? 'unavailable',
-        twinId: activeTwin?.id ?? null,
+        blueprintId: persistedTwinId ?? builderId ?? 'unavailable',
+        twinId: persistedTwinId,
         returnTab: 'simulation',
       }),
     );
@@ -198,11 +225,28 @@ export function Step5Deploy() {
    * facility the action states that rather than opening an invented default.
    */
   const handleOpenBlueprint = () => {
-    if (!activeTwin?.id) {
-      toast.error('No active facility selected. Select a facility to open its Blueprint.');
+    if (!persistedTwinId) {
+      toast.error('Bind this draft to a facility before opening its Blueprint.');
       return;
     }
-    navigate(`/blueprint/${activeTwin.id}`);
+    navigate(`/blueprint/${persistedTwinId}`);
+  };
+
+  const handleBindActiveFacility = async () => {
+    if (!builderId || !activeTwin?.id) {
+      toast.error('Select an active facility before binding this draft.');
+      return;
+    }
+    try {
+      await builderService.update(builderId, { twin_id: activeTwin.id, type: '3d_twin' });
+      setPersistedTwinId(activeTwin.id);
+      setReadinessEvidenceError('Refreshing facility evidence.');
+      setEvidenceRefresh((value) => value + 1);
+      toast.success(`Bound this draft to ${activeTwin.name}.`);
+    } catch (error) {
+      console.error('[Step5] Failed to bind active facility:', error);
+      toast.error('The facility binding was not saved. Activation remains blocked.');
+    }
   };
 
   const handleAddKPIs = async (newKPIs: any[]) => {
@@ -330,6 +374,17 @@ export function Step5Deploy() {
         icon={<Rocket className="h-5 w-5" />}
       />
 
+      {isFacilityProduct && !persistedTwinId && (
+        <DCCard title="Facility binding required" icon={<AlertTriangle className="h-4 w-4" />}>
+          <p className="text-sm text-muted-foreground">
+            This saved data-centre draft has no durable facility identity. Generic agent-run evidence will not be used.
+          </p>
+          <Button className="mt-4" onClick={handleBindActiveFacility} disabled={!activeTwin?.id}>
+            {activeTwin?.id ? `Bind to active facility: ${activeTwin.name}` : 'Select an active facility to continue'}
+          </Button>
+        </DCCard>
+      )}
+
       {/* Readiness Score */}
       <div className="grid gap-4 grid-cols-4">
         <DCKPITile
@@ -391,9 +446,13 @@ export function Step5Deploy() {
             builderState={builderState}
             governanceConfig={governanceConfig}
             currentVersion={currentVersion}
+            productKind={productKind}
+            twinId={persistedTwinId}
+            updatedAt={builderUpdatedAt}
           />
           <AutoSuggestedKPIs
             industry={industry}
+            productKind={productKind}
             existingKPIs={localKPIs}
             onAddKPIs={handleAddKPIs}
           />
@@ -401,7 +460,7 @@ export function Step5Deploy() {
 
         <TabsContent value="blueprint" className="mt-4">
           <BlueprintReviewSection 
-            twinId={activeTwin?.id || "unavailable"}
+            twinId={persistedTwinId || "unavailable"}
             onOpenBlueprint={handleOpenBlueprint}
           />
         </TabsContent>

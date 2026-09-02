@@ -7,31 +7,61 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
-  FileText, Brain, Plug, GitBranch, Settings, Shield, User, Clock
+  FileText, Brain, Plug, GitBranch, Settings, Shield, Building2
 } from 'lucide-react';
+import type { BuildKind } from '@/lib/builder/buildKind';
 
 interface DeploymentSummaryCardProps {
   builderState: any;
   governanceConfig: any;
   currentVersion: string;
+  productKind: BuildKind;
+  twinId: string | null;
+  updatedAt: string | null;
 }
 
 export function DeploymentSummaryCard({
   builderState,
   governanceConfig,
-  currentVersion
+  currentVersion,
+  productKind,
+  twinId,
+  updatedAt,
 }: DeploymentSummaryCardProps) {
-  const sections = [
-    {
-      title: 'Overview',
-      icon: FileText,
-      items: [
-        { label: 'Name', value: builderState?.goal || 'Untitled Agent' },
-        { label: 'Category', value: builderState?.type || 'agent' },
-        { label: 'Industry', value: builderState?.industry || 'Not specified' },
-        { label: 'Department', value: builderState?.department || 'Not specified' },
-      ]
-    },
+  const isFacilityProduct = productKind === '3d_twin' || productKind === 'process_twin';
+  const overview = {
+    title: 'Overview',
+    icon: FileText,
+    items: [
+      { label: 'Name', value: builderState?.goal || (isFacilityProduct ? 'Untitled data-centre twin' : 'Untitled agent') },
+      { label: 'Category', value: isFacilityProduct ? 'Data-centre digital twin' : productKind },
+      { label: 'Industry', value: builderState?.industry || 'Not specified' },
+      { label: 'Department', value: builderState?.department || 'Not specified' },
+    ],
+  };
+  const runtime = {
+    title: 'Record',
+    icon: Settings,
+    items: [
+      { label: 'State', value: 'Draft review' },
+      { label: 'Version', value: currentVersion || 'Unavailable' },
+      { label: 'Owner', value: 'Unavailable' },
+      { label: 'Last Modified', value: updatedAt ? new Date(updatedAt).toLocaleDateString() : 'Unavailable' },
+    ],
+  };
+  const governance = {
+    title: 'Governance',
+    icon: Shield,
+    items: [
+      { label: 'Access Control', value: governanceConfig?.accessControl || 'Default' },
+      { label: 'Audit Enabled', value: governanceConfig?.auditEnabled ? 'Yes' : 'No' },
+      { label: 'Data Classification', value: governanceConfig?.dataClassification || 'Not specified' },
+      { label: 'Compliance Tags', value: governanceConfig?.tags?.join(', ') || 'None' },
+    ],
+  };
+
+  const agentSections = [
+    overview,
     {
       title: 'Intelligence',
       icon: Brain,
@@ -62,34 +92,33 @@ export function DeploymentSummaryCard({
         { label: 'Automations', value: builderState?.workflow?.automations?.length?.toString() || 'None' },
       ]
     },
-    {
-      title: 'Runtime',
-      icon: Settings,
-      items: [
-        { label: 'Environment', value: 'Development' },
-        { label: 'Version', value: currentVersion || '1.0.0' },
-        { label: 'Owner', value: 'Current User' },
-        { label: 'Last Modified', value: new Date().toLocaleDateString() },
-      ]
-    },
-    {
-      title: 'Governance',
-      icon: Shield,
-      items: [
-        { label: 'Access Control', value: governanceConfig?.accessControl || 'Default' },
-        { label: 'Audit Enabled', value: governanceConfig?.auditEnabled ? 'Yes' : 'Yes (default)' },
-        { label: 'Data Classification', value: governanceConfig?.dataClassification || 'Internal' },
-        { label: 'Compliance Tags', value: governanceConfig?.tags?.join(', ') || 'None' },
-      ]
-    }
+    runtime,
+    governance,
   ];
+
+  const facilitySections = [
+    overview,
+    {
+      title: 'Facility scope',
+      icon: Building2,
+      items: [
+        { label: 'Facility binding', value: twinId || 'Not bound' },
+        { label: 'Evidence scope', value: twinId ? 'Bound facility only' : 'Unavailable until bound' },
+        { label: 'Template', value: builderState?.template || 'Not specified' },
+        { label: 'Simulation source', value: twinId ? 'Server-validated facility runs' : 'Unavailable' },
+      ],
+    },
+    runtime,
+    governance,
+  ];
+  const sections = isFacilityProduct ? facilitySections : agentSections;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Configuration Summary</CardTitle>
-          <Badge variant="outline">v{currentVersion || '1.0.0'}</Badge>
+          <Badge variant="outline">{currentVersion ? `v${currentVersion}` : 'Version unavailable'}</Badge>
         </div>
       </CardHeader>
       <CardContent>

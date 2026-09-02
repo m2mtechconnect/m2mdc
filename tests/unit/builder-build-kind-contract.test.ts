@@ -11,6 +11,7 @@ import {
   BUILD_KINDS,
   isBuildKind,
   normalizeBuildKind,
+  resolvePersistedBuildKind,
   resolveTemplateBuildKind,
 } from '@/lib/builder/buildKind';
 import { templateToBlueprint } from '@/lib/builder/templateToBlueprint';
@@ -60,6 +61,24 @@ describe('build-kind helper', () => {
         templateName: 'Retail Inventory Optimization',
       }),
     ).toBe('agent');
+  });
+
+  it('recovers a legacy facility draft even when it was stored as an agent', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      templateId: 'datacentre-master-twin-v1',
+    })).toBe('3d_twin');
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      twinId: 'facility-123',
+    })).toBe('3d_twin');
+  });
+
+  it('does not reclassify a generic agent from free-form business copy', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      templateName: 'Customer Support Agent',
+    })).toBe('agent');
   });
 });
 

@@ -319,9 +319,9 @@ function ShellBody() {
 }
 
 export default function EvidenceBetaShell() {
-  const { twins } = useActiveTwin();
+  const { twins, activeTwinId } = useActiveTwin();
   return (
-    <EvidenceBetaProvider twins={twins}>
+    <EvidenceBetaProvider twins={twins} defaultFacilityId={activeTwinId}>
       <ShellBody />
     </EvidenceBetaProvider>
   );

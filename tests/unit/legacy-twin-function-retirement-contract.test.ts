@@ -87,7 +87,7 @@ describe('legacy twin function retirement', () => {
 
     expect(shell).toMatch(/const FundingIntakeDemo = import\.meta\.env\.DEV/);
     expect(shell).toMatch(
-      /import\.meta\.env\.DEV && FundingIntakeDemo && \(\s*\n\s*<Route path="\/digital-twins-demo\/funding-intake"/,
+      /import\.meta\.env\.DEV && FundingIntakeDemo && <Route path="\/digital-twins-demo\/funding-intake"/,
     );
   });
 });

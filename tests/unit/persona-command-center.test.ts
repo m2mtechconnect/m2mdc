@@ -3,6 +3,7 @@ import type { Permission } from '@/auth/permissions';
 import {
   buildPersonaCommandActions,
   buildPersonaCurrentWork,
+  buildPersonaScopeLabel,
   resolvePersonaScope,
   type PersonaCommandContext,
 } from '@/workspace/dashboard/personaCommandCenter';
@@ -99,5 +100,14 @@ describe('persona-prioritized Command Center', () => {
     expect(resolvePersonaScope(false, 'owner')).toBe('platform');
     expect(resolvePersonaScope(false, 'admin')).toBe('platform');
     expect(resolvePersonaScope(true, 'admin')).toBe('organization');
+  });
+
+  it('does not repeat an organization suffix in the persona scope label', () => {
+    expect(buildPersonaScopeLabel('AURA qualification organization', 'organization'))
+      .toBe('AURA qualification organization');
+    expect(buildPersonaScopeLabel('M2M TECH', 'organization'))
+      .toBe('M2M TECH organization');
+    expect(buildPersonaScopeLabel(null, 'platform')).toBe('Platform scope');
+    expect(buildPersonaScopeLabel(null, 'personal')).toBe('Evaluation scope');
   });
 });

@@ -16,6 +16,24 @@ export function resolvePersonaScope(
   return 'personal';
 }
 
+/**
+ * Keep the tenant scope explicit without repeating a suffix already present in
+ * the authoritative organization name (for example, "AURA qualification
+ * organization organization").
+ */
+export function buildPersonaScopeLabel(
+  activeOrganizationName: string | null,
+  scope: PersonaScope,
+): string {
+  const organizationName = activeOrganizationName?.trim() ?? '';
+  if (organizationName) {
+    return /\borganization$/i.test(organizationName)
+      ? organizationName
+      : `${organizationName} organization`;
+  }
+  return scope === 'platform' ? 'Platform scope' : 'Evaluation scope';
+}
+
 export interface PersonaCommandContext {
   scope: PersonaScope;
   blueprintHref: string;

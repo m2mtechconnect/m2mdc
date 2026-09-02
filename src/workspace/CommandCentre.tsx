@@ -48,6 +48,7 @@ import { useDurableWorkspaceRuns } from './useDurableWorkspaceRuns';
 import { buildRackGrid } from './dashboard/rackModel';
 import { PersonaPriorityPanel } from './dashboard/PersonaPriorityPanel';
 import {
+  buildPersonaScopeLabel,
   buildPersonaCommandActions,
   buildPersonaCurrentWork,
   resolvePersonaScope,
@@ -175,11 +176,7 @@ export default function CommandCentre() {
     isPilot: resolution.status === 'pilot',
   });
   const personaScope = resolvePersonaScope(Boolean(activeOrganization), authorization.primaryRole);
-  const personaScopeLabel = activeOrganization
-    ? `${activeOrganization.orgName} organization`
-    : personaScope === 'platform'
-      ? 'Platform scope'
-      : 'Evaluation scope';
+  const personaScopeLabel = buildPersonaScopeLabel(activeOrganization?.orgName ?? null, personaScope);
   const personaContext = {
     scope: personaScope,
     blueprintHref,

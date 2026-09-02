@@ -120,6 +120,17 @@ describe('Schema Truth Layer', () => {
     expect(packageJson.scripts['verify:fast']).toContain('verify:schema-truth');
   });
 
+  it('checks out complete schema history in the QA unit gate', () => {
+    const workflow = read('.github/workflows/qa-suite.yml');
+    const unitJob = workflow.slice(
+      workflow.indexOf('  unit-tests:'),
+      workflow.indexOf('  e2e-tests:'),
+    );
+
+    expect(unitJob).toContain('ref: ${{ env.AURA_SOURCE_SHA }}');
+    expect(unitJob).toContain('fetch-depth: 0');
+  });
+
   it('forbids deletion', () => {
     expect(read('docs/adr/0011-schema-truth-canonical-families.md')).toContain(
       'No table is deleted',

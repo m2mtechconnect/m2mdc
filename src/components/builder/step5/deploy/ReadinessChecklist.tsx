@@ -78,21 +78,21 @@ export function ReadinessChecklist({
       },
       {
         id: 'simulation',
-        label: 'Simulation run at least once',
-        status: simulationHistory.length > 0 ? 'ok' : 'warning',
+        label: 'Server-validated simulation succeeded',
+        status: simulationHistory.length > 0 ? 'ok' : 'missing',
         tooltip: simulationHistory.length > 0
-          ? `${simulationHistory.length} simulation run(s) completed`
-          : 'Running a simulation before deployment is recommended',
+          ? `${simulationHistory.length} server-validated simulation run(s) succeeded`
+          : 'A browser preview or unverified run cannot authorize production activation',
         fixStep: undefined,
         icon: Play
       },
       {
         id: 'kpis',
         label: 'KPIs configured',
-        status: builderState?.kpis?.length > 0 ? 'ok' : 'warning',
+        status: builderState?.kpis?.length > 0 ? 'ok' : 'missing',
         tooltip: builderState?.kpis?.length > 0
           ? `${builderState.kpis.length} KPI(s) defined`
-          : 'Consider adding KPIs to track facility and twin outcomes',
+          : 'Save at least one KPI to verify facility and twin outcomes',
         fixStep: undefined,
         icon: Target
       },

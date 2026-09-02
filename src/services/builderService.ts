@@ -26,6 +26,11 @@ export interface BuilderConfig {
     policies?: Record<string, any>;
     mcp_servers?: any[];
   };
+  kpis?: Array<Record<string, unknown>>;
+  governance?: {
+    auditEnabled?: boolean;
+    tags?: string[];
+  };
   step_completed?: number;
 }
 
@@ -34,6 +39,7 @@ export interface Builder {
   name: string;
   description: string | null;
   status: string;
+  twin_id?: string | null;
   config: BuilderConfig;
   created_at: string;
   updated_at: string;
@@ -169,7 +175,8 @@ export const builderService = {
 
       if (error) {
         console.error('[builderService] Deploy failed:', error);
-        throw new Error(`Failed to deploy builder: ${error.message || 'Unknown error'}`);
+        const serverMessage = await readServerErrorMessage(error);
+        throw new Error(`Failed to deploy builder: ${serverMessage || error.message || 'Unknown error'}`);
       }
 
       if (!data) {

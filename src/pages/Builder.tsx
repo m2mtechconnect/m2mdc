@@ -25,7 +25,6 @@ import { trackBuilderStep } from '@/lib/analytics/analyticsService';
 import { useCoPilotContext } from '@/contexts/CoPilotContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { useRBAC } from '@/contexts/RBACContext';
-import { builderService } from '@/services/builderService';
 
 export default function Builder() {
   const { t } = useTranslation();
@@ -412,45 +411,13 @@ export default function Builder() {
     );
   }
 
-  const handleDeploy = async () => {
-    const state = useWizardBuilderStore.getState();
-    if (!state.builderId) return { success: false, message: 'No builder to activate' };
-
-    if (state.type === '3d_twin' || state.type === 'process_twin') {
-      try {
-        const { builder } = await builderService.get(state.builderId);
-        const boundTwinId = builder.config?.twin_id;
-        if (!boundTwinId) {
-          return {
-            success: false,
-            message: 'This build is not bound to a facility. Start the build from the Facilities workspace.',
-          };
-        }
-        const boundTwin = configuredTwins.find((candidate) => candidate.id === boundTwinId);
-        if (!boundTwin) {
-          return { success: false, message: 'The bound facility is no longer available or still requires operator setup.' };
-        }
-        if (activeTwinId !== boundTwinId) await setActiveTwin(boundTwinId);
-      } catch (bindingError) {
-        console.error('[Builder] Facility binding verification failed', bindingError);
-        return {
-          success: false,
-          message: bindingError instanceof Error ? bindingError.message : 'Facility binding could not be verified',
-        };
-      }
-    }
-
-    return state.deployBuilder();
-  };
-
   return (
     <BuilderLayout
       onNext={handleNext}
       onBack={handleBack}
       nextDisabled={!isValid}
-      nextLabel={effectiveCurrentStep === 5 ? 'Activate configuration' : undefined}
+      nextLabel={effectiveCurrentStep === 5 ? 'Deployment actions above' : undefined}
       lastSaved={fromScanner ? dcTwinStore.lastSaved : lastSaved}
-      onDeploy={effectiveCurrentStep === 5 && !fromScanner ? handleDeploy : undefined}
       currentStep={effectiveCurrentStep}
     >
       <CurrentStepComponent />

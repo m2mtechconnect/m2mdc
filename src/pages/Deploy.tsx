@@ -13,6 +13,11 @@ import { SectionCard, WorkspaceHeader } from '@/components/workspace-system';
 import { DeploymentEvidenceCard } from '@/components/deploy/DeploymentEvidenceCard';
 import { stackLabel } from '@/config/auraStackManifest';
 import { modelDisplayLabel } from '@/lib/llm/modelLabels';
+import { builderService } from '@/services/builderService';
+import {
+  evaluateBuilderActivationReadiness,
+  type ActivationReadinessResult,
+} from '../../supabase/functions/_shared/builderActivationReadiness';
 import {
   appendDeploymentEvent,
   closeDeployment,
@@ -54,6 +59,7 @@ export default function Deploy() {
   const [activating, setActivating] = useState(false);
   const [stages, setStages] = useState<ActivationStage[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [readiness, setReadiness] = useState<ActivationReadinessResult | null>(null);
 
   const canActivate = can('deployment.execute');
 
@@ -71,7 +77,7 @@ export default function Deploy() {
 
         const { data: agent, error: agentError } = await supabase
           .from('agents')
-          .select('id, name, status, config, connector_ids')
+          .select('id, name, status, config, connector_ids, twin_id')
           .eq('id', systemId)
           .maybeSingle();
         if (agentError) throw agentError;
@@ -86,7 +92,7 @@ export default function Deploy() {
 
         const { data: intelligence, error: intelligenceError } = await supabase
           .from('intelligence_settings')
-          .select('mcp_servers')
+          .select('mcp_servers, model_id')
           .eq('system_id', systemId)
           .maybeSingle();
         if (intelligenceError) throw intelligenceError;
@@ -101,8 +107,55 @@ export default function Deploy() {
             : null;
         const grounding = config.grounding === true;
         const tools = Array.isArray(intelligence?.mcp_servers) ? intelligence.mcp_servers.length : 0;
+        const twinId = typeof config.twin_id === 'string' ? config.twin_id : agent.twin_id;
+
+        const versionPromise = supabase
+          .from('agent_versions')
+          .select('id', { count: 'exact', head: true })
+          .eq('agent_id', systemId);
+        const simulationPromise = twinId
+          ? supabase
+              .from('simulation_runs')
+              .select('id', { count: 'exact', head: true })
+              .eq('twin_id', twinId)
+              .eq('lifecycle_status', 'succeeded')
+              .eq('verification_level', 'server-validated')
+          : supabase
+              .from('agent_runs')
+              .select('id', { count: 'exact', head: true })
+              .eq('agent_id', systemId)
+              .in('status', ['success', 'completed']);
+        const [versionResult, simulationResult] = await Promise.all([versionPromise, simulationPromise]);
+        let facilityAvailable = !twinId;
+        let facilityError: string | null = null;
+        if (twinId) {
+          const { data: facility, error: facilityQueryError } = await supabase
+            .from('data_centre_twins')
+            .select('id, metadata')
+            .eq('id', twinId)
+            .maybeSingle();
+          facilityError = facilityQueryError?.message || null;
+          const metadata = facility?.metadata && typeof facility.metadata === 'object' && !Array.isArray(facility.metadata)
+            ? facility.metadata as Record<string, unknown>
+            : null;
+          facilityAvailable = Boolean(facility && metadata?.provisioned !== 'default_starter_twin');
+        }
+        const readinessError = versionResult.error?.message || simulationResult.error?.message || facilityError;
+        const activationReadiness = evaluateBuilderActivationReadiness({
+          ...config,
+          twin_id: twinId,
+          connector_ids: agent.connector_ids,
+        }, {
+          verifiedSimulationCount: simulationResult.count ?? 0,
+          versionCount: versionResult.count ?? 0,
+          workflowCount: workflow ? 1 : 0,
+          intelligenceConfigured: Boolean(intelligence?.model_id),
+          facilityAvailable,
+          evidenceError: readinessError ? 'Persisted readiness evidence could not be verified.' : null,
+        });
 
         if (!cancelled) {
+          setReadiness(activationReadiness);
           setSummary({
             name: agent.name ?? 'Untitled system',
             status: agent.status ?? 'draft',
@@ -128,7 +181,7 @@ export default function Deploy() {
   }
 
   async function activateInAura() {
-    if (!systemId || !summary || activating || !canActivate) return;
+    if (!systemId || !summary || activating || !canActivate || !readiness?.isReady) return;
 
     setActivating(true);
     setError(null);
@@ -183,14 +236,7 @@ export default function Deploy() {
 
       currentStage = 2;
       setStage(2, 'running');
-      const { error: activationError } = await supabase
-        .from('agents')
-        .update({ status: 'active', deployed_at: new Date().toISOString() })
-        .eq('id', systemId);
-      if (activationError) {
-        await record(3, 'activate-configuration', 'failed', { message: activationError.message });
-        throw activationError;
-      }
+      await builderService.deploy(systemId);
       await record(3, 'activate-configuration', 'succeeded', {
         external_runtime_provisioned: false,
       });
@@ -335,6 +381,16 @@ export default function Deploy() {
           </Alert>
         )}
 
+        {readiness && !readiness.isReady && (
+          <Alert variant="destructive" className="mb-6">
+            <CircleAlert className="h-4 w-4" aria-hidden="true" />
+            <AlertDescription>
+              <strong>Activation blocked.</strong>{' '}
+              {readiness.blockers.map((item) => item.message).join(' ')}
+            </AlertDescription>
+          </Alert>
+        )}
+
         <SectionCard
           title="Activation readiness"
           description="Facts read from the saved AURA system configuration. Managed AI model serving is configured separately from runtime activation."
@@ -362,7 +418,7 @@ export default function Deploy() {
                 <p><span className="font-medium">External runtime:</span> Not provisioned by this action</p>
                 <p><span className="font-medium">Runtime health:</span> Not verified</p>
               </div>
-              <Button className="w-full" size="lg" disabled={!canActivate || activating || !summary} onClick={() => { void activateInAura(); }}>
+              <Button className="w-full" size="lg" disabled={!canActivate || activating || !summary || !readiness?.isReady} onClick={() => { void activateInAura(); }}>
                 {activating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <CheckCircle2 className="mr-2 h-4 w-4" aria-hidden="true" />}
                 {activating ? 'Activating...' : 'Activate in AURA'}
               </Button>

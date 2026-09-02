@@ -57,8 +57,8 @@ export function DeploymentWarnings({
   if (simulationHistory.length === 0) {
     warnings.push({
       id: 'no-simulation',
-      message: 'No simulation runs yet. Testing before deployment is recommended.',
-      severity: 'warning',
+      message: 'No successful server-validated simulation exists. Production activation is blocked.',
+      severity: 'critical',
       fixStep: 5,
       icon: Play
     });
@@ -68,8 +68,8 @@ export function DeploymentWarnings({
   if (!builderState?.kpis?.length) {
     warnings.push({
       id: 'no-kpis',
-      message: 'No KPIs defined. Add KPIs to track facility and twin outcomes over time.',
-      severity: 'warning',
+      message: 'No saved KPIs exist. Production activation requires measurable facility and twin outcomes.',
+      severity: 'critical',
       fixStep: 5,
       icon: Target
     });

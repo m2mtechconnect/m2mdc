@@ -9,6 +9,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
+import { evaluateBuilderActivationReadiness } from "../_shared/builderActivationReadiness.ts";
 
 const InputSchema = z.object({
   builderId: z.string().uuid(),
@@ -20,15 +21,14 @@ serve(createHandler({
   inputSchema: InputSchema,
   handler: async (input, context) => {
     const { builderId } = input;
-    const { supabase, userId, log } = context;
+    const { supabase, log } = context;
 
     log("Activating builder configuration", { builderId });
 
     const { data: builder, error: fetchError } = await supabase
       .from('agents')
-      .select('*')
+      .select('id, twin_id, connector_ids, config')
       .eq('id', builderId)
-      .eq('owner_id', userId)
       .single();
 
     if (fetchError) {
@@ -36,48 +36,80 @@ serve(createHandler({
       throw { code: 'NOT_FOUND', message: 'Builder not found', status: 404 };
     }
 
-    const config = builder.config as Record<string, any>;
+    const config = (builder.config || {}) as Record<string, any>;
     const isDCTwin = !!config.overview;
     const effectiveGoal = config.goal || config.overview?.twinSummary || config.overview?.description;
     const effectiveIndustry = config.industry || config.overview?.industry || config.overview?.industries?.[0];
     const effectiveDepartment = config.department || (isDCTwin ? 'IT Operations' : null);
     const effectiveType = config.type || (isDCTwin ? '3d_twin' : 'agent');
 
-    const errors: string[] = [];
-    if (!effectiveGoal) errors.push('Goal is required');
-    if (!effectiveIndustry) errors.push('Industry is required');
-    if (!effectiveDepartment) errors.push('Department is required');
-    if (!effectiveType) errors.push('Type is required');
-
     const hasStandardWorkflow = config.workflow?.actions?.length > 0;
     const hasDCWorkflows = Array.isArray(config.workflows) && config.workflows.length > 0;
-    if (!hasStandardWorkflow && !hasDCWorkflows) errors.push('Workflow configuration is required');
-
-    const hasModelConfig = config.model_config?.response_profile || config.model_config?.model || config.intelligence?.modelId;
-    if (!hasModelConfig) errors.push('Response profile is required');
 
     let boundTwinId: string | null = null;
+    let facilityAvailable = effectiveType !== '3d_twin' && effectiveType !== 'process_twin';
     if (effectiveType === '3d_twin' || effectiveType === 'process_twin') {
-      boundTwinId = typeof config.twin_id === 'string' ? config.twin_id : null;
-      if (!boundTwinId) {
-        errors.push('Facility binding is required');
-      } else {
+      boundTwinId = typeof config.twin_id === 'string'
+        ? config.twin_id
+        : typeof builder.twin_id === 'string'
+          ? builder.twin_id
+          : null;
+      if (boundTwinId) {
         const { data: facility, error: facilityError } = await supabase
           .from('data_centre_twins')
           .select('id, metadata')
           .eq('id', boundTwinId)
           .maybeSingle();
 
-        if (facilityError || !facility) {
-          errors.push('Bound facility is not available');
-        } else {
+        if (!facilityError && facility) {
           const metadata = facility.metadata as Record<string, unknown> | null;
-          if (metadata?.provisioned === 'default_starter_twin') {
-            errors.push('Bound facility requires operator setup');
-          }
+          facilityAvailable = metadata?.provisioned !== 'default_starter_twin';
         }
       }
     }
+
+    const [versionResult, workflowResult, intelligenceResult, simulationResult] = await Promise.all([
+      supabase.from('agent_versions').select('id', { count: 'exact', head: true }).eq('agent_id', builderId),
+      supabase.from('workflows').select('id', { count: 'exact', head: true }).eq('system_id', builderId),
+      supabase.from('intelligence_settings').select('id, model_id').eq('system_id', builderId).maybeSingle(),
+      boundTwinId
+        ? supabase
+            .from('simulation_runs')
+            .select('id', { count: 'exact', head: true })
+            .eq('twin_id', boundTwinId)
+            .eq('lifecycle_status', 'succeeded')
+            .eq('verification_level', 'server-validated')
+        : supabase
+            .from('agent_runs')
+            .select('id', { count: 'exact', head: true })
+            .eq('agent_id', builderId)
+            .in('status', ['success', 'completed']),
+    ]);
+
+    const evidenceErrors = [
+      versionResult.error?.message,
+      workflowResult.error?.message,
+      intelligenceResult.error?.message,
+      simulationResult.error?.message,
+    ].filter(Boolean);
+
+    const readinessConfig = {
+      ...config,
+      goal: effectiveGoal,
+      industry: effectiveIndustry,
+      department: effectiveDepartment,
+      type: effectiveType,
+      twin_id: boundTwinId,
+      connector_ids: builder.connector_ids,
+    };
+    const readiness = evaluateBuilderActivationReadiness(readinessConfig, {
+      verifiedSimulationCount: simulationResult.count ?? 0,
+      versionCount: versionResult.count ?? 0,
+      workflowCount: workflowResult.count ?? 0,
+      intelligenceConfigured: Boolean(intelligenceResult.data?.model_id),
+      facilityAvailable,
+      evidenceError: evidenceErrors.length > 0 ? 'Persisted readiness evidence could not be verified.' : null,
+    });
 
     log("Activation validation", {
       isDCTwin,
@@ -87,11 +119,14 @@ serve(createHandler({
       hasDCWorkflows,
       standardActions: config.workflow?.actions?.length || 0,
       dcWorkflows: config.workflows?.length || 0,
+      readinessScore: readiness.score,
+      blockerIds: readiness.blockers.map((item) => item.id),
     });
 
-    if (errors.length > 0) {
-      log("Activation validation failed", { errors });
-      throw { code: 'VALIDATION_ERROR', message: errors.join(', '), status: 400 };
+    if (!readiness.isReady) {
+      const messages = readiness.blockers.map((item) => item.message);
+      log("Activation validation failed", { errors: messages });
+      throw { code: 'VALIDATION_ERROR', message: messages.join(' '), status: 400 };
     }
 
     const nowIso = new Date().toISOString();
@@ -117,9 +152,9 @@ serve(createHandler({
       .update({
         status: 'active',
         config: updatedConfig,
+        deployed_at: nowIso,
       })
       .eq('id', builderId)
-      .eq('owner_id', userId)
       .select()
       .single();
 

@@ -3,8 +3,9 @@
 Status: **BLOCKED for deletion; quarantine remains authoritative.**
 
 This is a scoped structural audit, not authorization to delete source, undeploy
-functions, remove database objects, or change production. The audited commit is
-`33ac38e626e8b087026ea9a5700ea60a8295ea36` on
+functions, remove database objects, or change production. The implementation
+audited is `33ac38e626e8b087026ea9a5700ea60a8295ea36`; the initial audit evidence
+was committed as `80b304a501012769e0df528ef3b61e3fcfa0772b` on
 `review/ai-transport-consolidation-20260902`.
 
 ## Decision
@@ -47,8 +48,11 @@ unresolved trust-boundary edge preventing deletion.
 | Quarantine registry | All five functions are listed under `quarantine-in-place-no-promotion`. | Enforced by `edge-function-quarantine-contract.test.ts`. | Keep registered. |
 | Package use | `@langchain/langgraph` appears in `package.json` and `bun.lock`; no runtime source import was found. | Strong source evidence; bundle and historical external tooling still require qualification before removal. | Retirement candidate. |
 | New linked project | Read-only inventory for `zmewwjizebvublcsmhcz` returned eight active functions; none were `langgraph-*`. | Observed 2026-09-02 with the signed-in account. This project is not the repository-declared production ref. | No undeploy action required there. |
-| Declared production project | `supabase/config.toml` and production guards identify `psfvrskpnwcshvajzeix`. Read-only function inventory returned HTTP 403 for the current account. | **Blocked:** deployed function state and invocation telemetry are unavailable. | No source deletion or undeploy. |
-| Database objects | The LangGraph handlers use `agent_runs`, `agent_memory`, and `rag_documents`. `agent_runs` and `rag_documents` have active non-LangGraph consumers. | Database rows and retention were not queried. | Keep all tables, policies, types and migrations. |
+| Live application target | Lovable project `33c7ca9f-ffa8-4d71-9226-1ab9f9ef8f4b` at published commit `f1c614b3920b57cdd254ecd5915cd2e9bc08699c` has Supabase enabled, and its committed `.env` targets `psfvrskpnwcshvajzeix`. | Strong evidence that the declared ref is still the live build target, not a stale repository value. | Treat `psfvrskpnwcshvajzeix` as production until a governed release changes it. |
+| Declared production project | `supabase/config.toml`, production guards and the live Lovable build identify `psfvrskpnwcshvajzeix`. Direct dashboard navigation redirected to the current account's accessible organizations, and read-only CLI inventory returned HTTP 403. | **Blocked:** deployed function state and gateway invocation telemetry are unavailable. | No source deletion or undeploy. |
+| Current Supabase ownership view | The active dashboard account is `contact@m2mtechconnect.com`, Owner of the visible `M2M TECH` organization. That organization exposes only `aura-validation` (`zmewwjizebvublcsmhcz`) and paused `engineering_os` (`rjaannhfbabsjisqfzlx`); none of the four accessible organizations exposes `psfvrskpnwcshvajzeix`. | Strong account/organization evidence observed 2026-09-02. The production-owning account or organization is still unidentified. | Obtain an invitation from the production owner; do not create another AURA database or relink production. |
+| Production application rows | Read-only aggregate queries through Lovable's linked production database found zero rows in `agent_runs`, `agent_memory`, `rag_documents`, `agent_activity_logs`, and `agent_action_logs`. `audit_logs` contained 472 rows (2025-12-09 through 2026-08-27) and zero case-insensitive `langgraph` references across action, entity type and details. | Strong evidence that these application tables do not record LangGraph use. It does not cover Edge Function gateway logs, callers that fail before writes, or external consumers that do not persist markers. | Supports retirement candidacy; does not authorize deletion. |
+| Database objects | The LangGraph handlers use `agent_runs`, `agent_memory`, and `rag_documents`. The schema is present in production, and repository consumers outside LangGraph still rely on shared tables. | Production tables are currently empty, but schema authority and active non-LangGraph code contracts remain. | Keep all tables, policies, types and migrations. |
 | Ownership | Most history originates from generated/Lovable commits; no current domain owner is declared for this family. | Owner unassigned. | Assign an AURA agent-runtime owner before retirement approval. |
 
 ## Naming and retirement ledger

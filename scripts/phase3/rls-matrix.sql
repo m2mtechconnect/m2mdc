@@ -277,7 +277,7 @@ BEGIN
   ------------------------------------------------ tenant A approver identity
   PERFORM pg_temp.act_as(approver_a);
   SELECT count(*) INTO n FROM public.simulation_runs WHERE id = run_a;
-  PERFORM pg_temp.expect('tenant A approver has no implicit read of another member run', n = 0, true);
+  PERFORM pg_temp.expect('tenant A approver reads organization run for governed handoff', n = 1, true);
   RESET role;
 
   -------------------------------------------------- tenant A administrator

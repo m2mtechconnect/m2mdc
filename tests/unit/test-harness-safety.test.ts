@@ -218,6 +218,9 @@ describe('test harness safety guards', () => {
     expect(matrix).toContain(
       "VALUES (member_a, org_a, twin_a, 'validation-extended', 'succeeded')",
     );
+    expect(matrix).toContain(
+      'tenant A approver reads organization run for governed handoff',
+    );
     expect(validator).toContain("op: 'create'");
     expect(validator).toContain("requestedExecutionClass: 'ephemeral-local-validation'");
     expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');

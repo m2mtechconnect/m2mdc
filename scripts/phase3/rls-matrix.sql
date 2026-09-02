@@ -243,7 +243,7 @@ BEGIN
   -- all authorization assertions below still execute as authenticated/anon.
   PERFORM set_config('request.jwt.claims', '{"role":"service_role"}', true);
   INSERT INTO public.simulation_runs (user_id, tenant_id, twin_id, scenario_key, lifecycle_status)
-  VALUES (member_a, member_a, twin_a, 'validation-extended', 'succeeded') RETURNING id INTO run_a;
+  VALUES (member_a, org_a, twin_a, 'validation-extended', 'succeeded') RETURNING id INTO run_a;
 
   ------------------------------------------------------------- anon writes
   PERFORM set_config('request.jwt.claims', NULL, true);

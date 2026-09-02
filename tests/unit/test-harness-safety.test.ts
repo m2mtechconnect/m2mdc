@@ -215,6 +215,9 @@ describe('test harness safety guards', () => {
     expect(validator).toContain('WITH inserted AS (');
     expect(validator).toContain(') SELECT id FROM inserted');
     expect(matrix.match(/simulation_runs \(user_id, tenant_id, twin_id, scenario_key,/g)).toHaveLength(5);
+    expect(matrix).toContain(
+      "VALUES (member_a, org_a, twin_a, 'validation-extended', 'succeeded')",
+    );
     expect(validator).toContain("op: 'create'");
     expect(validator).toContain("requestedExecutionClass: 'ephemeral-local-validation'");
     expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');

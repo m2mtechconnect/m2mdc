@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "49919a2ddc6217cc702c3801bd2c1b6c51887d04",
-    "workflowRunId": 33625703952,
-    "artifactId": 9844751169,
-    "artifactZipSha256": "1587b681823831a92d3d11a1ef640539b461b56533733ebefcba3ef0a44eaee0"
+    "sha": "f2af3cc3781e4fde61226776ab264d72c0842be0",
+    "workflowRunId": 33629286801,
+    "artifactId": 9846158523,
+    "artifactZipSha256": "8c96c9510d1d896be19c0b8743021a1765f83a1bf1c3552a39e02c90813dc71a"
   },
   "notes": [
     "PR #127 exact-head review approved intentional changes on analytics desktop/mobile, Builder deployment readiness, and Connections desktop/mobile. The reviewed artifact showed one readiness heading, corrected Connections ownership, visible provenance labels without trend overlap, and no duplicate inspector close control.",
@@ -35,7 +35,8 @@
     "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged.",
     "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact.",
     "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract.",
-    "2026-09-02 exact-head qualification inspected all 20 screenshots from Visual Regression workflow 33625703952 at source 49919a2ddc6217cc702c3801bd2c1b6c51887d04. The first candidate artifact was rejected after review exposed a repeated organization suffix. The corrected artifact 9844751169 was then visibly reviewed: activation desktop/mobile remain fail-closed with explicit persisted-evidence blockers, Builder deployment readiness exposes the missing KPI and server-validated simulation requirements, and Command Center desktop/mobile show the persona priority journey without duplicated scope copy, clipped primary controls, overlap or page-level horizontal overflow. The other 15 fingerprints remained exact or retained their approved responsive invariant."
+    "2026-09-02 exact-head qualification inspected all 20 screenshots from Visual Regression workflow 33625703952 at source 49919a2ddc6217cc702c3801bd2c1b6c51887d04. The first candidate artifact was rejected after review exposed a repeated organization suffix. The corrected artifact 9844751169 was then visibly reviewed: activation desktop/mobile remain fail-closed with explicit persisted-evidence blockers, Builder deployment readiness exposes the missing KPI and server-validated simulation requirements, and Command Center desktop/mobile show the persona priority journey without duplicated scope copy, clipped primary controls, overlap or page-level horizontal overflow. The other 15 fingerprints remained exact or retained their approved responsive invariant.",
+    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not."
   ],
   "screenshots": [
     {
@@ -172,8 +173,8 @@
     },
     {
       "file": "teams-light-chromium-linux.png",
-      "mode": "sha256",
-      "sha256": "21e76bb3a490c9cfb0a130b88c11cb20155a58b8b544d33183a36fa0c7966b39",
+      "mode": "pixel-sha256-4bit",
+      "pixelSha256": "871ee986ce4c0dc8712aa20500082a00e3a15a136f391de58ece57bb5fc1e5c9",
       "width": 1280,
       "height": 720
     }

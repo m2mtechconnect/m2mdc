@@ -2,6 +2,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pngDimensions, quantizedPixelDigest } from './png-pixel-fingerprint.mjs';
 
 const outputDir = resolve(process.argv[2] || 'visual-current-head');
 const manifestPath = resolve(process.argv[3] || 'tests/visual/approved-linux-visuals.json');
@@ -9,17 +10,6 @@ const manifestPath = resolve(process.argv[3] || 'tests/visual/approved-linux-vis
 function fail(message) {
   console.error(`[visual-fingerprint] ${message}`);
   process.exitCode = 1;
-}
-
-function pngDimensions(buffer) {
-  const signature = Buffer.from([0x89,0x50,0x4e,0x47,0x0d,0x0a,0x1a,0x0a]);
-  if (buffer.length < 24 || !buffer.subarray(0, 8).equals(signature)) {
-    throw new Error('not a valid PNG');
-  }
-  return {
-    width: buffer.readUInt32BE(16),
-    height: buffer.readUInt32BE(20),
-  };
 }
 
 if (!existsSync(manifestPath)) {
@@ -89,6 +79,17 @@ for (const item of expected) {
       fail(`${item.file}: SHA-256 drift\n  approved ${item.sha256}\n  current  ${digest}`);
     } else {
       console.log(`[visual-fingerprint] PASS ${item.file} ${dimensions.width}x${dimensions.height} ${digest.slice(0, 12)}…`);
+    }
+  } else if (item.mode === 'pixel-sha256-4bit') {
+    try {
+      const digest = quantizedPixelDigest(buffer);
+      if (digest !== item.pixelSha256) {
+        fail(`${item.file}: quantized pixel SHA-256 drift\n  approved ${item.pixelSha256}\n  current  ${digest}`);
+      } else {
+        console.log(`[visual-fingerprint] PASS quantized pixels ${item.file} ${dimensions.width}x${dimensions.height} ${digest.slice(0, 12)}…`);
+      }
+    } catch (error) {
+      fail(`${item.file}: ${error instanceof Error ? error.message : String(error)}`);
     }
   } else if (item.mode === 'responsive') {
     console.log(`[visual-fingerprint] PASS responsive invariant ${item.file} ${dimensions.width}x${dimensions.height}`);

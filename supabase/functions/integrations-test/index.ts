@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -177,21 +178,13 @@ serve(async (req) => {
 
 // Test function implementations
 async function testGemini() {
-  const apiKey = Deno.env.get('LOVABLE_API_KEY');
+  const apiKey = isManagedAIConfigured();
   if (!apiKey) throw new Error('LOVABLE_API_KEY not configured');
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      messages: [{ role: 'user', content: testPrompt }],
-      max_tokens: 50,
-    }),
-  });
+  const response = await makeAIResponse(
+      { messages: [{ role: 'user', content: testPrompt }], maxTokens: 50 },
+      { model: 'fast', operation: 'integrations-test' },
+    );
 
   if (!response.ok) {
     const error = await response.text();

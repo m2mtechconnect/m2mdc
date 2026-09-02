@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { DOMParser, Element } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
@@ -135,7 +136,7 @@ serve(async (req) => {
     
     // Health check endpoint for Gemini
     if (healthCheck) {
-      const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+      const LOVABLE_API_KEY = isManagedAIConfigured();
       if (!LOVABLE_API_KEY) {
         return new Response(
           JSON.stringify({ 
@@ -149,27 +150,21 @@ serve(async (req) => {
 
       const healthStart = Date.now();
       try {
-        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
-            messages: [{ role: "user", content: "Hello" }],
-            max_tokens: 10,
-          }),
-        });
+        const response = await makeAIResponse(
+      { messages: [{ role: "user", content: "Hello" }], maxTokens: 10 },
+      { model: 'fast', operation: 'url-capture' },
+    );
 
         const latency = Date.now() - healthStart;
+        const aiEvidence = getAIResponseEvidence(response);
         
         if (response.ok) {
           return new Response(
             JSON.stringify({ 
               healthy: true, 
               latency_ms: latency,
-              model: "google/gemini-2.5-flash"
+              model: aiEvidence?.model ?? null,
+              ai: aiEvidence,
             }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
@@ -208,7 +203,7 @@ serve(async (req) => {
     const startTime = Date.now();
     const requestId = crypto.randomUUID();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -224,7 +219,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    console.log("✓ Lovable AI configured");
+    console.log("✓ Managed AI configured");
 
     // STAGE: Preflight - Check robots.txt (lightweight check, not strict RFC compliance)
     console.log(`[${requestId}] STAGE: preflight`);
@@ -700,15 +695,8 @@ serve(async (req) => {
 
     // STAGE: Summarize - Generate AI summary
     console.log(`[${requestId}] STAGE: summarize - calling Gemini`);
-    const summaryResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+    const summaryResponse = await makeAIResponse(
+      { messages: [
           {
             role: "system",
             content: `You are a web content summarizer. Analyze the website content and provide:
@@ -728,9 +716,9 @@ Return JSON:
             role: "user",
             content: `Title: ${title}\n\nContent:\n${mainContent.substring(0, 4000)}`,
           },
-        ],
-      }),
-    });
+        ] },
+      { model: 'fast', operation: 'url-capture' },
+    );
 
     let aiSummary;
     if (summaryResponse.ok) {

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isManagedAIConfigured } from "../_shared/ai-client.ts";
 
 
 serve(async (req) => {
@@ -11,8 +12,8 @@ serve(async (req) => {
   try {
     const ts = Date.now();
     
-    // Primary: Check Lovable Cloud managed AI (always available)
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    // Primary: check the supported managed AI boundary.
+    const lovableApiKey = isManagedAIConfigured();
     const lovableHealthy = !!lovableApiKey;
     
     // Optional: Check external Google Cloud credentials
@@ -25,11 +26,11 @@ serve(async (req) => {
     const externalGoogleHealthy = !!(credentials && projectId);
 
     const health = {
-      // Primary provider
+      // Primary provider. The profile mapping remains server-owned.
       lovable_managed: {
         healthy: lovableHealthy,
-        provider: 'lovable_cloud',
-        models: ['google/gemini-3-pro-preview', 'google/gemini-2.5-flash', 'google/gemini-2.5-flash-lite'],
+        provider: 'aura_managed',
+        profiles: ['advanced', 'balanced', 'fast', 'fallback'],
         status: lovableHealthy ? 'ready' : 'not_configured'
       },
       
@@ -39,22 +40,24 @@ serve(async (req) => {
         configured: externalGoogleHealthy,
         vertex_search: externalGoogleHealthy && !!vertexDataStoreId,
         region: location,
-        status: useExternalGoogle ? (externalGoogleHealthy ? 'ready' : 'not_configured') : 'disabled'
+        status: useExternalGoogle
+          ? (externalGoogleHealthy ? 'configured_not_active' : 'not_configured')
+          : 'disabled'
       },
       
       // Overall status
-      active_provider: useExternalGoogle && externalGoogleHealthy ? 'external_google' : 'lovable_managed',
-      overall_healthy: lovableHealthy, // Always healthy if Lovable key exists
+      active_provider: 'aura_managed',
+      overall_healthy: lovableHealthy,
       ts,
       requestId: crypto.randomUUID()
     };
     
     if (!lovableHealthy) {
-      console.warn('[health-ai] LOVABLE_API_KEY not configured - AI features may not work');
+      console.warn('[health-ai] Managed AI is not configured - AI features may not work');
     }
     
     if (useExternalGoogle && !externalGoogleHealthy) {
-      console.warn('[health-ai] External Google credentials requested but not configured - falling back to Lovable managed');
+      console.warn('[health-ai] External Google is not an active runtime adapter; managed AI remains active');
     }
 
     return new Response(JSON.stringify(health), {

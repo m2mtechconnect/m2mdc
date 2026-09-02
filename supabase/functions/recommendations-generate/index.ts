@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/recommendations-generate
  * 
@@ -169,8 +170,8 @@ Output JSON array of up to 3 objects per department with keys:
 
 Each citation must include: url, snippet (text excerpt from the chunk), snippet_id (chunk id like rag_0, ks_1).`;
 
-    // Call Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    // Call the managed AI boundary.
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: 'CONFIGURATION_ERROR',
@@ -179,23 +180,15 @@ Each citation must include: url, snippet (text excerpt from the chunk), snippet_
       };
     }
 
-    log("Calling Lovable AI");
+    log("Calling managed AI");
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-3-pro-preview',
-        messages: [
+    const aiResponse = await makeAIResponse(
+      { messages: [
           { role: 'system', content: SYSTEM_PROMPT },
           { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.3,
-      }),
-    });
+        ], temperature: 0.3 },
+      { model: 'reasoning', operation: 'recommendations-generate' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();

@@ -1,6 +1,6 @@
 # ADR 0012 — Managed AI transport boundary
 
-Status: Proposed for review. This ADR authorizes no provider migration or new runtime.
+Status: Accepted in the review branch. Production rollout remains separately gated.
 
 ## Decision
 
@@ -28,7 +28,17 @@ tenant-policy authority.
   qualified separately.
 - Provider changes are isolated behind one server boundary without changing browser
   contracts or exposing secrets.
-- Direct provider calls are migrated incrementally with focused regression evidence;
-  this decision does not authorize a broad mechanical rewrite.
+- All AI completion callers use the shared transport. A repository contract test fails
+  if the managed completion endpoint appears outside that boundary.
+- Provider failure bodies are sanitized at the boundary. Request correlation,
+  operation, profile, status and latency evidence are recorded without prompts,
+  credentials or provider response bodies.
 - Adding a new AI gateway or Python service requires a new decision record and exact-SHA
   qualification rather than dependency installation alone.
+
+## Rollout gate
+
+This decision is implemented and locally qualified, but not deployed by this ADR.
+Production promotion requires the normal exact-SHA release checks, a canary, rollback
+readiness and a 30-day observation window for reliability, latency, cost and model
+quality. The observation window cannot be inferred from local tests.

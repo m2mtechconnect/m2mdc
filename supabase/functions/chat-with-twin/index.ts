@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -11,7 +12,7 @@ serve(async (req) => {
   try {
     const { messages, templateContext } = await req.json();
     
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
@@ -37,21 +38,13 @@ ${templateContext?.blueprint?.workflow_steps?.map((s: any) => `${s.label}`).join
 
 Answer questions about this Digital Twin clearly and concisely. Explain what it does, how it works, what scenarios it handles, and any limitations. Be specific and avoid vague statements.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+    const response = await makeAIResponse(
+      { messages: [
           { role: "system", content: contextualPrompt },
           ...messages,
-        ],
-        stream: true,
-      }),
-    });
+        ] },
+      { model: 'fast', operation: 'chat-with-twin', stream: true },
+    );
 
     if (!response.ok) {
       if (response.status === 429) {

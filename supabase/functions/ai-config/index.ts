@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { getCorsHeaders } from '../_shared/cors.ts';
 import { requireCaller, callerRejectedResponse } from '../_shared/callerIdentity.ts';
+import { isManagedAIConfigured } from '../_shared/ai-client.ts';
 
 /**
  * Provider-neutral managed AI capability probe.
@@ -28,7 +29,7 @@ serve(async (req) => {
     });
   }
 
-  const managedAiAvailable = Boolean(Deno.env.get('LOVABLE_API_KEY'));
+  const managedAiAvailable = isManagedAIConfigured();
   const groundingAvailable = false;
 
   return new Response(JSON.stringify({

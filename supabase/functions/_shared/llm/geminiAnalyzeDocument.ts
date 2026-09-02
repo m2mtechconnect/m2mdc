@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../ai-client.ts";
 /**
  * Gemini-powered document analysis with chunking
  * Uses map-reduce approach for large documents
@@ -37,7 +38,7 @@ const CHUNK_OVERLAP = 500; // 500 char overlap between chunks
 export async function geminiAnalyzeDocument(
   input: AnalysisInput
 ): Promise<AnalysisResult> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+  const LOVABLE_API_KEY = isManagedAIConfigured();
   if (!LOVABLE_API_KEY) {
     throw new Error("GEMINI_NOT_CONFIGURED");
   }
@@ -68,7 +69,7 @@ async function analyzeFullDocument(
   text: string,
   fileName: string
 ): Promise<AnalysisResult> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+  const LOVABLE_API_KEY = isManagedAIConfigured()!;
 
   const systemPrompt = `You are an expert document analyst. Analyze the following document and extract:
 1. A brief outline (3-5 main points)
@@ -96,22 +97,13 @@ Return your analysis as a JSON object with this structure:
   }
 }`;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3-pro-preview",
-      messages: [
+  const response = await makeAIResponse(
+      { messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Document: ${fileName}\n\n${text}` },
-      ],
-      temperature: 0.3,
-      response_format: { type: "json_object" },
-    }),
-  });
+      ], temperature: 0.3, responseFormat: { type: "json_object" } },
+      { model: 'reasoning', operation: 'document-analysis' },
+    );
 
   if (!response.ok) {
     if (response.status === 429) {
@@ -168,27 +160,19 @@ async function analyzeChunk(
   chunkIndex: number,
   totalChunks: number
 ): Promise<string> {
-  const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+  const LOVABLE_API_KEY = isManagedAIConfigured()!;
 
   const systemPrompt = `You are analyzing part ${chunkIndex} of ${totalChunks} of a larger document.
 Provide a concise summary of the key points, entities, and concepts in this section.
 Focus on what's important and actionable. Keep it under 500 words.`;
 
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3-pro-preview",
-      messages: [
+  const response = await makeAIResponse(
+      { messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: chunk },
-      ],
-      temperature: 0.3,
-    }),
-  });
+      ], temperature: 0.3 },
+      { model: 'reasoning', operation: 'document-analysis' },
+    );
 
   if (!response.ok) {
     console.error(`Chunk ${chunkIndex} analysis failed`);

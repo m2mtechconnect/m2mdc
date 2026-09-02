@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/classify-content
  * 
@@ -45,7 +46,7 @@ serve(createHandler({
 
     log("Classifying content", { hasUrl: !!url, hasText: !!text });
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: ErrorCodes.INTERNAL_ERROR,
@@ -78,21 +79,13 @@ Classify this content and return only valid JSON.`;
 
     log("Calling AI for classification");
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+    const aiResponse = await makeAIResponse(
+      { messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.2,
-      }),
-    });
+        ], temperature: 0.2 },
+      { model: 'fast', operation: 'classify-content' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();

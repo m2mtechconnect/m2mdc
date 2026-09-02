@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/agent-stream
  * 
@@ -87,7 +88,7 @@ serve(createHandler({
     }
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       log("LOVABLE_API_KEY not configured");
       throw {
@@ -97,8 +98,8 @@ serve(createHandler({
       };
     }
 
-    // Extract model and settings - ENFORCE GEMINI 3.X
-    const modelId = agent.config?.model || agent.model_id || 'google/gemini-3-pro-preview';
+    // Runtime tuning remains configurable, but provider/model selection is
+    // resolved by the server-owned managed AI profile.
     const temperature = params?.temperature ?? agent.config?.temperature ?? 0.7;
     const maxTokens = params?.maxTokens ?? agent.config?.max_tokens ?? 2048;
     const systemPrompt = agent.config?.system_prompt || 'You are a helpful AI assistant.';
@@ -111,24 +112,14 @@ serve(createHandler({
 
     const startTime = Date.now();
 
-    log("Calling Lovable AI", { model: modelId });
+    log("Calling managed AI", { profile: 'reasoning' });
 
-    // Call Lovable AI Gateway with streaming
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: modelId,
-        messages: aiMessages,
-        temperature,
-        max_tokens: maxTokens,
-        stream: true,
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS)
-    });
+    // Call the managed AI boundary with streaming.
+    const aiResponse = await makeAIResponse(
+      { messages: aiMessages, temperature: temperature, maxTokens: maxTokens },
+      { model: 'reasoning', operation: 'agent-stream', stream: true, signal: AbortSignal.timeout(TIMEOUT_MS) },
+    );
+    const aiEvidence = getAIResponseEvidence(aiResponse);
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
@@ -138,7 +129,7 @@ serve(createHandler({
       if (aiResponse.status === 429) {
         errorMsg = 'Rate limit exceeded. Please try again later.';
       } else if (aiResponse.status === 402) {
-        errorMsg = 'Payment required. Please add funds to your Lovable AI workspace.';
+        errorMsg = 'AI service capacity is unavailable. Please contact support.';
       }
       
       throw {
@@ -194,7 +185,7 @@ serve(createHandler({
             agent_id: agentId,
             user_id: userId,
             input: { messages },
-            output: { response: fullResponse },
+            output: { response: fullResponse, ai: aiEvidence },
             status: 'completed',
             duration_ms: latency,
             completed_at: new Date().toISOString()
@@ -211,7 +202,7 @@ serve(createHandler({
             agent_id: agentId,
             user_id: userId,
             input: { messages },
-            output: { error: err instanceof Error ? err.message : 'Stream error' },
+            output: { error: err instanceof Error ? err.message : 'Stream error', ai: aiEvidence },
             status: 'failed',
             duration_ms: Date.now() - startTime,
             completed_at: new Date().toISOString()

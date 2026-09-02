@@ -1,6 +1,6 @@
 {
   "suite": "supervisor-engineering-evals",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "dataClass": "synthetic-evaluation-data",
   "note": "Synthetic evaluation cases for the governed engineering-knowledge retrieval module and evidence guardrails. Every case, statement and artifact reference in this file is authored synthetic material for evaluation only. Nothing here is telemetry, tenant data or an assertion about production state.",
   "cases": [
@@ -375,6 +375,78 @@
         "grounding": "grounded",
         "domains": ["platform-assurance"],
         "topEntryId": "pa-portable-qualification-and-perimeter-parity",
+        "minCitations": 3
+      }
+    },
+    {
+      "id": "eval-30",
+      "title": "Readiness warnings with an enabled production action retrieve executable-gate guidance",
+      "kind": "retrieval",
+      "input": { "query": "readiness score warnings zero simulations missing KPIs deploy production button enabled" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-executable-readiness-gates",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-31",
+      "title": "Direct deployment request with stale browser readiness retrieves server-validation guidance",
+      "kind": "retrieval",
+      "input": { "query": "direct deployment request stale browser readiness server policy reject" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-executable-readiness-gates",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-32",
+      "title": "Explicitly advisory warning near miss still retrieves readiness-gate guidance",
+      "kind": "retrieval",
+      "input": { "query": "advisory warning non blocking status explicit tested readiness gate" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-executable-readiness-gates",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-33",
+      "title": "Evidence route substituting a demo facility retrieves context-continuity guidance",
+      "kind": "retrieval",
+      "input": { "query": "active tenant facility evidence route silently substitutes demonstration facility unrelated run" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-context-continuity-and-demo-isolation",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-34",
+      "title": "Facility with no evidence retrieves fail-closed no-substitution guidance",
+      "kind": "retrieval",
+      "input": { "query": "requested facility no bound evidence fail closed no fixture substitution" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-context-continuity-and-demo-isolation",
+        "minCitations": 2
+      }
+    },
+    {
+      "id": "eval-35",
+      "title": "Exact release with blocked authenticated smoke and zero mounted assets retrieves runtime proof guidance",
+      "kind": "retrieval",
+      "input": { "query": "exact deployed commit authenticated smoke blocked credentials zero mounted asset roles benchmark run missing" },
+      "expect": {
+        "grounding": "grounded",
+        "domains": ["platform-assurance"],
+        "topEntryId": "pa-runtime-asset-and-post-publish-proof",
         "minCitations": 3
       }
     }

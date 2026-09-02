@@ -156,4 +156,102 @@ export const PLATFORM_ASSURANCE_CORPUS: EngineeringKnowledgeEntry[] = [
     provenance: 'engineering-guidance',
     tenantScope: 'global',
   },
+  {
+    id: 'pa-executable-readiness-gates',
+    domain: 'platform-assurance',
+    title: 'Readiness findings must control deployment actions',
+    guidance:
+      'A readiness score, warning list or no-go label is ineffective when activation and environment deployment ' +
+      'controls remain executable. Compute one canonical server-validated readiness decision from required ' +
+      'simulations, KPI coverage, governance, versioning, runtime bindings and target-environment policy. Use that ' +
+      'decision to disable or reject every activation and deployment path, including direct requests and stale ' +
+      'browser state. Warnings may remain advisory only when their non-blocking status is explicit and tested.',
+    keywords: [
+      'readiness', 'warning', 'score', 'activate', 'deployment', 'production', 'simulation', 'kpi',
+      'disabled', 'server', 'policy', 'stale',
+    ],
+    citations: [
+      {
+        label: 'AURA Builder deployment step',
+        locator: 'src/components/builder/steps/Step5Deploy.tsx',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA Builder readiness checklist',
+        locator: 'src/components/builder/step5/deploy/ReadinessChecklist.tsx',
+        kind: 'repository-artifact',
+      },
+    ],
+    restrictedClaimCategories: ['deployment', 'production-readiness'],
+    runtimeIntegrationClaim: 'none',
+    provenance: 'engineering-guidance',
+    tenantScope: 'global',
+  },
+  {
+    id: 'pa-context-continuity-and-demo-isolation',
+    domain: 'platform-assurance',
+    title: 'Facility, run and source context must survive route transitions',
+    guidance:
+      'A governed journey carries the canonical organization, facility, run, source mode and observation timestamp ' +
+      'through every dashboard, simulation, analytics and evidence route. A direct route may show an explicit ' +
+      'unselected state, but it must not silently replace an active tenant facility with a demonstration facility ' +
+      'or unrelated run. Test link navigation, copied URLs, reloads and absent parameters, and fail closed when the ' +
+      'requested facility has no bound evidence instead of substituting fixtures.',
+    keywords: [
+      'context', 'facility', 'run', 'source', 'route', 'transition', 'reload', 'direct', 'demo',
+      'substitution', 'evidence', 'tenant',
+    ],
+    citations: [
+      {
+        label: 'AURA evidence facility scope resolver',
+        locator: 'src/dsx/runtime/evidenceFacilityScope.ts',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA evidence workspace shell',
+        locator: 'src/pages/dsx/EvidenceBetaShell.tsx',
+        kind: 'repository-artifact',
+      },
+    ],
+    restrictedClaimCategories: ['production-readiness'],
+    runtimeIntegrationClaim: 'none',
+    provenance: 'engineering-guidance',
+    tenantScope: 'global',
+  },
+  {
+    id: 'pa-runtime-asset-and-post-publish-proof',
+    domain: 'platform-assurance',
+    title: 'Runtime assets and deployed releases require exact observation evidence',
+    guidance:
+      'Approved manifests, structural stage checks and public-route smoke checks do not prove a mounted runtime ' +
+      'asset or an authenticated deployed journey. Release qualification must match the exact deployed commit, ' +
+      'complete every required authenticated check and preserve evidence without concurrent-writer races. Asset ' +
+      'qualification must record the exact derivative checksum, mounted object coverage, target hardware, benchmark ' +
+      'and human visual verdict. Missing credentials, zero mounted roles or an absent run identifier are blockers.',
+    keywords: [
+      'runtime', 'asset', 'mounted', 'coverage', 'hardware', 'benchmark', 'visual', 'smoke',
+      'authenticated', 'deployed', 'commit', 'credentials', 'evidence', 'race',
+    ],
+    citations: [
+      {
+        label: 'AURA post-publish smoke workflow',
+        locator: '.github/workflows/post-publish-smoke.yml',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA reference-facility validation',
+        locator: 'src/pages/admin/ReferenceFacilityValidation.tsx',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA GPU acceptance benchmark scene',
+        locator: 'src/validation/gpuAcceptance/BenchmarkScene.tsx',
+        kind: 'repository-artifact',
+      },
+    ],
+    restrictedClaimCategories: ['deployment', 'production-readiness'],
+    runtimeIntegrationClaim: 'none',
+    provenance: 'engineering-guidance',
+    tenantScope: 'global',
+  },
 ];

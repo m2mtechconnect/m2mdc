@@ -8,8 +8,7 @@
 import { test, expect, type BrowserContext, type Page } from '@playwright/test';
 import { test as guardedTest } from './_setup/fixtures';
 import { installSupabaseMock, buildFakeSession } from './_setup/supabase-mock';
-import { getRoleDashboardConfig } from '@/config/roleDashboardConfig';
-import type { AppRole } from '@/contexts/RBACContext';
+import { WORKSPACE_NAV } from '@/config/appNavigation';
 
 /** Canonical routes plus compatibility aliases that must continue to resolve. */
 const DEEP_LINK_ROUTES: readonly string[] = [
@@ -105,30 +104,20 @@ guardedTest.describe('AURA DC full-surface deep-link coverage', () => {
   }
 });
 
-guardedTest.describe('AURA DC per-role header navigation (real clicks)', () => {
-  const roles: AppRole[] = ['engineer', 'executive', 'manager', 'security_admin'];
-
-  for (const roleKey of roles) {
-    const cfg = getRoleDashboardConfig(roleKey);
-    if (!cfg) continue;
-    const primaryLinks = cfg.navigation.filter((n) => n.group === 'primary');
-
-    guardedTest(`role=${roleKey} primary nav clicks land on declared routes`, async ({ context, page, guard }) => {
+guardedTest.describe('AURA DC permanent workspace navigation (real clicks)', () => {
+  for (const item of WORKSPACE_NAV) {
+    guardedTest(`${item.fullName} lands on its canonical workspace route`, async ({ context, page, guard }) => {
       await page.setViewportSize({ width: 1920, height: 1080 });
       const mock = await installSupabaseMock(context);
       await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
       await expect.poll(() => mock.profileHits(), { timeout: 5_000 }).toBeGreaterThan(0);
 
-      for (const item of primaryLinks) {
-        const link = page.getByRole('link', { name: new RegExp(item.fullName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first();
-        if (!(await link.count())) continue;
-        if (!(await link.isVisible())) continue;
-        await link.click();
-        await expect
-          .poll(() => currentPath(page), { timeout: 5_000, message: `${item.fullName} -> ${item.href}` })
-          .toMatch(new RegExp(`^${item.href.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}(/|\\\\?|$)`));
-        await page.goBack({ waitUntil: 'domcontentloaded' }).catch(() => {});
-      }
+      const link = page.getByRole('link', { name: item.fullName, exact: true }).first();
+      await expect(link).toBeVisible();
+      await link.click();
+      await expect
+        .poll(() => currentPath(page), { timeout: 5_000, message: `${item.fullName} -> ${item.href}` })
+        .toMatch(new RegExp(`^${item.href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(/|\\?|$)`));
 
       expect(guard.anyExternalCompleted()).toBe(false);
     });

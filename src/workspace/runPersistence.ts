@@ -55,6 +55,21 @@ interface PersistParams {
   idempotencyKey: string;
 }
 
+interface LifecycleCreatePayload {
+  run?: { id?: string; lifecycle_status?: string };
+  idempotent?: boolean;
+}
+
+/** Accept the standardized Edge envelope and the legacy flat response shape. */
+function lifecycleCreatePayload(raw: unknown): LifecycleCreatePayload {
+  if (!raw || typeof raw !== 'object') return {};
+  const outer = raw as Record<string, unknown>;
+  const nested = outer.data;
+  return nested && typeof nested === 'object'
+    ? (nested as LifecycleCreatePayload)
+    : (outer as LifecycleCreatePayload);
+}
+
 function snapshotOf(run: WorkspaceRun) {
   return {
     input: {
@@ -103,78 +118,73 @@ export async function persistRun(params: PersistParams): Promise<PersistOutcome>
     };
   }
 
-  const { data: auth, error: authError } = await supabase.auth.getUser();
-  if (authError || !auth?.user) {
-    return { status: 'unsaved', reason: 'You are not signed in, so the run could not be saved.' };
-  }
-  const tenantId = await activeOrganizationId();
-  if (!tenantId) {
-    return { status: 'unsaved', reason: 'Select an active organization before recording a simulation run.' };
-  }
-
   const snap = snapshotOf(run);
-  const row = {
-    twin_id: twinId,
-    user_id: auth.user.id,
-    tenant_id: tenantId,
-    scenario_key: run.scenarioId,
-    scenario_name: run.scenarioLabel,
-    scenario_type: params.scenarioType ?? 'operational',
-    run_label: run.id,
-    run_key: run.id,
-    status: 'completed' as const,
-    lifecycle_status: 'succeeded',
-    run_intent: 'preview',
-    verification_level: 'client-produced-unverified',
-    started_at: run.startedAt,
-    finished_at: run.completedAt,
-    duration_ms: Math.max(0, new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime()),
-    baseline_kpis: run.baseline as unknown as Record<string, number>,
-    final_kpis: run.result as unknown as Record<string, number>,
-    events: run.events as unknown as Record<string, unknown>[],
-    kpi_snapshots: [],
-    input_snapshot: snap.input,
-    output_snapshot: snap.output,
-    metric_provenance: metricProvenanceFor(run.result),
-    engine_version: RUN_ENGINE_VERSION,
-    execution_origin: 'client-browser',
-    validation_status: 'client-produced-unverified',
-    blueprint_id: params.blueprintId && isUuid(params.blueprintId) ? params.blueprintId : null,
-    blueprint_version: params.blueprintVersion ?? null,
-    idempotency_key: idempotencyKey,
-    checksum: runChecksum(snap),
-    metadata: { schemaVersion: RUN_SCHEMA_VERSION },
-  };
-
-  const { data, error } = await supabase
-    .from('simulation_runs')
-    .insert(row as never)
-    .select('id, run_key')
-    .single();
-
-  if (error) {
-    if ((error as { code?: string }).code === '23505') {
-      const { data: existing } = await supabase
-        .from('simulation_runs')
-        .select('id, run_key')
-        .eq('tenant_id', tenantId)
-        .eq('idempotency_key', idempotencyKey)
-        .maybeSingle();
-      if (existing) {
-        const e = existing as { id: string; run_key: string | null };
-        return { status: 'duplicate', id: e.id, runKey: e.run_key ?? run.id };
-      }
-    }
-    return {
-      status: 'unsaved',
-      reason: `The run could not be saved to the server, so no operational record exists. ${
-        (error as { message?: string }).message?.slice(0, 160) ?? ''
-      }`.trim(),
-    };
+  const durationMs = Math.max(0, new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime());
+  const createResult = await supabase.functions.invoke('run-lifecycle', {
+    body: {
+      op: 'create',
+      twinId,
+      runKey: run.id,
+      scenarioKey: run.scenarioId,
+      scenarioName: run.scenarioLabel,
+      scenarioType: params.scenarioType ?? 'operational',
+      requestedProvider: 'aura-deterministic-browser',
+      providerVersion: RUN_ENGINE_VERSION,
+      requestedExecutionClass: 'browser-preview',
+      requestedIntent: 'preview',
+      inputSnapshot: snap.input,
+      configuration: run.overrides,
+      idempotencyKey,
+    },
+  });
+  if (createResult.error) {
+    return { status: 'unsaved', reason: `The server rejected the run before it was recorded. ${createResult.error.message}` };
   }
 
-  const saved = data as unknown as { id: string; run_key: string | null };
-  return { status: 'saved', id: saved.id, runKey: saved.run_key ?? run.id };
+  const createPayload = lifecycleCreatePayload(createResult.data);
+  const created = createPayload.run;
+  if (!created?.id) return { status: 'unsaved', reason: 'The run service returned no durable run record.' };
+  if (createPayload.idempotent && created.lifecycle_status === 'succeeded') {
+    return { status: 'duplicate', id: created.id, runKey: run.id };
+  }
+
+  if (created.lifecycle_status === 'queued') {
+    const running = await supabase.functions.invoke('run-lifecycle', {
+      body: { op: 'transition', runId: created.id, to: 'running' },
+    });
+    if (running.error) {
+      return { status: 'unsaved', reason: `The durable run could not enter execution. ${running.error.message}` };
+    }
+  }
+
+  const completed = await supabase.functions.invoke('run-lifecycle', {
+    body: {
+      op: 'transition',
+      runId: created.id,
+      to: 'succeeded',
+      outputSnapshot: snap.output,
+      baselineKpis: run.baseline,
+      finalKpis: run.result,
+      events: run.events,
+      metricProvenance: metricProvenanceFor(run.result),
+      actualProvider: 'aura-deterministic-browser',
+      outcomeExecutionClass: 'browser-preview',
+      measuredDurationMs: durationMs,
+    },
+  });
+  if (completed.error) {
+    await supabase.functions.invoke('run-lifecycle', {
+      body: {
+        op: 'transition',
+        runId: created.id,
+        to: 'failed',
+        failureCode: 'CLIENT_RESULT_PERSIST_FAILED',
+        failureMessage: completed.error.message.slice(0, 500),
+      },
+    });
+    return { status: 'unsaved', reason: `The run result was not recorded. ${completed.error.message}` };
+  }
+  return { status: 'saved', id: created.id, runKey: run.id };
 }
 
 interface RunRow {
@@ -197,9 +207,16 @@ interface RunRow {
 }
 
 interface DecisionRow {
+  id: string;
   run_id: string | null;
   recommendation_id: string;
   outcome: string;
+  rationale: string;
+  approver: string;
+  decided_at: string;
+  snapshot_hash: string;
+  decision_hash: string | null;
+  evidence_schema_version: string;
 }
 
 function decisionState(outcome: string): DecisionState | null {
@@ -233,6 +250,38 @@ export function rowToRun(row: RunRow): WorkspaceRun {
   };
 }
 
+export function applyDecisionRowsToRuns(runs: WorkspaceRun[], rows: DecisionRow[]): WorkspaceRun[] {
+  const recordsByRun = new Map<string, NonNullable<WorkspaceRun['decisionRecords']>>();
+  const byRun = new Map<string, Record<string, DecisionState>>();
+  for (const row of rows) {
+    if (!row.run_id) continue;
+    const state = decisionState(row.outcome);
+    if (!state) continue;
+    const decisions = byRun.get(row.run_id) ?? {};
+    decisions[row.recommendation_id] = state;
+    byRun.set(row.run_id, decisions);
+    const records = recordsByRun.get(row.run_id) ?? [];
+    records.push({
+      id: row.id,
+      recommendationId: row.recommendation_id,
+      state: state as Exclude<DecisionState, 'pending'>,
+      outcome: row.outcome as 'approved' | 'rejected' | 'escalated',
+      rationale: row.rationale,
+      approver: row.approver,
+      decidedAt: row.decided_at,
+      snapshotHash: row.snapshot_hash,
+      decisionHash: row.decision_hash,
+      evidenceSchemaVersion: row.evidence_schema_version,
+    });
+    recordsByRun.set(row.run_id, records);
+  }
+  return runs.map((run) => ({
+    ...run,
+    decisions: run.serverId ? (byRun.get(run.serverId) ?? {}) : {},
+    decisionRecords: run.serverId ? (recordsByRun.get(run.serverId) ?? []) : [],
+  }));
+}
+
 export async function loadServerRuns(twinId?: string | null): Promise<WorkspaceRun[]> {
   const tenantId = await activeOrganizationId();
   if (!tenantId) return [];
@@ -257,23 +306,11 @@ export async function loadServerRuns(twinId?: string | null): Promise<WorkspaceR
 
   const { data: decisionData, error: decisionError } = await supabase
     .from('decision_records')
-    .select('run_id, recommendation_id, outcome')
+    .select('id, run_id, recommendation_id, outcome, rationale, approver, decided_at, snapshot_hash, decision_hash, evidence_schema_version')
     .eq('tenant_id', tenantId)
     .in('run_id', runIds)
     .order('decided_at', { ascending: true });
   if (decisionError || !decisionData) return runs;
 
-  const byRun = new Map<string, Record<string, DecisionState>>();
-  for (const row of decisionData as unknown as DecisionRow[]) {
-    if (!row.run_id) continue;
-    const state = decisionState(row.outcome);
-    if (!state) continue;
-    const decisions = byRun.get(row.run_id) ?? {};
-    decisions[row.recommendation_id] = state;
-    byRun.set(row.run_id, decisions);
-  }
-  return runs.map((run) => ({
-    ...run,
-    decisions: run.serverId ? (byRun.get(run.serverId) ?? {}) : {},
-  }));
+  return applyDecisionRowsToRuns(runs, decisionData as unknown as DecisionRow[]);
 }

@@ -1,6 +1,9 @@
 /**
- * Centralized validation for builder deployment
- * Must match backend requirements exactly from builders-deploy edge function
+ * Base-field validation for builder/template prepopulation.
+ *
+ * This is not an activation authority. Production activation is decided by
+ * the shared builderActivationReadiness contract and recomputed by the
+ * builders-deploy Edge Function from persisted evidence.
  */
 
 export interface BuilderValidationField {
@@ -12,8 +15,7 @@ export interface BuilderValidationField {
 }
 
 /**
- * REQUIRED FIELDS FOR DEPLOYMENT
- * These must match exactly what the backend expects in builders-deploy
+ * REQUIRED BASE FIELDS FOR BUILDER PREPOPULATION
  */
 export const REQUIRED_FIELDS_FOR_DEPLOY: BuilderValidationField[] = [
   {
@@ -82,8 +84,7 @@ export interface ValidationResult {
 }
 
 /**
- * Validate builder state for deployment readiness
- * Matches backend validation in builders-deploy edge function
+ * Validate builder base fields. This cannot declare production readiness.
  */
 export function validateBuilderForDeploy(state: any): ValidationResult {
   const errors = REQUIRED_FIELDS_FOR_DEPLOY

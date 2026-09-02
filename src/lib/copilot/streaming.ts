@@ -11,6 +11,7 @@ import type { CoPilotContextPayload } from '@/types/copilotContext';
 import { buildDataCentreSystemPrompt, isDataCentreContext } from './dataCentreContext';
 import { getDCDomainContext } from './dcDomainContext';
 import { buildDCSystemPrompt } from './dcSystemPrompt';
+import { buildFacilityTruthContext } from './truthContext';
 
 interface StreamOptions {
   query: string;
@@ -19,6 +20,11 @@ interface StreamOptions {
   signal: AbortSignal;
   onToken: (token: string) => void;
   onStructured?: (data: any) => void;
+  /**
+   * Additive per-response provenance event. Optional: streams remain valid
+   * when the handler is absent, and unknown event types are ignored.
+   */
+  onProvenance?: (data: any) => void;
   onComplete: () => void;
   onError: (error: Error) => void;
 }
@@ -34,7 +40,7 @@ function isCoPilotContextPayload(context: any): context is CoPilotContextPayload
  * Stream Co-Pilot response with token-by-token updates
  */
 export async function streamCoPilotResponse(options: StreamOptions): Promise<void> {
-  const { query, context, sessionId, signal, onToken, onStructured, onComplete, onError } = options;
+  const { query, context, sessionId, signal, onToken, onStructured, onProvenance, onComplete, onError } = options;
 
   try {
     console.log('[CoPilot Streaming] Getting session...');
@@ -58,9 +64,15 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
     let enhancedContext: any;
     
     if (isCoPilotContextPayload(context)) {
-      // New mode-aware context - pass directly to backend
+      // New mode-aware context - pass through, plus the structured facility
+      // truth block that grounds the server-side evidence envelope.
       console.log('[CoPilot Streaming] Using mode-aware context:', context.mode);
-      enhancedContext = context;
+      enhancedContext = {
+        ...context,
+        facilityTruth: buildFacilityTruthContext(
+          context.mode === 'simulation' ? 'simulation' : 'blueprint'
+        ),
+      };
     } else {
       // Legacy context - apply domain-specific enhancements
       console.log('[CoPilot Streaming] Using legacy context');
@@ -83,8 +95,10 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
         domainSystemPrompt: domainPrompt || undefined,
         isDataCentreDomain: isDCDomain,
         dcDomainContext: dcDomainContext,
+        facilityTruth: buildFacilityTruthContext(context.activePage),
       };
     }
+    
     
     console.log('[CoPilot Streaming] Payload:', { 
       query, 
@@ -157,6 +171,12 @@ export async function streamCoPilotResponse(options: StreamOptions): Promise<voi
           if (parsed.type === 'structured' && parsed.data && onStructured) {
             console.log('[CoPilot Streaming] Received structured data');
             onStructured(parsed.data);
+          }
+
+          // Additive provenance event. Ignored safely when no handler is set;
+          // it never affects tokens, structured data or stream completion.
+          if (parsed.type === 'provenance' && parsed.data && onProvenance) {
+            onProvenance(parsed.data);
           }
         } catch (e) {
           console.error('[CoPilot Streaming] Failed to parse SSE data:', e, 'Line:', data);

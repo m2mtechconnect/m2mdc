@@ -1,0 +1,39 @@
+type ScrollTarget = Pick<Window, 'dispatchEvent'> & {
+  scrollTo: Window['scrollTo'];
+  scrollX: number;
+  scrollY: number;
+  pageXOffset: number;
+  pageYOffset: number;
+};
+
+/**
+ * Installs the scroll behavior JSDOM intentionally leaves unimplemented.
+ * Position getters and the scroll event keep the shim useful to interaction
+ * tests instead of merely silencing the missing-browser-API error.
+ */
+export function installWindowScrollShim(target?: ScrollTarget) {
+  const scrollTarget = target
+    ?? (typeof window === 'undefined' ? undefined : window);
+  if (!scrollTarget) return;
+
+  let x = 0;
+  let y = 0;
+
+  Object.defineProperties(scrollTarget, {
+    scrollX: { configurable: true, get: () => x },
+    scrollY: { configurable: true, get: () => y },
+    pageXOffset: { configurable: true, get: () => x },
+    pageYOffset: { configurable: true, get: () => y },
+  });
+
+  scrollTarget.scrollTo = ((first: number | ScrollToOptions, second?: number) => {
+    if (typeof first === 'number') {
+      x = Number.isFinite(first) ? first : x;
+      y = Number.isFinite(second) ? (second as number) : y;
+    } else {
+      x = Number.isFinite(first.left) ? (first.left as number) : x;
+      y = Number.isFinite(first.top) ? (first.top as number) : y;
+    }
+    scrollTarget.dispatchEvent(new Event('scroll'));
+  }) as Window['scrollTo'];
+}

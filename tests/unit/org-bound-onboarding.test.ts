@@ -6,6 +6,7 @@ const read = (relativePath: string) => fs.readFileSync(path.resolve(process.cwd(
   .replace(/\r\n/g, '\n');
 
 const migration = read('supabase/migrations/20260823222000_org_bound_onboarding.sql');
+const actorMigration = read('supabase/migrations/20260901120000_bind_invitation_transactions_to_actor.sql');
 const inviteFn = read('supabase/functions/teams-invite/index.ts');
 const acceptFn = read('supabase/functions/teams-accept-invite/index.ts');
 const config = read('supabase/config.toml');
@@ -34,26 +35,28 @@ describe('organization-bound onboarding', () => {
 
     expect(inviteFn).toContain("authClient.rpc('active_org_id')");
     expect(inviteFn).toContain(".from('org_memberships')");
-    expect(inviteFn).toContain('org_id: orgId');
+    expect(inviteFn).toContain("authClient.rpc('create_org_invite'");
+    expect(actorMigration).toContain('v_org_id := public.active_org_id()');
+    expect(actorMigration).toContain('v_email, _role, v_user_id, v_org_id');
     expect(inviteFn).not.toContain(".from('user_roles')");
     expect(inviteFn).toContain("const INVITER_ROLES = new Set(['admin', 'owner', 'security_admin'])");
 
     const profileCheck = inviteFn.indexOf('if (!profile?.is_approved)');
     const membershipCheck = inviteFn.indexOf('if (!membership || membership.status');
-    const tenantServiceClient = inviteFn.indexOf("const serviceClient = createClient", membershipCheck);
+    const tenantTransaction = inviteFn.indexOf("authClient.rpc('create_org_invite'", membershipCheck);
     expect(profileCheck).toBeGreaterThan(-1);
     expect(membershipCheck).toBeGreaterThan(profileCheck);
-    expect(tenantServiceClient).toBeGreaterThan(membershipCheck);
+    expect(tenantTransaction).toBeGreaterThan(membershipCheck);
   });
 
   it('accepts only organization-bound invites through the transactional membership RPC', () => {
-    expect(acceptFn).toContain(".select('id, email, role, status, invited_by, org_id, expires_at')");
-    expect(acceptFn).toContain("if (!invite.org_id)");
-    expect(acceptFn).toContain("serviceClient.rpc('accept_org_invite'");
+    expect(acceptFn).toContain("authClient.rpc('accept_org_invite_token'");
+    expect(acceptFn).not.toContain('createSupabaseServiceClient');
     expect(acceptFn).not.toContain(".from('user_roles')");
-    expect(migration).toContain('INSERT INTO public.org_memberships');
-    expect(migration).toContain('SET is_approved = true');
-    expect(migration).toContain("SET status = 'accepted'");
+    expect(actorMigration).toContain("auth.jwt() ->> 'email'");
+    expect(actorMigration).toContain('INSERT INTO public.org_memberships');
+    expect(actorMigration).toContain('SET is_approved = true');
+    expect(actorMigration).toContain("UPDATE public.team_invites SET status = 'accepted'");
   });
 
   it('restricts first-customer provisioning to an approved global platform owner before service role creation', () => {
@@ -65,7 +68,7 @@ describe('organization-bound onboarding', () => {
     expect(inviteFn).toContain("serviceClient.rpc('platform_provision_organization'");
 
     const ownerCheck = inviteFn.indexOf('if (isPlatformOwner !== true)');
-    const platformServiceClient = inviteFn.indexOf("const serviceClient = createClient", ownerCheck);
+    const platformServiceClient = inviteFn.indexOf('const serviceClient = createSupabaseServiceClient()', ownerCheck);
     expect(ownerCheck).toBeGreaterThan(-1);
     expect(platformServiceClient).toBeGreaterThan(ownerCheck);
   });

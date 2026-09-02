@@ -18,9 +18,11 @@
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { createHandler } from "../_shared/handler.ts";
 import { CANONICAL_SCHEMA_VERSION, canonicalHash } from "../_shared/canonicalHash.ts";
+import {
+  createSupabaseServiceClient,
+} from "../_shared/serviceCredential.ts";
 
 /** Lifecycle states of the canonical persisted run. */
 export const LIFECYCLE = [
@@ -57,6 +59,9 @@ const SERVER_VERIFIABLE_PROVIDERS: string[] = [];
 const CreateSchema = z.object({
   op: z.literal("create"),
   twinId: z.string().uuid(),
+  // Optional for canonical callers created before the workspace exposed a
+  // stable human-readable run key.
+  runKey: z.string().min(1).max(200).optional(),
   scenarioKey: z.string().min(1).max(200),
   scenarioName: z.string().max(300).optional(),
   scenarioType: z.enum(["operational", "design"]).default("operational"),
@@ -95,10 +100,7 @@ const TransitionSchema = z.object({
 const InputSchema = z.discriminatedUnion("op", [CreateSchema, TransitionSchema]);
 
 function admin() {
-  return createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+  return createSupabaseServiceClient();
 }
 
 serve(
@@ -170,6 +172,8 @@ serve(
           twin_id: input.twinId,
           user_id: userId,
           tenant_id: activeOrgId,
+          run_key: input.runKey ?? null,
+          run_label: input.runKey ?? null,
           scenario_key: input.scenarioKey,
           scenario_name: input.scenarioName ?? input.scenarioKey,
           scenario_type: input.scenarioType,

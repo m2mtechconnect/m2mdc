@@ -15,6 +15,8 @@ import { useSearchParams } from 'react-router-dom';
 import { ProvenanceBadge } from '@/components/provenance/ProvenanceBadge';
 import { RUN_UNAVAILABLE_LABEL } from '@/capabilities/runProvenance';
 import { stackCopy } from '@/config/auraStackManifest';
+import { resolvePersonaFamily } from '@/config/personaJourneyModel';
+import { useRBAC } from '@/contexts/RBACContext';
 
 /**
  * The Command Centre reads the configured Blueprint model and deterministic
@@ -42,7 +44,15 @@ import { FacilityPlanCard, type CanvasOverlayId } from './dashboard/FacilityPlan
 import { RecentSimulations } from './dashboard/RecentSimulations';
 import { StatusSnapshot, buildSnapshotRows } from './dashboard/StatusSnapshot';
 import { MetricQuickView } from './dashboard/MetricQuickView';
+import { useDurableWorkspaceRuns } from './useDurableWorkspaceRuns';
 import { buildRackGrid } from './dashboard/rackModel';
+import { PersonaPriorityPanel } from './dashboard/PersonaPriorityPanel';
+import {
+  buildPersonaScopeLabel,
+  buildPersonaCommandActions,
+  buildPersonaCurrentWork,
+  resolvePersonaScope,
+} from './dashboard/personaCommandCenter';
 
 /** Primary highlights cells, in scanning order. */
 const PRIMARY_KPIS: KpiKey[] = ['pue', 'itLoadKw', 'capacityHeadroom', 'sovereigntyScore'];
@@ -56,7 +66,15 @@ const LAYER_STORAGE_KEY = 'aura.dashboard.layer';
 export default function CommandCentre() {
   useSeededRunFixtures();
   const { facility, assets, isFallback, naming, modelNotes } = useFacilityModel();
+  const {
+    activeOrganization,
+    authorization,
+    organizationRole,
+    permissions,
+    resolution,
+  } = useRBAC();
   const overrides = useWorkspaceStore((s) => s.overrides);
+  useDurableWorkspaceRuns(facility.id);
   const runs = useWorkspaceStore((s) => s.runs);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -96,7 +114,7 @@ export default function CommandCentre() {
         { replace: !rackId && !rackParam },
       );
     },
-    [searchParams, setSearchParams, grid, rackParam],
+    [setSearchParams, grid, rackParam],
   );
 
   const kpis = deriveKpis(facility, overrides);
@@ -151,6 +169,34 @@ export default function CommandCentre() {
   const evidenceNeedingReview = interpretations.filter(
     (k) => k.state === 'watch' || k.state === 'constraint',
   ).length;
+
+  const personaFamily = resolvePersonaFamily({
+    organizationRole,
+    platformRole: authorization.primaryRole,
+    isPilot: resolution.status === 'pilot',
+  });
+  const personaScope = resolvePersonaScope(Boolean(activeOrganization), authorization.primaryRole);
+  const personaScopeLabel = buildPersonaScopeLabel(activeOrganization?.orgName ?? null, personaScope);
+  const personaContext = {
+    scope: personaScope,
+    blueprintHref,
+    simulationHref,
+    evidenceHref,
+    latestRunId: latestRun?.id ?? null,
+    pendingDecisions,
+    runCount: runs.length,
+    evidenceNeedingReview,
+    isFallback,
+  } as const;
+  const permissionSet = useMemo(() => new Set(permissions), [permissions]);
+  const priorityActions = buildPersonaCommandActions(
+    personaFamily ?? 'viewer_pilot',
+    permissionSet,
+    personaContext,
+  );
+  const currentWork = personaFamily
+    ? buildPersonaCurrentWork(personaFamily, personaContext)
+    : null;
 
   useEffect(() => {
     document.title = `${facility.name} | AURA command centre`;
@@ -223,15 +269,22 @@ export default function CommandCentre() {
           calculatedAt={calculatedAt}
           hasRecordedRun={latestRun !== null}
           isFallback={isFallback}
-          simulationHref={simulationHref}
-          blueprintHref={blueprintHref}
-          evidenceHref={evidenceHref}
+          priorityActions={priorityActions}
           kpis={primaryKpis}
           evidenceHrefForKpi={(kpi: KpiInterpretation) => evidenceHrefForKpi(kpi.key, facility.id)}
           onSelectKpi={setMetricKpi}
           provenance={<ProvenanceBadge meta={COMMAND_CENTRE_PROVENANCE} />}
           assumptions={assumptions}
         />
+
+        {personaFamily && currentWork && (
+          <PersonaPriorityPanel
+            family={personaFamily}
+            scopeLabel={personaScopeLabel}
+            currentWork={currentWork}
+            actions={priorityActions}
+          />
+        )}
 
         <div className="dashboard-grid">
           <div className="dashboard-main">

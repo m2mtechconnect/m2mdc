@@ -67,6 +67,13 @@ async function probeFocusInside(
       if (!container) {
         return [{ selector: containerSelector, reason: 'command palette container not found' }];
       }
+      const waitFrame = window.__auraWaitForFrame;
+      if (!waitFrame) {
+        throw new Error(
+          'focus-probe: window.__auraWaitForFrame is not installed; the bounded frame fixture must run before navigation',
+        );
+      }
+      const failures: FocusFailure[] = [];
 
       const focusables = Array.from(
         container.querySelectorAll<HTMLElement>(
@@ -108,13 +115,26 @@ async function probeFocusInside(
         const other = items.find((el) => el !== selected) as HTMLElement;
         selected.setAttribute('data-selected', 'true');
         other.setAttribute('data-selected', 'false');
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
-        const selBg = window.getComputedStyle(selected).backgroundColor;
-        const otherBg = window.getComputedStyle(other).backgroundColor;
-        if (selBg === otherBg) {
-          // Selected state provides no visible styling delta.
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (globalThis as any).__cmdkItemFailure = { selBg, otherBg };
+        // FAIL-CLOSED: if the selection-styling frame does not commit, record
+        // a named blocking failure and do NOT read the unpainted styles.
+        let selectionFramePainted = false;
+        try {
+          await waitFrame(`cmdk selected item ${selectorFor(selected)}`, { ordinal: 1 });
+          selectionFramePainted = true;
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(selected),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+        }
+        if (selectionFramePainted) {
+          const selBg = window.getComputedStyle(selected).backgroundColor;
+          const otherBg = window.getComputedStyle(other).backgroundColor;
+          if (selBg === otherBg) {
+            // Selected state provides no visible styling delta.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (globalThis as any).__cmdkItemFailure = { selBg, otherBg };
+          }
         }
       }
 
@@ -144,10 +164,11 @@ async function probeFocusInside(
         return parts.join('');
       }
 
-      const failures: FocusFailure[] = [];
       const sample = focusables.slice(0, limit);
 
-      for (const el of sample) {
+      for (let index = 0; index < sample.length; index += 1) {
+        const el = sample[index];
+        const frameLabel = `${selectorFor(el)} (sample ${index + 1}/${sample.length})`;
         // cmdk aggressively re-focuses its input; if this element is
         // already the active element, verify its focused fingerprint
         // directly (outline width > 0 or box-shadow with a ring
@@ -157,7 +178,17 @@ async function probeFocusInside(
         // ring statically instead of relying on a blur/focus diff.
         if (document.activeElement === el || el.hasAttribute('cmdk-input')) {
           el.focus({ preventScroll: true });
-          await new Promise((r) => requestAnimationFrame(() => r(null)));
+          // FAIL-CLOSED: a stalled frame is a named blocking failure; never
+          // continue to the static ring check on an uncommitted paint.
+          try {
+            await waitFrame(frameLabel, { ordinal: 1 });
+          } catch (error) {
+            failures.push({
+              selector: selectorFor(el),
+              reason: error instanceof Error ? error.message : String(error),
+            });
+            continue;
+          }
           const s = window.getComputedStyle(el);
           const hasOutline =
             s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0;
@@ -176,8 +207,18 @@ async function probeFocusInside(
         }
         el.blur();
         // Force a paint before reading resting styles so a prior
-        // iteration's focus ring can fully clear.
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        // iteration's focus ring can fully clear. FAIL-CLOSED: a stall is a
+        // named blocking failure and this element's style assertions are
+        // skipped — a missed frame can never pass.
+        try {
+          await waitFrame(frameLabel, { ordinal: 1 });
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(el),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
         const resting = fingerprint(el);
 
         // cmdk items use aria-selected + roving tabindex; simulate the
@@ -188,7 +229,15 @@ async function probeFocusInside(
           el.setAttribute('data-selected', 'true');
           el.setAttribute('aria-selected', 'true');
         }
-        await new Promise((r) => requestAnimationFrame(() => r(null)));
+        try {
+          await waitFrame(frameLabel, { ordinal: 2 });
+        } catch (error) {
+          failures.push({
+            selector: selectorFor(el),
+            reason: error instanceof Error ? error.message : String(error),
+          });
+          continue;
+        }
 
         if (!el.isConnected) continue;
         // Roving-tabindex items where focus never landed: skip cleanly.

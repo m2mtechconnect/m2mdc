@@ -318,7 +318,7 @@ export function BuilderLayout({
                 Step {activeStep} of {steps.length}
               </div>
 
-              {isDeployStep && fromScanner ? (
+              {isDeployStep && (fromScanner || !onDeploy) ? (
                 <div className="min-w-24" aria-hidden="true" />
               ) : isDeployStep && onDeploy ? (
                 <Button

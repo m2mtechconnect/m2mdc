@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "fixtureId": "aura-enterprise-qa-v1",
   "classification": "SIMULATED_TEST_DATA",
   "provenance": {
@@ -23,54 +23,63 @@
     {
       "key": "owner",
       "role": "owner",
+      "persona_family": "owner_admin",
       "required": true,
       "purpose": "organization lifecycle and full tenant administration"
     },
     {
       "key": "admin",
       "role": "admin",
+      "persona_family": "owner_admin",
       "required": false,
       "purpose": "members, settings and integrations"
     },
     {
       "key": "executive",
       "role": "executive",
+      "persona_family": "executive_manager",
       "required": false,
       "purpose": "ROI, dashboards and approvals"
     },
     {
       "key": "manager",
       "role": "manager",
+      "persona_family": "executive_manager",
       "required": false,
       "purpose": "facility workflows and approvals"
     },
     {
       "key": "engineer",
       "role": "engineer",
+      "persona_family": "engineer_operator",
       "required": false,
       "purpose": "builder, simulation and validation"
     },
     {
       "key": "operator",
       "role": "operator",
+      "persona_family": "engineer_operator",
       "required": false,
       "purpose": "operations and incident workflows"
     },
     {
       "key": "compliance",
       "role": "compliance",
+      "persona_family": "compliance_analyst",
       "required": false,
       "purpose": "evidence, audit and export"
     },
     {
       "key": "analyst",
       "role": "data_analyst",
+      "persona_family": "compliance_analyst",
       "required": false,
       "purpose": "analytics and read-only reports"
     },
     {
       "key": "viewer",
       "role": "viewer",
+      "persona_family": "viewer_pilot",
       "required": false,
       "purpose": "least-privilege and denial-path validation"
     }

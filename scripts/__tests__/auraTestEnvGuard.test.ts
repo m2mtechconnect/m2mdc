@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { describe, it, expect } from "vitest";
 import { evaluateTestEnvGuard, refFromUrl, isDenylistedHost } from "../aura-test-env-guard.mjs";
 

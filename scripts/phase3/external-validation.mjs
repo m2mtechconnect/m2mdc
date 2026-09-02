@@ -9,8 +9,10 @@
  *      to an empty public schema, in order, without error
  *   2. schema object inventory    - Phase 3 functions, triggers, policies,
  *      indexes and grants exist after replay
- *   3. rollback + reapplication   - the Phase 3 migrations can be removed from
- *      the replay set and reapplied, with an identical final schema signature
+ *   3. baseline restore + forward reapplication - the schema can be restored
+ *      to the migration immediately before Phase 3, then Phase 3 and every
+ *      dependent migration can be applied in canonical order with an
+ *      identical final schema signature
  *   4. tenant isolation + RLS     - scripts/phase3/rls-matrix.sql, executed as
  *      the `authenticated` and `anon` roles with real request context
  *   5. trusted write boundary     - run-lifecycle / record-decision over real
@@ -129,6 +131,20 @@ const MIGRATION_DIR = 'supabase/migrations';
 const allMigrations = readdirSync(MIGRATION_DIR).filter((f) => f.endsWith('.sql')).sort();
 const phase3 = JSON.parse(readFileSync('scripts/phase3/phase3-migrations.json', 'utf8')).phase3;
 
+function phase3ReplayPlan() {
+  const indexes = phase3.map((file) => allMigrations.indexOf(file));
+  if (indexes.some((index) => index < 0)) {
+    throw new Error('phase 3 replay manifest references a migration that does not exist');
+  }
+  const first = Math.min(...indexes);
+  const prefix = allMigrations.slice(0, first);
+  const forward = allMigrations.slice(first);
+  if (!phase3.every((file) => forward.includes(file))) {
+    throw new Error('phase 3 replay plan does not contain every declared phase 3 migration');
+  }
+  return { prefix, forward };
+}
+
 function resetPublicSchema() {
   psql([
     '-c',
@@ -226,19 +242,27 @@ function runRlsMatrix(label) {
 }
 const rlsPasses = fullSignature ? runRlsMatrix('tenant isolation + RLS matrix') : 0;
 
-// 4. rollback + reapplication ---------------------------------------------
+// 4. baseline restore + forward reapplication ------------------------------
 if (fullSignature) {
   try {
+    const { prefix, forward } = phase3ReplayPlan();
     resetPublicSchema();
-    applyMigrations(allMigrations.filter((f) => !phase3.includes(f)));
-    record('phase 3 rollback (baseline without phase 3 migrations)', 'PASS', `${phase3.length} migrations withheld`);
-    applyMigrations(phase3);
+    applyMigrations(prefix);
+    record(
+      'phase 3 baseline restore',
+      'PASS',
+      `${prefix.length} migrations applied through ${prefix.at(-1) ?? 'empty baseline'}`,
+    );
+    // Later migrations depend on Phase 3 columns and policies. Applying them
+    // while Phase 3 is withheld creates an impossible historical state. Replay
+    // the entire suffix in filename order, exactly as production upgrades do.
+    applyMigrations(forward);
     const again = schemaSignature();
     if (again !== fullSignature) throw new Error(`schema signature diverged: ${again} != ${fullSignature}`);
-    record('phase 3 reapplication', 'PASS', `identical schema signature ${again}`);
-    runRlsMatrix('RLS matrix after rollback + reapplication');
+    record('phase 3 forward reapplication', 'PASS', `identical schema signature ${again}`);
+    runRlsMatrix('RLS matrix after baseline restore + forward reapplication');
   } catch (e) {
-    record('phase 3 rollback + reapplication', 'FAIL', String(e.stderr || e.message).slice(0, 1200));
+    record('phase 3 baseline restore + forward reapplication', 'FAIL', String(e.stderr || e.message).slice(0, 1200));
   }
 }
 

@@ -12,7 +12,6 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/
 import { useIsMobile } from '@/hooks/use-mobile';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
-import { supabase } from '@/integrations/supabase/client';
 import { useShellLayoutStore } from '@/stores/shellLayoutStore';
 import { FacilityCanvas } from './FacilityCanvas';
 import { KpiStrip } from './KpiStrip';
@@ -27,6 +26,7 @@ import { ROLE_VIEWS, useWorkspaceStore } from './workspaceStore';
 import { useSeededRunFixtures } from './runFixtures';
 import { parseSimulationHandoff } from '@/simulation/handoff';
 import { STEP_PARAM, isWorkflowStep, useWorkflowStep } from './useWorkflowStep';
+import { useDurableWorkspaceRuns } from './useDurableWorkspaceRuns';
 
 /** Docked inspector width envelope (Salesforce-style split workspace). */
 const PANEL_DEFAULT = 368;
@@ -113,20 +113,8 @@ export default function AuraWorkspace() {
     document.title = `${facility.name} | AURA simulation workspace`;
   }, [facility.name]);
 
-  // The server record list is authoritative. It is reloaded whenever the
-  // session identity or the routed facility changes, so a cached browser copy
-  // can never stand in for a durable run.
-  const hydrateRuns = useWorkspaceStore((s) => s.hydrateRuns);
-  useEffect(() => {
-    let cancelled = false;
-    supabase.auth.getUser().then(({ data }) => {
-      if (cancelled) return;
-      void hydrateRuns(data?.user?.id ?? null, facility.id);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [hydrateRuns, facility.id]);
+  // Dashboard and Simulation share the same tenant-qualified durable queue.
+  useDurableWorkspaceRuns(facility.id);
 
   // Below xl the panel is an overlay, so it must not cover the model on load.
   useEffect(() => {
@@ -188,11 +176,14 @@ export default function AuraWorkspace() {
     }
     if (runParam && runs.some((r) => r.id === runParam)) {
       setActiveRun(runParam);
-      setTool('compare');
+      // A canonical `?step=` deep link owns the panel. Run-only links retain
+      // the historical compare default, while decision-queue links can open
+      // Review without this hydration effect overwriting the requested step.
+      if (!urlOwnsStep) setTool('compare');
     }
     // Deep links are applied once per URL change, not on every run mutation.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runParam, compareParam, assetParam, runs.length]);
+  }, [runParam, compareParam, assetParam, runs.length, urlOwnsStep]);
 
   // Facility preselection: a ?twin=... deep-link from the command centre
   // (or a shared URL) should activate that facility if the user has access.

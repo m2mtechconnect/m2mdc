@@ -54,6 +54,32 @@ describe('test harness safety guards', () => {
     }
   });
 
+  it('selects a loopback test backend before imports and creates seed clients lazily', () => {
+    const setup = repositoryFile('tests/setup.ts');
+    const environment = repositoryFile('tests/_setup/safeTestEnvironment.ts');
+    const seeds = repositoryFile('tests/helpers/seedHelpers.ts');
+
+    expect(setup.indexOf('primeSafeTestEnvironment();')).toBeLessThan(
+      setup.indexOf('installLiveBackendGuard();'),
+    );
+    expect(environment).toContain('TEST_SUPABASE_URL: env.TEST_SUPABASE_URL');
+    expect(environment).not.toContain('VITE_SUPABASE_URL: env.VITE_SUPABASE_URL');
+    expect(seeds).toContain('supabase ??= createTestSupabaseClient();');
+    expect(seeds).not.toContain('const supabase = createTestSupabaseClient();');
+  });
+
+  it('installs browser shims and rejects unreviewed console errors globally', () => {
+    const setup = repositoryFile('tests/setup.ts');
+    const guard = repositoryFile('tests/_setup/unexpectedConsoleGuard.ts');
+    const lifecycle = repositoryFile('tests/unit/activeTwinContext-lifecycle.test.tsx');
+
+    expect(setup).toContain('installWindowScrollShim();');
+    expect(setup).toContain('installUnexpectedConsoleGuard();');
+    expect(guard).toContain('collector?.assertClean();');
+    expect(lifecycle).toContain('expectConsoleError(/Failed to fetch twin/i);');
+    expect(lifecycle).not.toContain("vi.spyOn(console, 'error')");
+  });
+
   it('contains no direct cloud Supabase endpoint in executable E2E tests', () => {
     for (const path of [
       'tests/e2e/auth-security.spec.ts',
@@ -189,11 +215,24 @@ describe('test harness safety guards', () => {
     expect(validator).toContain('WITH inserted AS (');
     expect(validator).toContain(') SELECT id FROM inserted');
     expect(matrix.match(/simulation_runs \(user_id, tenant_id, twin_id, scenario_key,/g)).toHaveLength(5);
+    expect(matrix).toContain(
+      "VALUES (member_a, org_a, twin_a, 'validation-extended', 'succeeded')",
+    );
+    expect(matrix).toContain(
+      'tenant A approver reads organization run for governed handoff',
+    );
     expect(validator).toContain("op: 'create'");
     expect(validator).toContain("requestedExecutionClass: 'ephemeral-local-validation'");
     expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');
     expect(validator).toContain('createA.body?.data?.run?.id');
     expect(validator).not.toContain("action: 'transition'");
+    expect(validator).toContain('const prefix = allMigrations.slice(0, first)');
+    expect(validator).toContain('const forward = allMigrations.slice(first)');
+    expect(validator).not.toContain("allMigrations.filter((f) => !phase3.includes(f))");
+    expect(matrix).toContain(
+      "authenticated clients cannot insert decision evidence directly",
+    );
+    expect(matrix).toContain("set_config('request.jwt.claims', '{\"role\":\"service_role\"}', true)");
     const twinReadStatements = twinReadGrant
       .split('\n')
       .filter((line) => !line.trim().startsWith('--'))

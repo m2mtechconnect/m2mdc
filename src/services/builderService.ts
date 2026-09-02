@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { BuildKind } from "@/lib/builder/buildKind";
 
 export interface BuilderConfig {
   source?: 'file' | 'questionnaire' | 'template' | 'url' | 'manual' | 'homepage' | 'dashboard' | 'imported' | 'manage-agents' | 'blank' | 'facility';
@@ -25,6 +26,11 @@ export interface BuilderConfig {
     policies?: Record<string, any>;
     mcp_servers?: any[];
   };
+  kpis?: Array<Record<string, unknown>>;
+  governance?: {
+    auditEnabled?: boolean;
+    tags?: string[];
+  };
   step_completed?: number;
 }
 
@@ -33,6 +39,7 @@ export interface Builder {
   name: string;
   description: string | null;
   status: string;
+  twin_id?: string | null;
   config: BuilderConfig;
   created_at: string;
   updated_at: string;
@@ -43,6 +50,25 @@ function routedTwinId(): string | undefined {
   const value = new URL(window.location.href).searchParams.get('twin');
   return value || undefined;
 }
+
+/**
+ * Read the server-authored error message from a failed function invocation.
+ * Returns only the `error.message` string produced by our own Edge Function
+ * error contract; never headers, tokens, or the request payload.
+ */
+async function readServerErrorMessage(error: unknown): Promise<string | null> {
+  const context = (error as { context?: unknown })?.context;
+  if (!context || typeof (context as Response).json !== 'function') return null;
+  try {
+    const body = await (context as Response).clone().json();
+    const message = body?.error?.message;
+    return typeof message === 'string' && message.trim() ? message : null;
+  } catch {
+    return null;
+  }
+}
+
+
 
 export const builderService = {
   /**
@@ -55,7 +81,8 @@ export const builderService = {
     goal?: string;
     industry?: string;
     department?: string;
-    type?: string;
+    /** Backend contract value only; normalize through `@/lib/builder/buildKind`. */
+    type?: BuildKind;
     template_id?: string;
     twin_id?: string;
   }): Promise<{ id: string; builder: Builder }> {
@@ -70,7 +97,11 @@ export const builderService = {
 
       if (error) {
         console.error('[builderService] Create failed:', error);
-        throw new Error(`Failed to create builder: ${error.message || 'Unknown error'}`);
+        // Surface the server's own structured error message when present.
+        // Only the server-authored `error.message` is used; no headers,
+        // tokens, payload echo or stack detail is exposed.
+        const serverMessage = await readServerErrorMessage(error);
+        throw new Error(`Failed to create builder: ${serverMessage || error.message || 'Unknown error'}`);
       }
 
       if (!data || !data.data) {
@@ -144,7 +175,8 @@ export const builderService = {
 
       if (error) {
         console.error('[builderService] Deploy failed:', error);
-        throw new Error(`Failed to deploy builder: ${error.message || 'Unknown error'}`);
+        const serverMessage = await readServerErrorMessage(error);
+        throw new Error(`Failed to deploy builder: ${serverMessage || error.message || 'Unknown error'}`);
       }
 
       if (!data) {

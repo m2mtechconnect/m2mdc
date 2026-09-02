@@ -76,7 +76,7 @@ describe('corpus entry invariants', () => {
     }
   });
 
-  it('covers all four knowledge domains', () => {
+  it('covers every declared knowledge domain', () => {
     const domains = new Set(ENGINEERING_KNOWLEDGE_CORPUS.map((e) => e.domain));
     for (const domain of ENGINEERING_KNOWLEDGE_DOMAINS) {
       expect(domains.has(domain)).toBe(true);
@@ -148,6 +148,7 @@ describe('knowledge registry integration', () => {
     'src/supervisor/knowledge/auraEngineeringKnowledge.ts',
     'docs/adr/0010-governed-ui-patterns-and-synthetic-evaluation-data.md',
     'src/supervisor/evals/supervisor-engineering-evals.json',
+    'docs/ux/persona-journey-map.md',
   ];
 
   it.each(expectedRefs)('indexes %s as an ingestible source', (ref) => {

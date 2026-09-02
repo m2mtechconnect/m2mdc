@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 /**
  * Regression guard for the PR-0.1 production perimeter.
  *
@@ -47,7 +49,11 @@ function runEnforcer(cwd: string): { code: number; output: string } {
 function mirrorRepo(mutate: (a: typeof allowlist) => void): string {
   const dir = mkdtempSync(join(tmpdir(), 'aura-perimeter-'));
   for (const entry of ['src', 'supabase', '.github']) {
-    symlinkSync(join(REPO, entry), join(dir, entry));
+    symlinkSync(
+      join(REPO, entry),
+      join(dir, entry),
+      process.platform === 'win32' ? 'junction' : 'dir',
+    );
   }
   mkdirSync(join(dir, EVIDENCE_DIR), { recursive: true });
   const mutated = JSON.parse(JSON.stringify(allowlist));

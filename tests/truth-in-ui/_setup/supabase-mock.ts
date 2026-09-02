@@ -17,6 +17,8 @@
  */
 
 import type { BrowserContext, Page, Route } from '@playwright/test';
+import type { AnyRole } from '../../../src/auth/permissions';
+import type { OrganizationRole } from '../../../src/auth/organizationAuthorization';
 
 
 // Supabase-js derives its default storage key from the configured URL's
@@ -153,13 +155,22 @@ export async function installSupabaseMock(
   opts: {
     session?: FakeSession;
     profileRole?: 'admin' | 'user';
+    /** Canonical global grant. Null models an authenticated user with no platform grant. */
+    platformRole?: AnyRole | null;
     withActiveOrganization?: boolean;
+    organizationRole?: OrganizationRole;
+    /** Tenant-scoped durable fixtures for cross-persona journey tests. */
+    simulationRuns?: unknown[];
+    decisionRecords?: unknown[];
   } = {},
 ): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
   const log: SanitizedRequest[] = [];
   let profileHits = 0;
   const organizationId = '00000000-0000-4000-8000-000000000010';
+  const globalRole = opts.platformRole !== undefined
+    ? opts.platformRole
+    : (opts.profileRole ?? 'admin');
 
   const profileRow = {
     id: session.userId,
@@ -256,17 +267,17 @@ export async function installSupabaseMock(
         // Mirror the real row shape: the roster UI keys on `id` and renders
         // `granted_at` / `expires_at`, so a stripped-down row is not a
         // faithful stand-in for the API.
-        JSON.stringify([
+        JSON.stringify(globalRole ? [
           {
             id: `role-${session.userId}`,
             user_id: session.userId,
-            role: opts.profileRole ?? 'admin',
+            role: globalRole,
             scope: 'global',
             granted_by: session.userId,
             granted_at: '2026-01-01T00:00:00.000Z',
             expires_at: null,
           },
-        ]),
+        ] : []),
       );
     }
 
@@ -275,7 +286,7 @@ export async function installSupabaseMock(
       return fulfillJson(JSON.stringify(opts.withActiveOrganization ? [{
         org_id: organizationId,
         user_id: session.userId,
-        role: 'owner',
+        role: opts.organizationRole ?? 'owner',
         status: 'active',
         is_default: true,
       }] : []));
@@ -300,6 +311,16 @@ export async function installSupabaseMock(
 
     if (pathname.startsWith('/rest/v1/rpc/set_active_org')) {
       return fulfillJson(JSON.stringify(opts.withActiveOrganization ? organizationId : null));
+    }
+
+    if (pathname.startsWith('/rest/v1/simulation_runs')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.simulationRuns ?? []));
+    }
+
+    if (pathname.startsWith('/rest/v1/decision_records')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      return fulfillJson(JSON.stringify(opts.decisionRecords ?? []));
     }
 
     // ---- RPC / other REST --------------------------------------

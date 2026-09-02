@@ -12,11 +12,38 @@
  * - Tokens: { type: 'token', content: string }
  * - Structured: { type: 'structured', data: {...} }
  * - Done: data: [DONE]
+ *
+ * TRUTH GROUNDING (see ../_shared/assistantTruth.ts):
+ * - Every request builds a server-owned deterministic facility evidence
+ *   envelope. Truth questions (live/simulated/measured, telemetry, OpenUSD /
+ *   SimReady, deployment/readiness, connected/healthy/verified) are answered
+ *   deterministically from that envelope with visible citations, before and
+ *   instead of any generic model recommendation.
+ * - All structured actions/insights/next steps pass through the
+ *   capability-aware gate; the generic model path receives the envelope as a
+ *   hard-rule preamble.
+ * - Run provenance: a client-supplied run id is an UNTRUSTED LOCATOR. It is
+ *   verified against public.simulation_runs through the caller's RLS-scoped
+ *   client (never the service role) before the evidence envelope is built;
+ *   only that verified record can ground a recorded run.
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import {
+  buildEvidencePreamble,
+  buildFacilityEvidenceEnvelope,
+  chunkForStream,
+  classifyTruthQuery,
+  extractCandidateRunId,
+  gateStructuredResponse,
+  renderTruthAnswer,
+  type VerifiedRunRecord,
+} from "../_shared/assistantTruth.ts";
+import { renderLessonBlock, retrieveApprovedLessons } from "../_shared/learning/lessonRetrieval.ts";
+import { resolveModelPolicy } from "../_shared/learning/modelPolicy.ts";
+import { buildResponseProvenance } from "../_shared/learning/responseProvenance.ts";
 
 
 interface CoPilotStreamRequest {
@@ -26,6 +53,7 @@ interface CoPilotStreamRequest {
 }
 
 serve(async (req) => {
+  const requestStartedAt = Date.now();
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,20 +78,121 @@ serve(async (req) => {
 
     const { query, context, sessionId }: CoPilotStreamRequest = await req.json();
 
+    // Run-id verification: a client-supplied run id is an UNTRUSTED LOCATOR.
+    // It becomes provenance only when the caller's own RLS-scoped client can
+    // read the row back from public.simulation_runs (never the service role,
+    // and only minimal provenance fields - no tenant or user columns).
+    // Missing auth, malformed ids, query errors, and invisible rows all fail
+    // closed to "not verified" inside the evidence builder.
+    const candidateRunId = extractCandidateRunId(context ?? {});
+    let verifiedRun: VerifiedRunRecord | null = null;
+    if (user && candidateRunId) {
+      const { data: runRow, error: runLookupError } = await supabaseClient
+        .from('simulation_runs')
+        .select('id, status, started_at, finished_at')
+        .eq('id', candidateRunId)
+        .maybeSingle();
+      if (runLookupError) {
+        console.warn('[CoPilot] Run provenance lookup failed; run stays not verified');
+      } else if (runRow && typeof runRow.id === 'string') {
+        verifiedRun = {
+          id: runRow.id,
+          status: typeof runRow.status === 'string' ? runRow.status : null,
+          startedAt: typeof runRow.started_at === 'string' ? runRow.started_at : null,
+          finishedAt: typeof runRow.finished_at === 'string' ? runRow.finished_at : null,
+        };
+      }
+    }
+
+    // Server-owned deterministic evidence envelope. Built for EVERY request:
+    // truth questions are answered from it directly, and every structured
+    // suggestion is gated against it. Client context can only downgrade it.
+    const evidenceEnvelope = buildFacilityEvidenceEnvelope(context ?? {}, verifiedRun);
+    if (evidenceEnvelope.rejectedClientClaims.length > 0) {
+      console.warn('[CoPilot] Ignored client evidence upgrade attempts:', evidenceEnvelope.rejectedClientClaims);
+    }
+
+    const truthClassification = classifyTruthQuery(query ?? '');
+    if (truthClassification.isTruthQuery) {
+      // Deterministic grounded answer: no model call, citations name the
+      // AURA surfaces, abstains when evidence is missing. Streaming contract
+      // (token events, structured event, [DONE]) is preserved.
+      console.log('[CoPilot] Truth question detected, topics:', truthClassification.topics);
+      const truthAnswer = renderTruthAnswer(query ?? '', evidenceEnvelope);
+      const gatedTruthStructured = gateStructuredResponse(truthAnswer.structured, evidenceEnvelope, context ?? {});
+      const truthEncoder = new TextEncoder();
+      // Deterministic path: no model is invoked, so the provenance record
+      // reports the truth policy with null model and null token usage.
+      const truthPolicy = resolveModelPolicy('truth-grounding');
+      const truthStream = new ReadableStream({
+        async start(controller) {
+          try {
+            for (const chunk of chunkForStream(truthAnswer.markdown)) {
+              controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'token', content: chunk })}\n\n`));
+            }
+            controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'structured', data: gatedTruthStructured })}\n\n`));
+            const truthProvenance = buildResponseProvenance({
+              path: 'truth',
+              policy: truthPolicy,
+              lessonIds: [],
+              latencyMs: Date.now() - requestStartedAt,
+              groundedCitationCount: truthAnswer.markdown.match(/\[[^\][]+ · [^\][]+\]/g)?.length ?? 0,
+              rejectedClientClaimCount: evidenceEnvelope.rejectedClientClaims.length,
+            });
+            controller.enqueue(truthEncoder.encode(`data: ${JSON.stringify({ type: 'provenance', data: truthProvenance })}\n\n`));
+            controller.enqueue(truthEncoder.encode('data: [DONE]\n\n'));
+
+
+            // Preserve memory behavior (only for authenticated users)
+            if (user) {
+              await saveMemory(supabaseClient, user.id, query, context, truthAnswer.markdown);
+            }
+
+            controller.close();
+          } catch (error) {
+            console.error('Truth stream error:', error);
+            controller.error(error);
+          }
+        }
+      });
+      return new Response(truthStream, {
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+        }
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // ENFORCE GEMINI 3.X MODEL
-    const model = 'google/gemini-3-pro-preview';
+    // Server-owned, provider-neutral model routing. A browser-supplied model
+    // identifier is never read here.
+    const modelPolicy = resolveModelPolicy('general-assistant');
+    const model = modelPolicy.model as string;
 
     // Fetch persistent memory (only for authenticated users)
     const memory = user ? await fetchMemory(supabaseClient, user.id) : {};
     console.log('[CoPilot] Loaded memory:', Object.keys(memory), 'authenticated:', !!user);
 
-    // Build context-aware system prompt with memory
-    const systemPrompt = buildSystemPrompt(context, memory);
+    // Approved lessons: reviewed, active guidance only. Injected BEFORE the
+    // evidence preamble so the preamble remains the final authority.
+    const retrievedLessons = retrieveApprovedLessons(query ?? '');
+    const lessonBlock = renderLessonBlock(retrievedLessons);
+
+    // Build context-aware system prompt with memory, always terminated by the
+    // authoritative evidence preamble so the model cannot contradict page truth.
+    const systemPrompt = [
+      buildSystemPrompt(context, memory),
+      lessonBlock,
+      buildEvidencePreamble(evidenceEnvelope),
+    ]
+      .filter((part) => part && part.length > 0)
+      .join('\n\n');
 
     // Stream setup
     const encoder = new TextEncoder();
@@ -83,8 +212,8 @@ serve(async (req) => {
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: query }
               ],
-              temperature: 0.7,
-              max_tokens: 2048,
+              temperature: modelPolicy.temperature ?? 0.7,
+              max_tokens: modelPolicy.maxTokens ?? 2048,
               stream: true,
             })
           });
@@ -101,6 +230,9 @@ serve(async (req) => {
           const decoder = new TextDecoder();
           let buffer = '';
           let accumulatedContent = '';
+          // Token usage is recorded only when the provider supplies it. It is
+          // never estimated: unknown stays null in the provenance record.
+          const usage: { input: number | null; output: number | null } = { input: null, output: null };
 
           while (true) {
             const { done, value } = await reader.read();
@@ -116,9 +248,24 @@ serve(async (req) => {
 
               const data = line.slice(6).trim();
               if (data === '[DONE]') {
-                // Send structured response
-                const structured = generateStructuredResponse(query, context, accumulatedContent);
+                // Send structured response, gated against the evidence
+                // envelope so no unavailable-capability suggestion leaks.
+                const structured = gateStructuredResponse(
+                  generateStructuredResponse(query, context, accumulatedContent),
+                  evidenceEnvelope,
+                  context ?? {},
+                );
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'structured', data: structured })}\n\n`));
+                const modelProvenance = buildResponseProvenance({
+                  path: 'model',
+                  policy: modelPolicy,
+                  lessonIds: retrievedLessons.lessonIds,
+                  latencyMs: Date.now() - requestStartedAt,
+                  tokens: usage,
+                  groundedCitationCount: accumulatedContent.match(/\[[^\][]+ · [^\][]+\]/g)?.length ?? 0,
+                  rejectedClientClaimCount: evidenceEnvelope.rejectedClientClaims.length,
+                });
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'provenance', data: modelProvenance })}\n\n`));
                 controller.enqueue(encoder.encode('data: [DONE]\n\n'));
                 
                 // Save memory after response (only for authenticated users)
@@ -132,6 +279,12 @@ serve(async (req) => {
 
               try {
                 const parsed = JSON.parse(data);
+                if (parsed?.usage) {
+                  const promptTokens = parsed.usage.prompt_tokens;
+                  const completionTokens = parsed.usage.completion_tokens;
+                  if (typeof promptTokens === 'number') usage.input = promptTokens;
+                  if (typeof completionTokens === 'number') usage.output = completionTokens;
+                }
                 const delta = parsed.choices?.[0]?.delta?.content;
                 if (delta) {
                   accumulatedContent += delta;
@@ -606,43 +759,39 @@ function generateStructuredResponse(query: string, context: any, response: strin
     });
   }
 
-  if (context.activePage === 'template_library') {
-    structured.actions.push({
-      label: 'Browse Templates',
-      handler: '/templates',
-      icon: 'external'
-    });
-  }
+  // Retired catalogue suggestion categories are never emitted; the
+  // structured gate (gateStructuredResponse) enforces this fail-closed.
 
   // Generate insights
   if (context.workflowsCount === 0) {
     structured.insights.push('No workflows configured yet. Consider adding a monitoring or automation workflow.');
   }
   if (context.integrationsCount === 0) {
-    structured.insights.push('No integrations connected. Connect data sources to enable rich agent functionality.');
+    structured.insights.push('No integrations are configured for this agent yet.');
   }
   if (context.totalRuns === 0) {
-    structured.insights.push('Agent has not been run yet. Test it with a simulation or deploy to production.');
+    structured.insights.push('This agent has no recorded executions yet.');
   }
 
-  // Generate next steps based on context
+  // Generate next steps based on context (evidence-grounded; capability
+  // verbs like deploy/connect are reserved for verified capabilities).
   if (context.activePage === 'builder') {
     structured.nextSteps = [
       'Complete all 5 builder steps',
-      'Test your agent in the simulation sandbox',
-      'Deploy to a test environment first'
+      'Review the generated blueprint for accuracy',
+      'Check capability availability before planning a release'
     ];
   } else if (context.activePage === 'agent_detail') {
     structured.nextSteps = [
       'Review workflow configurations',
-      'Run a test simulation',
-      'Monitor metrics and logs'
+      'Review recent execution records and logs',
+      'Review metrics for anomalies'
     ];
   } else {
     structured.nextSteps = [
-      'Explore available templates',
-      'Create or configure an agent',
-      'Set up workflows and integrations'
+      'Review the operating mode and provenance indicators on the current page',
+      'Open Evidence to inspect result provenance before acting on any value',
+      'Check capability availability before planning connections or releases'
     ];
   }
 
@@ -948,7 +1097,7 @@ function generateDCStructuredResponse(query: string, context: any, response: str
     ];
   } else {
     structured.nextSteps = [
-      'Monitor real-time KPIs in the dashboard',
+      'Review the modelled KPIs on the dashboard',
       'Review alerts and acknowledge resolved issues',
       'Run simulations to test operational resilience'
     ];
@@ -1084,7 +1233,7 @@ function generateContextualFollowUps(query: string, context: any, response: stri
   else if (queryLower.includes('setup') || queryLower.includes('configure') || queryLower.includes('create')) {
     followUps.push(
       `What configuration options are available?`,
-      `Are there templates I can start from?`,
+      `What configuration matters most for this use case?`,
       `What's the minimum configuration needed to get started?`
     );
   }

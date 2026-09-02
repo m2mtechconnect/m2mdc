@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { useWizardBuilderStore } from '@/stores/wizardBuilderStore';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { loadAllTemplates } from '@/lib/templateLoader';
@@ -77,7 +77,9 @@ describe('Template URL Loading Integration', () => {
     });
 
     // Initialize builder with templateId in params
-    await result.current.initializeBuilder(params);
+    await act(async () => {
+      await result.current.initializeBuilder(params);
+    });
 
     // Check that blueprint was created and stored
     const blueprint = useBlueprintStore.getState().currentBlueprint;
@@ -102,7 +104,9 @@ describe('Template URL Loading Integration', () => {
       step: '1'
     });
 
-    await result.current.initializeBuilder(params);
+    await act(async () => {
+      await result.current.initializeBuilder(params);
+    });
 
     // Should have loaded from database mock
     const blueprint = useBlueprintStore.getState().currentBlueprint;
@@ -117,7 +121,10 @@ describe('Template URL Loading Integration', () => {
     vi.mocked(supabase.from).mockReturnValueOnce({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
-          single: vi.fn(() => ({ data: null, error: { message: 'Not found' } })),
+          single: vi.fn(() => ({
+            data: null,
+            error: { code: 'PGRST116', message: 'Not found' },
+          })),
         })),
       })),
     } as any);
@@ -129,7 +136,9 @@ describe('Template URL Loading Integration', () => {
       step: '1'
     });
 
-    await result.current.initializeBuilder(params);
+    await act(async () => {
+      await result.current.initializeBuilder(params);
+    });
 
     // A missing template must not crash: the store falls back to a blank
     // draft with no blueprint attached.
@@ -201,7 +210,9 @@ describe('Template URL Loading Integration', () => {
     });
 
     // Pass blueprint directly (simulates clicking "Use Template" button)
-    await result.current.initializeBuilder(params, undefined, undefined, mockBlueprint);
+    await act(async () => {
+      await result.current.initializeBuilder(params, undefined, undefined, mockBlueprint);
+    });
 
     // Should use the passed blueprint, not load templateId
     const state = useWizardBuilderStore.getState();
@@ -216,7 +227,9 @@ describe('Template URL Loading Integration', () => {
       step: '1'
     });
 
-    await result.current.initializeBuilder(params);
+    await act(async () => {
+      await result.current.initializeBuilder(params);
+    });
 
     const state = useWizardBuilderStore.getState();
     const blueprint = useBlueprintStore.getState().currentBlueprint;
@@ -238,15 +251,19 @@ describe('Template URL Loading Integration', () => {
     
     // Test different step values
     for (const step of ['1', '2', '3', '4', '5']) {
-      useWizardBuilderStore.getState().reset();
-      useBlueprintStore.getState().clearBlueprint();
+      act(() => {
+        useWizardBuilderStore.getState().reset();
+        useBlueprintStore.getState().clearBlueprint();
+      });
 
       const params = new URLSearchParams({
         templateId: 'datacentre-master-twin-v1',
         step
       });
 
-      await result.current.initializeBuilder(params);
+      await act(async () => {
+        await result.current.initializeBuilder(params);
+      });
 
       const state = useWizardBuilderStore.getState();
       expect(state.currentStep).toBe(parseInt(step, 10));
@@ -257,7 +274,9 @@ describe('Template URL Loading Integration', () => {
     const { result } = renderHook(() => useWizardBuilderStore());
     const params = new URLSearchParams({ draft: 'test-builder-id', step: '5' });
 
-    await result.current.initializeBuilder(params);
+    await act(async () => {
+      await result.current.initializeBuilder(params);
+    });
 
     expect(useWizardBuilderStore.getState().currentStep).toBe(5);
   });
@@ -281,10 +300,12 @@ describe('Template URL Loading Integration', () => {
     const params2 = new URLSearchParams({ templateId: 'datacentre-master-twin-v1', step: '2' });
 
     // Start both loads simultaneously
-    const [load1, load2] = await Promise.all([
-      result.current.initializeBuilder(params1),
-      result.current.initializeBuilder(params2)
-    ]);
+    await act(async () => {
+      await Promise.all([
+        result.current.initializeBuilder(params1),
+        result.current.initializeBuilder(params2)
+      ]);
+    });
 
     // Should handle gracefully without crashes
     const state = useWizardBuilderStore.getState();

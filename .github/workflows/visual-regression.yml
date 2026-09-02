@@ -10,6 +10,7 @@ on:
       - 'src/config/**/*.ts'
       - 'tests/visual/**'
       - 'scripts/verify-visual-fingerprints.mjs'
+      - 'scripts/png-pixel-fingerprint.mjs'
       - 'playwright.visual.config.ts'
       - 'tailwind.config.ts'
       - '.github/workflows/visual-regression.yml'
@@ -94,4 +95,4 @@ jobs:
         run: |
           echo "Release source SHA: $AURA_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "Global application contract: light theme. Scoped NOC dark styling is tested separately from global mode." >> "$GITHUB_STEP_SUMMARY"
-          echo "Screenshots are generated fresh, activation evidence is consolidated into the lifecycle artifact, then all files are checked against the approved SHA-256/dimension manifest. CI never updates the manifest." >> "$GITHUB_STEP_SUMMARY"
+          echo "Screenshots are generated fresh, activation evidence is consolidated into the lifecycle artifact, then all files are checked against the approved byte or quantized-pixel SHA-256/dimension manifest. CI never updates the manifest." >> "$GITHUB_STEP_SUMMARY"

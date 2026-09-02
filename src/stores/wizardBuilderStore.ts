@@ -3,6 +3,7 @@ import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { DEFAULT_RESPONSE_PROFILE, isResponseProfile } from '@/lib/llm/responseProfiles';
+import { normalizeBuildKind, type BuildKind } from '@/lib/builder/buildKind';
 
 // Module-level request generation counters. Every call to a Builder read
 // (loadBuilder or a deploy-path readback) captures the counter at start;
@@ -197,7 +198,9 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
               .single();
             
             if (error) {
-              console.error('❌ [STORE] Failed to fetch template from database:', error);
+              if (error.code !== 'PGRST116') {
+                console.error('❌ [STORE] Failed to fetch template from database:', error);
+              }
             } else {
               template = data as any;
             }
@@ -246,12 +249,13 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         // Create a new draft with blueprint data
         // Note: template_id is only passed if it's a valid UUID
         // Template slugs like "retail_inventory_optimization" are NOT UUIDs
-        const createParams: any = {
-          source: blueprintToUse.source as any,
+        const blueprintBuildKind: BuildKind | null = normalizeBuildKind(blueprintToUse.type);
+        const createParams: Parameters<typeof builderService.create>[0] = {
+          source: blueprintToUse.source,
           goal: blueprintToUse.description,
           industry: blueprintToUse.industry || undefined,
           department: blueprintToUse.department || undefined,
-          type: blueprintToUse.type || undefined,
+          type: blueprintBuildKind ?? undefined,
         };
         
         // Only include template_id if it looks like a UUID (8-4-4-4-12 format)
@@ -270,7 +274,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           goal: blueprintToUse.description || '',
           industry: blueprintToUse.industry || '',
           department: blueprintToUse.department || '',
-          type: blueprintToUse.type || 'agent', // Default to 'agent' if not specified
+          type: blueprintBuildKind ?? 'agent', // Default to 'agent' if not specified
           template: blueprintToUse.templateId || '',
           workflow: builderState.workflow || initialState.workflow,
           modelConfig: builderState.modelConfig || initialState.modelConfig,
@@ -341,7 +345,9 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       const industry = params.get('industry') || prefilled?.industry || '';
       const department = params.get('department') || prefilled?.department || '';
       const template = params.get('template') || '';
-      const type = params.get('type') as 'agent' | 'process_twin' | '3d_twin' | null;
+      // Unknown ?type= values are rejected, never cast: the backend contract
+      // accepts only the three canonical build kinds.
+      const type = normalizeBuildKind(params.get('type'));
 
       console.log('🆕 [STORE] Creating new draft', { 
         goal, 

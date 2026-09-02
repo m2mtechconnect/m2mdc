@@ -69,6 +69,36 @@ export const UI_UX_SYNTHETIC_GOVERNANCE_CORPUS: EngineeringKnowledgeEntry[] = [
     tenantScope: 'global',
   },
   {
+    id: 'ux-persona-family-golden-journeys',
+    domain: 'ui-ux-patterns',
+    title: 'Persona families and golden journeys stay separate from authorization',
+    guidance:
+      'Treat platform roles, organization membership roles and workflow views as separate contracts. ' +
+      'Customer-facing presentation uses five stable persona families: owner or administrator, engineer ' +
+      'or operator, executive or manager, compliance or analyst, and viewer or pilot. A persona family may ' +
+      'prioritize language, evidence and next actions, but it never grants access. Evaluate each family with ' +
+      'a golden journey that completes a real job, persists state, proves the outcome and exercises a denial ' +
+      'or failure case. Permission and route checks are necessary coverage, but they are not evidence that a ' +
+      'persona job is complete.',
+    keywords: ['persona', 'family', 'journey', 'golden', 'authorization', 'role', 'workflow', 'permissions'],
+    citations: [
+      {
+        label: 'AURA DC persona and journey map',
+        locator: 'docs/ux/persona-journey-map.md',
+        kind: 'repository-artifact',
+      },
+      {
+        label: 'AURA persona journey presentation contract',
+        locator: 'src/config/personaJourneyModel.ts',
+        kind: 'repository-artifact',
+      },
+    ],
+    restrictedClaimCategories: [],
+    runtimeIntegrationClaim: 'none',
+    provenance: 'engineering-guidance',
+    tenantScope: 'global',
+  },
+  {
     id: 'sdg-synthetic-data-labeling',
     domain: 'synthetic-data-governance',
     title: 'Synthetic and demonstration data labelling rules',

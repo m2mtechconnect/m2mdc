@@ -55,6 +55,10 @@ export default defineConfig({
     ? undefined
     : {
         command: 'bun run dev',
+        // Tagger off when THIS config cold-starts the server (CI). A reused
+        // interactive dev server keeps the tagger — that is the documented
+        // trade-off in scripts/componentTaggerPolicy.ts.
+        env: { AURA_DISABLE_COMPONENT_TAGGER: '1' },
         url: 'http://localhost:8080',
         reuseExistingServer: !process.env.CI,
         timeout: 120000,

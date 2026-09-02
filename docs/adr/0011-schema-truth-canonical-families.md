@@ -19,9 +19,12 @@ and rollback evidence are recorded at one exact SHA.
 
 Migration filenames, normalized migration contents, exact generated-object names,
 and the generated-type checksum are pinned in
-`docs/architecture/schema-truth/exact-head-manifest.json`. Deployed metadata is a
-separate optional input and missing evidence remains explicit. Any difference fails
-the comparator; it never updates the baseline automatically.
+`docs/architecture/schema-truth/exact-head-manifest.json`. The source commit is derived
+from the latest commit that touched the generated types or migrations, not a hard-coded
+value. Deployed metadata is mandatory for a release verdict and must identify the exact
+audited application commit. Repository-only comparison remains available, returns a
+distinct non-release verdict, and cannot qualify a deployed environment. Any difference
+fails the comparator; it never updates the baseline automatically.
 
 ## Consequences
 

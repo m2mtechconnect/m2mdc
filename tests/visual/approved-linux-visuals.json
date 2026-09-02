@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "923f938b1aecbe08da200e915561ac9360be6052",
-    "workflowRunId": 33383837407,
-    "artifactId": 9754888225,
-    "artifactZipSha256": "1e4a74f7a60598bca8e843ee8a007ab7d0e9e633174888a59ddbcb73986b6b74"
+    "sha": "f2af3cc3781e4fde61226776ab264d72c0842be0",
+    "workflowRunId": 33629286801,
+    "artifactId": 9846158523,
+    "artifactZipSha256": "8c96c9510d1d896be19c0b8743021a1765f83a1bf1c3552a39e02c90813dc71a"
   },
   "notes": [
     "PR #127 exact-head review approved intentional changes on analytics desktop/mobile, Builder deployment readiness, and Connections desktop/mobile. The reviewed artifact showed one readiness heading, corrected Connections ownership, visible provenance labels without trend overlap, and no duplicate inspector close control.",
@@ -34,22 +34,24 @@
     "2026-08-27 exact-head remediation review inspected all 20 generated screenshots from Visual Regression workflow 33136149911 at source 3b2d772606c62e73d0aba3721fe55a50bf2efffa before updating fingerprints. The reviewed changes consolidate the five lifecycle workspaces, retire Marketplace from the global experience, preserve honest simulated/unavailable runtime labels, clarify organization-scoped access, and keep desktop/mobile layouts free of blocking clipping, overlap or contradictory navigation.",
     "2026-08-28 exact-head qualification inspected the corrected Compliance screenshot from Visual Regression workflow 33198830967 at source d8b5774c428595aebd665081c43aadedf7978f06. The owner explicitly approved fingerprint 4789161cf0d65a53b06fa5a13513297faca1ed9ba2fb28b6a4bd7eee30dd0887 after confirming the truthful Not assessed state, absence of fabricated percentages, and disabled export explanation; the other 19 exact fingerprints remained unchanged.",
     "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact.",
-    "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract."
+    "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract.",
+    "2026-09-02 exact-head qualification inspected all 20 screenshots from Visual Regression workflow 33625703952 at source 49919a2ddc6217cc702c3801bd2c1b6c51887d04. The first candidate artifact was rejected after review exposed a repeated organization suffix. The corrected artifact 9844751169 was then visibly reviewed: activation desktop/mobile remain fail-closed with explicit persisted-evidence blockers, Builder deployment readiness exposes the missing KPI and server-validated simulation requirements, and Command Center desktop/mobile show the persona priority journey without duplicated scope copy, clipped primary controls, overlap or page-level horizontal overflow. The other 15 fingerprints remained exact or retained their approved responsive invariant.",
+    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not."
   ],
   "screenshots": [
     {
       "file": "activation-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "3e0fabd2cf431eb535bdb54ad2bc2ba84950580a6dd9baaedb7efa3061d62bfa",
+      "sha256": "84034c17cb897c5884a7e34117bd52a1821f8c4fb8dc86d7e0d29787ba0a9405",
       "width": 1280,
-      "height": 1633
+      "height": 1745
     },
     {
       "file": "activation-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "97f8707d3c8b866c58395d53c1eca4a3115ad684ad7b80cf494b024e2a27fb68",
+      "sha256": "8a8fb0578102f9c4257819f89998551227812a811b236cb24b8dac8e63d84fde",
       "width": 375,
-      "height": 3004
+      "height": 3242
     },
     {
       "file": "ai-runtime-light-chromium-linux.png",
@@ -103,7 +105,7 @@
     {
       "file": "builder-step5-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e86d74cd0b6ac5840fe97a7fdedb38b6d810da9b9e52e86424dee0c8184845b2",
+      "sha256": "d548f723849eaec7d727c6fb9d0d0ae8a155cb552a055ca89f4958b0f668ce2f",
       "width": 1280,
       "height": 720
     },
@@ -124,16 +126,16 @@
     {
       "file": "dashboard-hero-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "3a7ee081211c89422b667638806d862a2ec3d502d46debb46d69dd715204809e",
+      "sha256": "96cbc1e14a044acba2ee5434e25ab56db27c287f93abf7176cc1314218e961e0",
       "width": 1280,
       "height": 720
     },
     {
       "file": "dashboard-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "3b2e7198af7ecaaa133c8e7f8c4384af28e3f03485645f39a62779fa1e1384dd",
+      "sha256": "39b22dc6543ffe5b8eb50b43c5638fd65d06a1d8ea056210e00328f5b18920ef",
       "width": 375,
-      "height": 1945
+      "height": 2367
     },
     {
       "file": "deployments-light-chromium-linux.png",
@@ -171,8 +173,8 @@
     },
     {
       "file": "teams-light-chromium-linux.png",
-      "mode": "sha256",
-      "sha256": "21e76bb3a490c9cfb0a130b88c11cb20155a58b8b544d33183a36fa0c7966b39",
+      "mode": "pixel-sha256-4bit",
+      "pixelSha256": "871ee986ce4c0dc8712aa20500082a00e3a15a136f391de58ece57bb5fc1e5c9",
       "width": 1280,
       "height": 720
     }

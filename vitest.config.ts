@@ -2,11 +2,12 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react-swc';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
+import { nodeScriptShebangPlugin } from './scripts/vitestScriptShebang';
 
 const configDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [nodeScriptShebangPlugin(), react()],
   test: {
     globals: true,
     environment: 'jsdom',

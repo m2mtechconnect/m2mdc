@@ -175,7 +175,7 @@ export function DeploymentReadinessChecklist({
               <div className="flex items-center gap-3">
                 <Check className="h-5 w-5 text-green-600 dark:text-green-400 shrink-0" />
                 <p className="text-sm font-medium text-green-800 dark:text-green-200">
-                  All checks passed! Ready to deploy.
+                  Template configuration checks passed. Persisted activation evidence is verified in Builder.
                 </p>
               </div>
             </div>

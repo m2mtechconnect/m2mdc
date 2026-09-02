@@ -61,6 +61,33 @@ describe('workspace run export', () => {
     expect(payload.title).toContain(run.id);
   });
 
+  it('includes the append-only decision chain for compliance handoff', () => {
+    const payload = buildRunExportPayload({
+      ...run,
+      decisionRecords: [{
+        id: 'decision-1',
+        recommendationId: 'reserve-headroom',
+        state: 'deferred',
+        outcome: 'escalated',
+        rationale: 'Additional facilities evidence is required before approval.',
+        approver: 'manager@example.invalid',
+        decidedAt: '2026-08-17T01:00:00.000Z',
+        snapshotHash: 'sha256-snapshot',
+        decisionHash: 'sha256-decision',
+        evidenceSchemaVersion: 'aura-evidence-v1',
+      }],
+    });
+    const decision = payload.records.find((record) => record.metricId === 'decision.decision-1');
+    expect(decision).toMatchObject({
+      value: 'escalated',
+      provenance: 'simulated',
+      source: 'public.decision_records:decision-1',
+      observedAt: '2026-08-17T01:00:00.000Z',
+    });
+    expect(decision?.description).toContain('Additional facilities evidence');
+    expect(payload.operatingState?.humanReviewStatus).toBe('1 append-only decision record');
+  });
+
   it('serializes to CSV and JSON containing the run id', () => {
     const payload = buildRunExportPayload(run);
     expect(toCsv(payload)).toContain('SIM-2026-08-17-001');

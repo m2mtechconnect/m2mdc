@@ -89,6 +89,9 @@ export function DecidePanel() {
           const decision = run.decisions[rec.id] ?? 'pending';
           const rationale = rationales[rec.id] ?? '';
           const error = errors[rec.id];
+          const latestRecord = [...(run.decisionRecords ?? [])]
+            .reverse()
+            .find((record) => record.recommendationId === rec.id);
           return (
             <li key={rec.id} className="rounded-md border border-border p-3">
               <div className="mb-1 flex items-start justify-between gap-2">
@@ -96,6 +99,17 @@ export function DecidePanel() {
                 <Badge variant="outline" className="shrink-0 text-xs">{rec.signal}</Badge>
               </div>
               <p className="mb-3 text-xs text-muted-foreground">{rec.rationale}</p>
+              {latestRecord && (
+                <div className="mb-3 rounded border border-border bg-muted/40 p-2 text-xs" data-testid={`decision-evidence-${rec.id}`}>
+                  <p className="font-medium text-foreground">
+                    {latestRecord.outcome} by {latestRecord.approver}
+                  </p>
+                  <p className="text-muted-foreground">{latestRecord.rationale}</p>
+                  <p className="mt-1 font-mono text-[10px] text-muted-foreground">
+                    {latestRecord.decidedAt} · snapshot {latestRecord.snapshotHash}
+                  </p>
+                </div>
+              )}
 
               <label className="mb-1 block text-xs font-medium text-foreground" htmlFor={`decision-rationale-${rec.id}`}>
                 Review rationale

@@ -13,9 +13,13 @@
  */
 
 import React from 'react';
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { ActiveTwinProvider, useActiveTwin } from '@/context/ActiveTwinContext';
+import {
+  expectConsoleError,
+  observedConsoleErrors,
+} from '../_setup/unexpectedConsoleGuard';
 
 // Deferred promise helper.
 function defer<T>() {
@@ -72,17 +76,10 @@ function Capture() {
 }
 
 describe('ActiveTwinContext lifecycle', () => {
-  let errSpy: ReturnType<typeof vi.spyOn>;
-
   beforeEach(() => {
     maybeSingleQueue.length = 0;
     captured = null;
     localStorage.clear();
-    errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    errSpy.mockRestore();
   });
 
   it('drops fetch results that resolve after provider unmount without logging', async () => {
@@ -110,8 +107,7 @@ describe('ActiveTwinContext lifecycle', () => {
       await Promise.resolve();
     });
 
-    const lifecycleErrors = errSpy.mock.calls
-      .map((args) => String(args[0]))
+    const lifecycleErrors = observedConsoleErrors()
       .filter((m) => /Failed to fetch (twin|location)/i.test(m));
     expect(lifecycleErrors, 'no fetch errors after unmount').toEqual([]);
   });
@@ -139,14 +135,14 @@ describe('ActiveTwinContext lifecycle', () => {
       await Promise.resolve();
     });
 
-    const lifecycleErrors = errSpy.mock.calls
-      .map((args) => String(args[0]))
+    const lifecycleErrors = observedConsoleErrors()
       .filter((m) => /Failed to fetch (twin|location)/i.test(m));
     expect(lifecycleErrors, 'superseded fetch must not log').toEqual([]);
   });
 
   it('still logs when the CURRENT generation fails with a genuine transport error', async () => {
     const pending = nextMaybeSingle();
+    expectConsoleError(/Failed to fetch twin/i);
 
     render(
       <ActiveTwinProvider>
@@ -162,8 +158,7 @@ describe('ActiveTwinContext lifecycle', () => {
       await Promise.resolve();
     });
 
-    const lifecycleErrors = errSpy.mock.calls
-      .map((args) => String(args[0]))
+    const lifecycleErrors = observedConsoleErrors()
       .filter((m) => /Failed to fetch twin/i.test(m));
     expect(lifecycleErrors.length, 'live-generation failure must surface').toBeGreaterThanOrEqual(1);
   });

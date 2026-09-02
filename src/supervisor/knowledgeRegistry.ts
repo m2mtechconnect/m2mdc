@@ -164,6 +164,16 @@ export const KNOWLEDGE_SOURCES: KnowledgeSource[] = [
     regressionCaseRef: 'tests/unit/supervisor-engineering-evals.test.ts',
     note: 'Synthetic evaluation cases only; never telemetry or tenant data.',
   },
+  {
+    id: 'ks-persona-journey-map',
+    kind: 'architecture-decision',
+    title: 'AURA DC persona and golden-journey presentation contract',
+    ref: 'docs/ux/persona-journey-map.md',
+    disposition: 'accepted',
+    redactionState: 'approved-redacted',
+    regressionCaseRef: 'tests/unit/persona-journey-model.test.ts',
+    note: 'Presentation families may prioritize work but never grant authorization.',
+  },
 ];
 
 /** A source may be indexed only when reviewed, redacted and not rejected. */

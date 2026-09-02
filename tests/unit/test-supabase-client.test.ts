@@ -4,8 +4,39 @@ import {
   resolveTestSupabaseConfig,
   resolveTestUserCredentials,
 } from '../helpers/testSupabaseClient';
+import { primeSafeTestEnvironment } from '../_setup/safeTestEnvironment';
 
 describe('loopback-only test Supabase configuration', () => {
+  it('neutralizes ambient cloud configuration before imports can consume it', () => {
+    const env = {
+      VITE_SUPABASE_URL: 'https://ambient-project.supabase.co',
+      VITE_SUPABASE_PUBLISHABLE_KEY: 'ambient-key',
+      SUPABASE_URL: 'https://another-ambient-project.supabase.co',
+    };
+
+    expect(primeSafeTestEnvironment(env)).toEqual({
+      url: 'http://127.0.0.1:54321',
+      anonKey: 'test-placeholder-anon-key',
+    });
+    expect(env.VITE_SUPABASE_URL).toBe('http://127.0.0.1:54321');
+    expect(env.VITE_SUPABASE_PUBLISHABLE_KEY).toBe('test-placeholder-anon-key');
+    expect(env.SUPABASE_URL).toBe('http://127.0.0.1:54321');
+  });
+
+  it('preserves an explicit safe test target and rejects an explicit remote one', () => {
+    const safeEnv = {
+      TEST_SUPABASE_URL: 'http://localhost:54321',
+      TEST_SUPABASE_ANON_KEY: 'explicit-test-key',
+    };
+    expect(primeSafeTestEnvironment(safeEnv)).toEqual({
+      url: 'http://localhost:54321',
+      anonKey: 'explicit-test-key',
+    });
+    expect(() => primeSafeTestEnvironment({
+      TEST_SUPABASE_URL: 'https://explicit-remote.supabase.co',
+    })).toThrow(UnsafeTestBackendError);
+  });
+
   it.each([
     'http://127.0.0.1:54321',
     'http://localhost:54321',

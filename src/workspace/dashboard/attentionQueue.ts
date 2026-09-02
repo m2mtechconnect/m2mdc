@@ -184,7 +184,7 @@ export function buildAttentionQueue(input: AttentionInputs): AttentionItem[] {
       actions: [
         {
           label: 'Review recommendations',
-          to: latestRunId ? `/simulation?run=${encodeURIComponent(latestRunId)}&review=pending` : '/simulation?review=pending',
+          to: latestRunId ? `/simulation?step=decide&run=${encodeURIComponent(latestRunId)}` : '/simulation?step=decide',
         },
       ],
     });

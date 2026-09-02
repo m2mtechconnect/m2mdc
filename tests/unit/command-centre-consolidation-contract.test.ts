@@ -16,11 +16,13 @@ describe('Command Center consolidation contract', () => {
     expect(highlights).toContain('Command Center · Data centre facility');
   });
 
-  it('keeps one primary action and moves secondary destinations behind progressive disclosure', () => {
-    expect(highlights).toContain('data-testid="primary-action-simulate"');
+  it('keeps one persona-prioritized primary action and progressively discloses the remainder', () => {
+    expect(commandCentre).toContain('<PersonaPriorityPanel');
+    expect(commandCentre).toContain('buildPersonaCommandActions');
+    expect(highlights).toContain('data-testid="primary-persona-action"');
     expect(highlights).not.toContain('data-testid="command-create-facility"');
-    expect(highlights).toContain('<Link to={evidenceHref}>View Evidence</Link>');
-    expect(highlights).toContain('<Link to="/manage/facilities?create=true">New facility</Link>');
+    expect(highlights).toContain('additionalActions.map');
+    expect(highlights).not.toContain('<Link to="/manage/facilities?create=true">New facility</Link>');
   });
 
   it('preserves explicit simulation provenance after removing the duplicate hero', () => {

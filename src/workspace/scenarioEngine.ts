@@ -82,6 +82,19 @@ export interface RunRecommendation {
 
 export type DecisionState = 'pending' | 'accepted' | 'rejected' | 'deferred';
 
+export interface WorkspaceDecisionRecord {
+  id: string;
+  recommendationId: string;
+  state: Exclude<DecisionState, 'pending'>;
+  outcome: 'approved' | 'rejected' | 'escalated';
+  rationale: string;
+  approver: string;
+  decidedAt: string;
+  snapshotHash: string;
+  decisionHash: string | null;
+  evidenceSchemaVersion: string;
+}
+
 export interface WorkspaceRun {
   id: string;
   /**
@@ -99,6 +112,7 @@ export interface WorkspaceRun {
   executionOrigin?: 'client-browser' | 'server-edge-function' | 'imported-legacy';
   validationStatus?:
     | 'client-produced-unverified'
+    | 'client-generated-unverified'
     | 'server-validated'
     | 'imported-unverified'
     | 'invalid';
@@ -114,6 +128,8 @@ export interface WorkspaceRun {
   events: RunEvent[];
   recommendations: RunRecommendation[];
   decisions: Record<string, DecisionState>;
+  /** Append-only server evidence visible to authorized organization members. */
+  decisionRecords?: WorkspaceDecisionRecord[];
 }
 
 export function applyStress(overrides: ConfigOverrides, scenario: ScenarioDescriptor): ConfigOverrides {

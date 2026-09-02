@@ -1,6 +1,7 @@
 import { AgentBlueprint, TemplateSourceEntry } from "@/types/agentBlueprint";
 import type { ValidatedTemplate } from '@/lib/templates/unifiedTemplateService';
 import { autoRepairWorkflow, validateRepairedWorkflow } from '@/lib/validation/workflowAutoRepair';
+import { resolveTemplateBuildKind } from '@/lib/builder/buildKind';
 
 /**
  * Converts a validated template into an AgentBlueprint for the Builder
@@ -174,7 +175,16 @@ export function templateToBlueprint(
     department: primaryDepartment,
     useCase: config.problem_statement || config.summary || template.description,
     level: template.difficulty as any || config.level || null,
-    type: ((template as any).twin_type || config.type || 'agent') as any,
+    // Build kind is a backend contract value ('agent' | 'process_twin' |
+    // '3d_twin'). Template `twin_type` taxonomy must never leak into it.
+    type: resolveTemplateBuildKind({
+      configType: config.type,
+      twinType: (template as { twin_type?: unknown }).twin_type,
+      industry: primaryIndustry,
+      department: primaryDepartment,
+      templateId: template.id,
+      templateName: template.name,
+    }),
     
     // Business metrics
     goals,

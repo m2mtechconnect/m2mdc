@@ -26,11 +26,13 @@ import type {
 import { SIMULATOR_ENGINEERING_CORPUS } from './corpus/simulatorEngineeringCorpus';
 import { OPENUSD_ASSETS_CORPUS } from './corpus/openUsdAssetsCorpus';
 import { UI_UX_SYNTHETIC_GOVERNANCE_CORPUS } from './corpus/uiUxSyntheticGovernanceCorpus';
+import { PLATFORM_ASSURANCE_CORPUS } from './corpus/platformAssuranceCorpus';
 
 export const ENGINEERING_KNOWLEDGE_CORPUS: EngineeringKnowledgeEntry[] = [
   ...SIMULATOR_ENGINEERING_CORPUS,
   ...OPENUSD_ASSETS_CORPUS,
   ...UI_UX_SYNTHETIC_GOVERNANCE_CORPUS,
+  ...PLATFORM_ASSURANCE_CORPUS,
 ];
 
 // ------------------------------------------------------------- version pin
@@ -71,10 +73,10 @@ export interface EngineeringCorpusManifest {
 }
 
 export const ENGINEERING_CORPUS_MANIFEST: EngineeringCorpusManifest = {
-  version: '1.0.0',
-  pinnedAt: '2026-08-31',
-  checksum: 'fnv1a32:6f857b80',
-  entryCount: 12,
+  version: '1.5.0',
+  pinnedAt: '2026-09-01',
+  checksum: 'fnv1a32:f50df3d6',
+  entryCount: 21,
 };
 
 export interface CorpusIntegrityResult {

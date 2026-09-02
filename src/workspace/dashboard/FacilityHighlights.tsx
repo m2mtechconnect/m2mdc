@@ -9,7 +9,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Boxes,
+  ArrowRight,
   Building2,
   ChevronDown,
   CircleAlert,
@@ -17,7 +17,6 @@ import {
   Ellipsis,
   FileSearch,
   Info,
-  Play,
   TriangleAlert,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -31,6 +30,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { type KpiInterpretation, type KpiState } from './kpiInterpretation';
+import type { PersonaCommandAction } from './personaCommandCenter';
 
 interface Props {
   workspaceLabel: string;
@@ -40,9 +40,7 @@ interface Props {
   calculatedAt: string;
   hasRecordedRun: boolean;
   isFallback: boolean;
-  simulationHref: string;
-  blueprintHref: string;
-  evidenceHref: string;
+  priorityActions: PersonaCommandAction[];
   kpis: KpiInterpretation[];
   evidenceHrefForKpi: (kpi: KpiInterpretation) => string;
   onSelectKpi: (kpi: KpiInterpretation) => void;
@@ -67,15 +65,15 @@ export function FacilityHighlights({
   calculatedAt,
   hasRecordedRun,
   isFallback,
-  simulationHref,
-  blueprintHref,
-  evidenceHref,
+  priorityActions,
   kpis,
   evidenceHrefForKpi,
   onSelectKpi,
   provenance,
   assumptions,
 }: Props) {
+  const [primaryAction, secondaryAction, ...additionalActions] = priorityActions;
+
   return (
     <section
       aria-labelledby="facility-highlights-heading"
@@ -116,54 +114,50 @@ export function FacilityHighlights({
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           {/* Only rendered when the user has more than one facility. */}
           <FacilitySwitcher />
-          <Button
-            asChild
-            className="h-10 px-4 text-[14px] font-semibold shadow-sm max-sm:h-11"
-            data-testid="primary-action-simulate"
-          >
-            <Link to={simulationHref}>
-              <Play className="mr-2 h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
-              Start simulation
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal sm:inline-flex">
-            <Link to={blueprintHref}>
-              <Boxes className="mr-2 h-4 w-4" strokeWidth={1.75} aria-hidden />
-              Open Blueprint
-            </Link>
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                className="h-[38px] w-[38px] p-0 max-sm:h-11 max-sm:w-11"
-                aria-label="More facility actions"
-                title="More facility actions"
-              >
-                <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link to="/manage/facilities?create=true">New facility</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild className="sm:hidden">
-                <Link to={blueprintHref}>Open Blueprint</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to={evidenceHref}>View Evidence</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to={`${blueprintHref}?tab=model`}>Inspect facility model</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/manage/integrations">Open Connections</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/simulation">Simulation workspace</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {primaryAction && (
+            <Button
+              asChild
+              className="h-10 px-4 text-[14px] font-semibold shadow-sm max-sm:h-11"
+              data-testid="primary-persona-action"
+              data-action-id={primaryAction.id}
+            >
+              <Link to={primaryAction.href}>
+                {primaryAction.label}
+                <ArrowRight className="ml-2 h-[18px] w-[18px]" strokeWidth={2} aria-hidden />
+              </Link>
+            </Button>
+          )}
+          {secondaryAction && (
+            <Button asChild variant="outline" className="hidden h-[38px] text-[14px] font-normal sm:inline-flex">
+              <Link to={secondaryAction.href}>{secondaryAction.label}</Link>
+            </Button>
+          )}
+          {additionalActions.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="h-[38px] w-[38px] p-0 max-sm:h-11 max-sm:w-11"
+                  aria-label="More priority actions"
+                  title="More priority actions"
+                >
+                  <Ellipsis className="h-[18px] w-[18px]" strokeWidth={1.75} aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {secondaryAction && (
+                  <DropdownMenuItem asChild className="sm:hidden">
+                    <Link to={secondaryAction.href}>{secondaryAction.label}</Link>
+                  </DropdownMenuItem>
+                )}
+                {additionalActions.map((item) => (
+                  <DropdownMenuItem key={item.id} asChild>
+                    <Link to={item.href}>{item.label}</Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 

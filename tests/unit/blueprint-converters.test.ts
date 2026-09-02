@@ -199,7 +199,8 @@ describe('templateToBlueprint', () => {
 
     // Metadata
     expect(blueprint.industry).toBe('Technology');
-    expect(blueprint.type).toBe('operational');
+    // Build kind is the backend contract value, not template taxonomy.
+    expect(blueprint.type).toBe('3d_twin');
     expect(blueprint.expectedRoi).toBe('280%');
 
     // Goals derived from the blueprint KPI set
@@ -220,7 +221,7 @@ describe('templateToBlueprint', () => {
 
     expect(blueprint.source).toBe('template');
     expect(blueprint.sourceEntry).toBe('dashboard');
-    expect(blueprint.type).toBe('operational');
+    expect(blueprint.type).toBe('3d_twin');
     expect(blueprint.certified).toBe(true);
 
     // Communication style comes from the template config
@@ -233,7 +234,7 @@ describe('templateToBlueprint', () => {
 
     expect(blueprint.source).toBe('template');
     expect(blueprint.sourceEntry).toBe('builder');
-    expect(blueprint.type).toBe('operational');
+    expect(blueprint.type).toBe('3d_twin');
     expect(blueprint.tools.recommendedIntegrations.length).toBeGreaterThan(0);
   });
 
@@ -300,7 +301,8 @@ describe('templateToBlueprint', () => {
     
     // Should map JSON schema correctly
     expect(blueprint.name).toBe('Test JSON Template');
-    expect(blueprint.type).toBe('operational');
+    // Non-facility template keeps the safe product default build kind.
+    expect(blueprint.type).toBe('agent');
     expect(blueprint.expectedRoi).toBe('180%');
     expect(blueprint.model.provider).toBe('openai');
     expect(blueprint.model.modelName).toBe('gpt-5-mini');

@@ -16,6 +16,7 @@
 import { test, expect, type Page } from './_setup/fixtures';
 import { assertNoOnboardingOverlay, seedDismissedTours } from './_setup/app-state';
 import { installSupabaseMock } from './_setup/supabase-mock';
+import { requireCommittedFrames } from './_setup/focus-probe';
 
 // Exercise the canonical workspace directly. Starting from the retired index
 // races its redirect and can transiently replace the rendered shell with the
@@ -59,9 +60,12 @@ async function keyboardFocus(page: Page, selector: string) {
   // The contract is visual: allow Chromium to commit the focus paint before
   // reading computed styles. This does not retry the interaction or relax the
   // assertion; it observes the result after the next rendered frame.
-  await page.evaluate(() => new Promise<void>((resolve) => {
-    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-  }));
+  // FAIL-CLOSED: each of the two frames either commits within the configured
+  // bound or the wait rejects with a named FrameCommitStallError carrying the
+  // target selector, the frame ordinal, the bound and the elapsed time —
+  // failing this test immediately. A missed frame can never reach the style
+  // assertions or silently pass.
+  await requireCommittedFrames(page, `keyboard focus target ${selector}`, 2);
 }
 
 async function assertVisibleFocusRing(page: Page, selector: string, label: string) {

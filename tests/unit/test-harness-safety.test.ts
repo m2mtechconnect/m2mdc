@@ -220,6 +220,13 @@ describe('test harness safety guards', () => {
     expect(validator).toContain('idempotencyKey: `phase3-${crypto.randomUUID()}`');
     expect(validator).toContain('createA.body?.data?.run?.id');
     expect(validator).not.toContain("action: 'transition'");
+    expect(validator).toContain('const prefix = allMigrations.slice(0, first)');
+    expect(validator).toContain('const forward = allMigrations.slice(first)');
+    expect(validator).not.toContain("allMigrations.filter((f) => !phase3.includes(f))");
+    expect(matrix).toContain(
+      "authenticated clients cannot insert decision evidence directly",
+    );
+    expect(matrix).toContain("set_config('request.jwt.claims', '{\"role\":\"service_role\"}', true)");
     const twinReadStatements = twinReadGrant
       .split('\n')
       .filter((line) => !line.trim().startsWith('--'))

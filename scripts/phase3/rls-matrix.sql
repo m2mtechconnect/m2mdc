@@ -120,16 +120,39 @@ BEGIN
   PERFORM pg_temp.expect('a terminal run cannot be reopened', ok, true);
 
   -------------------------------------------------- decision immutability
+  ok := false;
+  BEGIN
+    INSERT INTO public.decision_records (
+      user_id, tenant_id, run_id, recommendation_id, outcome, rationale,
+      approver, decided_at, data_mode, observation_tick,
+      evidence_snapshot, snapshot_hash, timeline_id
+    )
+    VALUES (
+      ua, org_a, run_a, 'rec-client', 'approved', 'direct client decision attempt',
+      'tenant-a@validation.invalid', now(), 'SIMULATED', 0,
+      '{}'::jsonb, 'validation-snapshot-client', 'run:' || run_a::text
+    );
+  EXCEPTION WHEN OTHERS THEN ok := true;
+  END;
+  PERFORM pg_temp.expect('authenticated clients cannot insert decision evidence directly', ok, true);
+  RESET role;
+
+  -- The trusted record-decision boundary writes with service-role authority.
+  -- Seed one equivalent row in that envelope so immutability and tenant-read
+  -- assertions exercise a real record without weakening the client boundary.
+  PERFORM set_config('request.jwt.claims', '{"role":"service_role"}', true);
   INSERT INTO public.decision_records (
-    user_id, run_id, recommendation_id, outcome, rationale,
+    user_id, tenant_id, run_id, recommendation_id, outcome, rationale,
     approver, decided_at, data_mode, observation_tick,
     evidence_snapshot, snapshot_hash, timeline_id
   )
   VALUES (
-    ua, run_a, 'rec-1', 'approved', 'validation rationale long enough',
+    ua, org_a, run_a, 'rec-1', 'approved', 'validation rationale long enough',
     'tenant-a@validation.invalid', now(), 'SIMULATED', 0,
     '{}'::jsonb, 'validation-snapshot-owner', 'run:' || run_a::text
   );
+
+  PERFORM pg_temp.act_as(ua);
   ok := false;
   BEGIN
     UPDATE public.decision_records SET outcome = 'rejected' WHERE run_id = run_a;

@@ -103,7 +103,7 @@ describe('approved-lesson retrieval', () => {
 
   it('keeps the deterministic truth path ahead of any model invocation', () => {
     const truthIdx = EDGE_SOURCE.indexOf('classifyTruthQuery(query');
-    const gatewayIdx = EDGE_SOURCE.indexOf('ai.gateway.lovable.dev');
+    const gatewayIdx = EDGE_SOURCE.indexOf('makeAIStreamingCompletion(');
     expect(truthIdx).toBeGreaterThan(-1);
     expect(gatewayIdx).toBeGreaterThan(truthIdx);
   });

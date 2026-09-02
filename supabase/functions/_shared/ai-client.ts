@@ -28,6 +28,11 @@ export interface AIClientOptions {
   maxTokens?: number;
 }
 
+export interface AIMessage {
+  role: string;
+  content: string;
+}
+
 export interface ManagedAIClient {
   type: 'lovable_managed';
   apiKey: string;
@@ -46,6 +51,38 @@ export class AIProviderRequestError extends Error {
     super(message);
     this.name = 'AIProviderRequestError';
   }
+}
+
+async function requestManagedAICompletion(
+  messages: AIMessage[],
+  options: AIClientOptions,
+  stream: boolean,
+): Promise<Response> {
+  const client = getAIClient(options);
+  const response = await fetch(client.endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${client.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: client.model,
+      messages,
+      temperature: client.temperature,
+      max_tokens: client.maxTokens,
+      ...(stream ? { stream: true } : {}),
+    }),
+  });
+
+  if (!response.ok) {
+    console.error('[AI Client] Managed provider request failed', {
+      profile: client.profile,
+      status: response.status,
+    });
+    throw new AIProviderRequestError(response.status);
+  }
+
+  return response;
 }
 
 /** Resolve one server-owned managed AI profile. */
@@ -73,35 +110,23 @@ export function getAIClient(options: AIClientOptions = {}): ManagedAIClient {
 
 /** Make an AI completion request using the selected server-owned profile. */
 export async function makeAICompletion(
-  messages: Array<{ role: string; content: string }>,
+  messages: AIMessage[],
   options: AIClientOptions = {},
 ) {
-  const client = getAIClient(options);
-  const response = await fetch(client.endpoint, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${client.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: client.model,
-      messages,
-      temperature: client.temperature,
-      max_tokens: client.maxTokens,
-    }),
-  });
-
-  if (!response.ok) {
-    const detail = await response.text();
-    console.error('[AI Client] Managed provider request failed', {
-      profile: client.profile,
-      status: response.status,
-      detail: detail.slice(0, 500),
-    });
-    throw new AIProviderRequestError(response.status);
-  }
-
+  const response = await requestManagedAICompletion(messages, options, false);
   return await response.json();
+}
+
+/**
+ * Start a streaming AI completion through the same server-owned transport.
+ * Callers receive the upstream response stream but cannot provide an endpoint,
+ * credential or arbitrary model id.
+ */
+export function makeAIStreamingCompletion(
+  messages: AIMessage[],
+  options: AIClientOptions = {},
+): Promise<Response> {
+  return requestManagedAICompletion(messages, options, true);
 }
 
 /** Health check for a server-owned AI profile. */

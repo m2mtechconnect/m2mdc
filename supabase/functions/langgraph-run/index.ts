@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { makeAIStreamingCompletion } from "../_shared/ai-client.ts";
 
 
 serve(async (req) => {
@@ -80,12 +81,6 @@ serve(async (req) => {
 
           const context = docsResult?.documents?.map((d: any) => d.content).join('\n\n') || '';
 
-          // Call Lovable AI
-          const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-          if (!LOVABLE_API_KEY) {
-            throw new Error('LOVABLE_API_KEY not configured');
-          }
-
           const messages = [
             {
               role: 'system',
@@ -98,22 +93,9 @@ serve(async (req) => {
             messages.splice(1, 0, ...memory.state.history);
           }
 
-          const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'google/gemini-2.5-flash',
-              messages,
-              stream: true,
-            }),
+          const aiResponse = await makeAIStreamingCompletion(messages, {
+            model: 'compatibilityFast',
           });
-
-          if (!aiResponse.ok) {
-            throw new Error(`AI gateway error: ${aiResponse.status}`);
-          }
 
           const reader = aiResponse.body?.getReader();
           const decoder = new TextDecoder();

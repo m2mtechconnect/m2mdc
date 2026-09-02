@@ -31,6 +31,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { makeAIStreamingCompletion } from "../_shared/ai-client.ts";
 import {
   buildEvidencePreamble,
   buildFacilityEvidenceEnvelope,
@@ -165,15 +166,9 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
-
     // Server-owned, provider-neutral model routing. A browser-supplied model
     // identifier is never read here.
     const modelPolicy = resolveModelPolicy('general-assistant');
-    const model = modelPolicy.model as string;
 
     // Fetch persistent memory (only for authenticated users)
     const memory = user ? await fetchMemory(supabaseClient, user.id) : {};
@@ -199,28 +194,19 @@ serve(async (req) => {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // Call Lovable AI Gateway with streaming
-          const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model,
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: query }
-              ],
+          // The shared server-only adapter owns provider endpoint, credential
+          // and model selection while this handler preserves the SSE contract.
+          const aiResponse = await makeAIStreamingCompletion(
+            [
+              { role: 'system', content: systemPrompt },
+              { role: 'user', content: query },
+            ],
+            {
+              model: 'primary',
               temperature: modelPolicy.temperature ?? 0.7,
-              max_tokens: modelPolicy.maxTokens ?? 2048,
-              stream: true,
-            })
-          });
-
-          if (!aiResponse.ok) {
-            throw new Error(`AI API error: ${aiResponse.status}`);
-          }
+              maxTokens: modelPolicy.maxTokens ?? 2048,
+            },
+          );
 
           if (!aiResponse.body) {
             throw new Error('No response body');

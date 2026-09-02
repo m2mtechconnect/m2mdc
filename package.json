@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@faker-js/faker": "^10.1.0",
+    "@faker-js/faker": "^10.5.0",
     "@hookform/resolvers": "^3.10.0",
     "@langchain/core": "^1.2.9",
     "@langchain/langgraph": "^1.4.12",
@@ -156,6 +156,7 @@
     "ws": "8.21.0"
   },
   "overrides": {
+    "@humanfs/node": "0.16.8",
     "brace-expansion": "5.0.9",
     "flatted": "3.4.4",
     "glob": "10.5.0",

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
-  Save, Play, CheckCircle2, Trash2, Loader2
+  Save, Eye, CheckCircle2, Trash2
 } from "lucide-react";
 import { WorkflowPalette } from "./WorkflowPalette";
 import { NodeConfigDrawer } from "./NodeConfigDrawer";
@@ -60,6 +60,18 @@ const NODE_LABELS: Record<string, string> = {
 };
 
 const isValidUUID = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
+function getWorkflowValidationErrors(nodes: WorkflowNode[], edges: WorkflowEdge[]): string[] {
+  const errors: string[] = [];
+  if (nodes.length === 0) errors.push("Workflow has no nodes");
+  if (nodes.length > 1 && edges.length === 0) errors.push("Nodes are not connected");
+  const nodesWithIncoming = new Set(edges.map(e => e.toNodeId));
+  const entryNodes = nodes.filter(n => !nodesWithIncoming.has(n.id));
+  if (nodes.length > 0 && entryNodes.length === 0) {
+    errors.push("No entry point found (circular dependency)");
+  }
+  return errors;
+}
 
 export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -513,13 +525,8 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     }
   };
 
-  const handleValidate = async () => {
-    const errors: string[] = [];
-    if (nodes.length === 0) errors.push("Workflow has no nodes");
-    if (nodes.length > 1 && edges.length === 0) errors.push("Nodes are not connected");
-    const nodesWithIncoming = new Set(edges.map(e => e.toNodeId));
-    const entryNodes = nodes.filter(n => !nodesWithIncoming.has(n.id));
-    if (nodes.length > 0 && entryNodes.length === 0) errors.push("No entry point found (circular dependency)");
+  const handleValidate = () => {
+    const errors = getWorkflowValidationErrors(nodes, edges);
     if (errors.length === 0) {
       toast({ title: "Validation passed ✓", description: "Workflow structure is valid" });
       return true;
@@ -529,33 +536,38 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
     }
   };
 
-  const [isTestRunning, setIsTestRunning] = useState(false);
   const [testResult, setTestResult] = useState<any>(null);
   const [showTestResults, setShowTestResults] = useState(false);
 
-  const handleTestRun = async () => {
-    if (nodes.length === 0) {
-      toast({ title: "No nodes", description: "Add nodes before testing", variant: "destructive" });
+  const handlePreviewStructure = () => {
+    const errors = getWorkflowValidationErrors(nodes, edges);
+    if (errors.length > 0) {
+      toast({ title: "Preview unavailable", description: errors.join('; '), variant: "destructive" });
       return;
     }
-    setIsTestRunning(true); setTestResult(null); setShowTestResults(true);
-    try {
-      const startTime = Date.now();
-      const trace = nodes.map((node, idx) => ({
-        node_id: node.id, node_type: node.type, status: 'success' as const,
-        duration_ms: 10 + Math.floor(Math.random() * 90),
-        result: { output: `[Mock] ${node.type} executed`, step: idx + 1 },
-      }));
-      await new Promise(r => setTimeout(r, 400 + Math.random() * 400));
-      const result = {
-        execution_trace: trace,
-        summary: { total_nodes: nodes.length, total_edges: edges.length, duration_ms: Date.now() - startTime, successful_nodes: trace.length, failed_nodes: 0 },
-      };
-      setTestResult(result);
-      toast({ title: "Simulation complete", description: `${result.summary.total_nodes} nodes in ${result.summary.duration_ms}ms` });
-    } catch (error: any) {
-      toast({ title: "Test run failed", description: error.message, variant: "destructive" });
-    } finally { setIsTestRunning(false); }
+    const trace = nodes.map((node, idx) => ({
+      node_id: node.id,
+      node_type: node.type,
+      status: 'not-executed' as const,
+      result: {
+        output: `Local preview only — ${node.type} was not executed against a backend.`,
+        step: idx + 1,
+      },
+    }));
+    setTestResult({
+      execution_trace: trace,
+      summary: {
+        mode: 'local-structural-preview',
+        total_nodes: nodes.length,
+        total_edges: edges.length,
+        backend_executed: false,
+      },
+    });
+    setShowTestResults(true);
+    toast({
+      title: "Local preview ready",
+      description: "Structure validated. No backend workflow was executed.",
+    });
   };
 
   const handleClear = () => {
@@ -595,8 +607,8 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
             <Button variant="outline" size="sm" onClick={handleValidate} className="gap-2">
               <CheckCircle2 className="h-4 w-4" />Validate
             </Button>
-            <Button variant="outline" size="sm" onClick={handleTestRun} disabled={isTestRunning} className="gap-2">
-              {isTestRunning ? <><Loader2 className="h-4 w-4 animate-spin" />Testing...</> : <><Play className="h-4 w-4" />Test Run</>}
+            <Button variant="outline" size="sm" onClick={handlePreviewStructure} className="gap-2">
+              <Eye className="h-4 w-4" />Preview Structure
             </Button>
           </div>
 
@@ -605,9 +617,7 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
             <Badge variant="secondary">{nodes.length} nodes</Badge>
             <Badge variant="secondary">{edges.length} edges</Badge>
             {testResult && (
-              <Badge variant={testResult.summary?.failed_nodes === 0 ? "default" : "destructive"}>
-                {testResult.summary?.failed_nodes === 0 ? "✓ Passed" : "✗ Failed"}
-              </Badge>
+              <Badge variant="outline">Preview only</Badge>
             )}
           </div>
 
@@ -648,29 +658,27 @@ export function WorkflowEditor({ systemId, workflowId }: WorkflowEditorProps) {
       {/* Palette */}
       <WorkflowPalette onAddNode={handleAddNode} />
 
-      {/* Test Results */}
+      {/* Local structural preview — never presented as backend execution evidence. */}
       {testResult && (
         <Collapsible open={showTestResults} onOpenChange={setShowTestResults}>
           <Card className="glass-panel p-4">
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="w-full justify-between">
-                <span className="font-medium text-sm">Simulation — {testResult.summary?.total_nodes} nodes, {testResult.summary?.duration_ms}ms</span>
-                <Badge variant={testResult.summary?.failed_nodes === 0 ? "default" : "destructive"}>
-                  {testResult.summary?.failed_nodes === 0 ? `${testResult.summary?.successful_nodes} passed` : `${testResult.summary?.failed_nodes} failed`}
-                </Badge>
+                <span className="font-medium text-sm">Local structural preview — {testResult.summary?.total_nodes} nodes</span>
+                <Badge variant="outline">Not executed</Badge>
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-3 space-y-2">
               {testResult.execution_trace?.map((trace: any, idx: number) => (
                 <div key={idx} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border border-border">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${trace.status === 'success' ? 'bg-green-500/20' : 'bg-destructive/20'}`}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-muted">
                     <span className="text-sm font-mono font-medium">{idx + 1}</span>
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{trace.node_type}</p>
                     <p className="text-xs text-muted-foreground">{trace.result?.output || trace.error}</p>
                   </div>
-                  <Badge variant="outline" className="text-[10px]">{trace.duration_ms}ms</Badge>
+                  <Badge variant="outline" className="text-[10px]">Preview</Badge>
                 </div>
               ))}
             </CollapsibleContent>

@@ -223,13 +223,13 @@ jobs:
               --output /dev/null \
               --write-out '%{url_effective}' \
               "${base}${route}")"
-            ROUTE="$route" EFFECTIVE_URL="$effective_url" node - <<'NODE'
+            ROUTE="$route" EFFECTIVE_URL="$effective_url" node -e '
             const effective = new URL(process.env.EFFECTIVE_URL);
             const approved = new URL(process.env.APPROVED_ORIGIN);
             if (effective.origin !== approved.origin) {
               throw new Error(`DEPLOYMENT_BLOCKED: ${process.env.ROUTE} redirected to unapproved origin ${effective.origin}`);
             }
-            NODE
+            '
           done
 
       - name: Run pinned published SEO validation

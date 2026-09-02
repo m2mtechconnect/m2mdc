@@ -4,13 +4,12 @@
  * ONE source of truth, shared verbatim by the edge runtime and by vitest.
  * There is no mirror to drift from.
  *
- * Phase 1 seeds exactly the two invariants proven by the truth-grounding
- * hardening. Each lesson encodes the MECHANISM, not the current wording of
- * any single answer, so a rephrased regression still fails the eval suite.
+ * Each reviewed lesson encodes the MECHANISM, not the current wording of any
+ * single answer, so a rephrased regression still fails the eval suite.
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-01.3';
+export const LESSON_REGISTRY_VERSION = '2026-09-02.1';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -123,6 +122,36 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     dataClass: 'reviewed-lesson',
     reviewedBy: 'AURA engineering review',
     reviewedAt: '2026-09-01T18:00:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'release-workflow-shell-syntax-parity.v1',
+    version: 1,
+    title: 'Release workflow shell fragments must remain valid after YAML block indentation is removed',
+    status: 'active',
+    origin: 'confirmed-miss',
+    invariant:
+      'Every release-gating shell fragment must be validated in the exact representation executed by the workflow runner after YAML block indentation is removed. A Bash heredoc terminator must begin at column zero unless the tab-stripping form is used; nesting an indented heredoc in a loop is therefore release-blocking even when the product, fingerprint and routes are healthy. Prefer shell-safe inline execution for nested scripts, preserve fail-closed security checks, and require a platform-neutral contract test that parses the workflow and rejects unterminated heredocs before deployment verification.',
+    guidance:
+      'When a release workflow fails after the source build and live fingerprint pass, separate product evidence from verifier execution evidence. Inspect the runner-expanded shell, not only the YAML source. For a heredoc inside a loop or conditional, either keep its terminator at the exact Bash-required column or replace it with a shell-safe inline script. Retain origin, fingerprint and route assertions unchanged, then run a workflow-parsing regression test before re-dispatching the exact candidate.',
+    citations: [
+      '.github/workflows/release-target-verification.yml#Smoke-published-routes-without-cross-origin-redirects',
+      'tests/unit/release-target-verification-contract.test.ts',
+      'https://github.com/m2mtechconnect/m2mdc/actions/runs/33673228870',
+    ],
+    triggers: [
+      'release workflow',
+      'github actions',
+      'heredoc',
+      'unexpected end of file',
+      'workflow syntax',
+      'route smoke',
+      'release verifier',
+      'deployment blocked',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-02T19:32:00.000Z',
     supersedes: null,
   } as AuraLesson),
 ]);

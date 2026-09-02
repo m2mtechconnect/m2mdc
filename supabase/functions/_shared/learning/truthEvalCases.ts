@@ -208,6 +208,16 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
       invariantMustMention: ['lovable_dev_server', 'explicitly', 'evidence', 'filtering'],
     },
   },
+  {
+    id: 'lesson-release-workflow-shell-syntax-active',
+    kind: 'lesson-integrity',
+    title: 'The release-workflow shell-syntax lesson is active and encodes the runner mechanism',
+    lessonId: 'release-workflow-shell-syntax-parity.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['yaml', 'heredoc', 'column zero', 'contract test'],
+    },
+  },
 ];
 
 

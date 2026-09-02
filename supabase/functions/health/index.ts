@@ -1,3 +1,5 @@
+import { isManagedAIConfigured } from '../_shared/ai-client.ts';
+
 /**
  * /v1/health
  * 
@@ -7,7 +9,7 @@
  * REQUEST: None
  * 
  * RESPONSE:
- * - gemini: AI service status (lovable_managed or external_google)
+ * - gemini: managed AI service status (compatibility response field)
  * - vertex: Vertex Search status
  * - zapier: Zapier availability
  * - region: Deployment region
@@ -42,27 +44,16 @@ serve(createHandler({
       region: Deno.env.get('GOOGLE_LOCATION') || 'northamerica-northeast1'
     };
 
-    // Check AI - Primary: Lovable managed, Optional: External Google
+    // Check the only supported AI runtime: the managed AURA boundary.
     const geminiStart = Date.now();
     try {
-      const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-      const useExternalGoogle = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true';
-      const googleCreds = Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON');
-      const projectId = Deno.env.get('GOOGLE_PROJECT_ID');
-      
-      // Lovable managed is primary
+      const lovableApiKey = isManagedAIConfigured();
+
       if (lovableApiKey) {
         results.gemini.status = 'healthy';
-        results.gemini.provider = 'lovable_managed';
+        results.gemini.provider = 'aura_managed';
         results.gemini.latency = Date.now() - geminiStart;
-      } 
-      // Fallback to external Google if explicitly enabled
-      else if (useExternalGoogle && googleCreds && projectId) {
-        results.gemini.status = 'healthy';
-        results.gemini.provider = 'external_google';
-        results.gemini.latency = Date.now() - geminiStart;
-      } 
-      else {
+      } else {
         results.gemini.status = 'not_configured';
         log("AI provider not configured");
       }

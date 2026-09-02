@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { isManagedAIConfigured } from "../_shared/ai-client.ts";
 
 
 interface ValidationResult {
@@ -35,33 +36,15 @@ serve(async (req) => {
       connectors: false,
     };
 
-    // Check for AI secrets - Lovable managed is sufficient
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    const useExternalGoogle = Deno.env.get('USE_EXTERNAL_GOOGLE') === 'true';
-    
-    if (!lovableApiKey && !useExternalGoogle) {
-      errors.push('Missing LOVABLE_API_KEY - AI features will not work');
+    // Check the only supported managed AI runtime.
+    const lovableApiKey = isManagedAIConfigured();
+
+    if (!lovableApiKey) {
+      errors.push('Managed AI is not configured - AI features will not work');
       checks.secrets = false;
-    } else if (lovableApiKey) {
-      checks.secrets = true;
-      console.log('✓ Lovable managed AI configured');
     } else {
-      // External Google validation
-      const externalSecrets = [
-        "GOOGLE_APPLICATION_CREDENTIALS_JSON",
-        "GOOGLE_PROJECT_ID",
-        "GOOGLE_LOCATION",
-        "GEMINI_MODEL",
-      ];
-      
-      let allExternalSecretsPresent = true;
-      for (const secret of externalSecrets) {
-        if (!Deno.env.get(secret)) {
-          warnings.push(`External Google enabled but missing: ${secret}`);
-          allExternalSecretsPresent = false;
-        }
-      }
-      checks.secrets = allExternalSecretsPresent;
+      checks.secrets = true;
+      console.log('✓ Managed AI configured');
     }
 
     // Check if Vertex AI Search index exists (simulated - would need actual GCP call)

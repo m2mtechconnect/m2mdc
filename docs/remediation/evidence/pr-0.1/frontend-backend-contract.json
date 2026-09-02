@@ -1,0 +1,42 @@
+{
+  "schema": "aura.frontend-backend-contract.v1",
+  "generated_at": "2026-09-02T00:00:00.000Z",
+  "policy": "default-deny",
+  "notes": [
+    "This evidence classifies frontend Edge Function calls that are not in the governed production allowlist.",
+    "Default verification permits only this exact reviewed set so new drift fails CI.",
+    "Release verification is fail-closed while any blocker or unresolved dynamic call remains.",
+    "An entry is evidence of a blocker, not authorization to deploy or execute the function in production."
+  ],
+  "known_blockers": [
+    { "function": "aoc-runtime-action", "inventory_disposition": "unknown-blocked", "reason": "Runtime mutation path has not passed production authorization and execution qualification." },
+    { "function": "arcade-servers", "inventory_disposition": "unknown-blocked", "reason": "Marketplace server discovery is not in the governed production function perimeter." },
+    { "function": "canary-deploy", "inventory_disposition": "unknown-blocked", "reason": "Deployment canary execution has not passed production authorization and failure-mode qualification." },
+    { "function": "connection-credential", "inventory_disposition": "unknown-blocked", "reason": "Credential handling has not passed production secret-boundary qualification." },
+    { "function": "connection-health-check", "inventory_disposition": "unknown-blocked", "reason": "Connection health execution is not in the governed production function perimeter." },
+    { "function": "connection-provision", "inventory_disposition": "unknown-blocked", "reason": "Connection provisioning has not passed production authorization and tenant-boundary qualification." },
+    { "function": "dc-scan-url", "inventory_disposition": "unknown-blocked", "reason": "Remote URL scanning has not passed production egress and untrusted-input qualification." },
+    { "function": "digital-twin-event", "inventory_disposition": "unknown-blocked", "reason": "Digital-twin event execution has not passed production lifecycle qualification." },
+    { "function": "digital-twin-run-get", "inventory_disposition": "unknown-blocked", "reason": "Digital-twin run retrieval has not passed production tenant-boundary qualification." },
+    { "function": "digital-twin-runs-list", "inventory_disposition": "unknown-blocked", "reason": "Digital-twin run listing has not passed production tenant-boundary qualification." },
+    { "function": "green-dc-recommend", "inventory_disposition": "disabled", "reason": "The backend capability is explicitly disabled while a frontend caller remains." },
+    { "function": "managed-connector-capabilities", "inventory_disposition": "unknown-blocked", "reason": "Managed connector capability discovery is outside the governed production perimeter." },
+    { "function": "managed-connector-verify", "inventory_disposition": "unknown-blocked", "reason": "Managed connector verification has not passed production credential and tenant qualification." },
+    { "function": "managed-user-oauth-complete", "inventory_disposition": "unknown-blocked", "reason": "Managed-user OAuth completion has not passed production redirect, state, and tenant qualification." },
+    { "function": "managed-user-disconnect", "inventory_disposition": "unknown-blocked", "reason": "Managed-user disconnection has not passed production authorization qualification." },
+    { "function": "managed-user-oauth-start", "inventory_disposition": "unknown-blocked", "reason": "Managed-user OAuth initiation has not passed production redirect and tenant qualification." },
+    { "function": "public-intake", "inventory_disposition": "unknown-blocked", "reason": "Anonymous intake is outside the approved authenticated production perimeter." },
+    { "function": "recommendations-generate-stream", "inventory_disposition": "unknown-blocked", "reason": "Streaming recommendation generation has not passed production AI runtime qualification." },
+    { "function": "teams-accept-invite", "inventory_disposition": "unknown-blocked", "reason": "Invitation acceptance has not passed production identity and tenant-boundary qualification." },
+    { "function": "url-turbo-capture", "inventory_disposition": "unknown-blocked", "reason": "Remote URL capture has not passed production egress and untrusted-input qualification." },
+    { "function": "website-scan", "inventory_disposition": "unknown-blocked", "reason": "Website scanning has not passed production egress and untrusted-input qualification." }
+  ],
+  "dynamic_call_sites": [
+    {
+      "file": "src/hooks/useEdgeFunction.ts",
+      "expression": "functionName",
+      "release_disposition": "release-blocked",
+      "reason": "A generic runtime function name cannot be proven against the production allowlist statically."
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/agent-run
  * 
@@ -62,7 +63,7 @@ serve(createHandler({
     }
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       log("LOVABLE_API_KEY not configured");
       throw {
@@ -72,8 +73,8 @@ serve(createHandler({
       };
     }
 
-    // Extract model and settings from agent config
-    const modelId = agent.config?.model || agent.model_id || 'google/gemini-2.5-flash';
+    // Runtime tuning remains configurable, but provider/model selection is
+    // resolved by the server-owned managed AI profile.
     const temperature = params?.temperature ?? agent.config?.temperature ?? 0.7;
     const maxTokens = params?.maxTokens ?? agent.config?.max_tokens ?? 1024;
     const systemPrompt = agent.config?.system_prompt || 'You are a helpful AI assistant.';
@@ -86,23 +87,13 @@ serve(createHandler({
 
     const startTime = Date.now();
 
-    log("Calling Lovable AI", { model: modelId });
+    log("Calling managed AI", { profile: 'fast' });
 
-    // Call Lovable AI Gateway
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: modelId,
-        messages: aiMessages,
-        temperature,
-        max_tokens: maxTokens,
-        stream: false,
-      })
-    });
+    // Call the managed AI boundary.
+    const aiResponse = await makeAIResponse(
+      { messages: aiMessages, temperature: temperature, maxTokens: maxTokens },
+      { model: 'fast', operation: 'agent-run' },
+    );
 
     const latency = Date.now() - startTime;
 
@@ -117,6 +108,7 @@ serve(createHandler({
     }
 
     const aiData = await aiResponse.json();
+    const aiEvidence = getAIResponseEvidence(aiResponse);
     const responseText = aiData.choices?.[0]?.message?.content || 'No response';
 
     // Log run to database (non-blocking)
@@ -126,7 +118,7 @@ serve(createHandler({
         agent_id: agentId,
         user_id: userId,
         input: { messages },
-        output: { response: responseText },
+        output: { response: responseText, ai: aiEvidence },
         status: 'completed',
         duration_ms: latency,
         completed_at: new Date().toISOString()
@@ -137,7 +129,8 @@ serve(createHandler({
     return {
       response: responseText,
       latency_ms: latency,
-      model: modelId
+      model: aiEvidence?.model ?? null,
+      ai: aiEvidence,
     };
   }
 }));

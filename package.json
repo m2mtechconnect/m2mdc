@@ -15,7 +15,10 @@
     "test:tagger-repro": "playwright test --config=playwright.tagger-repro.config.ts",
     "test:route-stress": "playwright test --config=playwright.route-stress.config.ts",
     "audit:architecture": "node scripts/audit-architecture-inventory.mjs --summary",
+    "audit:frontend-backend": "node scripts/verify-frontend-backend-contract.mjs",
     "verify:architecture-governance": "node scripts/audit-architecture-inventory.mjs --check --summary",
+    "verify:frontend-backend": "node scripts/verify-frontend-backend-contract.mjs",
+    "verify:frontend-backend:release": "node scripts/verify-frontend-backend-contract.mjs --release",
     "verify:schema-truth": "node scripts/schema-truth/verify-schema-truth.mjs",
     "verify:schema-truth:repository": "node scripts/schema-truth/verify-schema-truth.mjs --repository-only",
     "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
@@ -31,7 +34,7 @@
     "test:e2e:record": "playwright test --update-snapshots",
     "test:e2e:golden": "playwright test tests/e2e/golden-user-journey.spec.ts --project=chromium --workers=1",
     "typecheck": "tsc -p tsconfig.app.json --noEmit",
-    "verify:fast": "bun run typecheck && bun run lint && bun run verify:architecture-governance && bun run verify:schema-truth && bun run test:unit && bun run build",
+    "verify:fast": "bun run typecheck && bun run lint && bun run verify:architecture-governance && bun run verify:frontend-backend && bun run verify:schema-truth && bun run test:unit && bun run build",
     "verify": "bun run verify:fast && bun run test:int",
     "db:seed:studio": "tsx scripts/seed.ts",
     "guard:test-env": "node scripts/aura-test-env-guard.mjs",
@@ -47,13 +50,13 @@
     "test:e2e:release": "node scripts/run-release-e2e.mjs",
     "test:e2e:legacy": "playwright test",
     "verify:release:smoke": "bun run verify && bun run test:e2e:golden",
-    "verify:release-contract": "node scripts/aura-release-contract.mjs validate",
+    "verify:release-contract": "node scripts/verify-frontend-backend-contract.mjs --release && node scripts/aura-release-contract.mjs validate",
     "db:seed:enterprise-qa": "tsx scripts/seed-enterprise-qa-org.ts",
     "auth:bootstrap-owner": "tsx scripts/bootstrap-platform-owner.ts"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@faker-js/faker": "^10.1.0",
+    "@faker-js/faker": "^10.5.0",
     "@hookform/resolvers": "^3.10.0",
     "@langchain/core": "^1.2.9",
     "@langchain/langgraph": "^1.4.12",
@@ -156,6 +159,7 @@
     "ws": "8.21.0"
   },
   "overrides": {
+    "@humanfs/node": "0.16.8",
     "brace-expansion": "5.0.9",
     "flatted": "3.4.4",
     "glob": "10.5.0",

@@ -34,13 +34,8 @@ serve(async (req) => {
 
     const { query, k = 5 } = await req.json();
 
-    // Get embedding for query using Lovable AI
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
-
-    // For now, return simple text search. In production, use embeddings
+    // This endpoint currently performs tenant-scoped text search. It must not
+    // claim or require an embedding runtime until one is implemented.
     const { data: documents, error } = await supabase
       .from('rag_documents')
       .select('id, content, metadata')

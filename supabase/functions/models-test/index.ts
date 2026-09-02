@@ -5,9 +5,9 @@ import { requireCaller, callerRejectedResponse } from '../_shared/callerIdentity
 import { checkAIHealth, type AITextProfile } from '../_shared/ai-client.ts';
 
 const PROFILE_MAP: Record<string, AITextProfile> = {
-  balanced: 'primary',
-  fast: 'compatibilityFast',
-  reasoning: 'fallback',
+  balanced: 'balanced',
+  fast: 'fast',
+  reasoning: 'reasoning',
   summary: 'compatibilitySummary',
 };
 

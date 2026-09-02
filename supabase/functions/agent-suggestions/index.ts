@@ -18,7 +18,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
 import { createHandler } from "../_shared/handler.ts";
-import { callExternalApi } from "../_shared/rest-client.ts";
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 // Input validation schema
@@ -44,7 +44,7 @@ const basePatterns = [
     one_liner: 'Plan and draft omni-channel marketing campaigns with AI',
     department: 'Marketing',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['marketing', 'campaign', 'content', 'social', 'email', 'ads'],
     success_metric: 'Qualified MQLs',
     desired_outcome: 'Predictive'
@@ -54,7 +54,7 @@ const basePatterns = [
     one_liner: 'Qualify and route leads, draft personalized outreach',
     department: 'Sales',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['sales', 'lead', 'qualify', 'outreach', 'crm', 'pipeline'],
     success_metric: 'Meetings Booked',
     desired_outcome: 'Prescriptive'
@@ -64,7 +64,7 @@ const basePatterns = [
     one_liner: 'Automate invoice and ledger matching with AI',
     department: 'Finance',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['finance', 'invoice', 'reconcile', 'accounting', 'ledger', 'expense'],
     success_metric: 'Reconciliation Accuracy',
     desired_outcome: 'Diagnostic'
@@ -74,7 +74,7 @@ const basePatterns = [
     one_liner: 'AI-powered ticket routing and response suggestions',
     department: 'Operations',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['support', 'customer', 'ticket', 'help', 'service', 'troubleshoot'],
     success_metric: 'Response Time',
     desired_outcome: 'Prescriptive'
@@ -84,7 +84,7 @@ const basePatterns = [
     one_liner: 'Extract insights from user feedback and product data',
     department: 'Product',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['product', 'feedback', 'insights', 'feature', 'roadmap', 'user'],
     success_metric: 'Feature Adoption',
     desired_outcome: 'Predictive'
@@ -94,7 +94,7 @@ const basePatterns = [
     one_liner: 'Automate employee onboarding workflows and document prep',
     department: 'HR',
     starter_workflow: 'mcp',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['hr', 'onboarding', 'employee', 'hiring', 'training', 'compliance'],
     success_metric: 'Onboarding Time',
     desired_outcome: 'Prescriptive'
@@ -104,7 +104,7 @@ const basePatterns = [
     one_liner: 'Classify and route compliance documents automatically',
     department: 'Legal',
     starter_workflow: 'classify',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['legal', 'compliance', 'document', 'policy', 'regulation', 'audit'],
     success_metric: 'Classification Accuracy',
     desired_outcome: 'Diagnostic'
@@ -114,7 +114,7 @@ const basePatterns = [
     one_liner: 'Predict stock levels and automate reorder workflows',
     department: 'Operations',
     starter_workflow: 'analyze',
-    recommended_model: 'google/gemini-3-pro-preview',
+    recommended_model: 'reasoning',
     keywords: ['inventory', 'stock', 'supply', 'warehouse', 'reorder', 'logistics'],
     success_metric: 'Stockout Rate',
     desired_outcome: 'Predictive'
@@ -173,8 +173,7 @@ serve(createHandler({
 
     log('Cache MISS');
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
+    if (!isManagedAIConfigured()) {
       throw { code: 'CONFIG_ERROR', message: 'LOVABLE_API_KEY not configured' };
     }
 
@@ -199,7 +198,7 @@ For each agent, return:
 - department: Primary department
 - relevance_score: 0-100 score for how well it matches the query
 - starter_workflow: "analyze" | "classify" | "mcp"
-- recommended_model: "google/gemini-3-pro-preview"
+- recommended_model: "reasoning" (server-owned response profile)
 - success_metric: Default metric for this agent type
 - desired_outcome: "Diagnostic" | "Predictive" | "Prescriptive"
 
@@ -213,27 +212,20 @@ ${JSON.stringify(candidates, null, 2)}
 Rank these agents by relevance to the query and return top 5 as JSON array with relevance_score added.`;
 
     try {
-      const aiData = await callExternalApi({
-        name: 'gemini-rank-agents',
-        url: 'https://ai.gateway.lovable.dev/v1/chat/completions',
-        options: {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-3-pro-preview',
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: userPrompt }
-            ],
-            temperature: 0.3,
-          }),
+      const aiResponse = await makeAIResponse(
+        {
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+          temperature: 0.3,
         },
-        responseSchema: AIResponseSchema,
-        correlationId,
-      });
+        { model: 'reasoning', operation: 'agent-suggestions' },
+      );
+      if (!aiResponse.ok) {
+        throw new Error(`Managed AI request failed with status ${aiResponse.status}`);
+      }
+      const aiData = AIResponseSchema.parse(await aiResponse.json());
 
       const content = aiData.choices[0].message.content;
       

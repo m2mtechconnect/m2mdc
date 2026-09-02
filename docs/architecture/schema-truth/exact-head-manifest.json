@@ -1,6 +1,6 @@
 {
   "schema": "aura.schema-truth.v2",
-  "sourceSha": "83789f8b23d8345c15ff0ebe79067c4a3ca59820",
+  "sourceSha": "228ccf6e86f3e02a5a6531683db5a855f9d2fc40",
   "generatedTypesSha256": "8a815cd57fdc10ae92329cae78db6be6fad9a1fe9d3b56ff6b2f94b2fe25281b",
   "tableCount": 140,
   "tableNamesSha256": "559cfcae3a33fc486ca0c3db776fbd110e1ab21b5bed9427dd545e6044f983cd",
@@ -8,7 +8,7 @@
   "viewNamesSha256": "d655e183f88659aeb3daddea0a58cf5f66b710f77d2845f4cfebf92c3d97804e",
   "functionCount": 52,
   "functionNamesSha256": "91fe1445b00ab142b0e5de2f7dcdbb8f1c5eb174f9796d3bb51c8207df764aa7",
-  "migrationCount": 94,
-  "migrationsSha256": "a422f8f18cf92c8f7ac7060bbac9483c5d778d6bd49c88fb4cee181b3468d26d",
-  "migrationContentsSha256": "28822bdf778f2ca40182cf8501145bca4a1b80f3e2308631fc00961edb5adf44"
+  "migrationCount": 95,
+  "migrationsSha256": "8d309f447c3913334dce4156917a44b8c17327bf2486263a3c4a48a55bd038f4",
+  "migrationContentsSha256": "83218c01839555dfb95301cb6c15b77b0511376508cda98449e07bc03e2c8384"
 }

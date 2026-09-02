@@ -13,8 +13,9 @@
  *        unauthenticated surface (/login or /), never render protected content
  *
  *   Authenticated plane (requires a session from preview-session.mjs):
- *     4. /dashboard, /analytics, /evidence/overview render for the smoke
- *        identity (route availability + session behavior)
+ *     4. /dashboard, /analytics, /simulation and /evidence/overview commit
+ *        route-specific meaningful content for the smoke identity within the
+ *        production loading budget
  *     5. Truth/provenance labels present on simulated surfaces
  *
  * Fail-closed contract:
@@ -46,15 +47,37 @@ import { chromium } from 'playwright';
 import { resolvePreviewSession, installPreviewSession, PreviewSessionUnavailableError } from './preview-session.mjs';
 
 const TARGET = (process.env.AURA_SMOKE_TARGET ?? 'https://auradc.m2mtechconnect.com').replace(/\/$/, '');
-const EXPECTED_SHA = process.env.AURA_EXPECTED_SHA ?? null;
+const EXPECTED_SHA = process.env.AURA_EXPECTED_SHA?.trim() || null;
 const PUBLIC_ONLY = process.argv.includes('--unauthenticated-only');
 const EVIDENCE_DIR = new URL('../docs/evidence/post-publish-smoke/', import.meta.url);
-const AUTHENTICATED_ROUTES = ['/dashboard', '/analytics', '/evidence/overview'];
+const AUTHENTICATED_ROUTES = [
+  { id: 'dashboard', path: '/dashboard' },
+  { id: 'analytics', path: '/analytics' },
+  { id: 'simulation', path: '/simulation?step=inspect' },
+  { id: 'evidence', path: '/evidence/overview' },
+];
 const REGISTRY_FILE = fileURLToPath(new URL('../src/supervisor/postPublishSmokeRegistry.ts', import.meta.url));
 /** How the run was started. Read-only in every mode. */
 const TRIGGER = ['automatic-on-publish', 'scheduled', 'manual'].includes(process.env.AURA_SMOKE_TRIGGER ?? '')
   ? process.env.AURA_SMOKE_TRIGGER
   : 'manual';
+const parseBoundedMs = (value, fallback, max) => {
+  const parsed = Number.parseInt(value ?? '', 10);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.min(parsed, max) : fallback;
+};
+/** Publish-triggered runs wait for the immutable fingerprint, not a timer guess. */
+const RELEASE_WAIT_MS = parseBoundedMs(
+  process.env.AURA_RELEASE_WAIT_MS,
+  EXPECTED_SHA ? 10 * 60_000 : 0,
+  15 * 60_000,
+);
+const RELEASE_POLL_MS = parseBoundedMs(process.env.AURA_RELEASE_POLL_MS, 5_000, 30_000);
+/** Meaningful production content must commit before the bounded loader expires. */
+const MEANINGFUL_ROUTE_BUDGET_MS = parseBoundedMs(
+  process.env.AURA_MEANINGFUL_ROUTE_BUDGET_MS,
+  12_000,
+  30_000,
+);
 /** Publish-driven mode: exit cleanly when the live SHA has already been qualified. */
 const ONLY_IF_NEW_PUBLISH = process.argv.includes('--only-if-new-publish');
 /** SHA served by the live target, resolved during the fingerprint check. */
@@ -104,34 +127,67 @@ async function fetchCheck(url) {
   return { status: res.status, text };
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function checkReleaseFingerprint() {
-  try {
-    const { status, text } = await fetchCheck(`${TARGET}/release.json`);
-    if (status !== 200) {
-      record('release-fingerprint', 'public', 'FAIL', `/release.json returned HTTP ${status}`);
-      return;
-    }
-    let payload;
+  if (EXPECTED_SHA && !/^[0-9a-f]{40}$/.test(EXPECTED_SHA)) {
+    record('release-fingerprint', 'public', 'FAIL', `expected SHA is not a 40-character lowercase Git SHA: ${EXPECTED_SHA}`);
+    return;
+  }
+
+  const deadline = Date.now() + RELEASE_WAIT_MS;
+  let attempt = 0;
+  for (;;) {
+    attempt += 1;
+    let retryDetail = null;
     try {
-      payload = JSON.parse(text);
-    } catch {
-      record('release-fingerprint', 'public', 'FAIL', '/release.json is not valid JSON');
-      return;
+      const { status, text } = await fetchCheck(`${TARGET}/release.json`);
+      if (status !== 200) {
+        retryDetail = `/release.json returned HTTP ${status}`;
+      } else {
+        let payload;
+        try {
+          payload = JSON.parse(text);
+        } catch {
+          record('release-fingerprint', 'public', 'FAIL', '/release.json is not valid JSON');
+          return;
+        }
+
+        const problems = [];
+        if (payload.schema !== 'aura.release-fingerprint.v1') problems.push(`schema=${payload.schema ?? 'missing'}`);
+        for (const field of ['sha', 'branch', 'environment', 'buildId']) {
+          if (!payload[field] || typeof payload[field] !== 'string') problems.push(`${field} empty`);
+        }
+        if (typeof payload.sha === 'string' && /^[0-9a-f]{40}$/.test(payload.sha)) observedSha = payload.sha;
+        if (problems.length > 0) {
+          record('release-fingerprint', 'public', 'FAIL', problems.join('; '));
+          return;
+        }
+        if (EXPECTED_SHA && payload.sha !== EXPECTED_SHA) {
+          retryDetail = `sha mismatch: expected ${EXPECTED_SHA}, got ${payload.sha}`;
+        } else {
+          record(
+            'release-fingerprint',
+            'public',
+            'PASS',
+            `sha=${payload.sha} branch=${payload.branch} env=${payload.environment} attempts=${attempt}`,
+          );
+          return;
+        }
+      }
+    } catch (error) {
+      retryDetail = `fetch error: ${error.message}`;
     }
-    const problems = [];
-    if (payload.schema !== 'aura.release-fingerprint.v1') problems.push(`schema=${payload.schema ?? 'missing'}`);
-    for (const field of ['sha', 'branch', 'environment', 'buildId']) {
-      if (!payload[field] || typeof payload[field] !== 'string') problems.push(`${field} empty`);
+
+    if (EXPECTED_SHA && Date.now() < deadline) {
+      const remainingSeconds = Math.ceil((deadline - Date.now()) / 1000);
+      console.log(`[WAIT] release-fingerprint — ${retryDetail}; retrying in ${RELEASE_POLL_MS}ms (${remainingSeconds}s remain)`);
+      await sleep(RELEASE_POLL_MS);
+      continue;
     }
-    if (EXPECTED_SHA && payload.sha !== EXPECTED_SHA) problems.push(`sha mismatch: expected ${EXPECTED_SHA}, got ${payload.sha}`);
-    if (typeof payload.sha === 'string' && /^[0-9a-f]{40}$/.test(payload.sha)) observedSha = payload.sha;
-    if (problems.length > 0) {
-      record('release-fingerprint', 'public', 'FAIL', problems.join('; '));
-    } else {
-      record('release-fingerprint', 'public', 'PASS', `sha=${payload.sha} branch=${payload.branch} env=${payload.environment}`);
-    }
-  } catch (error) {
-    record('release-fingerprint', 'public', 'FAIL', `fetch error: ${error.message}`);
+
+    record('release-fingerprint', 'public', 'FAIL', retryDetail ?? 'release fingerprint did not resolve');
+    return;
   }
 }
 
@@ -173,6 +229,71 @@ async function checkUnauthenticatedRedirect(browser) {
   }
 }
 
+function meaningfulLocator(page, routeId) {
+  switch (routeId) {
+    case 'dashboard':
+      return page.getByTestId('facility-highlights').getByRole('heading', { level: 1 });
+    case 'analytics':
+      return page.getByRole('heading', { name: 'Operations & Telemetry', level: 1 });
+    case 'simulation':
+      return page.getByTestId('aura-workspace');
+    case 'evidence':
+      return page.getByTestId('dsx-workspace-title').or(
+        page.getByRole('heading', { name: 'Evidence unavailable for this facility', level: 1 }),
+      );
+    case 'builder':
+      return page.getByRole('heading', { name: /Create your first facility|Start a facility build/i, level: 1 });
+    default:
+      throw new Error(`No meaningful-content locator is registered for ${routeId}`);
+  }
+}
+
+async function openMeaningfulRoute(page, route, { recordResult = true } = {}) {
+  const startedAt = Date.now();
+  try {
+    await page.goto(`${TARGET}${route.path}`, { waitUntil: 'domcontentloaded' });
+    await meaningfulLocator(page, route.id).waitFor({
+      state: 'visible',
+      timeout: MEANINGFUL_ROUTE_BUDGET_MS,
+    });
+    const meaningfulMs = Date.now() - startedAt;
+    const actualPath = new URL(page.url()).pathname;
+    const expectedPath = route.path.split('?')[0];
+    const textLength = await page.evaluate(() => (document.body.innerText ?? '').trim().length);
+    const loadingVisible = await page.getByText('Loading your workspace', { exact: true }).count();
+    if (actualPath !== expectedPath || textLength <= 200 || loadingVisible > 0) {
+      if (recordResult) {
+        record(
+          `authed-route:${route.path}`,
+          'authenticated',
+          'FAIL',
+          `path=${actualPath} textLength=${textLength} loadingVisible=${loadingVisible} meaningfulMs=${meaningfulMs}`,
+        );
+      }
+      return false;
+    }
+    if (recordResult) {
+      record(
+        `authed-route:${route.path}`,
+        'authenticated',
+        'PASS',
+        `meaningful content in ${meaningfulMs}ms (${textLength} chars)`,
+      );
+    }
+    return true;
+  } catch (error) {
+    if (recordResult) {
+      record(
+        `authed-route:${route.path}`,
+        'authenticated',
+        'FAIL',
+        `meaningful content did not commit within ${MEANINGFUL_ROUTE_BUDGET_MS}ms: ${error.message}`,
+      );
+    }
+    return false;
+  }
+}
+
 async function checkAuthenticatedPlane(browser) {
   let session;
   try {
@@ -180,7 +301,7 @@ async function checkAuthenticatedPlane(browser) {
   } catch (error) {
     if (error instanceof PreviewSessionUnavailableError) {
       for (const route of AUTHENTICATED_ROUTES) {
-        record(`authed-route:${route}`, 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
+        record(`authed-route:${route.path}`, 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
       }
       record('truth-labels:analytics', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
       record('truth-labels:evidence', 'authenticated', 'BLOCKED_BY_AUTH', 'no resolvable smoke session (fail closed)');
@@ -196,20 +317,10 @@ async function checkAuthenticatedPlane(browser) {
   const page = await context.newPage();
   try {
     for (const route of AUTHENTICATED_ROUTES) {
-      await page.goto(`${TARGET}${route}`, { waitUntil: 'domcontentloaded' });
-      await page.waitForTimeout(2000);
-      const path = new URL(page.url()).pathname;
-      const text = await page.evaluate(() => (document.body.innerText ?? '').trim());
-      const bounced = path === '/login' || path === '/';
-      if (!bounced && text.length > 200) {
-        record(`authed-route:${route}`, 'authenticated', 'PASS', `rendered (${text.length} chars)`);
-      } else {
-        record(`authed-route:${route}`, 'authenticated', 'FAIL', `path=${path} textLength=${text.length}`);
-      }
+      await openMeaningfulRoute(page, route);
     }
     // Truth/provenance labels on the simulated analytics surface.
-    await page.goto(`${TARGET}/analytics`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
+    await openMeaningfulRoute(page, { id: 'analytics', path: '/analytics' }, { recordResult: false });
     const analyticsText = await page.evaluate(() => document.body.innerText ?? '');
     if (/simulat|demonstration|not measured|fixture/i.test(analyticsText)) {
       record('truth-labels:analytics', 'authenticated', 'PASS', 'simulated/demo provenance language present');
@@ -221,7 +332,12 @@ async function checkAuthenticatedPlane(browser) {
     // deterministic demonstration without a tenant-facility id so a stored
     // facility is never silently substituted onto the fixture.
     await page.goto(`${TARGET}/evidence/operations/thermal`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
+    await page.getByTestId('dsx-workspace-title').or(
+      page.getByRole('heading', { name: 'Evidence unavailable for this facility', level: 1 }),
+    ).waitFor({
+      state: 'visible',
+      timeout: MEANINGFUL_ROUTE_BUDGET_MS,
+    });
     const evidenceText = await page.evaluate(() => document.body.innerText ?? '');
     if (
       /simulat|replayed|live-source|unavailable/i.test(evidenceText) &&
@@ -235,8 +351,7 @@ async function checkAuthenticatedPlane(browser) {
     // High-value Builder journeys are read-only. The smoke identity must own
     // a saved draft fixture so the same-path `?draft=` transition is exercised
     // without creating or changing production data.
-    await page.goto(`${TARGET}/builder`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2500);
+    await openMeaningfulRoute(page, { id: 'builder', path: '/builder' }, { recordResult: false });
     const savedDraft = page.locator('section[aria-labelledby="builder-existing-heading"] a[href^="/builder?draft="]').first();
     if (await savedDraft.count()) {
       try {

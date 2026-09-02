@@ -107,7 +107,7 @@ test.describe('persona-prioritized Command Center', () => {
     const panel = await openDashboard(context, page, { withActiveOrganization: true });
 
     await expect(panel).toHaveAttribute('data-persona-family', 'owner_admin');
-    await expect(panel.getByText(/Owner \/ administrator focus · AURA Truth Organization organization/i)).toBeVisible();
+    await expect(panel.getByText(/Owner \/ administrator focus · AURA Truth Organization/i)).toBeVisible();
     await expect(panel.getByTestId('persona-action-readiness')).toBeVisible();
     await expect(panel.getByTestId('persona-action-people-access')).toBeVisible();
     await expect(panel.getByTestId('persona-action-connections')).toBeVisible();

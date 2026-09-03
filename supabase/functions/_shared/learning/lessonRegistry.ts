@@ -9,7 +9,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-02.2';
+export const LESSON_REGISTRY_VERSION = '2026-09-02.3';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -161,15 +161,16 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     status: 'active',
     origin: 'confirmed-miss',
     invariant:
-      'A successful component test or policy classification never proves end-to-end product truth. For every changed feature, the persisted product identity and facility binding, backend query and authorization path, frontend route mount and navigation, UI labels and unavailable states, synthetic evaluation, production build artifact and runtime journey must describe the same capability. A production-blocked route must be absent from the production build, an unbound facility product must never borrow generic agent evidence, and missing authoritative context must fail closed rather than substitute a demonstration dataset or invented value.',
+      'A successful component test or policy classification never proves end-to-end product truth. For every changed feature, the persisted product identity and facility binding, backend query and authorization path, frontend route mount and navigation, UI labels and unavailable states, synthetic evaluation, production build artifact and runtime journey must describe the same capability. Unit, integration, visual and browser-journey contracts must encode the same authority rule; a stale fixture that requires a fallback forbidden by the runtime is a release failure, not permission to weaken the runtime. A production-blocked route must be absent from the production build, an unbound facility product must never borrow generic agent evidence, and missing authoritative context must fail closed rather than substitute a demonstration dataset or invented value.',
     guidance:
-      'Before calling an AURA change complete, build a cross-layer trace from persona intent to persisted identity, authorized data source, API/function, UI state, route/navigation, production artifact and runtime evidence. Test the exact, analogous and adversarial cases. Treat a taxonomy label without a build-time guard, a UI card without a bound dataset, or a passing mocked journey without verified backend evidence as incomplete. Persist every confirmed miss as a focused regression and synthetic lesson evaluation. This governed learning adds reviewed guidance only; it does not perform autonomous model-weight training or change production configuration.',
+      'Before calling an AURA change complete, build a cross-layer trace from persona intent to persisted identity, authorized data source, API/function, UI state, route/navigation, production artifact and runtime evidence. When an authority or fallback rule changes, sweep every unit, integration, visual and browser-journey assertion in the same change and reject contradictory expectations before CI. Test the exact, analogous and adversarial cases. Treat a taxonomy label without a build-time guard, a UI card without a bound dataset, a stale fixture that invents context, or a passing mocked journey without verified backend evidence as incomplete. Persist every confirmed miss as a focused regression and synthetic lesson evaluation. This governed learning adds reviewed guidance only; it does not perform autonomous model-weight training or change production configuration.',
     citations: [
       'scripts/verify-production-perimeter.mjs#NEG-A',
       'src/dsx/runtime/evidenceFacilityScope.ts',
       'src/components/builder/steps/Step5Deploy.tsx',
       'tests/unit/builder-deployment-truth-contract.test.ts',
       'tests/unit/evidence-facility-context-contract.test.ts',
+      'tests/visual/snapshots.spec.ts#expectLifecycleNavigation',
     ],
     triggers: [
       'end to end',
@@ -182,6 +183,8 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
       'ui api mismatch',
       'super agent missed',
       'cross layer',
+      'stale test contract',
+      'visual regression',
     ],
     dataClass: 'reviewed-lesson',
     reviewedBy: 'AURA engineering review',

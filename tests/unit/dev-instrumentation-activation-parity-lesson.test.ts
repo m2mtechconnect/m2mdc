@@ -42,7 +42,7 @@ describe('activation-parity lesson registration', () => {
   });
 
   it('bumps the registry version for the new lesson', () => {
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.2');
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.3');
   });
 
   it('cites the policy helper, config wiring, negative gate and tests', () => {

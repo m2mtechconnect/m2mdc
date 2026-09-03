@@ -16,7 +16,7 @@ describe('cross-layer product-truth lesson', () => {
   const evalId = 'lesson-cross-layer-product-truth-active';
 
   it('is reviewed, active and registry-valid', () => {
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.2');
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-02.3');
     expect(lessonById(lessonId)?.status).toBe('active');
     expect(lessonById(lessonId)?.origin).toBe('confirmed-miss');
     expect(verifyLessonRegistryIntegrity().ok).toBe(true);

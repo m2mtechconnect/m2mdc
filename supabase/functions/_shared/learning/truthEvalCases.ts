@@ -247,7 +247,7 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
     lessonId: 'cross-layer-product-truth-parity.v1',
     expect: {
       active: true,
-      invariantMustMention: ['persisted product identity', 'route mount', 'production build', 'fail closed'],
+      invariantMustMention: ['persisted product identity', 'route mount', 'production build', 'stale fixture', 'fail closed'],
     },
   },
   {

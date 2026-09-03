@@ -124,7 +124,9 @@ async function expectLifecycleNavigation(page: Page) {
       const actualHref = await link.getAttribute('href');
       const evidenceUrl = new URL(actualHref ?? '', 'http://aura.local');
       expect(evidenceUrl.pathname).toBe(href);
-      expect(evidenceUrl.searchParams.get('facility')).toBe('aura-reference-facility');
+      // The visual tenant fixture has no authoritative active twin. The
+      // global shell must fail closed instead of fabricating reference scope.
+      expect(evidenceUrl.searchParams.get('facility')).toBeNull();
     } else {
       await expect(link).toHaveAttribute('href', href);
     }

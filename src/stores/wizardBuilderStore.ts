@@ -377,7 +377,6 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         configType: config.type,
         twinId: config.twin_id ?? builder.twin_id,
         templateId: config.template_id,
-        templateName: builder.name,
       });
 
       // Auto-generate workflow with gemini analysis if available
@@ -536,7 +535,6 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         configType: config.type,
         twinId: config.twin_id ?? builder.twin_id,
         templateId: config.template_id,
-        templateName: builder.name,
       });
 
       console.log('[Builder] Draft loaded:', { builderId, config });

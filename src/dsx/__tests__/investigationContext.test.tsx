@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import {
@@ -88,6 +88,30 @@ function Probe() {
   );
 }
 
+function FacilityProbe() {
+  const location = useLocation();
+  return <span data-testid="facility-search">{location.search}</span>;
+}
+
+function facilityShell(defaultFacilityId: string | null, initial = '/dsx/evidence-beta') {
+  return (
+    <HelmetProvider>
+      <MemoryRouter initialEntries={[initial]}>
+        <Routes>
+          <Route
+            path="/dsx/evidence-beta"
+            element={
+              <EvidenceBetaProvider defaultFacilityId={defaultFacilityId}>
+                <FacilityProbe />
+              </EvidenceBetaProvider>
+            }
+          />
+        </Routes>
+      </MemoryRouter>
+    </HelmetProvider>
+  );
+}
+
 function renderShell(initial = '/dsx/evidence-beta') {
   return render(
     <HelmetProvider>
@@ -123,5 +147,31 @@ describe('shared context bar', () => {
     expect(chip.textContent).toContain(rack.name);
     fireEvent.click(screen.getByTestId('dsx-context-clear'));
     expect(screen.queryByTestId('dsx-context-chip-stable_asset_id')).toBeNull();
+  });
+});
+
+describe('inherited facility ownership', () => {
+  it('follows the active facility after the first URL mirror', async () => {
+    const view = render(facilityShell('facility-a'));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).toContain('facility=facility-a'));
+
+    view.rerender(facilityShell('facility-b'));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).toContain('facility=facility-b'));
+  });
+
+  it('preserves a facility supplied explicitly by a deep link', async () => {
+    const view = render(facilityShell('facility-a', '/dsx/evidence-beta?facility=shared-facility'));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).toContain('facility=shared-facility'));
+
+    view.rerender(facilityShell('facility-b', '/dsx/evidence-beta?facility=shared-facility'));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).toContain('facility=shared-facility'));
+  });
+
+  it('removes inherited facility scope when the active facility is cleared', async () => {
+    const view = render(facilityShell('facility-a'));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).toContain('facility=facility-a'));
+
+    view.rerender(facilityShell(null));
+    await waitFor(() => expect(screen.getByTestId('facility-search').textContent).not.toContain('facility='));
   });
 });

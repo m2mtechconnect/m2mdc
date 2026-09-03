@@ -12,6 +12,7 @@ import {
   EVIDENCE_REFERENCE_FACILITY_ALIAS,
   resolveEvidenceFacilityScope,
 } from '@/dsx/runtime/evidenceFacilityScope';
+import { withEvidenceFacilityContext } from '@/dsx/runtime/evidenceNavigation';
 
 describe('evidence facility context', () => {
   it('parses the facility parameter from an inbound deep link', () => {
@@ -83,8 +84,22 @@ describe('evidence facility context', () => {
 
   it('carries the active facility through the global Evidence footer', () => {
     const layout = readFileSync('src/components/Layout.tsx', 'utf8');
-    expect(layout).toContain('const { facility: workspaceFacility } = useFacilityModel()');
-    expect(layout).toContain('?facility=${encodeURIComponent(evidenceFacilityId)}');
+    expect(layout).toContain('const { activeTwinId } = useActiveTwin()');
+    expect(layout).toContain('withEvidenceFacilityContext');
+    expect(layout).not.toContain('useFacilityModel');
+  });
+
+  it('does not inject demonstration scope when no active facility exists', () => {
+    expect(withEvidenceFacilityContext('/evidence/overview', null)).toBe('/evidence/overview');
+    expect(withEvidenceFacilityContext('/evidence/overview?dataset=reference', null))
+      .toBe('/evidence/overview?dataset=reference');
+  });
+
+  it('preserves existing query context when an authoritative facility exists', () => {
+    const href = withEvidenceFacilityContext('/evidence/overview?dataset=reference', 'facility-123');
+    const params = new URLSearchParams(href.split('?')[1]);
+    expect(params.get('dataset')).toBe('reference');
+    expect(params.get('facility')).toBe('facility-123');
   });
 });
 

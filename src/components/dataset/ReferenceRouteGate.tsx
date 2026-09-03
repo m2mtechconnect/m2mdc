@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useReferenceMode } from '@/data/dataset/DatasetProvider';
 import { surfaceForPath } from '@/data/dataset/surfaceRegistry';
+import { isNonProductionInternalPathname } from '@/config/routeRegistry';
 import ReferenceSurface from './ReferenceSurface';
 import ReferenceUnavailableSurface from './ReferenceUnavailableSurface';
 
@@ -16,7 +17,10 @@ export function ReferenceRouteGate({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const surface = surfaceForPath(pathname);
 
-  if (referenceMode && surface) {
+  // Route authority wins over dataset presentation. A production-blocked or
+  // development-only route must fall through to the production router's 404;
+  // reference mode is never an alternate mount for a forbidden surface.
+  if (referenceMode && surface && !isNonProductionInternalPathname(pathname)) {
     if (surface.classification === 'REFERENCE_DATA_CONSUMER') {
       return <ReferenceSurface surface={surface} />;
     }

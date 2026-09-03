@@ -258,6 +258,44 @@ export const PRODUCTION_ROUTES = ALL_ROUTES.filter(
   (route) => route.kind !== 'dev-only' && route.kind !== 'production-blocked',
 );
 
+/** Convert an absolute route pattern into a concrete-path matcher. */
+function routePatternToRegExp(pattern: string): RegExp {
+  const source = pattern
+    .split('/')
+    .map((segment) => {
+      if (segment === '*') return '.*';
+      if (segment.startsWith(':')) return '[^/]+';
+      return segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    })
+    .join('/');
+  return new RegExp(`^${source}/?$`);
+}
+
+/**
+ * Resolve the internal route that owns a concrete pathname.
+ *
+ * Exact declarations win over parameterised declarations. This matters for
+ * paths such as `/blueprint/preview`, which must not be mistaken for the
+ * canonical `/blueprint/:id` route.
+ */
+export function internalRouteForPathname(pathname: string): RouteRecord | null {
+  const normalized = pathname.replace(/\/+$/, '') || '/';
+  const absoluteRoutes = INTERNAL_ROUTES.filter((route) => route.path.startsWith('/'));
+  const exact = absoluteRoutes.find((route) => route.path === normalized);
+  if (exact) return exact;
+  return absoluteRoutes.find((route) => routePatternToRegExp(route.path).test(normalized)) ?? null;
+}
+
+/**
+ * True when a pathname is deliberately absent from the production route
+ * graph. Runtime wrappers must consult this authority before substituting an
+ * alternate renderer, otherwise they can accidentally remount blocked pages.
+ */
+export function isNonProductionInternalPathname(pathname: string): boolean {
+  const route = internalRouteForPathname(pathname);
+  return route?.kind === 'production-blocked' || route?.kind === 'dev-only';
+}
+
 export function isProductionRoute(path: string): boolean {
   return PRODUCTION_ROUTES.some((r) => r.path === path);
 }

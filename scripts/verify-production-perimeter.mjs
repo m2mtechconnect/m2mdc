@@ -25,6 +25,7 @@
  */
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { collectRouteDeclarations } from './lib/route-declarations.mjs';
 
 const REPO = process.cwd();
 const failures = [];
@@ -286,18 +287,11 @@ const ROUTER_FILES = [
 const routerSources = ROUTER_FILES
   .filter((rel) => existsSync(join(REPO, rel)))
   .map((rel) => ({ rel, src: readFileSync(join(REPO, rel), 'utf8') }));
-const appSrc = routerSources.map((f) => f.src).join('\n');
+const routeDeclarations = routerSources.flatMap(({ rel, src }) => collectRouteDeclarations(rel, src));
 
 for (const pat of allowlist.forbidden_production_routes || []) {
-  const literal = pat.replace('/*', '');
-  // Match the literal followed by "/" (subroute) or the closing quote (exact),
-  // so e.g. `/dev` does not falsely match `/dev-overlays`.
-  const re = new RegExp(`path=["']${literal.replace(/\//g, '\\/')}(?:["']|\\/)`);
-  const matches = appSrc.match(new RegExp(re, 'g')) || [];
-  // Allow occurrences that are gated by `import.meta.env.DEV` on the same
-  // JSX expression.
-  const gated = (appSrc.match(new RegExp(`import\\.meta\\.env\\.DEV[^\\n]*${re.source}`, 'g')) || []).length;
-  if (matches.length > gated) {
+  const routePattern = new RegExp('^' + pat.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\\\*/g, '.*') + '$');
+  if (routeDeclarations.some((route) => routePattern.test(route.path) && !route.devGated)) {
     fail(`router declares forbidden production route: ${pat}`);
   }
 }
@@ -324,26 +318,24 @@ if (existsSync(workflowDir)) {
   const redirect   = new Set(allowlist.redirect_only_routes || []);
   const forbidden  = allowlist.forbidden_production_routes || [];
   const forbiddenRe = forbidden.map((p) => new RegExp('^' + p.replace(/\*/g, '.*') + '$'));
-  const lines = appSrc.split('\n');
-  const seen = new Set();
-  const pathAndDev = /<Route[^>]*path=["']([^"']+)["']/;
-  for (const line of lines) {
-    const lm = pathAndDev.exec(line);
-    if (!lm) continue;
-    const p = lm[1];
-    if (seen.has(p)) continue;
-    seen.add(p);
+  const declarationsByPath = new Map();
+  for (const declaration of routeDeclarations) {
+    const existing = declarationsByPath.get(declaration.path) || [];
+    existing.push(declaration);
+    declarationsByPath.set(declaration.path, existing);
+  }
+  for (const [p, declarations] of declarationsByPath) {
     // Relative child paths (e.g. "overview") inherit the classification of
     // their already-classified parent route.
     if (!p.startsWith('/') && p !== '*') continue;
-    const isDevGated = /import\.meta\.env\.DEV/.test(line);
-    if (isDevGated) continue;
+    const shipsInProduction = declarations.some((declaration) => !declaration.devGated);
+    if (!shipsInProduction) continue;
     // A route classified as production-blocked is not allowed to ship merely
     // because it appears in the taxonomy. It must be behind the same
     // build-time DEV guard as a development-only surface. Terminal catch-all
     // handlers are exempt because they render the production 404 boundary.
     if (blocked.has(p)) {
-      if (p !== '*' && p !== '/*' && !isDevGated) {
+      if (p !== '*' && p !== '/*') {
         fail(`router ships production-blocked route without DEV gate: ${p}`);
       }
       continue;

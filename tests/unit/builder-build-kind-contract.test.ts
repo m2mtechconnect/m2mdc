@@ -7,6 +7,7 @@
  * 3d_twin), surfacing as "Edge Function returned a non-2xx status code".
  */
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   BUILD_KINDS,
   isBuildKind,
@@ -74,11 +75,24 @@ describe('build-kind helper', () => {
     })).toBe('3d_twin');
   });
 
-  it('does not reclassify a generic agent from free-form business copy', () => {
+  it('preserves an explicit non-default product kind even when a twin is bound', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'process_twin',
+      twinId: 'facility-123',
+      templateId: 'datacentre-master-twin-v1',
+    })).toBe('process_twin');
+  });
+
+  it('does not reclassify a generic agent from an unrelated template identity', () => {
     expect(resolvePersistedBuildKind({
       configType: 'agent',
-      templateName: 'Customer Support Agent',
+      templateId: 'customer-support-agent-v1',
     })).toBe('agent');
+  });
+
+  it('never passes a free-form builder name into persisted identity inference', () => {
+    const store = readFileSync('src/stores/wizardBuilderStore.ts', 'utf8');
+    expect(store).not.toContain('templateName: builder.name');
   });
 });
 

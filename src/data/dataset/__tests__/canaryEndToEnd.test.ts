@@ -27,6 +27,7 @@ import { toCsv, toJsonExport } from '../exportProvenance';
 import { answerFromDataset, authorizedRecords, GROUNDING_EVALS } from '../assistantGrounding';
 import { resolveDataset, PRODUCTION_DEFAULT_DATASET, withDataset } from '../datasetRegistry';
 import { NGC_UNAVAILABLE } from '../valueClassification';
+import { isNonProductionInternalPathname } from '@/config/routeRegistry';
 import {
   CLASSIFIED_FACILITIES,
   DSX_REFERENCE_RECORDS,
@@ -40,8 +41,22 @@ describe('surface migration matrix', () => {
   it('classifies every declared surface and migrates every consumer', () => {
     expect(SURFACE_MATRIX.length).toBeGreaterThan(30);
     const consumers = surfacesByClassification('REFERENCE_DATA_CONSUMER');
-    expect(consumers.length).toBeGreaterThanOrEqual(16);
+    expect(consumers.length).toBeGreaterThanOrEqual(12);
     expect(consumers.every((s) => s.migrated && s.sections.length > 0)).toBe(true);
+    expect(consumers.every((s) => !isNonProductionInternalPathname(s.path))).toBe(true);
+  });
+
+  it('never turns a non-production route into an alternate reference mount', () => {
+    for (const path of [
+      '/blueprint/preview',
+      '/simulation/preview',
+      '/deploy',
+      '/admin/asset-pipeline',
+      '/admin/asset-validation/asset-123',
+    ]) {
+      expect(isNonProductionInternalPathname(path), path).toBe(true);
+      expect(surfaceForPath(path)?.classification, path).not.toBe('REFERENCE_DATA_CONSUMER');
+    }
   });
 
   it('resolves parameterised routes to their surface', () => {

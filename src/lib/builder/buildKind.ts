@@ -73,19 +73,24 @@ export function resolvePersistedBuildKind(input: {
   configType?: unknown;
   twinId?: unknown;
   templateId?: unknown;
-  templateName?: unknown;
 }): BuildKind {
+  const explicit = normalizeBuildKind(input.configType);
+
+  // A non-default persisted kind is authoritative. In particular, a bound
+  // process twin remains a process twin instead of being collapsed to 3d_twin.
+  if (explicit && explicit !== DEFAULT_BUILD_KIND) return explicit;
+
+  // Legacy facility drafts were persisted as the default `agent`. A durable
+  // binding or immutable template id may repair that legacy value, but a
+  // free-form draft name must never change product identity.
   if (typeof input.twinId === 'string' && input.twinId.trim()) return FACILITY_BUILD_KIND;
 
-  const templateIdentity = [input.templateId, input.templateName]
-    .filter((value): value is string => typeof value === 'string')
-    .join(' ')
-    .toLowerCase();
+  const templateIdentity = typeof input.templateId === 'string' ? input.templateId.toLowerCase() : '';
   if (FACILITY_SIGNALS.some((signal) => templateIdentity.includes(signal))) {
     return FACILITY_BUILD_KIND;
   }
 
-  return normalizeBuildKind(input.configType) ?? DEFAULT_BUILD_KIND;
+  return explicit ?? DEFAULT_BUILD_KIND;
 }
 
 /**

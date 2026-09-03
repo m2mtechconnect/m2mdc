@@ -26,12 +26,12 @@ export function resolveEvidenceFacilityScope(
   if (!requestedId) {
     return {
       requestedId,
-      availability: 'demonstration',
-      displayName: EVIDENCE_BETA_SITE.name,
-      contextLabel: `${EVIDENCE_BETA_SITE.name} (demonstration fixture)`,
-      headerLabel: `Demonstration facility: ${EVIDENCE_BETA_SITE.name} (active facility not selected)`,
-      truthLabel: EVIDENCE_BETA_SITE.name,
-      reason: null,
+      availability: 'unavailable',
+      displayName: 'No active facility selected',
+      contextLabel: 'No active facility selected',
+      headerLabel: 'Facility evidence unavailable: no active facility selected',
+      truthLabel: 'No active facility selected',
+      reason: 'Select an active facility before opening Evidence. Demonstration values are not substituted.',
     };
   }
 

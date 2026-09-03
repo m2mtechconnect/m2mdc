@@ -169,7 +169,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/manage/facilities', 'Facilities', ['facilities', 'montreal'], [CONFIG, SPEC]),
   neutral('/blueprint', 'Blueprint facility resolver', 'Resolves the active facility before any dataset-backed Blueprint route is opened.'),
   consumer('/blueprint/:id', 'Blueprint', ['specifications', 'configurations', 'derivation', 'evidence'], [SPEC, CONFIG]),
-  consumer('/blueprint/preview', 'Blueprint preview', ['specifications', 'configurations'], [SPEC, CONFIG]),
+  neutral('/blueprint/preview', 'Blueprint preview', 'Production-blocked preview; the reference canary cannot mount it.'),
   consumer('/data-centre-twin/:id/blueprint', 'Twin blueprint', ['specifications', 'configurations', 'derivation'], [SPEC, CONFIG]),
   consumer('/builder', 'Build twin', ['configurations', 'derivation'], [CONFIG, SPEC]),
   consumer(
@@ -178,7 +178,7 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
     ['scenarios', 'run-lineage', 'compare', 'review', 'evidence', 'export'],
     [SCENARIO, KPI, CONFIG],
   ),
-  consumer('/simulation/preview', 'Simulation preview', ['scenarios', 'run-lineage'], [SCENARIO]),
+  neutral('/simulation/preview', 'Simulation preview', 'Production-blocked preview; the reference canary cannot mount it.'),
   consumer('/analytics', 'Telemetry and analytics', ['telemetry', 'kpis'], [KPI], {
     missingBehaviour: 'No time series exists in the reference dataset: history is reported unavailable.',
   }),
@@ -186,9 +186,9 @@ export const SURFACE_MATRIX: readonly SurfaceEntry[] = [
   consumer('/compliance', 'Evidence and compliance', ['evidence', 'export'], [KPI, SPEC, CONFIG, SCENARIO]),
   consumer('/app/agents', 'Subsystem agents', ['agents', 'ngc'], [SCENARIO]),
   consumer('/manage/integrations', 'Integrations', ['integrations'], []),
-  consumer('/deploy', 'Deployment lanes', ['deployments'], []),
+  neutral('/deploy', 'Deployment lanes', 'Production-blocked activation surface; the reference canary cannot mount it.'),
   consumer('/deployments', 'Deployment history', ['deployments'], []),
-  consumer('/admin/asset-pipeline', 'Asset pipeline', ['assets', 'ngc'], []),
+  neutral('/admin/asset-pipeline', 'Asset pipeline', 'Production-blocked administrator surface; the reference canary cannot mount it.'),
   consumer('/help', 'Support and documentation', ['glossary', 'ngc'], []),
   neutral('/readiness/supervisor', 'Enterprise Readiness Supervisor', 'Deterministic repository-evidence assessment only; no reference dataset values.'),
 

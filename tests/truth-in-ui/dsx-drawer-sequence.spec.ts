@@ -14,7 +14,7 @@
  *   • the next trigger is normally clickable straight after closure
  */
 import { test, expect, type Locator, type Page } from './_setup/fixtures';
-import { installSupabaseMock } from './_setup/supabase-mock';
+import { installDsxSupabaseMock } from './_setup/supabase-mock';
 import { seedDismissedTours, assertNoOnboardingOverlay } from './_setup/app-state';
 import { activateCard, closeAndSettle, assertNoOverlayArtifacts, waitForScrollSettled } from './_setup/card-activation';
 
@@ -49,7 +49,7 @@ async function expectAttribution(drawer: Locator, attr: string, value: string | 
 }
 
 test.describe('DSX drawer sequencing', () => {
-  test.beforeEach(async ({ context }) => { await installSupabaseMock(context);
+  test.beforeEach(async ({ context }) => { await installDsxSupabaseMock(context);
     await seedDismissedTours(context); });
 
   test('two consecutive constraint drawers activate normally', async ({ page }) => {

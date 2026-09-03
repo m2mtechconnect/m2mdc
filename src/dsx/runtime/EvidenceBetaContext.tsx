@@ -71,14 +71,21 @@ const Ctx = createContext<EvidenceBetaWorkspace | null>(null);
 export function EvidenceBetaProvider({
   children,
   twins = NO_FACILITY_TWINS,
+  defaultFacilityId = null,
 }: {
   children: ReactNode;
   twins?: readonly DataCentreTwin[];
+  defaultFacilityId?: string | null;
 }) {
   const rt = useEvidenceBeta();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
+  // Distinguishes a facility copied from global workspace state from a facility
+  // supplied explicitly by a deep link. Without this ownership marker, the
+  // first inherited value becomes indistinguishable from explicit URL intent
+  // and remains stale after the user changes facilities.
+  const inheritedFacilityId = useRef<string | null>(null);
 
   /**
    * Inspector state is derived from the URL (`inspector`, `metric`, `overlay`)
@@ -115,7 +122,14 @@ export function EvidenceBetaProvider({
     requestAnimationFrame(tryFocus);
   }, []);
 
-  const context = useMemo(() => parseContext(searchParams), [searchParams]);
+  const parsedContext = useMemo(() => parseContext(searchParams), [searchParams]);
+  const context = useMemo(
+    () =>
+      !parsedContext.facility_id && defaultFacilityId
+        ? { ...parsedContext, facility_id: defaultFacilityId }
+        : parsedContext,
+    [parsedContext, defaultFacilityId],
+  );
 
   // Deep link restore: a shared scenario id reopens the same scenario once.
   const urlScenario = context.scenario_id;
@@ -163,6 +177,29 @@ export function EvidenceBetaProvider({
     },
     [setSearchParams],
   );
+
+  // A direct Evidence route inherits the authenticated user's active facility.
+  // Explicit deep-link context always wins. An inherited value follows later
+  // global facility changes because its ownership is tracked separately.
+  useEffect(() => {
+    const currentFacilityId = parsedContext.facility_id;
+    const previousInheritedId = inheritedFacilityId.current;
+
+    if (!defaultFacilityId) {
+      if (previousInheritedId && currentFacilityId === previousInheritedId) {
+        inheritedFacilityId.current = null;
+        writeContext({ ...parsedContext, facility_id: null }, true);
+      }
+      return;
+    }
+
+    // A different URL value was supplied explicitly and owns the scope.
+    if (currentFacilityId && currentFacilityId !== previousInheritedId) return;
+    if (currentFacilityId === defaultFacilityId && previousInheritedId === defaultFacilityId) return;
+
+    inheritedFacilityId.current = defaultFacilityId;
+    writeContext({ ...parsedContext, facility_id: defaultFacilityId }, true);
+  }, [parsedContext, defaultFacilityId, writeContext]);
 
   // `setSearchParams` rewrites the URL without a fragment, so a deep link's
   // anchor would be lost the first time context is mirrored into the URL.

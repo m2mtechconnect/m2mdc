@@ -29,7 +29,10 @@ import NotFound from "./pages/NotFound";
 
 const Dashboard = lazy(loadDashboard);
 const Builder = lazy(loadBuilder);
-const Deploy = lazy(() => import("./pages/Deploy"));
+// Production-blocked surfaces are imported and mounted only in development.
+// Keeping both the import and the route behind the build-time DEV constant
+// prevents their chunks from entering the production graph.
+const Deploy = import.meta.env.DEV ? lazy(() => import("./pages/Deploy")) : null;
 const DeploymentHistory = lazy(() => import("./pages/DeploymentHistory"));
 const IntelligenceDashboard = lazy(loadOperations);
 const Compliance = lazy(() => import("./pages/Compliance"));
@@ -43,8 +46,8 @@ const AISettings = lazy(() => import("./pages/AISettings"));
 const Connections = lazy(() => import("./pages/Connections"));
 const ManageFacilities = lazy(() => import("./pages/manage/Facilities"));
 const SignOut = lazy(() => import("./pages/auth/index").then((m) => ({ default: m.SignOut })));
-const AgentWorkspace = lazy(() => import("./pages/AgentWorkspace"));
-const AgentChat = lazy(() => import("./pages/AgentChat"));
+const AgentWorkspace = import.meta.env.DEV ? lazy(() => import("./pages/AgentWorkspace")) : null;
+const AgentChat = import.meta.env.DEV ? lazy(() => import("./pages/AgentChat")) : null;
 // Demo-only intake surface. Development builds only, so production emits no chunk.
 const FundingIntakeDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/FundingIntakeDemo"))
@@ -53,11 +56,11 @@ const ManageAgents = lazy(() => import("./pages/ManageAgents"));
 const SystemManage = lazy(() => import("./pages/SystemManage"));
 const TwinManage = lazy(() => import("./pages/TwinManage"));
 const Blueprint = lazy(() => import("./pages/Blueprint"));
-const BlueprintPreview = lazy(() => import("./pages/BlueprintPreview"));
-const SimulationPreview = lazy(() => import("./pages/SimulationPreview"));
+const BlueprintPreview = import.meta.env.DEV ? lazy(() => import("./pages/BlueprintPreview")) : null;
+const SimulationPreview = import.meta.env.DEV ? lazy(() => import("./pages/SimulationPreview")) : null;
 const AuraWorkspace = lazy(loadSimulation);
 const TwinPreview = lazy(() => import("./pages/TwinPreview"));
-const TwinDebug = lazy(() => import("./pages/TwinDebug"));
+const TwinDebug = import.meta.env.DEV ? lazy(() => import("./pages/TwinDebug")) : null;
 const AgentDetail = lazy(() => import("./pages/AgentDetail"));
 const Profile = lazy(() => import("./pages/account/Profile"));
 const Settings = lazy(() => import("./pages/account/Settings"));
@@ -68,10 +71,12 @@ const AdminConsoleLayout = lazy(() => import("./pages/admin/AdminConsoleLayout")
 const Customers = lazy(() => import("./pages/admin/Customers"));
 const OnboardingSubmissions = lazy(() => import("./pages/OnboardingSubmissions"));
 const PlatformReadiness = lazy(() => import("./pages/admin/PlatformReadiness"));
-const AssetPreview = lazy(() => import("@/pages/admin/AssetPreview"));
-const AssetPipeline = lazy(() => import("@/pages/admin/AssetPipeline"));
-const AssetValidation = lazy(() => import("@/pages/admin/AssetValidation"));
-const ReferenceFacilityValidation = lazy(() => import("@/pages/admin/ReferenceFacilityValidation"));
+const AssetPreview = import.meta.env.DEV ? lazy(() => import("@/pages/admin/AssetPreview")) : null;
+const AssetPipeline = import.meta.env.DEV ? lazy(() => import("@/pages/admin/AssetPipeline")) : null;
+const AssetValidation = import.meta.env.DEV ? lazy(() => import("@/pages/admin/AssetValidation")) : null;
+const ReferenceFacilityValidation = import.meta.env.DEV
+  ? lazy(() => import("@/pages/admin/ReferenceFacilityValidation"))
+  : null;
 const DsxCapabilityRegistryPage = lazy(() => import("@/pages/admin/DsxCapabilityRegistryPage"));
 const DatasetRegistryPage = lazy(() => import("@/pages/admin/DatasetRegistryPage"));
 
@@ -117,10 +122,10 @@ function ApprovedUserRoutes() {
       <Route path="/login" element={<AuthenticatedEntryRedirect />} />
       <Route path="/onboarding" element={<AuthenticatedEntryRedirect />} />
       <Route path="/builder" element={<PermissionRouteGuard permission="twin.edit"><Builder /></PermissionRouteGuard>} />
-      <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.execute"><Deploy /></PermissionRouteGuard>} />
+      {import.meta.env.DEV && Deploy && <Route path="/deploy" element={<PermissionRouteGuard permission="deployment.execute"><Deploy /></PermissionRouteGuard>} />}
       <Route path="/deployments" element={<PermissionRouteGuard permission="deployment.view"><DeploymentHistory /></PermissionRouteGuard>} />
-      <Route path="/agent/:id" element={<AgentWorkspace />} />
-      <Route path="/agents/:id/chat" element={<AgentChat />} />
+      {import.meta.env.DEV && AgentWorkspace && <Route path="/agent/:id" element={<AgentWorkspace />} />}
+      {import.meta.env.DEV && AgentChat && <Route path="/agents/:id/chat" element={<AgentChat />} />}
       <Route path="/analytics" element={<PermissionRouteGuard permission="analytics.view"><IntelligenceDashboard /></PermissionRouteGuard>} />
       {/* Sovereignty / compliance evidence is a read-only reporting surface in
           the same family as /analytics and the Evidence workspaces, so it is
@@ -139,10 +144,10 @@ function ApprovedUserRoutes() {
       />
 
       <Route path="/admin/customers" element={<AdminRouteGuard permission="platform.manage_customers"><AdminConsoleLayout><Customers /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/admin/asset-preview" element={<AdminRouteGuard><AdminConsoleLayout><AssetPreview /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AdminConsoleLayout><AssetPipeline /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AdminConsoleLayout><AssetValidation /></AdminConsoleLayout></AdminRouteGuard>} />
-      <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><AdminConsoleLayout><ReferenceFacilityValidation /></AdminConsoleLayout></AdminRouteGuard>} />
+      {import.meta.env.DEV && AssetPreview && <Route path="/admin/asset-preview" element={<AdminRouteGuard><AdminConsoleLayout><AssetPreview /></AdminConsoleLayout></AdminRouteGuard>} />}
+      {import.meta.env.DEV && AssetPipeline && <Route path="/admin/asset-pipeline" element={<AdminRouteGuard><AdminConsoleLayout><AssetPipeline /></AdminConsoleLayout></AdminRouteGuard>} />}
+      {import.meta.env.DEV && AssetValidation && <Route path="/admin/asset-validation/:assetId" element={<AdminRouteGuard><AdminConsoleLayout><AssetValidation /></AdminConsoleLayout></AdminRouteGuard>} />}
+      {import.meta.env.DEV && ReferenceFacilityValidation && <Route path="/admin/reference-facility-validation" element={<AdminRouteGuard><AdminConsoleLayout><ReferenceFacilityValidation /></AdminConsoleLayout></AdminRouteGuard>} />}
       <Route path="/admin/accelerated-ai-capabilities" element={<AdminRouteGuard><AdminConsoleLayout><DsxCapabilityRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/dataset-registry" element={<AdminRouteGuard><AdminConsoleLayout><DatasetRegistryPage /></AdminConsoleLayout></AdminRouteGuard>} />
       <Route path="/admin/platform-readiness" element={<AdminRouteGuard><AdminConsoleLayout><PlatformReadiness /></AdminConsoleLayout></AdminRouteGuard>} />
@@ -150,7 +155,7 @@ function ApprovedUserRoutes() {
       <Route path="/manage/integrations" element={<PermissionRouteGuard permission="twin.edit"><Connections /></PermissionRouteGuard>} />
       {/* Admission is read-level; the page gates every mutation on twin.edit. */}
       <Route path="/manage/facilities" element={<PermissionRouteGuard permission="twin.view"><ManageFacilities /></PermissionRouteGuard>} />
-      <Route path="/marketplace" element={<PermissionRouteGuard permission="twin.edit"><PreserveNavigate to="/builder#templates" /></PermissionRouteGuard>} />
+      {import.meta.env.DEV && <Route path="/marketplace" element={<PermissionRouteGuard permission="twin.edit"><PreserveNavigate to="/builder#templates" /></PermissionRouteGuard>} />}
       <Route path="/app/agents" element={<PermissionRouteGuard permission="agent.view"><ManageAgents /></PermissionRouteGuard>} />
       <Route path="/app/agents/:slug/detail" element={<PermissionRouteGuard permission="agent.view"><AgentDetail /></PermissionRouteGuard>} />
       <Route path="/app/agents/:agentId/manage" element={<PermissionRouteGuard permission="agent.operate"><TwinManage /></PermissionRouteGuard>} />
@@ -161,13 +166,13 @@ function ApprovedUserRoutes() {
       <Route path="/data-centre-twin/:id" element={<PermissionRouteGuard permission="twin.view"><DataCentreTwin /></PermissionRouteGuard>} />
       <Route path="/data-centre-twin/:id/blueprint" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
       <Route path="/blueprint" element={<PermissionRouteGuard permission="twin.view"><ActiveBlueprintResolver /></PermissionRouteGuard>} />
-      <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />
+      {import.meta.env.DEV && BlueprintPreview && <Route path="/blueprint/preview" element={<PermissionRouteGuard permission="twin.view"><BlueprintPreview /></PermissionRouteGuard>} />}
       <Route path="/blueprint/:id" element={<PermissionRouteGuard permission="twin.view"><Blueprint /></PermissionRouteGuard>} />
       {/* The simulation workspace persists run records, so it is gated on the
           same least-privileged twin read permission as the other twin
           surfaces instead of being mounted for any approved account. */}
       <Route path="/simulation" element={<PermissionRouteGuard permission="twin.view"><AuraWorkspace /></PermissionRouteGuard>} />
-      <Route path="/simulation/preview" element={<PermissionRouteGuard permission="twin.view"><SimulationPreview /></PermissionRouteGuard>} />
+      {import.meta.env.DEV && SimulationPreview && <Route path="/simulation/preview" element={<PermissionRouteGuard permission="twin.view"><SimulationPreview /></PermissionRouteGuard>} />}
       <Route path="/help" element={<Help />} />
       {/* Read-only governance surface in the same family as /compliance and
           /analytics, so it is gated on the same least-privileged read
@@ -177,12 +182,10 @@ function ApprovedUserRoutes() {
       <Route path="/settings/ai" element={<PermissionRouteGuard permission="agent.administer"><AISettings /></PermissionRouteGuard>} />
       <Route path="/sign-out" element={<SignOut />} />
       <Route path="/twin-preview" element={<PermissionRouteGuard permission="twin.view"><TwinPreview /></PermissionRouteGuard>} />
-      <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />
+      {import.meta.env.DEV && TwinDebug && <Route path="/twin-debug" element={<AdminRouteGuard><AdminConsoleLayout><TwinDebug /></AdminConsoleLayout></AdminRouteGuard>} />}
       {/* Demo-only intake surface. Not a supported production feature, so it is
           reachable in development builds only. */}
-      {import.meta.env.DEV && FundingIntakeDemo && (
-        <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />
-      )}
+      {import.meta.env.DEV && FundingIntakeDemo && <Route path="/digital-twins-demo/funding-intake" element={<FundingIntakeDemo />} />}
 
       {ROUTE_ALIASES.map((alias) => (
         <Route key={alias.from} path={alias.from} element={<PreserveNavigate to={alias.to} />} />

@@ -19,6 +19,7 @@
 import type { BrowserContext, Page, Route } from '@playwright/test';
 import type { AnyRole } from '../../../src/auth/permissions';
 import type { OrganizationRole } from '../../../src/auth/organizationAuthorization';
+import { EVIDENCE_BETA_SITE } from '../../../src/dsx/fixtures/evidenceBetaFacility';
 
 
 // Supabase-js derives its default storage key from the configured URL's
@@ -150,6 +151,30 @@ export interface SupabaseMockHandle {
   storage(): { key: string; value: string };
 }
 
+export const TRUTH_TEST_TWIN = Object.freeze({
+  // This exact deterministic fixture is the only facility with a versioned
+  // in-repo Evidence dataset. Arbitrary tenant twins must remain unavailable.
+  id: EVIDENCE_BETA_SITE.aura_asset_id,
+  location_id: null,
+  name: 'Evidence Beta Site',
+  city: 'Montreal',
+  region_code: 'ca-central-1',
+  tier: 'Tier III',
+  capacity_kw: 12_000,
+  industry: 'AI data centre validation',
+  sovereignty_level: 'Canada',
+  pue_target: 1.2,
+  renewable_target_pct: 90,
+  carbon_intensity: 28,
+  metadata: { fixture: 'explicit-authoritative-facility' },
+  blueprint_id: null,
+  created_by_user: '00000000-0000-4000-8000-000000000001',
+  created_at: '2026-01-01T00:00:00.000Z',
+  updated_at: '2026-01-01T00:00:00.000Z',
+});
+
+type ActiveTwinFixture = typeof TRUTH_TEST_TWIN;
+
 export async function installSupabaseMock(
   target: BrowserContext | Page,
   opts: {
@@ -162,6 +187,8 @@ export async function installSupabaseMock(
     /** Tenant-scoped durable fixtures for cross-persona journey tests. */
     simulationRuns?: unknown[];
     decisionRecords?: unknown[];
+    /** Explicit authoritative facility for facility-bound journeys. */
+    activeTwin?: ActiveTwinFixture;
   } = {},
 ): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
@@ -323,6 +350,17 @@ export async function installSupabaseMock(
       return fulfillJson(JSON.stringify(opts.decisionRecords ?? []));
     }
 
+    if (pathname.startsWith('/rest/v1/data_centre_twins')) {
+      if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
+      const rows = opts.activeTwin ? [opts.activeTwin] : [];
+      const acceptHeader = (req.headers()['accept'] ?? '').toLowerCase();
+      const wantsSingle = acceptHeader.includes('pgrst.object');
+      return fulfillJson(
+        JSON.stringify(wantsSingle ? (opts.activeTwin ?? null) : rows),
+        wantsSingle ? 'application/vnd.pgrst.object+json' : 'application/json',
+      );
+    }
+
     // ---- RPC / other REST --------------------------------------
     if (pathname.startsWith('/rest/v1/') || pathname.startsWith('/rpc/')) {
       if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
@@ -341,21 +379,27 @@ export async function installSupabaseMock(
     const ctx = target as BrowserContext;
     await ctx.route('**/*', handle);
     await ctx.addInitScript(
-      ([storageKey, payload]) => {
-        try { window.localStorage.setItem(storageKey, payload); }
+      ([storageKey, payload, activeTwinId]) => {
+        try {
+          window.localStorage.setItem(storageKey, payload);
+          if (activeTwinId) window.localStorage.setItem('dc_active_twin_id', activeTwinId);
+        }
         catch { /* storage disabled */ }
       },
-      [STORAGE_KEY, session.storagePayload] as const,
+      [STORAGE_KEY, session.storagePayload, opts.activeTwin?.id ?? null] as const,
     );
   } else {
     const page = target as Page;
     await page.route('**/*', handle);
     await page.addInitScript(
-      ([storageKey, payload]) => {
-        try { window.localStorage.setItem(storageKey, payload); }
+      ([storageKey, payload, activeTwinId]) => {
+        try {
+          window.localStorage.setItem(storageKey, payload);
+          if (activeTwinId) window.localStorage.setItem('dc_active_twin_id', activeTwinId);
+        }
         catch { /* storage disabled */ }
       },
-      [STORAGE_KEY, session.storagePayload] as const,
+      [STORAGE_KEY, session.storagePayload, opts.activeTwin?.id ?? null] as const,
     );
   }
 
@@ -365,4 +409,16 @@ export async function installSupabaseMock(
     profileHits: () => profileHits,
     storage: () => ({ key: STORAGE_KEY, value: session.storagePayload }),
   };
+}
+
+/**
+ * Facility-bound Evidence journeys must declare their authoritative scope.
+ * This helper intentionally differs from the generic no-facility session so
+ * tests cannot pass by reviving the forbidden reference-facility fallback.
+ */
+export function installDsxSupabaseMock(target: BrowserContext | Page): Promise<SupabaseMockHandle> {
+  return installSupabaseMock(target, {
+    withActiveOrganization: true,
+    activeTwin: TRUTH_TEST_TWIN,
+  });
 }

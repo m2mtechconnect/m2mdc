@@ -7,10 +7,12 @@
  * 3d_twin), surfacing as "Edge Function returned a non-2xx status code".
  */
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import {
   BUILD_KINDS,
   isBuildKind,
   normalizeBuildKind,
+  resolvePersistedBuildKind,
   resolveTemplateBuildKind,
 } from '@/lib/builder/buildKind';
 import { templateToBlueprint } from '@/lib/builder/templateToBlueprint';
@@ -60,6 +62,37 @@ describe('build-kind helper', () => {
         templateName: 'Retail Inventory Optimization',
       }),
     ).toBe('agent');
+  });
+
+  it('recovers a legacy facility draft even when it was stored as an agent', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      templateId: 'datacentre-master-twin-v1',
+    })).toBe('3d_twin');
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      twinId: 'facility-123',
+    })).toBe('3d_twin');
+  });
+
+  it('preserves an explicit non-default product kind even when a twin is bound', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'process_twin',
+      twinId: 'facility-123',
+      templateId: 'datacentre-master-twin-v1',
+    })).toBe('process_twin');
+  });
+
+  it('does not reclassify a generic agent from an unrelated template identity', () => {
+    expect(resolvePersistedBuildKind({
+      configType: 'agent',
+      templateId: 'customer-support-agent-v1',
+    })).toBe('agent');
+  });
+
+  it('never passes a free-form builder name into persisted identity inference', () => {
+    const store = readFileSync('src/stores/wizardBuilderStore.ts', 'utf8');
+    expect(store).not.toContain('templateName: builder.name');
   });
 });
 

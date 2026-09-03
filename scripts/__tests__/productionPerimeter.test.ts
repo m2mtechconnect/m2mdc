@@ -76,6 +76,19 @@ afterAll(() => {
 });
 
 describe('production perimeter enforcer', () => {
+  it('installs the verifier dependencies before enforcing the perimeter in CI', () => {
+    const workflow = readFileSync(
+      join(REPO, '.github/workflows/production-perimeter.yml'),
+      'utf8',
+    );
+    const installAt = workflow.indexOf('bun install --frozen-lockfile');
+    const enforceAt = workflow.indexOf('node scripts/verify-production-perimeter.mjs');
+
+    expect(workflow).toContain('oven-sh/setup-bun@v2');
+    expect(installAt).toBeGreaterThan(-1);
+    expect(enforceAt).toBeGreaterThan(installAt);
+  });
+
   it('passes against the committed evidence', () => {
     const result = runEnforcer(REPO);
     expect(result.output).toContain('PASSED');
@@ -143,6 +156,17 @@ describe('production perimeter enforcer', () => {
     expect(result.code).toBe(1);
     expect(result.output).toContain('/dashboard');
   });
+
+  it('fails closed when a production route is reclassified as blocked without a DEV gate', () => {
+    const dir = mirrorRepo((a) => {
+      a.production_routes = a.production_routes.filter((r: string) => r !== '/dashboard');
+      a.production_blocked_routes = [...a.production_blocked_routes, '/dashboard'];
+    });
+    temps.push(dir);
+    const result = runEnforcer(dir);
+    expect(result.code).toBe(1);
+    expect(result.output).toContain('production-blocked route without DEV gate: /dashboard');
+  });
 });
 
 describe('production route classification', () => {
@@ -162,9 +186,8 @@ describe('production route classification', () => {
 
   /**
    * The recommendation preview routes are excluded from the production
-   * perimeter (2026-08-27). They remain declared in the authenticated router
-   * behind a permission guard, but they must stay classified as
-   * production_blocked and must never be re-promoted implicitly.
+   * perimeter (2026-08-27). They remain available only in development behind
+   * a permission guard and must stay classified as production_blocked.
    */
   it('excludes the recommendation preview routes from the production perimeter', () => {
     const blocked = new Set<string>(allowlist.production_blocked_routes);
@@ -176,6 +199,7 @@ describe('production route classification', () => {
         .split('\n')
         .find((line) => line.includes(`path="${route}"`));
       expect(declaration, `${route} must be declared in the authenticated router`).toBeDefined();
+      expect(declaration).toContain('import.meta.env.DEV');
       expect(declaration).toContain('PermissionRouteGuard');
     }
   });

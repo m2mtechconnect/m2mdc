@@ -17,7 +17,7 @@
  */
 
 import { test, expect, type Page, type Locator } from './_setup/fixtures';
-import { installSupabaseMock } from './_setup/supabase-mock';
+import { installDsxSupabaseMock } from './_setup/supabase-mock';
 import { seedDismissedTours } from './_setup/app-state';
 import { activateCard, closeAndSettle } from './_setup/card-activation';
 
@@ -147,7 +147,7 @@ async function auditAssetSelects(page: Page, route: string, failures: string[]) 
 
 test.describe('DSX Evidence Beta — clickable card destinations', () => {
   test.beforeEach(async ({ context }) => {
-    await installSupabaseMock(context);
+    await installDsxSupabaseMock(context);
     await seedDismissedTours(context);
   });
 

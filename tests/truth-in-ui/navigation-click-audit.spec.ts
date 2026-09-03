@@ -51,7 +51,9 @@ async function expectWorkspaceCommitted(
         ? page.getByRole('heading', { name: 'Operations & Telemetry', level: 1 })
         : workspace === 'simulation'
           ? page.getByTestId('aura-workspace')
-          : page.getByTestId('dsx-workspace-title');
+        : page.getByTestId('dsx-workspace-title').or(
+          page.getByTestId('evidence-facility-unavailable'),
+        );
 
   await expect(marker, `${workspace} must commit visible page content, not only update the URL`).toBeVisible({
     timeout: 10_000,
@@ -80,7 +82,7 @@ async function expectEvidenceContext(
     )
     .toEqual({
       pathname: expectedPath,
-      facility: 'aura-reference-facility',
+      facility: null,
       scenario: 'cooling_degradation',
       mode: 'SIMULATED',
       runPresent: true,

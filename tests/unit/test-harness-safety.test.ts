@@ -106,6 +106,9 @@ describe('test harness safety guards', () => {
   it('keeps dependency vulnerability auditing in the QA security gate', () => {
     const workflow = repositoryFile('.github/workflows/qa-suite.yml');
     expect(workflow).toContain('name: Security Scan');
+    expect(workflow).toContain('actions: read');
+    expect(workflow).toContain('security-events: write');
+    expect(workflow).toContain('uses: github/codeql-action/upload-sarif@v4');
     expect(workflow).toContain('run: bun audit --audit-level=moderate');
     expect(workflow.indexOf('uses: oven-sh/setup-bun@v2')).toBeLessThan(
       workflow.indexOf('run: bun audit --audit-level=moderate'),
@@ -133,6 +136,7 @@ describe('test harness safety guards', () => {
     expect(workflow).toContain('Generate fresh current-head screenshots for human review');
     expect(workflow).toContain('Fresh screenshots are review evidence only. This job never commits or pushes baselines.');
     expect(workflow).toContain('Enforce visual gate');
+    expect(workflow).toContain('retention-days: 7');
     expect(workflow).toContain("- 'src/config/**/*.ts'");
     expect(workflow).not.toContain("- 'src/config/appNavigation.ts'");
     expect(workflow).not.toContain('update-snapshots');
@@ -305,3 +309,4 @@ describe('test harness safety guards', () => {
     expect(lighthouse).toContain('"categories:performance": ["error", {"minScore": 0.85}]');
   });
 });
+

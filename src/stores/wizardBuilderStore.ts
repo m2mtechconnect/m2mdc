@@ -3,7 +3,7 @@ import { builderService, BuilderConfig } from '@/services/builderService';
 import { AgentBlueprint } from '@/types/agentBlueprint';
 import { useBlueprintStore } from '@/stores/blueprintStore';
 import { DEFAULT_RESPONSE_PROFILE, isResponseProfile } from '@/lib/llm/responseProfiles';
-import { normalizeBuildKind, type BuildKind } from '@/lib/builder/buildKind';
+import { normalizeBuildKind, resolvePersistedBuildKind, type BuildKind } from '@/lib/builder/buildKind';
 
 // Module-level request generation counters. Every call to a Builder read
 // (loadBuilder or a deploy-path readback) captures the counter at start;
@@ -373,6 +373,11 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
 
       // A freshly created draft may come back without a config payload.
       const config = (builder?.config ?? {}) as BuilderConfig;
+      const resolvedType = resolvePersistedBuildKind({
+        configType: config.type,
+        twinId: config.twin_id ?? builder.twin_id,
+        templateId: config.template_id,
+      });
 
       // Auto-generate workflow with gemini analysis if available
       let workflow = config.workflow || initialState.workflow;
@@ -386,7 +391,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           goal: config.goal || geminiAnalysis.use_case,
           industry: config.industry || geminiAnalysis.detected_industry,
           department: config.department || geminiAnalysis.detected_department,
-          type: config.type,
+          type: resolvedType,
           template: config.template_id,
         });
         
@@ -414,7 +419,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           goal: config.goal,
           industry: config.industry,
           department: config.department,
-          type: config.type,
+          type: resolvedType,
           template: config.template_id,
         });
         
@@ -445,7 +450,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         goal: config.goal || prefilled?.description || '',
         industry: config.industry || prefilled?.industry || '',
         department: config.department || prefilled?.department || '',
-        type: config.type || 'agent', // Default to 'agent' if not specified
+        type: resolvedType,
         template: config.template_id || '',
         workflow,
         modelConfig,
@@ -526,6 +531,12 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
       // A freshly created draft may come back without a config payload.
       const config = (builder?.config ?? {}) as BuilderConfig;
 
+      const resolvedType = resolvePersistedBuildKind({
+        configType: config.type,
+        twinId: config.twin_id ?? builder.twin_id,
+        templateId: config.template_id,
+      });
+
       console.log('[Builder] Draft loaded:', { builderId, config });
 
       // Auto-generate workflow if empty
@@ -537,7 +548,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
           goal: config.goal,
           industry: config.industry,
           department: config.department,
-          type: config.type,
+          type: resolvedType,
           template: config.template_id,
         });
         
@@ -555,7 +566,7 @@ export const useWizardBuilderStore = create<WizardBuilderState>()((set, get) => 
         goal: config.goal || '',
         industry: config.industry || '',
         department: config.department || '',
-        type: config.type || null,
+        type: resolvedType,
         template: config.template_id || '',
         workflow,
         modelConfig: config.model_config || initialState.modelConfig,

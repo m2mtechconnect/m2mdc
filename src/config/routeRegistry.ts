@@ -43,6 +43,8 @@ export type RouteKind =
   | 'retired-redirect'
   /** Mounted only under `import.meta.env.DEV`. */
   | 'dev-only'
+  /** Declared for local qualification only; excluded from production builds. */
+  | 'production-blocked'
   /** Terminal `*` / `/*` handler for a router branch. */
   | 'catch-all';
 
@@ -110,10 +112,10 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/login', shell: 'internal', kind: 'redirect', note: 'Signed-in entry redirect.' },
   { path: '/onboarding', shell: 'internal', kind: 'redirect', note: 'Signed-in entry redirect.' },
   { path: '/builder', shell: 'internal', kind: 'canonical' },
-  { path: '/deploy', shell: 'internal', kind: 'canonical', note: 'Deployment lanes; /deployments is the history view.' },
+  { path: '/deploy', shell: 'internal', kind: 'production-blocked', note: 'Activation is not in the qualified production perimeter.' },
   { path: '/deployments', shell: 'internal', kind: 'canonical' },
-  { path: '/agent/:id', shell: 'internal', kind: 'canonical' },
-  { path: '/agents/:id/chat', shell: 'internal', kind: 'canonical' },
+  { path: '/agent/:id', shell: 'internal', kind: 'production-blocked' },
+  { path: '/agents/:id/chat', shell: 'internal', kind: 'production-blocked' },
   { path: '/analytics', shell: 'internal', kind: 'canonical' },
   { path: '/compliance', shell: 'internal', kind: 'canonical' },
   { path: '/account/profile', shell: 'internal', kind: 'canonical' },
@@ -134,10 +136,10 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
     guard: 'admin',
     note: 'Platform-owner-only customer provisioning and inventory.',
   },
-  { path: '/admin/asset-preview', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/asset-pipeline', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/asset-validation/:assetId', shell: 'internal', kind: 'canonical', guard: 'admin' },
-  { path: '/admin/reference-facility-validation', shell: 'internal', kind: 'canonical', guard: 'admin' },
+  { path: '/admin/asset-preview', shell: 'internal', kind: 'production-blocked', guard: 'admin' },
+  { path: '/admin/asset-pipeline', shell: 'internal', kind: 'production-blocked', guard: 'admin' },
+  { path: '/admin/asset-validation/:assetId', shell: 'internal', kind: 'production-blocked', guard: 'admin' },
+  { path: '/admin/reference-facility-validation', shell: 'internal', kind: 'production-blocked', guard: 'admin' },
   {
     path: '/admin/accelerated-ai-capabilities',
     shell: 'internal',
@@ -149,7 +151,7 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/admin/platform-readiness', shell: 'internal', kind: 'canonical', guard: 'admin' },
   { path: '/manage/integrations', shell: 'internal', kind: 'canonical' },
   { path: '/manage/facilities', shell: 'internal', kind: 'canonical' },
-  { path: '/marketplace', shell: 'internal', kind: 'retired-redirect', note: 'Retired standalone catalogue; redirects to Builder templates behind twin.edit and must never be emitted.' },
+  { path: '/marketplace', shell: 'internal', kind: 'production-blocked', note: 'Retired standalone catalogue; local compatibility check only and never emitted in production.' },
   { path: '/app/agents', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents/:slug/detail', shell: 'internal', kind: 'canonical' },
   { path: '/app/agents/:agentId/manage', shell: 'internal', kind: 'canonical' },
@@ -160,10 +162,10 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   { path: '/data-centre-twin/:id', shell: 'internal', kind: 'canonical' },
   { path: '/data-centre-twin/:id/blueprint', shell: 'internal', kind: 'canonical' },
   { path: '/blueprint', shell: 'internal', kind: 'canonical', note: 'Resolves the active facility or renders an explicit facility setup state.' },
-  { path: '/blueprint/preview', shell: 'internal', kind: 'canonical' },
+  { path: '/blueprint/preview', shell: 'internal', kind: 'production-blocked' },
   { path: '/blueprint/:id', shell: 'internal', kind: 'canonical' },
   { path: '/simulation', shell: 'internal', kind: 'canonical' },
-  { path: '/simulation/preview', shell: 'internal', kind: 'canonical' },
+  { path: '/simulation/preview', shell: 'internal', kind: 'production-blocked' },
   { path: '/help', shell: 'internal', kind: 'canonical' },
   {
     path: '/readiness/supervisor',
@@ -178,7 +180,7 @@ export const INTERNAL_ROUTES: RouteRecord[] = [
   {
     path: '/twin-debug',
     shell: 'internal',
-    kind: 'canonical',
+    kind: 'production-blocked',
     guard: 'admin',
     note: 'Tenant diagnostics: exposes twin ids, raw query state and telemetry sources.',
   },
@@ -251,8 +253,48 @@ export const CANONICAL_ROUTES = ALL_ROUTES.filter((r) => r.kind === 'canonical')
 /** Routes compiled and mounted only in development builds. */
 export const DEV_ONLY_ROUTES = ALL_ROUTES.filter((r) => r.kind === 'dev-only');
 
-/** Paths that exist in production builds (dev-only mounts excluded). */
-export const PRODUCTION_ROUTES = ALL_ROUTES.filter((r) => r.kind !== 'dev-only');
+/** Paths that exist in production builds (local-only mounts excluded). */
+export const PRODUCTION_ROUTES = ALL_ROUTES.filter(
+  (route) => route.kind !== 'dev-only' && route.kind !== 'production-blocked',
+);
+
+/** Convert an absolute route pattern into a concrete-path matcher. */
+function routePatternToRegExp(pattern: string): RegExp {
+  const source = pattern
+    .split('/')
+    .map((segment) => {
+      if (segment === '*') return '.*';
+      if (segment.startsWith(':')) return '[^/]+';
+      return segment.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    })
+    .join('/');
+  return new RegExp(`^${source}/?$`);
+}
+
+/**
+ * Resolve the internal route that owns a concrete pathname.
+ *
+ * Exact declarations win over parameterised declarations. This matters for
+ * paths such as `/blueprint/preview`, which must not be mistaken for the
+ * canonical `/blueprint/:id` route.
+ */
+export function internalRouteForPathname(pathname: string): RouteRecord | null {
+  const normalized = pathname.replace(/\/+$/, '') || '/';
+  const absoluteRoutes = INTERNAL_ROUTES.filter((route) => route.path.startsWith('/'));
+  const exact = absoluteRoutes.find((route) => route.path === normalized);
+  if (exact) return exact;
+  return absoluteRoutes.find((route) => routePatternToRegExp(route.path).test(normalized)) ?? null;
+}
+
+/**
+ * True when a pathname is deliberately absent from the production route
+ * graph. Runtime wrappers must consult this authority before substituting an
+ * alternate renderer, otherwise they can accidentally remount blocked pages.
+ */
+export function isNonProductionInternalPathname(pathname: string): boolean {
+  const route = internalRouteForPathname(pathname);
+  return route?.kind === 'production-blocked' || route?.kind === 'dev-only';
+}
 
 export function isProductionRoute(path: string): boolean {
   return PRODUCTION_ROUTES.some((r) => r.path === path);

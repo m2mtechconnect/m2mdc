@@ -63,6 +63,37 @@ export function resolveTemplateBuildKind(input: {
 }
 
 /**
+ * Resolve a stored draft without trusting legacy `config.type` ahead of its
+ * durable product identity. Older facility drafts were sometimes persisted as
+ * `agent`; a bound twin or a facility-specific template is stronger evidence.
+ * Free-form goals and departments are deliberately excluded so a generic
+ * agent that merely discusses facilities is never reclassified.
+ */
+export function resolvePersistedBuildKind(input: {
+  configType?: unknown;
+  twinId?: unknown;
+  templateId?: unknown;
+}): BuildKind {
+  const explicit = normalizeBuildKind(input.configType);
+
+  // A non-default persisted kind is authoritative. In particular, a bound
+  // process twin remains a process twin instead of being collapsed to 3d_twin.
+  if (explicit && explicit !== DEFAULT_BUILD_KIND) return explicit;
+
+  // Legacy facility drafts were persisted as the default `agent`. A durable
+  // binding or immutable template id may repair that legacy value, but a
+  // free-form draft name must never change product identity.
+  if (typeof input.twinId === 'string' && input.twinId.trim()) return FACILITY_BUILD_KIND;
+
+  const templateIdentity = typeof input.templateId === 'string' ? input.templateId.toLowerCase() : '';
+  if (FACILITY_SIGNALS.some((signal) => templateIdentity.includes(signal))) {
+    return FACILITY_BUILD_KIND;
+  }
+
+  return explicit ?? DEFAULT_BUILD_KIND;
+}
+
+/**
  * Explicit facility identity signals. Deliberately narrow: a generic
  * "Operations" department is NOT a facility signal, so unrelated templates keep
  * the safe `agent` default.

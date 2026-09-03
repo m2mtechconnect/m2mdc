@@ -35,6 +35,25 @@ function expectEq(failures: string[], label: string, actual: unknown, expected: 
   if (actual !== expected) failures.push(`${label}: expected ${String(expected)}, got ${String(actual)}`);
 }
 
+function crossLayerViolations(testCase: Extract<TruthEvalCase, { kind: 'cross-layer-product-truth' }>): string[] {
+  const { scenario } = testCase;
+  const violations: string[] = [];
+  if (scenario.routeDisposition !== 'production' && scenario.alternateRendererMounted) {
+    violations.push('alternate-renderer-bypass');
+  }
+  if (!scenario.authoritativeFacilityId && scenario.emittedFacilityId) {
+    violations.push('implicit-facility-substitution');
+  }
+  if (
+    scenario.explicitBuildKind &&
+    scenario.explicitBuildKind !== 'agent' &&
+    scenario.resolvedBuildKind !== scenario.explicitBuildKind
+  ) {
+    violations.push('persisted-build-kind-overwrite');
+  }
+  return violations;
+}
+
 function runCase(testCase: TruthEvalCase): { result: TruthEvalCaseResult; cited: boolean } {
   const failures: string[] = [];
   let cited = false;
@@ -78,6 +97,10 @@ function runCase(testCase: TruthEvalCase): { result: TruthEvalCaseResult; cited:
       if (haystack.includes(needle.toLowerCase())) failures.push(`answer contains forbidden wording: ${needle}`);
     }
     cited = /\[[^\][]+ · [^\][]+\]/.test(answer);
+  } else if (testCase.kind === 'cross-layer-product-truth') {
+    const actual = crossLayerViolations(testCase).sort();
+    const expected = [...testCase.expect.violations].sort();
+    expectEq(failures, 'cross-layer violations', actual.join(','), expected.join(','));
   } else {
     const lesson = lessonById(testCase.lessonId);
     if (!lesson) {

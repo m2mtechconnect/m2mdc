@@ -6,8 +6,7 @@
  *
  *  1. /blueprint/preview and /simulation/preview were promoted into
  *     production_routes, then excluded again on 2026-08-27. They must stay
- *     production_blocked while remaining permission-guarded in the shipped
- *     router.
+ *     production_blocked and development-gated in the source router.
  *  2. teams-invite is recorded as unknown-blocked in the immutable
  *     edge-function-inventory.json and only reaches production-allowlisted
  *     through the additive edge-function-promotions.json overlay. Any consumer
@@ -64,11 +63,12 @@ describe('governance drift: preview surfaces', () => {
       expect(buckets).toHaveLength(1);
     });
 
-    it(`keeps ${route} behind a permission guard in the shipped router`, () => {
+    it(`keeps ${route} behind a development and permission guard`, () => {
       const declaration = shell
         .split('\n')
         .find((line) => line.includes(`path="${route}"`));
       expect(declaration, `expected ${route} to be declared in src/AuthenticatedShell.tsx`).toBeTruthy();
+      expect(declaration).toContain('import.meta.env.DEV');
       expect(declaration).toContain('PermissionRouteGuard');
       expect(declaration).toContain('permission="twin.view"');
     });

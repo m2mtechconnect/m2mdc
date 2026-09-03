@@ -18,6 +18,7 @@
     "verify:architecture-governance": "node scripts/audit-architecture-inventory.mjs --check --summary",
     "verify:schema-truth": "node scripts/schema-truth/verify-schema-truth.mjs",
     "verify:schema-truth:repository": "node scripts/schema-truth/verify-schema-truth.mjs --repository-only",
+    "capture:schema-truth:deployed": "node scripts/schema-truth/capture-deployed-schema.mjs --output=deployed-schema-snapshot.json",
     "verify:dsx-phase7": "node scripts/dsx-phase7-verify.mjs",
     "smoke:post-publish": "node scripts/post-publish-smoke.mjs",
     "test": "vitest run",
@@ -153,11 +154,13 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.67.0",
     "vite": "^7.3.6",
-    "ws": "8.21.0"
+    "ws": "8.21.0",
+    "yaml": "2.8.3"
   },
   "overrides": {
     "@humanfs/node": "0.16.8",
     "brace-expansion": "5.0.9",
+    "fflate": "0.8.3",
     "flatted": "3.4.4",
     "glob": "10.5.0",
     "lodash": "4.18.1",

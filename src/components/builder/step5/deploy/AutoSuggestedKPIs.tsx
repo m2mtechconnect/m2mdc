@@ -13,6 +13,7 @@ import {
   CheckCircle2, Plus, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import type { BuildKind } from '@/lib/builder/buildKind';
 
 interface KPI {
   id: string;
@@ -27,6 +28,7 @@ interface KPI {
 
 interface AutoSuggestedKPIsProps {
   industry: string;
+  productKind: BuildKind;
   existingKPIs: KPI[];
   onAddKPIs: (kpis: KPI[]) => void;
 }
@@ -65,8 +67,21 @@ const industryKPIs: Record<string, KPI[]> = {
   ]
 };
 
+const facilityKPIs: KPI[] = [
+  { id: 'pue', name: 'Power Usage Effectiveness', description: 'Facility energy-efficiency ratio from bound evidence', unit: 'ratio', direction: 'down', category: 'Efficiency' },
+  { id: 'rack-inlet-temperature', name: 'Rack Inlet Temperature', description: 'Rack inlet temperature from bound telemetry', unit: '°C', direction: 'down', category: 'Thermal' },
+  { id: 'power-capacity-utilization', name: 'Power Capacity Utilization', description: 'Used power capacity relative to the facility limit', unit: '%', direction: 'down', category: 'Capacity' },
+  { id: 'renewable-energy-share', name: 'Renewable Energy Share', description: 'Renewable share of facility energy from bound evidence', unit: '%', direction: 'up', category: 'Sustainability' },
+];
+
+export function recommendedKPIsFor(industry: string, productKind: BuildKind): KPI[] {
+  if (productKind === '3d_twin') return facilityKPIs;
+  return industryKPIs[industry] || industryKPIs.default;
+}
+
 export function AutoSuggestedKPIs({
   industry,
+  productKind,
   existingKPIs,
   onAddKPIs
 }: AutoSuggestedKPIsProps) {
@@ -74,12 +89,12 @@ export function AutoSuggestedKPIs({
   const [suggestions, setSuggestions] = useState<KPI[]>([]);
 
   useEffect(() => {
-    const recommended = industryKPIs[industry] || industryKPIs['default'];
+    const recommended = recommendedKPIsFor(industry, productKind);
     // Filter out KPIs that already exist
     const existingIds = new Set(existingKPIs.map(k => k.id));
     const filtered = recommended.filter(k => !existingIds.has(k.id));
     setSuggestions(filtered);
-  }, [industry, existingKPIs]);
+  }, [industry, productKind, existingKPIs]);
 
   const toggleKPI = (id: string) => {
     const newSelected = new Set(selectedKPIs);
@@ -114,7 +129,7 @@ export function AutoSuggestedKPIs({
         <CardContent>
           <div className="flex items-center gap-2 text-green-600">
             <CheckCircle2 className="h-5 w-5" />
-            <span>{existingKPIs.length} KPI(s) already configured for this agent.</span>
+            <span>{existingKPIs.length} KPI(s) already configured for this {productKind === '3d_twin' ? 'facility twin' : 'agent'}.</span>
           </div>
         </CardContent>
       </Card>
@@ -128,7 +143,7 @@ export function AutoSuggestedKPIs({
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
             <CardTitle className="text-lg">Recommended KPIs</CardTitle>
-            <Badge variant="secondary">{industry || 'General'}</Badge>
+            <Badge variant="secondary">{productKind === '3d_twin' ? 'Data centre' : industry || 'General'}</Badge>
           </div>
           <div className="flex gap-2">
             <Button
@@ -182,7 +197,9 @@ export function AutoSuggestedKPIs({
                   <div className="flex items-center gap-3 text-xs">
                     <Badge variant="outline" className="text-xs">{kpi.category}</Badge>
                     <span className="text-muted-foreground">
-                      {kpi.baseline} → {kpi.target} {kpi.unit}
+                      {kpi.baseline !== undefined && kpi.target !== undefined
+                        ? `${kpi.baseline} → ${kpi.target} ${kpi.unit}`
+                        : 'Baseline and target require facility evidence'}
                     </span>
                   </div>
                 </div>

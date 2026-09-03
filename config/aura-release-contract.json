@@ -15,6 +15,10 @@
   },
   "workflowGates": [
     {
+      "name": "AURA Deployment Drift",
+      "mode": "always"
+    },
+    {
       "name": "Production Perimeter",
       "mode": "always"
     },

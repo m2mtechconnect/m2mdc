@@ -1,0 +1,57 @@
+name: AURA Deployment Drift
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aura-deployment-drift-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  AURA_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+
+jobs:
+  deployment-drift:
+    name: Production schema and function parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.AURA_SOURCE_SHA }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.115.0
+
+      - name: Capture metadata-only deployed snapshot
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_CLI_PATH: supabase
+        run: node scripts/schema-truth/capture-deployed-schema.mjs --output=/tmp/aura-deployed-schema.json
+
+      - name: Compare exact-head repository, deployed schema, and function allowlist
+        run: node scripts/schema-truth/verify-schema-truth.mjs --deployed=/tmp/aura-deployed-schema.json
+
+      - name: Upload metadata-only drift evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: aura-deployment-drift-${{ env.AURA_SOURCE_SHA }}
+          path: /tmp/aura-deployed-schema.json
+          if-no-files-found: error
+          retention-days: 30

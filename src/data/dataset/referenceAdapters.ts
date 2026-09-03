@@ -109,20 +109,6 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
     ],
   }),
   adapter({
-    path: '/blueprint/preview',
-    pageId: 'blueprint-preview',
-    pageTitle: 'Blueprint Preview',
-    navGroup: 'design',
-    userJob: 'Read the resolved model without entering the editor.',
-    showConfigurationSelector: true,
-    exportStem: 'aura-blueprint-preview',
-    assistantContext: 'Resolved specification and configuration values only.',
-    tabs: [
-      { id: 'resolved', label: 'Resolved values', sections: ['specifications', 'configurations'], intent: 'Read-only resolution of the selected reference configuration.' },
-    ],
-    workflowLimitations: ['Editing is unavailable here: preview is read-only in every dataset, by design.'],
-  }),
-  adapter({
     path: '/data-centre-twin/:id/blueprint',
     pageId: 'twin-blueprint',
     pageTitle: 'Twin Blueprint',
@@ -175,21 +161,6 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
     workflowLimitations: [
       'Execution is refused, not approximated, when a required engineering input is unavailable: no value is substituted.',
     ],
-  }),
-  adapter({
-    path: '/simulation/preview',
-    pageId: 'simulation-preview',
-    pageTitle: 'Simulation Preview',
-    navGroup: 'simulate',
-    userJob: 'Preview a scenario and its lineage without executing it.',
-    showConfigurationSelector: true,
-    exportStem: 'aura-simulation-preview',
-    assistantContext: 'Scenario definitions and prospective run lineage.',
-    tabs: [
-      { id: 'scenarios', label: 'Scenarios', sections: ['scenarios'], intent: 'Scenario records in the reference dataset.' },
-      { id: 'lineage', label: 'Prospective lineage', sections: ['run-lineage'], intent: 'What a run would record, or why it would be blocked.' },
-    ],
-    workflowLimitations: ['Nothing is persisted here: preview never writes a run record.'],
   }),
   adapter({
     path: '/analytics',
@@ -274,22 +245,6 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
     ],
   }),
   adapter({
-    path: '/deploy',
-    pageId: 'deploy',
-    pageTitle: 'Deployment Lanes',
-    navGroup: 'govern',
-    userJob: 'Promote a validated design.',
-    showConfigurationSelector: false,
-    exportStem: 'aura-deployment-lanes',
-    assistantContext: 'Deployment eligibility only.',
-    tabs: [
-      { id: 'eligibility', label: 'Eligibility', sections: ['deployments'], intent: 'Why nothing in this dataset is deployable.' },
-    ],
-    workflowLimitations: [
-      'Deployment is refused: a reference facility is not commissioned and cannot be a deployment target.',
-    ],
-  }),
-  adapter({
     path: '/deployments',
     pageId: 'deployments',
     pageTitle: 'Deployment History',
@@ -302,21 +257,6 @@ export const REFERENCE_ADAPTERS: readonly ReferenceAdapter[] = [
       { id: 'history', label: 'History', sections: ['deployments'], intent: 'No deployment exists against reference data; the empty state is truthful, not a loading state.' },
     ],
     workflowLimitations: [],
-  }),
-  adapter({
-    path: '/admin/asset-pipeline',
-    pageId: 'asset-pipeline',
-    pageTitle: 'Asset Pipeline',
-    navGroup: 'govern',
-    userJob: 'Track asset ingestion and publication.',
-    showConfigurationSelector: false,
-    exportStem: 'aura-asset-pipeline',
-    assistantContext: 'Asset provenance only.',
-    tabs: [
-      { id: 'assets', label: 'Assets', sections: ['assets'], intent: 'OpenUSD-derived asset provenance, reported as provenance rather than DSX integration.' },
-      { id: 'blockers', label: 'Blockers', sections: ['ngc'], intent: 'Source availability.' },
-    ],
-    workflowLimitations: ['Publication actions are not shown here: asset publication stays with the legacy pipeline and is not driven by the dataset selector.'],
   }),
   adapter({
     path: '/help',

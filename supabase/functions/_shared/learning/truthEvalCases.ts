@@ -15,7 +15,12 @@
 export const TRUTH_EVAL_SUITE_ID = 'aura-truth-invariants';
 export const TRUTH_EVAL_DATA_CLASS = 'synthetic-evaluation-data';
 
-export type TruthEvalKind = 'viewport-claim' | 'run-provenance' | 'null-run-wording' | 'lesson-integrity';
+export type TruthEvalKind =
+  | 'viewport-claim'
+  | 'run-provenance'
+  | 'null-run-wording'
+  | 'lesson-integrity'
+  | 'cross-layer-product-truth';
 
 export interface ViewportEvalCase {
   id: string;
@@ -54,18 +59,35 @@ export interface LessonIntegrityEvalCase {
   expect: { active: boolean; invariantMustMention: string[] };
 }
 
+export interface CrossLayerProductTruthEvalCase {
+  id: string;
+  kind: 'cross-layer-product-truth';
+  title: string;
+  scenario: {
+    routeDisposition: 'production' | 'production-blocked' | 'dev-only';
+    alternateRendererMounted: boolean;
+    authoritativeFacilityId: string | null;
+    emittedFacilityId: string | null;
+    explicitBuildKind: 'agent' | 'process_twin' | '3d_twin' | null;
+    resolvedBuildKind: 'agent' | 'process_twin' | '3d_twin';
+  };
+  expect: { violations: string[] };
+}
+
 export type TruthEvalCase = (
   | ViewportEvalCase
   | RunProvenanceEvalCase
   | NullRunWordingEvalCase
   | LessonIntegrityEvalCase
+  | CrossLayerProductTruthEvalCase
 ) & { dataClass: typeof TRUTH_EVAL_DATA_CLASS };
 
 type TruthEvalCaseInput =
   | ViewportEvalCase
   | RunProvenanceEvalCase
   | NullRunWordingEvalCase
-  | LessonIntegrityEvalCase;
+  | LessonIntegrityEvalCase
+  | CrossLayerProductTruthEvalCase;
 
 const VALID_UUID = '11111111-2222-4333-8444-555555555555';
 const OTHER_UUID = '99999999-8888-4777-8666-555555555555';
@@ -217,6 +239,92 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
       active: true,
       invariantMustMention: ['yaml', 'heredoc', 'column zero', 'contract test'],
     },
+  },
+  {
+    id: 'lesson-cross-layer-product-truth-active',
+    kind: 'lesson-integrity',
+    title: 'The cross-layer product-truth lesson is active and encodes the missed mechanism',
+    lessonId: 'cross-layer-product-truth-parity.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['persisted product identity', 'route mount', 'production build', 'stale fixture', 'fail closed'],
+      guidanceMustMention: ['redirect aliases', 'generated screenshot evidence', 'explicit active facility fixture'],
+    },
+  },
+  {
+    id: 'lesson-canonical-schema-lineage-active',
+    kind: 'lesson-integrity',
+    title: 'The canonical schema-lineage lesson rejects aliases without a relationship and migration contract',
+    lessonId: 'canonical-schema-lineage-before-aliases.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['generated type', 'tenant path', 'compatibility mapping', 'deployed schema'],
+      guidanceMustMention: ['additive mapping', 'consumer cutover', 'unverified'],
+    },
+  },
+  {
+    id: 'lesson-retirement-runtime-data-proof-active',
+    kind: 'lesson-integrity',
+    title: 'The retirement lesson requires runtime, data, tenant and rollback evidence',
+    lessonId: 'retirement-needs-runtime-and-data-proof.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['retirement candidate', 'production observation', 'stored-data', 'rollback'],
+      guidanceMustMention: ['candidate ledger', 'quarantine', 'applied migrations', 'blocker'],
+    },
+  },
+  {
+    id: 'lesson-dataset-lineage-active',
+    kind: 'lesson-integrity',
+    title: 'The dataset-lineage lesson separates reviewed, synthetic, tenant and training data',
+    lessonId: 'dataset-lineage-source-to-provenance.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['source', 'chunk', 'dataset version', 'separate data classes'],
+      guidanceMustMention: ['object storage', 'synthetic evaluation fixtures', 'unverified'],
+    },
+  },
+  {
+    id: 'cross-layer-original-alternate-renderer-and-demo-fallback',
+    kind: 'cross-layer-product-truth',
+    title: 'A blocked route renderer and implicit demo scope reproduce the original miss',
+    scenario: {
+      routeDisposition: 'production-blocked',
+      alternateRendererMounted: true,
+      authoritativeFacilityId: null,
+      emittedFacilityId: 'aura-reference-facility',
+      explicitBuildKind: null,
+      resolvedBuildKind: 'agent',
+    },
+    expect: { violations: ['alternate-renderer-bypass', 'implicit-facility-substitution'] },
+  },
+  {
+    id: 'cross-layer-analogous-persisted-identity-overwrite',
+    kind: 'cross-layer-product-truth',
+    title: 'A bound process twin cannot be collapsed into a different build kind',
+    scenario: {
+      routeDisposition: 'production',
+      alternateRendererMounted: false,
+      authoritativeFacilityId: 'facility-123',
+      emittedFacilityId: 'facility-123',
+      explicitBuildKind: 'process_twin',
+      resolvedBuildKind: '3d_twin',
+    },
+    expect: { violations: ['persisted-build-kind-overwrite'] },
+  },
+  {
+    id: 'cross-layer-adversarial-valid-production-context',
+    kind: 'cross-layer-product-truth',
+    title: 'A valid production renderer and authoritative facility are not false positives',
+    scenario: {
+      routeDisposition: 'production',
+      alternateRendererMounted: true,
+      authoritativeFacilityId: 'facility-123',
+      emittedFacilityId: 'facility-123',
+      explicitBuildKind: 'process_twin',
+      resolvedBuildKind: 'process_twin',
+    },
+    expect: { violations: [] },
   },
 ];
 

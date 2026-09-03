@@ -15,9 +15,17 @@ is stale. The result also records the exact audited `HEAD`.
 
 Release qualification requires `--deployed=<snapshot.json>` or the
 `AURA_DEPLOYED_SCHEMA_SNAPSHOT` environment variable. The authorized metadata-only
-snapshot must use schema `aura.deployed-schema.v1`, identify the exact audited HEAD in
-`sourceSha`, contain an ISO `capturedAt`, and provide sorted `tables`, `views`, and
-`functions` arrays. Missing or stale deployed evidence fails closed.
+snapshot must use schema `aura.deployed-schema.v2`, identify the exact audited HEAD in
+`sourceSha`, contain an ISO `capturedAt`, match the reviewed production project in
+`config/aura-production-target.json`, and provide sorted `tables`, `views`, database
+`functions`, and deployed `edgeFunctions` arrays. The Edge Function inventory must
+exactly match the default-deny production allowlist. Missing, stale, or wrong-project
+evidence fails closed.
+
+CI captures the snapshot with `scripts/schema-truth/capture-deployed-schema.mjs` using
+the Supabase CLI and a repository secret named `SUPABASE_ACCESS_TOKEN`. The collector
+writes metadata names only. It never writes the token, credentials, rows, or customer
+data to the artifact.
 
 For local repository consistency only, run
 `node scripts/schema-truth/verify-schema-truth.mjs --repository-only`. Its verdict is

@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "f2af3cc3781e4fde61226776ab264d72c0842be0",
-    "workflowRunId": 33629286801,
-    "artifactId": 9846158523,
-    "artifactZipSha256": "8c96c9510d1d896be19c0b8743021a1765f83a1bf1c3552a39e02c90813dc71a"
+    "sha": "02b400fd04d0735cad6d2a30a190dd97cd40ac33",
+    "workflowRunId": 33710953631,
+    "artifactId": 9876939680,
+    "artifactZipSha256": "cba6b4ef34e35b6ab0ef50321b45c83b61e4d607049eeb6bab9f991ba47a54e1"
   },
   "notes": [
     "PR #127 exact-head review approved intentional changes on analytics desktop/mobile, Builder deployment readiness, and Connections desktop/mobile. The reviewed artifact showed one readiness heading, corrected Connections ownership, visible provenance labels without trend overlap, and no duplicate inspector close control.",
@@ -36,13 +36,14 @@
     "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact.",
     "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract.",
     "2026-09-02 exact-head qualification inspected all 20 screenshots from Visual Regression workflow 33625703952 at source 49919a2ddc6217cc702c3801bd2c1b6c51887d04. The first candidate artifact was rejected after review exposed a repeated organization suffix. The corrected artifact 9844751169 was then visibly reviewed: activation desktop/mobile remain fail-closed with explicit persisted-evidence blockers, Builder deployment readiness exposes the missing KPI and server-validated simulation requirements, and Command Center desktop/mobile show the persona priority journey without duplicated scope copy, clipped primary controls, overlap or page-level horizontal overflow. The other 15 fingerprints remained exact or retained their approved responsive invariant.",
-    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not."
+    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not.",
+    "2026-09-03 exact-head review inspected all 20 screenshots from workflow 33710953631 at source 02b400fd04d0735cad6d2a30a190dd97cd40ac33. Eighteen retained their approved fingerprints or responsive invariant. Activation now visibly blocks on persisted objective, industry, department, response-profile/KPI and successful server-validated simulation prerequisites. Evidence now explicitly reports that no active facility is selected and refuses to substitute demonstration values. Both intentional fail-closed states were reviewed with coherent navigation, readable copy and no blocking clipping or overlap before approving their exact fingerprints."
   ],
   "screenshots": [
     {
       "file": "activation-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "84034c17cb897c5884a7e34117bd52a1821f8c4fb8dc86d7e0d29787ba0a9405",
+      "sha256": "e6e9c4453cbe2f742bb20d95c4e17d8bdcd3f34564d84c68e4f2c8082df7eecc",
       "width": 1280,
       "height": 1745
     },
@@ -147,7 +148,7 @@
     {
       "file": "evidence-overview-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c1473dd43a9ed5e1ca342f665d02f475d88ca2d8f3458871837f32151ac2c28e",
+      "sha256": "167f9f4ba2a7cf4920db38a86c8595ed1a545701d1b95e57a1757fffc7f9c235",
       "width": 1280,
       "height": 720
     },

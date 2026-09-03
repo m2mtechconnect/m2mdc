@@ -252,6 +252,39 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
     },
   },
   {
+    id: 'lesson-canonical-schema-lineage-active',
+    kind: 'lesson-integrity',
+    title: 'The canonical schema-lineage lesson rejects aliases without a relationship and migration contract',
+    lessonId: 'canonical-schema-lineage-before-aliases.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['generated type', 'tenant path', 'compatibility mapping', 'deployed schema'],
+      guidanceMustMention: ['additive mapping', 'consumer cutover', 'unverified'],
+    },
+  },
+  {
+    id: 'lesson-retirement-runtime-data-proof-active',
+    kind: 'lesson-integrity',
+    title: 'The retirement lesson requires runtime, data, tenant and rollback evidence',
+    lessonId: 'retirement-needs-runtime-and-data-proof.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['retirement candidate', 'production observation', 'stored-data', 'rollback'],
+      guidanceMustMention: ['candidate ledger', 'quarantine', 'applied migrations', 'blocker'],
+    },
+  },
+  {
+    id: 'lesson-dataset-lineage-active',
+    kind: 'lesson-integrity',
+    title: 'The dataset-lineage lesson separates reviewed, synthetic, tenant and training data',
+    lessonId: 'dataset-lineage-source-to-provenance.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['source', 'chunk', 'dataset version', 'separate data classes'],
+      guidanceMustMention: ['object storage', 'synthetic evaluation fixtures', 'unverified'],
+    },
+  },
+  {
     id: 'cross-layer-original-alternate-renderer-and-demo-fallback',
     kind: 'cross-layer-product-truth',
     title: 'A blocked route renderer and implicit demo scope reproduce the original miss',

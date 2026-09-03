@@ -45,7 +45,7 @@ describe('ref-transparency lesson registration', () => {
 
   it('the registry version was bumped for the new lesson', () => {
     // Bumped again when the cross-layer lesson gained cross-suite authority parity.
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-03.1');
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-03.2');
   });
 
 

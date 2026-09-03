@@ -81,7 +81,7 @@ describe('release workflow shell-syntax governed lesson', () => {
 
   it('is reviewed, active, versioned and keeps the registry valid', () => {
     const lesson = lessonById(lessonId);
-    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-03.1');
+    expect(LESSON_REGISTRY_VERSION).toBe('2026-09-03.2');
     expect(lesson?.status).toBe('active');
     expect(lesson?.origin).toBe('confirmed-miss');
     expect(lesson?.dataClass).toBe('reviewed-lesson');

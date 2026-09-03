@@ -1,0 +1,150 @@
+{
+  "schemaVersion": "aura.cleanup-candidate-ledger.v1",
+  "auditedCommit": "66e8053a191d0e6ec1c7fb018ad8ca5c0013a7d5",
+  "generatedFrom": "scripts/audit-architecture-inventory.mjs",
+  "status": "candidate-inventory-only",
+  "destructiveActionsAuthorized": false,
+  "requiredEvidence": [
+    "static-and-dynamic-consumers",
+    "route-registry-and-deployment-configuration",
+    "schedules-webhooks-and-external-consumers",
+    "production-observation-window",
+    "stored-data-row-age-retention-and-tenant-profile",
+    "replacement-and-compatibility-effects",
+    "rollback-and-export-plan",
+    "exact-head-clean-replay-and-qualification"
+  ],
+  "summary": {
+    "runtimeSourceFiles": 1075,
+    "staticallyReachableRuntimeSourceFiles": 899,
+    "unreachableRuntimeCandidates": 176,
+    "tables": 140,
+    "runtimeUntouchedTables": 28,
+    "isolatedTableCandidates": 12,
+    "edgeFunctionDirectories": 165,
+    "directEdgeFunctionInvocations": 42,
+    "declaredProductionFunctions": 23
+  },
+  "candidates": [
+    {
+      "id": "legacy-knowledge-index-function",
+      "kind": "edge-function",
+      "physicalName": "knowledge-index",
+      "disposition": "rebuild-or-retire",
+      "deletionReady": false,
+      "observedEvidence": [
+        "not-in-production-function-allowlist",
+        "only-known-ui-caller-is-production-blocked",
+        "auth-comment-and-handler-level-disagree",
+        "accepts-caller-supplied-user-id",
+        "labels-embedding-model-without-computing-embedding"
+      ],
+      "observedProductionEvidence": ["absent-from-eight-function-deployed-inventory-2026-09-03"],
+      "missingEvidence": ["invocation-log-observation-window", "external-consumers", "stored-data-impact"],
+      "replacement": "canonical authenticated knowledge-ingestion service"
+    },
+    {
+      "id": "legacy-langgraph-upsert-doc-function",
+      "kind": "edge-function",
+      "physicalName": "langgraph-upsert-doc",
+      "disposition": "retire-behind-replacement",
+      "deletionReady": false,
+      "observedEvidence": ["not-in-production-function-allowlist", "no-static-in-repository-caller", "embedding-generation-is-placeholder"],
+      "observedProductionEvidence": ["absent-from-eight-function-deployed-inventory-2026-09-03", "rag-documents-absent-from-live-public-schema-2026-09-03"],
+      "missingEvidence": ["invocation-log-observation-window", "external-consumers", "historical-data-and-rollback-impact"],
+      "replacement": "canonical source-document-chunk ingestion service"
+    },
+    {
+      "id": "legacy-langgraph-search-docs-function",
+      "kind": "edge-function",
+      "physicalName": "langgraph-search-docs",
+      "disposition": "retire-behind-replacement",
+      "deletionReady": false,
+      "observedEvidence": ["not-in-production-function-allowlist", "embedding-search-is-placeholder", "unused-ai-key-precondition"],
+      "observedProductionEvidence": ["absent-from-eight-function-deployed-inventory-2026-09-03"],
+      "missingEvidence": ["invocation-log-observation-window", "external-consumers"],
+      "replacement": "canonical tenant-scoped retrieval service"
+    },
+    {
+      "id": "knowledge-upload-function",
+      "kind": "edge-function",
+      "physicalName": "knowledge-upload",
+      "disposition": "consolidate",
+      "deletionReady": false,
+      "observedEvidence": ["not-in-production-function-allowlist", "authenticated-handler", "no-static-in-repository-caller"],
+      "observedProductionEvidence": ["absent-from-eight-function-deployed-inventory-2026-09-03"],
+      "missingEvidence": ["invocation-log-observation-window", "external-consumers", "uploaded-object-retention"],
+      "replacement": "canonical authenticated knowledge-ingestion service"
+    },
+    {
+      "id": "parallel-rag-table-families",
+      "kind": "database-family",
+      "physicalName": "knowledge_sources|content_embeddings|rag_items|rag_chunks|rag_documents",
+      "disposition": "freeze-and-profile",
+      "deletionReady": false,
+      "observedEvidence": ["overlapping-source-document-chunk-lifecycles", "mixed-vector-dimensions", "separate-consumer-families"],
+      "observedProductionEvidence": ["all-five-family-tables-absent-from-live-public-schema-2026-09-03"],
+      "missingEvidence": ["full-deployed-schema-diff", "historical-data-and-retention-impact", "external-consumers", "backfill-checksums", "rollback"],
+      "replacement": "canonical source-document-chunk-dataset-provenance contract"
+    },
+    {
+      "id": "isolated-table-candidates",
+      "kind": "database-candidate-set",
+      "physicalName": "12 exact-head isolated candidates",
+      "members": [
+        "ai_recommendations_cache",
+        "asset_canary_events",
+        "capture_cache",
+        "dsx_asset_mappings",
+        "dsx_events_quarantine",
+        "dsx_gateway_heartbeats",
+        "dsx_ingestion_audit",
+        "industry_agents",
+        "m2m_templates",
+        "public_intake_rate_limits",
+        "role_change_audit",
+        "search_analytics"
+      ],
+      "disposition": "investigate",
+      "deletionReady": false,
+      "observedEvidence": ["no-resolved-runtime-consumer", "no-generated-incoming-or-outgoing-relationship"],
+      "observedProductionEvidence": {
+        "presentAndEmpty": ["ai_recommendations_cache", "asset_canary_events", "industry_agents", "search_analytics"],
+        "absentFromLivePublicSchema": ["capture_cache", "dsx_asset_mappings", "dsx_events_quarantine", "dsx_gateway_heartbeats", "dsx_ingestion_audit", "m2m_templates", "public_intake_rate_limits", "role_change_audit"],
+        "observedAt": "2026-09-03"
+      },
+      "missingEvidence": ["sql-only-consumers", "jobs-and-webhooks", "external-consumers", "retention-and-tenant-impact", "rollback"],
+      "replacement": null
+    },
+    {
+      "id": "unreachable-runtime-source-candidates",
+      "kind": "source-candidate-set",
+      "physicalName": "176 exact-head static reachability candidates",
+      "disposition": "classify-in-small-batches",
+      "deletionReady": false,
+      "observedEvidence": ["not-reachable-from-current-static-runtime-entrypoints"],
+      "missingEvidence": ["dynamic-imports", "registries", "generated-loading", "tests-and-fixtures", "deployment-entrypoints", "external-contracts"],
+      "replacement": null
+    },
+    {
+      "id": "parallel-context-module-trees",
+      "kind": "source-family",
+      "physicalName": "src/context|src/contexts",
+      "disposition": "consolidate-through-public-adapter",
+      "deletionReady": false,
+      "observedEvidence": ["parallel-ownership-trees"],
+      "missingEvidence": ["complete-import-graph", "runtime-consumers", "cycle-analysis", "compatibility-surface", "rollback"],
+      "replacement": "one domain-owned context public interface"
+    },
+    {
+      "id": "applied-migrations",
+      "kind": "database-history",
+      "physicalName": "supabase/migrations",
+      "disposition": "keep",
+      "deletionReady": false,
+      "observedEvidence": ["immutable-deployment-history-and-clean-replay-input"],
+      "missingEvidence": [],
+      "replacement": "forward repair migrations only"
+    }
+  ]
+}

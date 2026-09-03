@@ -9,7 +9,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-03.1';
+export const LESSON_REGISTRY_VERSION = '2026-09-03.2';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -193,6 +193,102 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     dataClass: 'reviewed-lesson',
     reviewedBy: 'AURA engineering review',
     reviewedAt: '2026-09-02T21:15:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'canonical-schema-lineage-before-aliases.v1',
+    version: 1,
+    title: 'Canonical schema lineage precedes new tables, aliases and frontend contracts',
+    status: 'active',
+    origin: 'review',
+    invariant:
+      'A database or API concept is canonical only when its physical table or function, generated type, server contract, frontend model, tests and documentation use one declared vocabulary and one visible relationship path. A new synonym, nullable ownership key or logical foreign key is unresolved architecture until the canonical authority, tenant path, indexed lookup, integrity enforcement, compatibility mapping and migration sequence are documented. Generated types and static diagrams describe repository state but do not prove the deployed schema.',
+    guidance:
+      'Before proposing a table, relationship or API name, trace the concept from migration and generated database type through server consumer, frontend consumer, tests and product wording. Prefer the existing canonical entity when it owns the same lifecycle. If compatibility requires an alias, name the canonical authority and publish an additive mapping, backfill validation, consumer cutover, observation window and delayed retirement. Mark missing deployed-schema or tenant-integrity evidence as unverified rather than inventing a relationship.',
+    citations: [
+      'docs/architecture/aura-super-agent-data-and-cleanup-audit-2026-09-03.md#canonical-product-data-relationship',
+      'docs/architecture/schema-and-code-retirement-ledger-2026-08-30.md',
+      'scripts/audit-architecture-inventory.mjs',
+      'src/integrations/supabase/types.ts',
+    ],
+    triggers: [
+      'schema naming',
+      'table naming',
+      'foreign key',
+      'database relationship',
+      'generated types',
+      'canonical table',
+      'duplicate table',
+      'tenant key',
+      'data model',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-03T14:35:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'retirement-needs-runtime-and-data-proof.v1',
+    version: 1,
+    title: 'Static reachability creates a retirement candidate, never deletion proof',
+    status: 'active',
+    origin: 'review',
+    invariant:
+      'An unreferenced source file, Edge Function, route, table, RPC, policy or fixture is only a retirement candidate. Safe removal requires static and dynamic consumer evidence, route and registry exposure, deployment configuration, schedules and webhooks, external clients, production observation, stored-data and retention analysis, tenant impact, replacement, compatibility effects and rollback. Applied migrations remain immutable history even after the objects they introduced are retired.',
+    guidance:
+      'When asked to clean old code or database objects, produce a candidate ledger with owner, evidence, missing proof, replacement and phase. Quarantine first, consolidate through a stable public contract, observe the cutover and remove only a small verified batch after every required gate is green. Report static reachability counts as investigation signals. Keep applied migrations and mark absent deployment, external-consumer, data-profile or rollback evidence as a blocker.',
+    citations: [
+      'docs/architecture/aura-super-agent-data-and-cleanup-audit-2026-09-03.md#cleanup-plan',
+      'docs/architecture/aura-cleanup-candidate-ledger-2026-09-03.json',
+      'scripts/audit-architecture-inventory.mjs',
+      'docs/adr/0008-domain-data-and-retirement-governance.md',
+    ],
+    triggers: [
+      'dead code',
+      'delete old code',
+      'cleanup',
+      'unused table',
+      'orphan function',
+      'retire migration',
+      'unreachable file',
+      'remove legacy',
+      'code hygiene',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-03T14:35:00.000Z',
+    supersedes: null,
+  } as AuraLesson),
+  Object.freeze({
+    id: 'dataset-lineage-source-to-provenance.v1',
+    version: 1,
+    title: 'AI datasets retain source-to-response lineage and explicit data class',
+    status: 'active',
+    origin: 'review',
+    invariant:
+      'Knowledge and machine-learning material is trustworthy only when source, document, chunk, embedding, dataset version and response provenance remain linked through immutable identifiers and checksums. Every item carries organization or user authority, data class, consent or license basis, redaction state, retention, parser and embedding versions, quality result and deletion state. Synthetic evaluation data, operational telemetry, tenant content, reviewed lessons and fine-tuning exports are separate data classes and never silently flow into one another.',
+    guidance:
+      'For knowledge ingestion or model-dataset work, describe the complete source-to-document-to-chunk-to-embedding-to-response lineage. Store large approved artifacts in versioned object storage and keep ownership, checksums, relationships, approvals, embeddings and provenance in the database. Keep reviewed lessons and synthetic evaluation fixtures code-owned. If a stage is a placeholder or its model availability is not observed, label it incomplete or unverified; do not describe retrieval data as model training.',
+    citations: [
+      'docs/architecture/aura-super-agent-data-and-cleanup-audit-2026-09-03.md#proposed-canonical-knowledge-and-dataset-contract',
+      'docs/adr/0010-governed-ui-patterns-and-synthetic-evaluation-data.md',
+      'supabase/functions/_shared/learning/feedbackContract.ts',
+      'supabase/functions/_shared/learning/responseProvenance.ts',
+    ],
+    triggers: [
+      'machine learning dataset',
+      'training data',
+      'rag storage',
+      'embedding storage',
+      'dataset lineage',
+      'knowledge chunks',
+      'model provenance',
+      'fine tuning',
+      'synthetic data',
+    ],
+    dataClass: 'reviewed-lesson',
+    reviewedBy: 'AURA engineering review',
+    reviewedAt: '2026-09-03T14:35:00.000Z',
     supersedes: null,
   } as AuraLesson),
 ]);

@@ -10,13 +10,13 @@ describe('dependency security overrides', () => {
       overrides?: Record<string, string>;
     };
 
-    expect(packageJson.overrides?.fflate).toBe('0.8.2');
+    expect(packageJson.overrides?.fflate).toBe('0.8.3');
   });
 
   it('resolves the fflate override in the Bun lockfile', () => {
     const lockfile = read('bun.lock');
 
-    expect(lockfile).toContain('"fflate": ["fflate@0.8.2"');
+    expect(lockfile).toContain('"fflate": ["fflate@0.8.3"');
     expect(lockfile).not.toContain('"fflate": ["fflate@0.6.10"');
   });
 });

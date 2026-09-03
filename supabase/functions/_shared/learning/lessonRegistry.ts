@@ -9,7 +9,7 @@
  */
 import { lessonSetDigest, validateLesson, type AuraLesson } from './lessonTypes.ts';
 
-export const LESSON_REGISTRY_VERSION = '2026-09-02.4';
+export const LESSON_REGISTRY_VERSION = '2026-09-03.1';
 
 const LESSONS: readonly AuraLesson[] = Object.freeze([
   Object.freeze({
@@ -163,7 +163,7 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
     invariant:
       'A successful component test or policy classification never proves end-to-end product truth. For every changed feature, the persisted product identity and facility binding, backend query and authorization path, frontend route mount and navigation, UI labels and unavailable states, synthetic evaluation, production build artifact and runtime journey must describe the same capability. Unit, integration, visual and browser-journey contracts must encode the same authority rule; a stale fixture that requires a fallback forbidden by the runtime is a release failure, not permission to weaken the runtime. A production-blocked route must be absent from the production build, an unbound facility product must never borrow generic agent evidence, and missing authoritative context must fail closed rather than substitute a demonstration dataset or invented value.',
     guidance:
-      'Before calling an AURA change complete, build a cross-layer trace from persona intent to persisted identity, authorized data source, API/function, UI state, route/navigation, production artifact and runtime evidence. When an authority or fallback rule changes, search for every assertion of the replaced state or label and sweep every unit, integration, visual and browser-journey assertion in the same change, including redirect aliases and generated screenshot evidence; reject contradictory expectations before CI. Test the exact, analogous and adversarial cases. Treat a taxonomy label without a build-time guard, a UI card without a bound dataset, a stale fixture that invents context, or a passing mocked journey without verified backend evidence as incomplete. Persist every confirmed miss as a focused regression and synthetic lesson evaluation. This governed learning adds reviewed guidance only; it does not perform autonomous model-weight training or change production configuration.',
+      'Before calling an AURA change complete, build a cross-layer trace from persona intent to persisted identity, authorized data source, API/function, UI state, route/navigation, production artifact and runtime evidence. When an authority or fallback rule changes, search for every assertion of the replaced state or label and sweep every unit, integration, visual and browser-journey assertion in the same change, including redirect aliases and generated screenshot evidence; reject contradictory expectations before CI. A test for facility-bound content must create an explicit active facility fixture, while a test without authoritative facility context must assert the fail-closed state. Test the exact, analogous and adversarial cases. Treat a taxonomy label without a build-time guard, a UI card without a bound dataset, a stale fixture that invents context, or a passing mocked journey without verified backend evidence as incomplete. Persist every confirmed miss as a focused regression and synthetic lesson evaluation. This governed learning adds reviewed guidance only; it does not perform autonomous model-weight training or change production configuration.',
     citations: [
       'scripts/verify-production-perimeter.mjs#NEG-A',
       'src/dsx/runtime/evidenceFacilityScope.ts',
@@ -173,6 +173,8 @@ const LESSONS: readonly AuraLesson[] = Object.freeze([
       'tests/visual/snapshots.spec.ts#expectLifecycleNavigation',
       'tests/truth-in-ui/auth-surfaces.spec.ts#/infrastructure',
       'tests/truth-in-ui/screenshots.spec.ts#infrastructure',
+      'tests/truth-in-ui/_setup/supabase-mock.ts#installDsxSupabaseMock',
+      'tests/truth-in-ui/navigation-click-audit.spec.ts#expectEvidenceContext',
     ],
     triggers: [
       'end to end',

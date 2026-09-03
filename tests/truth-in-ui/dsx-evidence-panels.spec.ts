@@ -3,7 +3,7 @@
  * quality bar, exceptions, diagrams) rather than placeholder content.
  */
 import { test, expect } from './_setup/fixtures';
-import { installSupabaseMock } from './_setup/supabase-mock';
+import { installDsxSupabaseMock } from './_setup/supabase-mock';
 
 const CASES: { path: string; testIds: string[] }[] = [
   { path: '/evidence/overview', testIds: ['dsx-rack-map-panel', 'dsx-trend-strip', 'dsx-evidence-quality'] },
@@ -19,7 +19,7 @@ const CASES: { path: string; testIds: string[] }[] = [
 
 for (const c of CASES) {
   test(`evidence panels render on ${c.path}`, async ({ page }) => {
-    await installSupabaseMock(page);
+    await installDsxSupabaseMock(page);
     await page.goto(c.path, { waitUntil: 'domcontentloaded' });
     for (const id of c.testIds) {
       await expect(page.getByTestId(id).first()).toBeVisible({ timeout: 15_000 });

@@ -110,7 +110,15 @@ test.describe('Auth-gated surfaces — mocked session, zero external egress', ()
     await goto(page, '/infrastructure', mock);
     await assertNoLive(page);
     await expect(page).toHaveURL(/\/evidence\/assets(?:\?.*)?$/);
-    await expect(page.getByRole('heading', { name: 'Registry health' })).toBeVisible();
+    // This mock does not establish an authoritative active facility. The
+    // canonical Evidence route must therefore fail closed instead of rendering
+    // a synthetic asset registry from an implicit reference facility.
+    await expect(
+      page.getByRole('heading', { name: 'Evidence unavailable for this facility', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByTestId('dsx-active-facility')).toContainText('no active facility selected', {
+      ignoreCase: true,
+    });
     await expect(page.getByTestId('infrastructure-operational-metrics')).toHaveCount(0);
     void guard;
   });

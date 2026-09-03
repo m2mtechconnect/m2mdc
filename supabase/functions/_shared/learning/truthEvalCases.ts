@@ -248,6 +248,7 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
     expect: {
       active: true,
       invariantMustMention: ['persisted product identity', 'route mount', 'production build', 'stale fixture', 'fail closed'],
+      guidanceMustMention: ['redirect aliases', 'generated screenshot evidence'],
     },
   },
   {

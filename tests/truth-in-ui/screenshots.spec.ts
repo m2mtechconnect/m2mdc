@@ -291,7 +291,15 @@ test.describe('Phase 1A.3.f — Auth-gated surfaces', () => {
     await page.goto('/infrastructure', { waitUntil: 'domcontentloaded' });
     await expect.poll(() => mock.profileHits(), { timeout: 5_000 }).toBeGreaterThan(0);
     await expect(page).toHaveURL(/\/evidence\/assets(?:\?|$)/);
-    await expect(page.getByText('Registry health', { exact: true })).toBeVisible();
+    // With no authoritative active facility in this fixture, the legacy alias
+    // must preserve the canonical route while showing the fail-closed Evidence
+    // state. A reference/demo facility is not a valid substitute.
+    await expect(
+      page.getByRole('heading', { name: 'Evidence unavailable for this facility', level: 1 }),
+    ).toBeVisible();
+    await expect(page.getByTestId('dsx-active-facility')).toContainText('no active facility selected', {
+      ignoreCase: true,
+    });
     await expect(page.getByTestId('infrastructure-operational-metrics')).toHaveCount(0);
     await shot(page, '18-infrastructure-asset-registry.png');
     void guard;

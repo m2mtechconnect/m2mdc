@@ -76,6 +76,19 @@ afterAll(() => {
 });
 
 describe('production perimeter enforcer', () => {
+  it('installs the verifier dependencies before enforcing the perimeter in CI', () => {
+    const workflow = readFileSync(
+      join(REPO, '.github/workflows/production-perimeter.yml'),
+      'utf8',
+    );
+    const installAt = workflow.indexOf('bun install --frozen-lockfile');
+    const enforceAt = workflow.indexOf('node scripts/verify-production-perimeter.mjs');
+
+    expect(workflow).toContain('oven-sh/setup-bun@v2');
+    expect(installAt).toBeGreaterThan(-1);
+    expect(enforceAt).toBeGreaterThan(installAt);
+  });
+
   it('passes against the committed evidence', () => {
     const result = runEnforcer(REPO);
     expect(result.output).toContain('PASSED');

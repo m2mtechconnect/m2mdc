@@ -7,6 +7,7 @@ const root = resolve(import.meta.dirname, '../..');
 const typesPath = resolve(root, 'src/integrations/supabase/types.ts');
 const migrationsPath = resolve(root, 'supabase/migrations');
 const baselinePath = resolve(root, 'docs/architecture/schema-truth/exact-head-manifest.json');
+const targetPath = resolve(root, 'config/aura-production-target.json');
 const deployedArg = process.argv.find((arg) => arg.startsWith('--deployed='));
 const deployedEnv = process.env.AURA_DEPLOYED_SCHEMA_SNAPSHOT;
 const repositoryOnly = process.argv.includes('--repository-only');
@@ -74,7 +75,11 @@ const manifest = {
 };
 
 const baseline = JSON.parse(readFileSync(baselinePath, 'utf8'));
+const target = JSON.parse(readFileSync(targetPath, 'utf8'));
+const allowlist = JSON.parse(readFileSync(resolve(root, target.edgeFunctionAllowlist), 'utf8'));
 const failures = [];
+if (target.schema !== 'aura.production-target.v1') failures.push('production target schema invalid');
+if (allowlist.policy !== 'default-deny') failures.push('edge function allowlist policy invalid');
 if (manifest.sourceSha !== baseline.sourceSha) failures.push('schema source commit drift');
 if (manifest.generatedTypes.sha256 !== baseline.generatedTypesSha256) failures.push('generated type checksum drift');
 if (manifest.generatedTypes.tables.length !== baseline.tableCount) failures.push('generated table count drift');
@@ -105,8 +110,11 @@ if (!repositoryOnly && deployedInput) {
   else {
     const snapshot = JSON.parse(readFileSync(deployedPath, 'utf8'));
     deployed = { status: 'compared', path: deployedInput };
-    if (snapshot.schema !== 'aura.deployed-schema.v1') {
+    if (snapshot.schema !== 'aura.deployed-schema.v2') {
       failures.push('deployed snapshot schema invalid');
+    }
+    if (snapshot.projectRef !== target.supabaseProjectRef) {
+      failures.push('deployed snapshot project target drift');
     }
     if (snapshot.sourceSha !== manifest.auditedHeadSha) {
       failures.push('deployed snapshot source commit drift');
@@ -121,6 +129,15 @@ if (!repositoryOnly && deployedInput) {
       }
       const actual = [...(snapshot[key] ?? [])].sort();
       if (JSON.stringify(actual) !== JSON.stringify(manifest.generatedTypes[key])) failures.push(`deployed ${key} drift`);
+    }
+    if (!Array.isArray(snapshot.edgeFunctions)) {
+      failures.push('deployed snapshot edgeFunctions missing');
+    } else {
+      const deployedEdgeFunctions = [...snapshot.edgeFunctions].sort();
+      const expectedEdgeFunctions = [...allowlist.production_functions].sort();
+      if (JSON.stringify(deployedEdgeFunctions) !== JSON.stringify(expectedEdgeFunctions)) {
+        failures.push('deployed edge function allowlist drift');
+      }
     }
   }
 }

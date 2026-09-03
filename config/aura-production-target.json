@@ -1,0 +1,5 @@
+{
+  "schema": "aura.production-target.v1",
+  "supabaseProjectRef": "zmewwjizebvublcsmhcz",
+  "edgeFunctionAllowlist": "docs/remediation/evidence/pr-0.1/route-allowlist.json"
+}

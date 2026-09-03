@@ -18,6 +18,8 @@ describe('Schema Truth Layer', () => {
     expect(verifier).toContain('schema source commit drift');
     expect(verifier).toContain('deployed metadata snapshot required');
     expect(verifier).toContain('deployed snapshot source commit drift');
+    expect(verifier).toContain('deployed snapshot project target drift');
+    expect(verifier).toContain('deployed edge function allowlist drift');
     expect(verifier).toContain('process.exitCode = 1');
   });
 
@@ -63,12 +65,16 @@ describe('Schema Truth Layer', () => {
     );
     const snapshotPath = resolve(tmpdir(), 'aura-schema-truth-deployed-snapshot.test.json');
     const snapshot = {
-      schema: 'aura.deployed-schema.v1',
+      schema: 'aura.deployed-schema.v2',
       sourceSha: repository.auditedHeadSha,
       capturedAt: '2026-09-01T20:00:00.000Z',
+      projectRef: 'zmewwjizebvublcsmhcz',
       tables: repository.generatedTypes.tables,
       views: repository.generatedTypes.views,
       functions: repository.generatedTypes.functions,
+      edgeFunctions: JSON.parse(
+        read('docs/remediation/evidence/pr-0.1/route-allowlist.json'),
+      ).production_functions,
     };
 
     try {
@@ -118,6 +124,23 @@ describe('Schema Truth Layer', () => {
       'node scripts/schema-truth/verify-schema-truth.mjs --repository-only',
     );
     expect(packageJson.scripts['verify:fast']).toContain('verify:schema-truth');
+    expect(packageJson.scripts['capture:schema-truth:deployed']).toContain(
+      'capture-deployed-schema.mjs',
+    );
+  });
+
+  it('automatically captures production metadata in a required exact-SHA workflow', () => {
+    const workflow = read('.github/workflows/aura-deployment-drift.yml');
+    const releaseContract = JSON.parse(read('config/aura-release-contract.json'));
+
+    expect(workflow).toContain('SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}');
+    expect(workflow).toContain('capture-deployed-schema.mjs');
+    expect(workflow).toContain('verify-schema-truth.mjs --deployed=');
+    expect(workflow).toContain('fetch-depth: 0');
+    expect(releaseContract.workflowGates).toContainEqual({
+      name: 'AURA Deployment Drift',
+      mode: 'always',
+    });
   });
 
   it('checks out complete schema history in the QA unit gate', () => {

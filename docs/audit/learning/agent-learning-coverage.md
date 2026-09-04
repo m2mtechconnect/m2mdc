@@ -56,13 +56,15 @@ coverage classes below.
 
 Current execution evidence is explicit: the focused governed-learning,
 truth, and Phase 1 vertical-slice contracts pass at 116/116 (105 prior
-contracts plus 11 vertical-slice/persistence tests). The parallel full unit surface reports
-2,864/2,867 passed, with two builder URL-contract tests and one legacy
-simulation-export test timing out or returning an undefined payload. Those
-files pass in isolation and together with file parallelism disabled (26/26),
-so the failures are classified as runner contention or isolation findings,
-not as resolved application defects. A bounded four-worker full run stalled
-before producing results and was stopped; no timeout was converted into a pass.
+contracts plus 11 vertical-slice/persistence tests). The latest parallel full
+unit surface reports 2,864/2,875 passed. The eleven failures are the two
+builder URL-contract tests, eight builder-store tests, and one legacy
+simulation-export test. The builder URL, builder-store, and simulation files
+pass in isolation; the URL and simulation files also pass together with file
+parallelism disabled (26/26). The failures are therefore classified as runner
+contention or isolation findings, not as resolved application defects. A
+bounded four-worker full run previously stalled before producing results and
+was stopped; no timeout was converted into a pass.
 
 ## Next controlled action
 

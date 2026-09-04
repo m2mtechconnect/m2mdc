@@ -3,6 +3,7 @@
   "blockingE2E": {
     "lifecycle": [
       "tests/e2e/acceptance-final.spec.ts",
+      "tests/e2e/phase1-vertical-slice.spec.ts",
       "tests/e2e/golden-user-journey.spec.ts"
     ],
     "authSecurity": [

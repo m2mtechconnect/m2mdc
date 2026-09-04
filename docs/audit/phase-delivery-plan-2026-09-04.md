@@ -83,6 +83,10 @@ loopback-only Supabase target and the fact that the current live suite is not
 yet evidence for persisted simulation decisions. It does not create a QA
 tenant, contact a cloud project or turn skipped live acceptance into a pass.
 
+The guarded persisted simulation journey is registered as a blocking lifecycle
+spec in `config/aura-release-contract.json` and is therefore included by the
+canonical release E2E runner once disposable QA is available.
+
 ## Definition of complete
 
 “End-to-end working” means a named persona can complete a real job through the

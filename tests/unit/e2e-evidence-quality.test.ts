@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 const E2E_EVIDENCE_FILES = [
   'tests/e2e/account-teams-integration.spec.ts',
   'tests/e2e/acceptance-final.spec.ts',
+  'tests/e2e/phase1-vertical-slice.spec.ts',
   'tests/e2e/persona-journeys.spec.ts',
 ];
 

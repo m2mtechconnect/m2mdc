@@ -28,6 +28,7 @@ describe('Phase 8 AURA DC release journey contract', () => {
   it('defines the persisted lifecycle acceptance and golden journey as blocking E2E authority', () => {
     expect(contract.blockingE2E.lifecycle).toEqual([
       'tests/e2e/acceptance-final.spec.ts',
+      'tests/e2e/phase1-vertical-slice.spec.ts',
       'tests/e2e/golden-user-journey.spec.ts',
     ]);
   });

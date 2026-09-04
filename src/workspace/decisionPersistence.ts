@@ -16,9 +16,27 @@ export interface DurableDecisionResult {
   id: string;
   run_id: string;
   outcome: DurableDecisionOutcome;
+  recommendation_id: string;
+  rationale: string;
+  approver: string;
   decided_at: string;
   snapshot_hash: string;
-  decision_hash: string;
+  decision_hash: string | null;
+  evidence_schema_version: string;
+}
+
+interface RecordDecisionPayload {
+  decision?: DurableDecisionResult;
+}
+
+/** Accept the standardized Edge envelope and the legacy flat response shape. */
+function recordDecisionPayload(raw: unknown): RecordDecisionPayload {
+  if (!raw || typeof raw !== 'object') return {};
+  const outer = raw as Record<string, unknown>;
+  const nested = outer.data;
+  return nested && typeof nested === 'object'
+    ? (nested as RecordDecisionPayload)
+    : (outer as RecordDecisionPayload);
 }
 
 /**
@@ -58,7 +76,7 @@ export async function persistDecision(input: DurableDecisionInput): Promise<Dura
   if (error) {
     throw new Error(error.message || 'The decision service rejected the request.');
   }
-  const decision = (data as { decision?: DurableDecisionResult } | null)?.decision;
+  const decision = recordDecisionPayload(data).decision;
   if (!decision?.id) {
     throw new Error('The decision service returned no durable decision record.');
   }

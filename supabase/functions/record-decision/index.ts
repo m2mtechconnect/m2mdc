@@ -128,7 +128,7 @@ serve(
       if (input.idempotencyKey) {
         const { data: prior } = await svc
           .from('decision_records')
-          .select('id, run_id, outcome, decided_at, snapshot_hash, decision_hash, rationale')
+          .select('id, run_id, recommendation_id, outcome, rationale, approver, decided_at, snapshot_hash, decision_hash, evidence_schema_version')
           .eq('tenant_id', activeOrgId)
           .eq('user_id', userId)
           .eq('idempotency_key', input.idempotencyKey)
@@ -195,7 +195,7 @@ serve(
           decision_status: 'recorded',
           authored_by: 'record-decision@2',
         })
-        .select('id, run_id, outcome, decided_at, snapshot_hash, decision_hash')
+        .select('id, run_id, recommendation_id, outcome, rationale, approver, decided_at, snapshot_hash, decision_hash, evidence_schema_version')
         .single();
       if (error) {
         if ((error as { code?: string }).code === '23505') {

@@ -56,7 +56,7 @@ jobs:
       - name: Validate canonical release contract
         run: bun run verify:release-contract
 
-      - name: Run unit tests with coverage
+      - name: Run unit tests with deterministic isolation and coverage
         run: bun run test:unit:coverage
 
       - name: Upload coverage reports

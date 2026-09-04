@@ -61,7 +61,7 @@ tests, 5 harness-boundary tests and 2 deterministic-runner tests). The prior
 parallel full unit surface reported 2,864/2,875 passed; the eleven failures
 were the two builder URL-contract tests, eight builder-store tests and one
 legacy simulation-export test. A complete serial run of the same unit surface
-now passes 288/288 files and 2,881/2,881 tests. The standard `test:unit` and
+now passes 289/289 files and 2,883/2,883 tests. The standard `test:unit` and
 `test:unit:coverage` commands now enforce that deterministic isolation mode,
 so the known runner-contention failure does not recur in the release gate.
 Ad-hoc parallel Vitest runs remain an unqualified developer convenience and

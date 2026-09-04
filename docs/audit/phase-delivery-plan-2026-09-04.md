@@ -65,7 +65,7 @@ disposable authenticated environment:
 - The standard unit and coverage commands now disable file parallelism and cap
   workers at one. This closes the known builder-store, builder-URL and legacy
   simulation runner-contention failure mode; a complete serial run passed
-  2,881/2,881 tests. Ad-hoc parallel runs remain unqualified and are not
+  2,883/2,883 tests. Ad-hoc parallel runs remain unqualified and are not
   release evidence.
 - The DSX broker lane is unavailable without a local broker; no data was
   simulated to manufacture evidence.

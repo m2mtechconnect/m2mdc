@@ -2,6 +2,19 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
+/**
+ * Stable pseudo-random value for a simulated test outcome. Persisted
+ * qualification data must be reproducible from its declared inputs rather
+ * than depending on ambient process entropy.
+ */
+function stableFraction(input: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < input.length; index += 1) {
+    hash ^= input.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return hash / 0x1_0000_0000;
+}
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req.headers.get('origin'));
@@ -68,7 +81,9 @@ serve(async (req) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     const duration = Date.now() - startTime;
-    const success = Math.random() > 0.2; // 80% success rate
+    const outcomeSeed = `${agentId}|${testQuery}|${scenarioId ?? ''}`;
+    const success = stableFraction(outcomeSeed) > 0.2; // deterministic 80% distribution
+    const tokensUsed = 100 + Math.floor(stableFraction(`${outcomeSeed}|tokens`) * 500);
 
     // Update test run
     await supabase
@@ -80,7 +95,7 @@ serve(async (req) => {
           scenario_id: scenarioId,
           test_metrics: {
             latency_ms: duration,
-            tokens_used: Math.floor(Math.random() * 500) + 100,
+            tokens_used: tokensUsed,
           }
         } : null,
         error: success ? null : 'Simulated test failure',

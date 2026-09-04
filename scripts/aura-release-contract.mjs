@@ -160,6 +160,9 @@ const writeQualificationSummary = writeSummary;
 async function qualify() {
   let sha = process.env.AURA_SOURCE_SHA ?? null;
   let prNumber = process.env.AURA_PR_NUMBER ?? null;
+  // Keep the last structured payload so a thrown gate failure or timeout
+  // cannot replace its diagnostics with a generic `gates: []` record.
+  let lastPayload = null;
   try {
     validateContract({ quiet: true });
 
@@ -201,6 +204,7 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
+      lastPayload = payload;
       await writeSummary(payload);
       fail(`Required workflow failed: ${failed.name} (${failed.conclusion})`);
     }
@@ -215,6 +219,7 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
+      lastPayload = payload;
       await writeSummary(payload);
       console.log(`AURA release qualification passed for ${sha} with ${gates.length} required workflows.`);
       return;
@@ -230,6 +235,7 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
+      lastPayload = payload;
       await writeSummary(payload);
       fail(`Timed out waiting for required workflows: ${gates.filter((gate) => gate.status !== 'completed').map((gate) => gate.name).join(', ')}`);
     }
@@ -238,18 +244,21 @@ async function qualify() {
     await new Promise((resolve) => setTimeout(resolve, pollMs));
   }
   } catch (error) {
-    await writeSummary({
-      schema: 'aura.release-qualification.v1',
-      sha,
-      prNumber: prNumber ? Number(prNumber) : null,
-      status: 'failure',
-      details: {
-        message: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack?.toString?.() ?? null : null,
-      },
-      gates: [],
-      checkedAt: new Date().toISOString(),
-    });
+    const details = {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack?.toString?.() ?? null : null,
+    };
+    await writeSummary(lastPayload
+      ? { ...lastPayload, details }
+      : {
+          schema: 'aura.release-qualification.v1',
+          sha,
+          prNumber: prNumber ? Number(prNumber) : null,
+          status: 'failure',
+          details,
+          gates: [],
+          checkedAt: new Date().toISOString(),
+        });
     throw error;
   }
 }

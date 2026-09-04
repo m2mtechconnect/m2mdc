@@ -18,13 +18,12 @@ import {
   DCPreviewTab, 
   DCDeployTab 
 } from '@/components/dc-twin/tabs';
-import { montrealSovereignDC, sovereignQCFacility } from '@/twins/dataCenter/mockData';
+import { montrealSovereignDC } from '@/twins/dataCenter/mockData';
 import { useActiveTwin } from '@/context/ActiveTwinContext';
 import { TwinOverlayProvider } from '@/context/TwinOverlayContext';
 import { useDCTwinBuilderStore } from '@/stores/dcTwinBuilderStore';
 import { EmptyStateSelectTwin } from '@/components/twin-selector';
 import { Eye, FileText, MessageSquare, Rocket, LayoutDashboard, Activity } from 'lucide-react';
-import type { DataCentreFacility } from '@/types/dataCenterTwin';
 import { OVERVIEW } from '@/ux';
 import { TwinVisualizationLayout } from '@/components/twin-visualization/TwinVisualizationLayout';
 import { DeferredSceneMount } from '@/components/twin-visualization/DeferredSceneMount';
@@ -49,12 +48,47 @@ function FacilityScenePlaceholder() {
   );
 }
 
+/**
+ * Authenticated twins must not inherit the demo facility fixture. Until the
+ * backend-to-dashboard operational adapter is available, show the
+ * tenant-owned configuration and make the missing measurement boundary
+ * explicit instead of presenting Montreal telemetry as live data.
+ */
+function OperationalDataUnavailable({ twin }: { twin: NonNullable<ReturnType<typeof useActiveTwin>['twin']> }) {
+  return (
+    <Card data-provenance="unavailable" data-testid="operational-data-unavailable">
+      <CardHeader>
+        <CardTitle className="text-base">Operational data not connected</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm">
+        <p className="text-muted-foreground">
+          This twin is loaded from your organization, but telemetry and domain
+          KPIs have not been verified for it yet. Demonstration measurements
+          are intentionally withheld.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-md border border-border/60 p-3">
+            <div className="text-xs text-muted-foreground">Configured location</div>
+            <div className="font-medium">{twin.city}, {twin.region_code}</div>
+          </div>
+          <div className="rounded-md border border-border/60 p-3">
+            <div className="text-xs text-muted-foreground">Configured capacity</div>
+            <div className="font-medium">{twin.capacity_kw.toLocaleString()} kW</div>
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground" role="status" aria-live="polite">
+          Source: organization twin configuration. Status: not assessed.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function DataCentreTwin() {
   const { t } = useTranslation();
   const { id } = useParams<{ id?: string }>();
   const [searchParams] = useSearchParams();
   const { twin, activeTwinId, setActiveTwin, isLoading, twins, isInitialized } = useActiveTwin();
-  const [facility, setFacility] = useState<DataCentreFacility | null>(null);
   
   // Check if we have an active builder session
   // CRITICAL: Only use builder session when there's NO active twin from header dropdown
@@ -127,18 +161,6 @@ export default function DataCentreTwin() {
       document.title = `Data Centre Twin | ${dcBuilderStore.overview.twinName}`;
     }
     
-    // Use mock facility data enhanced with current twin info
-    if (twin) {
-      const enhancedFacility: DataCentreFacility = {
-        ...montrealSovereignDC,
-        id: twin?.id || montrealSovereignDC.id,
-        name: twin?.name || montrealSovereignDC.name,
-        location: twin?.city 
-          ? { ...montrealSovereignDC.location, city: twin.city }
-          : montrealSovereignDC.location,
-      };
-      setFacility(enhancedFacility);
-    }
   }, [twin, isDemoMode, hasBuilderSession, dcBuilderStore.overview.twinName]);
   
   // Loading state - skip in demo mode
@@ -268,11 +290,6 @@ export default function DataCentreTwin() {
     );
   }
   
-  // Facility not yet loaded
-  if (!facility) {
-    return <LoadingState message="Initializing Data Centre Twin..." />;
-  }
-  
   return (
     <TwinOverlayProvider twinId={activeTwinId || twin?.id || 'default'}>
     <div className="min-h-screen bg-background">
@@ -294,13 +311,7 @@ export default function DataCentreTwin() {
           </CardContent>
         </Card>
         
-        <DataCentreDashboard 
-          facility={facility} 
-          initialTab={domainTab}
-          onScenarioSelect={(scenarioId) => {
-            console.log('Scenario selected:', scenarioId);
-          }}
-        />
+        <OperationalDataUnavailable twin={twin} />
       </div>
     </div>
     </TwinOverlayProvider>

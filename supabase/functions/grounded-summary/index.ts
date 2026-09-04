@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { callerRejectedResponse, requireCaller } from "../_shared/callerIdentity.ts";
 import { AI_CONFIG, AIProviderRequestError, makeAICompletion } from "../_shared/ai-client.ts";
 
 serve(async (req) => {
@@ -11,6 +12,7 @@ serve(async (req) => {
   }
 
   try {
+    const caller = await requireCaller(req);
     const { pageId, url, text, title } = await req.json();
 
     if (!text || !url) {
@@ -23,6 +25,25 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Service-role writes must still be bound to the authenticated caller.
+    // `page_summaries` is owned through `captured_pages.user_id`; never trust
+    // a browser-supplied page id as proof of ownership.
+    if (pageId) {
+      const { data: page, error: pageError } = await supabase
+        .from('captured_pages')
+        .select('id, user_id')
+        .eq('id', pageId)
+        .maybeSingle();
+
+      if (pageError) throw pageError;
+      if (!page || page.user_id !== caller.userId) {
+        return new Response(
+          JSON.stringify({ error: 'Page is not accessible to this user' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        );
+      }
+    }
 
     console.log('[grounded-summary] Generating summary for:', url);
 
@@ -116,6 +137,9 @@ Generate a grounded summary with citations to the source content.`;
     );
   } catch (error) {
     console.error('[grounded-summary] Error:', error);
+
+    const rejected = callerRejectedResponse(error, req);
+    if (rejected) return rejected;
 
     if (error instanceof AIProviderRequestError && error.status === 429) {
       return new Response(

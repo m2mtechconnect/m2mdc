@@ -102,10 +102,18 @@ export function metricProvenanceFor(result: KpiValues): Record<string, unknown> 
 }
 
 async function activeOrganizationId(): Promise<string | null> {
-  const { data, error } = await (supabase as unknown as {
-    rpc: (name: string) => Promise<{ data: unknown; error: { message?: string } | null }>;
-  }).rpc('active_org_id');
-  return !error && typeof data === 'string' && isUuid(data) ? data : null;
+  try {
+    const result = await (supabase as unknown as {
+      rpc: (name: string) => Promise<{ data: unknown; error: { message?: string } | null }>;
+    }).rpc('active_org_id');
+    const data = result?.data;
+    const error = result?.error;
+    return !error && typeof data === 'string' && isUuid(data) ? data : null;
+  } catch {
+    // Treat an unavailable context lookup as no context. The caller must not
+    // continue into a write boundary after an unresolved tenant check.
+    return null;
+  }
 }
 
 export async function persistRun(params: PersistParams): Promise<PersistOutcome> {
@@ -115,6 +123,18 @@ export async function persistRun(params: PersistParams): Promise<PersistOutcome>
     return {
       status: 'unsaved',
       reason: 'This facility is not a stored record, so the run cannot be saved as a durable operational record.',
+    };
+  }
+
+  // Resolve the caller's active tenant before invoking the write boundary so
+  // a missing session or organization fails closed with a stable UI message.
+  // The tenant is intentionally not sent by the browser; run-lifecycle
+  // resolves and verifies it again from the authenticated request context.
+  const tenantId = await activeOrganizationId();
+  if (!tenantId) {
+    return {
+      status: 'unsaved',
+      reason: 'An active organization is required before a simulation run can be saved.',
     };
   }
 

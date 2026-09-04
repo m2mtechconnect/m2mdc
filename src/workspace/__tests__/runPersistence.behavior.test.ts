@@ -2,11 +2,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { WorkspaceRun } from '../scenarioEngine';
 
 const invoke = vi.fn();
+const rpc = vi.fn();
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     functions: { invoke: (...args: unknown[]) => invoke(...args) },
     auth: { getUser: vi.fn() },
-    rpc: vi.fn(),
+    rpc: (...args: unknown[]) => rpc(...args),
     from: vi.fn(() => { throw new Error('direct table persistence is forbidden'); }),
   },
 }));
@@ -30,7 +31,31 @@ const run: WorkspaceRun = {
 };
 
 describe('server-bound run persistence', () => {
-  beforeEach(() => invoke.mockReset());
+  beforeEach(() => {
+    invoke.mockReset();
+    rpc.mockReset();
+    rpc.mockResolvedValue({ data: '11111111-1111-4111-8111-111111111111', error: null });
+  });
+
+  it('fails closed before invoking the write boundary without an active organization', async () => {
+    rpc.mockResolvedValueOnce({ data: null, error: null });
+
+    await expect(persistRun({ run, twinId: run.facilityId, idempotencyKey: 'idempotency-1' }))
+      .resolves.toEqual({
+        status: 'unsaved',
+        reason: 'An active organization is required before a simulation run can be saved.',
+      });
+    expect(rpc).toHaveBeenCalledWith('active_org_id');
+    expect(invoke).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when active-organization resolution is unavailable', async () => {
+    rpc.mockRejectedValueOnce(new Error('network unavailable'));
+
+    await expect(persistRun({ run, twinId: run.facilityId, idempotencyKey: 'idempotency-1' }))
+      .resolves.toMatchObject({ status: 'unsaved' });
+    expect(invoke).not.toHaveBeenCalled();
+  });
 
   it('creates, runs and completes through the trusted lifecycle boundary', async () => {
     invoke

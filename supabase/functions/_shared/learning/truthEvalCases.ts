@@ -218,6 +218,76 @@ const TRUTH_EVAL_CASE_INPUTS: readonly TruthEvalCaseInput[] = [
       invariantMustMention: ['yaml', 'heredoc', 'column zero', 'contract test'],
     },
   },
+  {
+    id: 'lesson-auth-email-hook-signed-webhook-active',
+    kind: 'lesson-integrity',
+    title: 'The auth-email-hook lesson is active and encodes signed-webhook ordering',
+    lessonId: 'auth-email-hook-signed-webhook.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['signed webhook', 'signature', 'timestamp', 'fail closed'],
+    },
+  },
+  {
+    id: 'lesson-physics-model-claim-grounding-active',
+    kind: 'lesson-integrity',
+    title: 'The physics-model claim lesson is active and encodes runtime evidence boundaries',
+    lessonId: 'physics-model-claim-grounding.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['physics-ml', 'runtime evidence', 'calibrated', 'production readiness'],
+    },
+  },
+  {
+    id: 'lesson-frontend-backend-api-contract-active',
+    kind: 'lesson-integrity',
+    title: 'The frontend-backend contract lesson is active and encodes end-to-end persistence',
+    lessonId: 'frontend-backend-api-contract.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['frontend', 'canonical api', 'response shape', 'reload', 'authorization'],
+    },
+  },
+  {
+    id: 'lesson-fixture-isolation-and-provenance-active',
+    kind: 'lesson-integrity',
+    title: 'The fixture-isolation lesson is active and encodes source and mode separation',
+    lessonId: 'fixture-isolation-and-provenance.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['fixture', 'provenance', 'operational surfaces', 'production data', 'tenant context'],
+    },
+  },
+  {
+    id: 'lesson-artifact-sha-provenance-active',
+    kind: 'lesson-integrity',
+    title: 'The artifact-provenance lesson is active and encodes exact-head release evidence',
+    lessonId: 'artifact-sha-provenance.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['artifact', 'digest', 'exact audited head', 'unverified', 'promotion'],
+    },
+  },
+  {
+    id: 'lesson-tenant-rls-caller-boundary-active',
+    kind: 'lesson-integrity',
+    title: 'The tenant-boundary lesson is active and encodes caller and RLS authority',
+    lessonId: 'tenant-rls-caller-boundary.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['server-side', 'authenticated caller', 'rls', 'cross-tenant', 'fail closed'],
+    },
+  },
+  {
+    id: 'lesson-physics-model-qualification-active',
+    kind: 'lesson-integrity',
+    title: 'The physics qualification lesson is active and encodes reproducible promotion evidence',
+    lessonId: 'physics-model-qualification.v1',
+    expect: {
+      active: true,
+      invariantMustMention: ['model card', 'dataset provenance', 'held-out metrics', 'calibration', 'fallback'],
+    },
+  },
 ];
 
 

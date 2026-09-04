@@ -67,6 +67,10 @@ disposable authenticated environment:
   simulation runner-contention failure mode; a complete serial run passed
   2,883/2,883 tests. Ad-hoc parallel runs remain unqualified and are not
   release evidence.
+- The repository PR-0.1 production-perimeter verifier passes for the current
+  branch (166 functions inventoried, 23 allowlisted), including the signed
+  `auth-email-hook` exception. The release block therefore requires fresh
+  exact-head CI/deployed evidence, not another source-level perimeter rewrite.
 - The DSX broker lane is unavailable without a local broker; no data was
   simulated to manufacture evidence.
 - Repository-only schema truth does not qualify a deployed database.

@@ -34,7 +34,7 @@ configuration changes.
 
 | Historical failure class | Current evidence | Required learning control | Status |
 | --- | --- | --- | --- |
-| `auth-email-hook` production-perimeter classification | Release evidence, perimeter work, signed-webhook contract tests, and the lesson/truth pair exist | Signed-webhook disposition test plus exact-head perimeter evidence | Partially covered |
+| `auth-email-hook` production-perimeter classification | Signed-webhook disposition, implementation ordering, contract tests, lesson/truth pair, and the local PR-0.1 verifier pass at the current branch checkpoint | Fresh exact-head CI/deployed perimeter evidence and provider callback observation | Partially covered |
 | Frontend/backend API contract drift | Individual route/API tests, the authenticated-QA harness contract, a guarded persisted-run browser journey and the new lesson/truth pair exist | Execute one authenticated end-to-end case from UI action through persisted response | Partially covered |
 | Fixture leakage into operational surfaces | Fixture labels, provenance tests, and the new lesson/truth pair exist | Cross-route regression cases proving fixture data cannot appear as live data | Partially covered |
 | Artifact and release-evidence preservation | Artifact/fingerprint checks and the new lesson/truth pair exist | Case that fails when evidence is stale, missing, or from a different SHA | Partially covered |

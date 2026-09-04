@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 const repo = (...parts: string[]) => resolve(process.cwd(), ...parts);
 const acceptance = readFileSync(repo('tests', 'e2e', 'acceptance-final.spec.ts'), 'utf8');
 const verticalSlice = readFileSync(repo('tests', 'e2e', 'phase1-vertical-slice.spec.ts'), 'utf8');
+const goldenJourney = readFileSync(repo('tests', 'e2e', 'golden-user-journey.spec.ts'), 'utf8');
 const authSetup = readFileSync(repo('tests', 'global-auth.setup.ts'), 'utf8');
 const client = readFileSync(repo('tests', 'helpers', 'testSupabaseClient.ts'), 'utf8');
 const playwright = readFileSync(repo('playwright.config.ts'), 'utf8');
@@ -55,5 +56,13 @@ describe('Phase 1 authenticated QA harness contract', () => {
     expect(verticalSlice).toContain("data_mode: 'SIMULATED'");
     expect(verticalSlice).toContain('reloads the tenant-scoped evidence');
     expect(verticalSlice).not.toMatch(/(?:password|service_role|sb_secret|eyJ)[\s:=][^\n]+/i);
+  });
+
+  it('recovers a copied QA session after a prior global sign-out', () => {
+    for (const lifecycleSpec of [acceptance, verticalSlice, goldenJourney]) {
+      expect(lifecycleSpec).toContain('reauthenticateBrowserTestSessionIfNeeded');
+    }
+    expect(client).toContain('global sign-out contract');
+    expect(client).toContain('never injects a token or bypasses approval');
   });
 });

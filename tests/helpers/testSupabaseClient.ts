@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import WebSocket from 'ws';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -86,6 +86,30 @@ export function resolveTestUserCredentials(
   }
 
   return { email, password };
+}
+
+/**
+ * Re-establishes the disposable QA session when an earlier lifecycle test has
+ * intentionally signed out through Supabase's global sign-out contract.
+ *
+ * Playwright storage state is copied per test, but Supabase refresh-token
+ * revocation is user-wide. A golden-journey logout can therefore invalidate a
+ * later test's copied refresh token even though browser isolation is intact.
+ * Re-entering through the real sign-in UI keeps the test honest and preserves
+ * the production auth boundary; it never injects a token or bypasses approval.
+ */
+export async function reauthenticateBrowserTestSessionIfNeeded(page: Page): Promise<boolean> {
+  const pathname = new URL(page.url()).pathname;
+  if (!/^\/(?:login|auth|sign-in)$/.test(pathname)) return false;
+
+  const credentials = resolveTestUserCredentials();
+  await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
+  await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+  await page.getByRole('button', { name: /^sign in$/i }).click();
+  await page.waitForURL((url) => !/^\/(?:login|auth|sign-in)$/.test(url.pathname), {
+    timeout: 20_000,
+  });
+  return true;
 }
 
 export function createTestSupabaseClient(options: { accessToken?: string } = {}) {

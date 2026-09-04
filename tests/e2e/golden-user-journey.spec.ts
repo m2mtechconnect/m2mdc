@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { resolveTestUserCredentials } from '../helpers/testSupabaseClient';
+import {
+  reauthenticateBrowserTestSessionIfNeeded,
+  resolveTestUserCredentials,
+} from '../helpers/testSupabaseClient';
 
 /**
  * Canonical AURA DC golden journey.
@@ -16,6 +19,7 @@ test.describe('Golden AURA DC user journey', () => {
     test.skip(browserName !== 'chromium', 'Golden journey runs once on Chromium');
 
     await page.goto('/dashboard');
+    await reauthenticateBrowserTestSessionIfNeeded(page);
     await expect(page).toHaveURL(/\/dashboard(?:[/?#]|$)/, { timeout: 20_000 });
     await expect(page.locator('body')).not.toContainText(/authorization error|something went wrong/i);
 
@@ -23,6 +27,7 @@ test.describe('Golden AURA DC user journey', () => {
     // against an already configured facility. No fabricated starter values are
     // accepted as a hidden prerequisite.
     await page.goto('/builder');
+    await reauthenticateBrowserTestSessionIfNeeded(page);
     await expect(page).toHaveURL(/\/builder(?:[/?#]|$)/, { timeout: 20_000 });
 
     const firstFacility = page.getByRole('heading', { name: /create your first facility/i });

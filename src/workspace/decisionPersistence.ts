@@ -21,6 +21,20 @@ export interface DurableDecisionResult {
   decision_hash: string;
 }
 
+interface RecordDecisionPayload {
+  decision?: DurableDecisionResult;
+}
+
+/** Accept the standardized Edge envelope and the legacy flat response shape. */
+function recordDecisionPayload(raw: unknown): RecordDecisionPayload {
+  if (!raw || typeof raw !== 'object') return {};
+  const outer = raw as Record<string, unknown>;
+  const nested = outer.data;
+  return nested && typeof nested === 'object'
+    ? (nested as RecordDecisionPayload)
+    : (outer as RecordDecisionPayload);
+}
+
 /**
  * Append a human decision to the server-owned evidence chain.
  * The client sends intent only. Identity, active organization, evidence
@@ -58,7 +72,7 @@ export async function persistDecision(input: DurableDecisionInput): Promise<Dura
   if (error) {
     throw new Error(error.message || 'The decision service rejected the request.');
   }
-  const decision = (data as { decision?: DurableDecisionResult } | null)?.decision;
+  const decision = recordDecisionPayload(data).decision;
   if (!decision?.id) {
     throw new Error('The decision service returned no durable decision record.');
   }

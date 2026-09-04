@@ -16,6 +16,10 @@ const source = readFileSync(
   join(REPO, 'supabase/functions/auth-email-hook/index.ts'),
   'utf8',
 );
+const packageManifest = JSON.parse(readFileSync(join(REPO, 'package.json'), 'utf8')) as {
+  overrides?: Record<string, string>;
+};
+const bunLock = readFileSync(join(REPO, 'bun.lock'), 'utf8');
 
 describe('auth email hook production perimeter contract', () => {
   it('records the provider callback as a signed webhook, not an anonymous API', () => {
@@ -43,5 +47,11 @@ describe('auth email hook production perimeter contract', () => {
     expect(verification).toBeGreaterThanOrEqual(0);
     expect(serviceClient).toBeGreaterThan(verification);
     expect(enqueue).toBeGreaterThan(serviceClient);
+  });
+
+  it('keeps the vulnerable fflate release out of the Bun dependency graph', () => {
+    expect(packageManifest.overrides).toMatchObject({ fflate: '0.6.11' });
+    expect(bunLock).toContain('"fflate": ["fflate@0.6.11"');
+    expect(bunLock).not.toContain('fflate@0.6.10');
   });
 });

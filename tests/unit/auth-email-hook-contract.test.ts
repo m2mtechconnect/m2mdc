@@ -49,6 +49,13 @@ describe('auth email hook production perimeter contract', () => {
     expect(enqueue).toBeGreaterThan(serviceClient);
   });
 
+  it('keeps the webhook originless and preview CORS on the shared policy', () => {
+    expect(source).toContain("from '../_shared/cors.ts'");
+    expect(source).not.toMatch(/Access-Control-Allow-Origin['"`]\s*:\s*['"`]\*['"`]/);
+    expect(source).toContain('handleCorsPreflightRequest');
+    expect(source).toContain('getCorsHeaders(req.headers.get(\'origin\'))');
+  });
+
   it('keeps the vulnerable fflate release out of the Bun dependency graph', () => {
     expect(packageManifest.overrides).toMatchObject({ fflate: '0.6.11' });
     expect(bunLock).toContain('"fflate": ["fflate@0.6.11"');

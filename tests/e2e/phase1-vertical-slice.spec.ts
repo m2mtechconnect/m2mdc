@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import {
   createTestSupabaseClient,
+  ensureBrowserTestSession,
   getBrowserTestSession,
-  reauthenticateBrowserTestSessionIfNeeded,
 } from '../helpers/testSupabaseClient';
 
 const LIVE_QA = process.env.QA_AUTH_BOOTSTRAP === '1';
@@ -15,8 +15,7 @@ test.describe('Phase 1 trusted vertical slice - persisted simulation and decisio
 
     // Establish a stored facility through the normal product flow. This keeps
     // the test from falling back to the illustrative reference facility.
-    await page.goto('/builder');
-    await reauthenticateBrowserTestSessionIfNeeded(page);
+    await ensureBrowserTestSession(page, '/builder');
     await expect(page).toHaveURL(/\/builder(?:[/?#]|$)/, { timeout: 20_000 });
 
     const firstFacility = page.getByRole('heading', { name: /create your first facility/i });

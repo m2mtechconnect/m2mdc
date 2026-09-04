@@ -89,27 +89,39 @@ export function resolveTestUserCredentials(
 }
 
 /**
- * Re-establishes the disposable QA session when an earlier lifecycle test has
- * intentionally signed out through Supabase's global sign-out contract.
+ * Establishes a disposable QA session through the real sign-in UI.
  *
- * Playwright storage state is copied per test, but Supabase refresh-token
- * revocation is user-wide. A golden-journey logout can therefore invalidate a
- * later test's copied refresh token even though browser isolation is intact.
- * Re-entering through the real sign-in UI keeps the test honest and preserves
- * the production auth boundary; it never injects a token or bypasses approval.
+ * Playwright storage state is copied per test, but Supabase's global sign-out
+ * contract revokes the refresh token user-wide. A golden-journey logout can
+ * therefore invalidate a later test's copied refresh token even though browser
+ * isolation is intact.
+ * Starting each lifecycle test at its explicit return path lets a valid state
+ * redirect normally and deterministically recovers a revoked state through the
+ * same sign-in flow a user uses. It never injects a token or bypasses approval.
  */
-export async function reauthenticateBrowserTestSessionIfNeeded(page: Page): Promise<boolean> {
-  const pathname = new URL(page.url()).pathname;
-  if (!/^\/(?:login|auth|sign-in)$/.test(pathname)) return false;
+export async function ensureBrowserTestSession(page: Page, destinationPath: string): Promise<void> {
+  const returnTo = destinationPath.startsWith('/') ? destinationPath : `/${destinationPath}`;
+  await page.goto(`/login?returnTo=${encodeURIComponent(returnTo)}`);
 
-  const credentials = resolveTestUserCredentials();
-  await page.getByLabel('Email Address', { exact: true }).fill(credentials.email);
-  await page.getByLabel('Password', { exact: true }).fill(credentials.password);
-  await page.getByRole('button', { name: /^sign in$/i }).click();
-  await page.waitForURL((url) => !/^\/(?:login|auth|sign-in)$/.test(url.pathname), {
-    timeout: 20_000,
-  });
-  return true;
+  const authPath = /^\/(?:login|auth|sign-in)$/;
+  if (authPath.test(new URL(page.url()).pathname)) {
+    const email = page.getByLabel('Email Address', { exact: true });
+    try {
+      await email.waitFor({ state: 'visible', timeout: 10_000 });
+    } catch {
+      // A valid persisted session may redirect away while the login bundle is
+      // hydrating. The final URL check below remains the authoritative result.
+    }
+
+    if (authPath.test(new URL(page.url()).pathname)) {
+      const credentials = resolveTestUserCredentials();
+      await email.fill(credentials.email);
+      await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+      await page.getByRole('button', { name: /^sign in$/i }).click();
+    }
+  }
+
+  await page.waitForURL((url) => !authPath.test(url.pathname), { timeout: 20_000 });
 }
 
 export function createTestSupabaseClient(options: { accessToken?: string } = {}) {

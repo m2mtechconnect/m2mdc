@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import {
   createTestSupabaseClient,
+  ensureBrowserTestSession,
   getBrowserTestSession,
-  reauthenticateBrowserTestSessionIfNeeded,
 } from '../helpers/testSupabaseClient';
 
 const LIVE_QA = process.env.QA_AUTH_BOOTSTRAP === '1';
@@ -13,8 +13,7 @@ test.describe('Functional acceptance - persisted behavior, not presence-only smo
   test('Builder persists one facility-bound draft and reloads that exact draft', async ({ page, browserName }) => {
     test.skip(browserName !== 'chromium', 'Durable Builder mutation runs once on Chromium to avoid cross-browser fixture races.');
 
-    await page.goto('/builder');
-    await reauthenticateBrowserTestSessionIfNeeded(page);
+    await ensureBrowserTestSession(page, '/builder');
     await expect(page).toHaveURL(/\/builder(?:[/?#]|$)/, { timeout: 20_000 });
 
     const firstFacility = page.getByRole('heading', { name: /create your first facility/i });

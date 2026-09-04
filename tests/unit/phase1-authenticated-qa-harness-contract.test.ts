@@ -60,9 +60,9 @@ describe('Phase 1 authenticated QA harness contract', () => {
 
   it('recovers a copied QA session after a prior global sign-out', () => {
     for (const lifecycleSpec of [acceptance, verticalSlice, goldenJourney]) {
-      expect(lifecycleSpec).toContain('reauthenticateBrowserTestSessionIfNeeded');
+      expect(lifecycleSpec).toContain('ensureBrowserTestSession');
     }
-    expect(client).toContain('global sign-out contract');
+    expect(client).toContain("Supabase's global sign-out");
     expect(client).toContain('never injects a token or bypasses approval');
   });
 });

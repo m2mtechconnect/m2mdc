@@ -40,7 +40,7 @@ The supervisor participates in every phase using the same sequence:
 | Phase | Outcome | Current state | Exit criteria |
 | --- | --- | --- | --- |
 | 0. Containment and truth | Remove fabricated claims and encode defect-family learning | **Complete for this branch**: 12 active lessons, 21 synthetic cases, focused suite 105/105 | No known truth-control regression; registry integrity, lint, typecheck and build green |
-| 1. Trusted vertical slice | Engineer/operator completes inspect -> simulate -> decide -> verify | **Repository contract complete; live QA blocked**: focused vertical-slice and persistence contract 11/11, including unavailable-tenant fail-closed handling | Authenticated UI-to-API-to-Supabase persistence, reload/resume, denial, failure, tenant/RLS and append-only decision evidence all pass in disposable QA |
+| 1. Trusted vertical slice | Engineer/operator completes inspect -> simulate -> decide -> verify | **Repository contract complete; live QA blocked**: focused vertical-slice, persistence and authenticated-QA-harness contracts 15/15, including unavailable-tenant fail-closed handling | Authenticated UI-to-API-to-Supabase persistence, reload/resume, denial, failure, tenant/RLS and append-only decision evidence all pass in disposable QA |
 | 2. Persona journeys | Owner/admin, engineer/operator, executive, compliance and viewer complete role-appropriate jobs through one shell | **Planned** | Each family has a golden journey with context, primary task, durable result, reload, handoff where applicable, and a negative case; narrow/keyboard/accessibility states pass |
 | 3. Provider and AI qualification | Add external runtimes only where evidence supports them | **Planned** | Provider boundary is isolated; model card, dataset lineage/license, held-out metrics, calibration, fallback and reproducible artifacts exist; unavailable claims remain unavailable |
 | 4. Release and operations | Promote one exact SHA with complete evidence | **Blocked until phases 1-3 qualify** | All required CI, visual, security, tenant, artifact/SHA, production fingerprint, rollback and human approval gates are green on the same SHA |
@@ -75,6 +75,13 @@ disposable authenticated environment:
   evidence exists.
 - Lovable may be used for reversible visual proposals; Codex remains the source
   of truth for backend wiring, security, tests and exact-head qualification.
+
+The authenticated-QA harness contract is now regression-tested in
+`tests/unit/phase1-authenticated-qa-harness-contract.test.ts`. It verifies the
+explicit disposable-QA switch, runtime identity requirements, normal UI login,
+loopback-only Supabase target and the fact that the current live suite is not
+yet evidence for persisted simulation decisions. It does not create a QA
+tenant, contact a cloud project or turn skipped live acceptance into a pass.
 
 ## Definition of complete
 

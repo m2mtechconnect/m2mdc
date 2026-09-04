@@ -35,7 +35,7 @@ configuration changes.
 | Historical failure class | Current evidence | Required learning control | Status |
 | --- | --- | --- | --- |
 | `auth-email-hook` production-perimeter classification | Release evidence, perimeter work, signed-webhook contract tests, and the lesson/truth pair exist | Signed-webhook disposition test plus exact-head perimeter evidence | Partially covered |
-| Frontend/backend API contract drift | Individual route/API tests and the new lesson/truth pair exist | One authenticated end-to-end case from UI action through persisted response | Partially covered |
+| Frontend/backend API contract drift | Individual route/API tests, the authenticated-QA harness contract and the new lesson/truth pair exist | One authenticated end-to-end case from UI action through persisted response | Partially covered |
 | Fixture leakage into operational surfaces | Fixture labels, provenance tests, and the new lesson/truth pair exist | Cross-route regression cases proving fixture data cannot appear as live data | Partially covered |
 | Artifact and release-evidence preservation | Artifact/fingerprint checks and the new lesson/truth pair exist | Case that fails when evidence is stale, missing, or from a different SHA | Partially covered |
 | Tenant/RLS/caller-boundary regressions | Security tests, policy documents, and the new lesson/truth pair exist | Authenticated cross-tenant cases covering caller identity, active organization and RLS | Partially covered |
@@ -55,8 +55,9 @@ qualification matrix still requires fresh exact-head evidence for the remaining
 coverage classes below.
 
 Current execution evidence is explicit: the focused governed-learning,
-truth, and Phase 1 vertical-slice contracts pass at 116/116 (105 prior
-contracts plus 11 vertical-slice/persistence tests). The latest parallel full
+truth, Phase 1 vertical-slice and authenticated-QA-harness contracts pass at
+120/120 (105 prior contracts plus 11 vertical-slice/persistence tests and 4
+harness-boundary tests). The latest parallel full
 unit surface reports 2,864/2,875 passed. The eleven failures are the two
 builder URL-contract tests, eight builder-store tests, and one legacy
 simulation-export test. The builder URL, builder-store, and simulation files

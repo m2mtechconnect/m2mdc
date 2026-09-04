@@ -62,10 +62,11 @@ disposable authenticated environment:
 
 ## Current blockers and non-goals
 
-- The full parallel unit run still has three runner-sensitive failures outside
-  the current diff. They pass in isolation and together with file parallelism
-  disabled, so this is a qualification-environment finding, not a passing
-  release gate.
+- The standard unit and coverage commands now disable file parallelism and cap
+  workers at one. This closes the known builder-store, builder-URL and legacy
+  simulation runner-contention failure mode; a complete serial run passed
+  2,881/2,881 tests. Ad-hoc parallel runs remain unqualified and are not
+  release evidence.
 - The DSX broker lane is unavailable without a local broker; no data was
   simulated to manufacture evidence.
 - Repository-only schema truth does not qualify a deployed database.

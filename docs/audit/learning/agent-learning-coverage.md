@@ -55,17 +55,17 @@ qualification matrix still requires fresh exact-head evidence for the remaining
 coverage classes below.
 
 Current execution evidence is explicit: the focused governed-learning,
-truth, Phase 1 vertical-slice and authenticated-QA-harness contracts pass at
-121/121 (105 prior contracts plus 11 vertical-slice/persistence tests and 5
-harness-boundary tests). The latest parallel full
-unit surface reports 2,864/2,875 passed. The eleven failures are the two
-builder URL-contract tests, eight builder-store tests, and one legacy
-simulation-export test. The builder URL, builder-store, and simulation files
-pass in isolation; the URL and simulation files also pass together with file
-parallelism disabled (26/26). The failures are therefore classified as runner
-contention or isolation findings, not as resolved application defects. A
-bounded four-worker full run previously stalled before producing results and
-was stopped; no timeout was converted into a pass.
+truth, Phase 1 vertical-slice, authenticated-QA-harness and unit-runner
+contracts pass at 133/133 (105 prior contracts, 11 vertical-slice/persistence
+tests, 5 harness-boundary tests and 2 deterministic-runner tests). The prior
+parallel full unit surface reported 2,864/2,875 passed; the eleven failures
+were the two builder URL-contract tests, eight builder-store tests and one
+legacy simulation-export test. A complete serial run of the same unit surface
+now passes 288/288 files and 2,881/2,881 tests. The standard `test:unit` and
+`test:unit:coverage` commands now enforce that deterministic isolation mode,
+so the known runner-contention failure does not recur in the release gate.
+Ad-hoc parallel Vitest runs remain an unqualified developer convenience and
+must not be used as release evidence.
 
 ## Next controlled action
 

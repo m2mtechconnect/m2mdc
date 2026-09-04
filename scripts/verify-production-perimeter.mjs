@@ -364,7 +364,10 @@ if (existsSync(workflowDir)) {
     const cfg = readFileSync(cfgPath, 'utf8');
     for (const name of allowlist.production_functions || []) {
       const block = cfg.match(
-        new RegExp(`\\[functions\\.${name}\\]([\\s\\S]*?)(?=\\n\\[|$)`),
+        // Supabase accepts both top-level function tables and function tables
+        // nested under `[functions]`; allow indentation when finding the next
+        // table so one function cannot inherit a sibling's JWT setting.
+        new RegExp(`\\[functions\\.${name}\\]([\\s\\S]*?)(?=\\n\\s*\\[|$)`),
       );
       const entry = invByName.get(name);
       const isWebhook = entry?.production_disposition === 'signed-webhook';

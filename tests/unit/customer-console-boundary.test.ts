@@ -24,7 +24,7 @@ describe('platform customer console boundary', () => {
   });
 
   it('uses the existing guarded teams-invite boundary for platform provisioning', () => {
-    expect(config).toContain('[functions.teams-invite]\nverify_jwt = true');
+    expect(config).toMatch(/\[functions\.teams-invite\]\s*\n\s*verify_jwt\s*=\s*true/);
     expect(config).not.toContain('[functions.organization-list]');
     expect(config).not.toContain('[functions.organization-provision]');
     expect(inviteFunction).toContain("mode === 'platform_provision'");

@@ -75,7 +75,7 @@ describe('organization-bound onboarding', () => {
 
   it('pins both onboarding Edge Functions behind gateway JWT verification', () => {
     for (const name of ['teams-invite', 'teams-accept-invite']) {
-      expect(config).toContain(`[functions.${name}]\nverify_jwt = true`);
+      expect(config).toMatch(new RegExp(`\\[functions\\.${name}\\]\\s*\\n\\s*verify_jwt\\s*=\\s*true`));
     }
     expect(config).not.toContain('[functions.organization-provision]');
     expect(config).not.toContain('[functions.organization-list]');

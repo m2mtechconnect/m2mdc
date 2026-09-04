@@ -48,7 +48,10 @@ jobs:
       - name: Run read-only post-publish smoke
         env:
           AURA_SMOKE_TARGET: ${{ inputs.target || 'https://auradc.m2mtechconnect.com' }}
-          AURA_EXPECTED_SHA: ${{ inputs.expected_sha }}
+          # Bind automatic workflow_run smoke to the exact source SHA that
+          # triggered the production mirror. Manual runs keep their explicit
+          # SHA, and scheduled runs fall back to the checked-out main SHA.
+          AURA_EXPECTED_SHA: ${{ github.event.workflow_run.head_sha || inputs.expected_sha || github.sha }}
           AURA_SMOKE_TRIGGER: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'schedule' && 'scheduled' || 'automatic-on-publish' }}
           # Optional authenticated plane. When these secrets are absent the
           # suite fails closed and records BLOCKED_BY_AUTH.
@@ -81,11 +84,24 @@ jobs:
           GIT_COMMITTER_NAME: aura-smoke-bot
           GIT_COMMITTER_EMAIL: aura-smoke-bot@users.noreply.github.com
         run: |
+          set -euo pipefail
+          evidence_ref='evidence/post-publish-smoke'
+          remote_evidence_ref="refs/remotes/origin/$evidence_ref"
+          # A fresh actions/checkout does not create a remote-tracking ref for
+          # the evidence branch. Fetch it before using --force-with-lease so
+          # stale branch information cannot make evidence preservation fail.
+          if git ls-remote --exit-code --heads origin "$evidence_ref" >/dev/null 2>&1; then
+            git fetch --no-tags origin "refs/heads/$evidence_ref:$remote_evidence_ref"
+          fi
+
           if [ -z "$(git status --porcelain docs/evidence/post-publish-smoke src/supervisor/postPublishSmokeRegistry.ts)" ]; then
             echo 'No new smoke evidence to preserve.'
             exit 0
           fi
-          git checkout -B evidence/post-publish-smoke
+          git checkout -B "$evidence_ref"
           git add docs/evidence/post-publish-smoke src/supervisor/postPublishSmokeRegistry.ts
           git commit -m "evidence: post-publish smoke run (${{ github.event_name }})"
-          git push --force-with-lease origin evidence/post-publish-smoke
+          expected_evidence_oid="$(git rev-parse --verify "$remote_evidence_ref" 2>/dev/null || true)"
+          git push \
+            --force-with-lease="refs/heads/$evidence_ref:$expected_evidence_oid" \
+            origin "HEAD:refs/heads/$evidence_ref"

@@ -150,6 +150,8 @@ async function handleWebhook(req: Request): Promise<Response> {
   let payload: any
   let run_id = ''
   try {
+    // verifyWebhookRequest validates the provider's x-lovable-signature and
+    // x-lovable-timestamp before any payload data is trusted.
     const verified = await verifyWebhookRequest({
       req,
       secret: apiKey,

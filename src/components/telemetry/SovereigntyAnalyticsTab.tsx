@@ -22,6 +22,8 @@ export function SovereigntyAnalyticsTab() {
     auditReadinessScore,
     riskLevel,
     result,
+    isAssessmentAvailable,
+    provenance,
   } = useSovereignty();
 
   // Mock time-series data for sovereignty metrics
@@ -70,6 +72,23 @@ export function SovereigntyAnalyticsTab() {
       violations: count,
     }));
   }, [result.violations]);
+
+  if (!isAssessmentAvailable) {
+    return (
+      <div className="space-y-6" data-provenance={provenance} data-testid="sovereignty-analytics-unavailable">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Sovereignty analytics not available</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            Tenant-backed sovereignty evidence is not connected. Scores, trends,
+            violations, and classification charts are withheld until a verified
+            source is available.
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

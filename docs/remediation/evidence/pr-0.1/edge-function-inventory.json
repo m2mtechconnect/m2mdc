@@ -110,6 +110,21 @@
     "notes": "Promoted 2026-08-23: createHandler authLevel:\"user\" (non-public) + shared fail-closed CORS via handler; verify_jwt=true at gateway. Invoked by promoted route /app/agents."
   },
   {
+    "function": "auth-email-hook",
+    "deployed": true,
+    "consumer_files": [],
+    "consumer_count": 0,
+    "verify_jwt_gateway": false,
+    "local_getUser_or_getClaims": false,
+    "uses_shared_auth_helper": false,
+    "checks_role_or_admin": false,
+    "checks_is_approved": false,
+    "webhook_signature_verification": true,
+    "uses_service_role_key": true,
+    "production_disposition": "signed-webhook",
+    "notes": "Auth provider callback, not a browser/API caller. Gateway JWT verification is disabled only because the hook uses the provider-signed x-lovable-signature and timestamp, verified with LOVABLE_API_KEY before payload parsing or service-role enqueue. Preview rendering remains a separate API-key-authenticated path and is not a production caller surface."
+  },
+  {
     "function": "agent-suggestions",
     "deployed": true,
     "consumer_files": [

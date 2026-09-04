@@ -10,7 +10,7 @@ import { useActiveRun, useWorkspaceStore } from '../workspaceStore';
 import type { DecisionState } from '../scenarioEngine';
 import { RunExportControls } from './RunExportControls';
 
-const OUTCOME_TO_LOCAL: Record<DurableDecisionOutcome, DecisionState> = {
+const OUTCOME_TO_LOCAL: Record<DurableDecisionOutcome, Exclude<DecisionState, 'pending'>> = {
   approved: 'accepted',
   rejected: 'rejected',
   escalated: 'deferred',
@@ -52,8 +52,19 @@ export function DecidePanel() {
     setSaving(recommendationId);
     setErrors((current) => ({ ...current, [recommendationId]: '' }));
     try {
-      await persistDecision({ run, recommendationId, outcome, rationale });
-      recordDecision(run.id, recommendationId, OUTCOME_TO_LOCAL[outcome]);
+      const durableDecision = await persistDecision({ run, recommendationId, outcome, rationale });
+      recordDecision(run.id, recommendationId, OUTCOME_TO_LOCAL[outcome], {
+        id: durableDecision.id,
+        recommendationId: durableDecision.recommendation_id,
+        state: OUTCOME_TO_LOCAL[durableDecision.outcome],
+        outcome: durableDecision.outcome,
+        rationale: durableDecision.rationale,
+        approver: durableDecision.approver,
+        decidedAt: durableDecision.decided_at,
+        snapshotHash: durableDecision.snapshot_hash,
+        decisionHash: durableDecision.decision_hash,
+        evidenceSchemaVersion: durableDecision.evidence_schema_version,
+      });
     } catch (error) {
       setErrors((current) => ({
         ...current,

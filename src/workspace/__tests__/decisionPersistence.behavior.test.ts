@@ -23,10 +23,14 @@ describe('durable decision response handling', () => {
     const decision = {
       id: '22222222-2222-4222-8222-222222222222',
       run_id: run.serverId,
+      recommendation_id: 'rec-1',
       outcome: 'rejected' as const,
+      rationale: 'QA rejected the simulated evidence for review.',
+      approver: 'qa-admin@example.invalid',
       decided_at: '2026-09-04T20:00:00.000Z',
       snapshot_hash: 'sha256:snapshot',
       decision_hash: 'sha256:decision',
+      evidence_schema_version: 'aura-evidence-v1',
     };
     invoke.mockResolvedValue({
       data: { success: true, data: { decision }, error: null, correlationId: 'corr-1' },
@@ -48,10 +52,14 @@ describe('durable decision response handling', () => {
     const decision = {
       id: '33333333-3333-4333-8333-333333333333',
       run_id: run.serverId,
+      recommendation_id: 'rec-2',
       outcome: 'escalated' as const,
+      rationale: 'QA escalated the simulated evidence for review.',
+      approver: 'qa-admin@example.invalid',
       decided_at: '2026-09-04T20:01:00.000Z',
       snapshot_hash: 'sha256:snapshot-2',
       decision_hash: 'sha256:decision-2',
+      evidence_schema_version: 'aura-evidence-v1',
     };
     invoke.mockResolvedValue({ data: { decision }, error: null });
 

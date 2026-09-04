@@ -16,9 +16,13 @@ export interface DurableDecisionResult {
   id: string;
   run_id: string;
   outcome: DurableDecisionOutcome;
+  recommendation_id: string;
+  rationale: string;
+  approver: string;
   decided_at: string;
   snapshot_hash: string;
-  decision_hash: string;
+  decision_hash: string | null;
+  evidence_schema_version: string;
 }
 
 interface RecordDecisionPayload {

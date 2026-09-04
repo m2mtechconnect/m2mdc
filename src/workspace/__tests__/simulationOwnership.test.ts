@@ -103,6 +103,33 @@ describe('Simulation run gate', () => {
     expect(stored.validationStatus).toBe('client-produced-unverified');
   });
 
+  it('keeps the server decision evidence visible after the durable write succeeds', async () => {
+    useWorkspaceStore.setState({ runs: [], activeRunId: null });
+    useWorkspaceStore.getState().setAssumptionsReviewed(true);
+    const runId = await useWorkspaceStore.getState().runScenario(facility);
+    const stored = useWorkspaceStore.getState().runs[0];
+    const recommendationId = stored.recommendations[0].id;
+
+    useWorkspaceStore.getState().recordDecision(runId!, recommendationId, 'rejected', {
+      id: 'decision-1',
+      recommendationId,
+      state: 'rejected',
+      outcome: 'rejected',
+      rationale: 'The simulated evidence remains unverified.',
+      approver: 'qa-admin@example.invalid',
+      decidedAt: '2026-09-04T20:00:00.000Z',
+      snapshotHash: 'sha256:snapshot',
+      decisionHash: 'sha256:decision',
+      evidenceSchemaVersion: 'aura-evidence-v1',
+    });
+
+    const updated = useWorkspaceStore.getState().runs[0];
+    expect(updated.decisions[recommendationId]).toBe('rejected');
+    expect(updated.decisionRecords).toEqual([
+      expect.objectContaining({ id: 'decision-1', recommendationId, outcome: 'rejected' }),
+    ]);
+  });
+
   it('invalidates the review whenever a run input changes', () => {
     useWorkspaceStore.getState().setAssumptionsReviewed(true);
     useWorkspaceStore.getState().setScenario('baseline');

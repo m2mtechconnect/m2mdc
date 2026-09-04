@@ -55,6 +55,8 @@ describe('Phase 1 trusted vertical slice', () => {
 
   it('keeps human decisions behind the server-owned evidence boundary', () => {
     expect(decisions).toContain("supabase.functions.invoke('record-decision'");
+    expect(decidePanel).toContain('decisionRecords');
+    expect(decidePanel).toContain('durableDecision.recommendation_id');
     expect(decisions).toContain('Unverified simulation previews cannot be approved.');
     expect(decisionEndpoint).toContain("supabase.rpc('active_org_id')");
     expect(decisionEndpoint).toContain("supabase.rpc('org_has_role'");

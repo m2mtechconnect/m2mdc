@@ -13,6 +13,7 @@ import {
   executeScenario,
   formatRunId,
   type DecisionState,
+  type WorkspaceDecisionRecord,
   type WorkspaceRun,
 } from './scenarioEngine';
 import { idempotencyKeyFor, loadServerRuns, persistRun } from './runPersistence';
@@ -83,7 +84,12 @@ interface WorkspaceState {
   clearRunError: () => void;
   setActiveRun: (runId: string) => void;
   toggleCompareRun: (runId: string) => void;
-  recordDecision: (runId: string, recommendationId: string, decision: DecisionState) => void;
+  recordDecision: (
+    runId: string,
+    recommendationId: string,
+    decision: DecisionState,
+    evidence?: WorkspaceDecisionRecord,
+  ) => void;
   openEvidence: (kpi: KpiKey) => void;
   closeEvidence: () => void;
   /** Test/verification helper: inserts deterministic fixture runs (idempotent). */
@@ -271,11 +277,22 @@ export const useWorkspaceStore = create<WorkspaceState>()(
           return { compareRunIds: [runId, ...s.compareRunIds].slice(0, 2) };
         }),
 
-      recordDecision: (runId, recommendationId, decision) =>
+      recordDecision: (runId, recommendationId, decision, evidence) =>
         set((s) => ({
-          runs: s.runs.map((r) =>
-            r.id === runId ? { ...r, decisions: { ...r.decisions, [recommendationId]: decision } } : r,
-          ),
+          runs: s.runs.map((r) => {
+            if (r.id !== runId) return r;
+            const decisionRecords = evidence
+              ? [
+                  ...(r.decisionRecords ?? []).filter((record) => record.id !== evidence.id),
+                  evidence,
+                ]
+              : r.decisionRecords;
+            return {
+              ...r,
+              decisions: { ...r.decisions, [recommendationId]: decision },
+              ...(decisionRecords ? { decisionRecords } : {}),
+            };
+          }),
         })),
 
       openEvidence: (evidenceKpi) => set({ evidenceKpi }),

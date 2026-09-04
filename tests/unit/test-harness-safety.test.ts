@@ -247,8 +247,14 @@ describe('test harness safety guards', () => {
     const config = repositoryFile('playwright.truth.config.ts');
     const mock = repositoryFile('tests/truth-in-ui/_setup/supabase-mock.ts');
 
-    expect(config).toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
-    expect(config).toContain('VITE_SUPABASE_PUBLISHABLE_KEY=safe-placeholder-anon-key');
+    expect(config).toContain("VITE_SUPABASE_URL: 'http://127.0.0.1:54321'");
+    expect(config).toContain("VITE_SUPABASE_PUBLISHABLE_KEY: 'safe-placeholder-anon-key'");
+    expect(config).toContain('env: TRUTH_SERVER_ENV');
+    expect(config).not.toContain('VITE_SUPABASE_URL=http://127.0.0.1:54321');
+    expect(config).toContain("process.platform === 'win32' ? 'vite.cmd' : 'vite'");
+    expect(config).toContain('const REPO_ROOT = path.dirname(fileURLToPath(import.meta.url));');
+    expect(config).toContain('cwd: REPO_ROOT');
+    expect(config).not.toContain('npx vite');
     expect(mock).toContain("'http://localhost:54321'");
     expect(mock).not.toContain("new Set(['127.0.0.1', 'localhost'");
     expect(STORAGE_KEY).toBe('sb-127-auth-token');

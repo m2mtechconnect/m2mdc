@@ -204,7 +204,12 @@ export function ActionCenter({
           Action Center
         </h2>
         <div className="flex items-center gap-2">
-          <p className="v2-mono text-[13px] font-medium text-muted-foreground">
+          <p
+            className="v2-mono text-[13px] font-medium text-muted-foreground"
+            aria-live="polite"
+            aria-atomic="true"
+            data-testid="action-center-count"
+          >
             {items.length} open
           </p>
           {items.length > limit && (
@@ -223,7 +228,7 @@ export function ActionCenter({
       </div>
 
       {items.length === 0 ? (
-        <p className="p-4 text-[13px] text-muted-foreground">
+        <p className="p-4 text-[13px] text-muted-foreground" role="status">
           No open items for the current design baseline.
         </p>
       ) : (

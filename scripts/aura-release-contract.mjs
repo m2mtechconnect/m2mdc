@@ -135,10 +135,10 @@ function latestRunByName(runs) {
   return result;
 }
 
-function writeQualificationSummary(payload) {
+async function writeSummary(payload) {
   const dir = path.join(ROOT, 'release-qualification');
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'summary.json'), `${JSON.stringify(payload, null, 2)}\n`);
+  await fs.promises.mkdir(dir, { recursive: true });
+  await fs.promises.writeFile(path.join(dir, 'summary.json'), `${JSON.stringify(payload, null, 2)}\n`);
 
   if (process.env.GITHUB_STEP_SUMMARY) {
     const lines = [
@@ -151,16 +151,19 @@ function writeQualificationSummary(payload) {
       ...payload.gates.map((gate) => `- ${gate.name}: ${gate.status}${gate.conclusion ? ` (${gate.conclusion})` : ''}`),
       '',
     ];
-    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
+    await fs.promises.appendFile(process.env.GITHUB_STEP_SUMMARY, `${lines.join('\n')}\n`);
   }
 }
 
+const writeQualificationSummary = writeSummary;
+
 async function qualify() {
-  validateContract({ quiet: true });
+  let sha = process.env.AURA_SOURCE_SHA ?? null;
+  let prNumber = process.env.AURA_PR_NUMBER ?? null;
+  try {
+    validateContract({ quiet: true });
 
   const repo = process.env.GITHUB_REPOSITORY;
-  const sha = process.env.AURA_SOURCE_SHA;
-  const prNumber = process.env.AURA_PR_NUMBER;
   const token = process.env.GITHUB_TOKEN;
   if (!repo || !sha || !prNumber || !token) {
     fail('Qualification requires GITHUB_REPOSITORY, AURA_SOURCE_SHA, AURA_PR_NUMBER and GITHUB_TOKEN.');
@@ -198,7 +201,7 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
-      writeQualificationSummary(payload);
+      await writeSummary(payload);
       fail(`Required workflow failed: ${failed.name} (${failed.conclusion})`);
     }
 
@@ -212,7 +215,7 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
-      writeQualificationSummary(payload);
+      await writeSummary(payload);
       console.log(`AURA release qualification passed for ${sha} with ${gates.length} required workflows.`);
       return;
     }
@@ -227,12 +230,27 @@ async function qualify() {
         gates,
         checkedAt: new Date().toISOString(),
       };
-      writeQualificationSummary(payload);
+      await writeSummary(payload);
       fail(`Timed out waiting for required workflows: ${gates.filter((gate) => gate.status !== 'completed').map((gate) => gate.name).join(', ')}`);
     }
 
     console.log(`Waiting for release gates: ${gates.filter((gate) => gate.status !== 'completed').map((gate) => `${gate.name}:${gate.status}`).join(', ')}`);
     await new Promise((resolve) => setTimeout(resolve, pollMs));
+  }
+  } catch (error) {
+    await writeSummary({
+      schema: 'aura.release-qualification.v1',
+      sha,
+      prNumber: prNumber ? Number(prNumber) : null,
+      status: 'failure',
+      details: {
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.toString?.() ?? null : null,
+      },
+      gates: [],
+      checkedAt: new Date().toISOString(),
+    });
+    throw error;
   }
 }
 

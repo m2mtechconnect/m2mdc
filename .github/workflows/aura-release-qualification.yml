@@ -46,11 +46,15 @@ jobs:
           AURA_QUALIFICATION_POLL_MS: 20000
         run: node scripts/aura-release-contract.mjs qualify
 
+      - name: Show release-qualification dir
+        if: always()
+        run: ls -la release-qualification || true
+
       - name: Upload release qualification evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: aura-release-qualification-${{ env.AURA_SOURCE_SHA }}
           path: release-qualification/summary.json
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30

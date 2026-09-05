@@ -30,7 +30,8 @@ const CLIMATE_OPTIONS: ClimateBand[] = ['cold', 'temperate', 'hot'];
 
 const fieldClass =
   'h-11 rounded-none border-white/15 bg-[#111112] text-sm text-[#F5F7FA] placeholder:text-[#7C838C] focus-visible:ring-success';
-const selectClass = `${fieldClass} w-full px-3 appearance-none`;
+const selectClass =
+  'h-11 w-full rounded-none border border-white/15 bg-[#111112] px-3 text-sm text-[#F5F7FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success';
 const labelClass = 'text-xs font-semibold uppercase tracking-[0.16em] text-[#AEB4BC]';
 
 function numberFormat(value: number, digits = 0): string {

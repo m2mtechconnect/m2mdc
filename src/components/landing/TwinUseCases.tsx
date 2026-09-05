@@ -80,59 +80,40 @@ function PersonaCard({ persona, index }: { persona: PersonaDef; index: number })
 
   return (
     <motion.div variants={cardVariants} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      <Card className={`relative h-full overflow-hidden bg-card/40 border-border/40 transition-all duration-500 group cursor-default ${isHovered ? 'bg-card shadow-xl border-border' : 'hover:bg-card/60'}`}>
-        <div className={`absolute top-0 left-0 right-0 h-1 ${persona.bgColor.replace('/10', '/60')} transition-all duration-300 ${isHovered ? 'h-1.5' : ''}`} />
-        <CardHeader className="pb-3">
+      <Card
+        className={`h-full cursor-default rounded-none border-x-0 border-b-0 border-t border-border bg-transparent shadow-none transition-colors duration-300 ${isHovered ? 'bg-muted/40' : ''}`}
+      >
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <motion.div
-                className={`w-14 h-14 rounded-2xl ${persona.bgColor} flex items-center justify-center transition-all duration-300 ${isHovered ? 'scale-110' : ''}`}
-                animate={{ rotate: isHovered ? [0, -5, 5, 0] : 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <persona.icon className={`h-7 w-7 ${persona.color}`} />
-              </motion.div>
-              <div>
-                <h3 className={`text-lg font-semibold transition-colors duration-300 ${isHovered ? persona.color : 'text-foreground'}`}>
-                  {t(persona.titleKey)}
-                </h3>
-                <p className="text-sm text-muted-foreground">{t(persona.subtitleKey)}</p>
-              </div>
-            </div>
+            <span className={`font-mono text-xs ${persona.color}`}>{String(index + 1).padStart(2, '0')}</span>
+            <persona.icon className={`h-5 w-5 ${persona.color}`} aria-hidden="true" />
           </div>
+          <h3 className="mt-6 font-display text-xl font-bold uppercase tracking-tight text-foreground">
+            {t(persona.titleKey)}
+          </h3>
+          <p className="text-sm text-muted-foreground">{t(persona.subtitleKey)}</p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <ul className="space-y-2.5">
+        <CardContent className="space-y-6">
+          <ul className="space-y-3">
             {persona.bulletKeys.map((key, bulletIndex) => (
-              <motion.li
-                key={bulletIndex}
-                className="flex items-start gap-2.5 text-sm text-muted-foreground group-hover:text-muted-foreground/90"
-                initial={{ opacity: 0, x: -10 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.3, delay: 0.3 + index * 0.08 + bulletIndex * 0.05 }}
-              >
-                <motion.div whileHover={{ scale: 1.2 }} transition={{ duration: 0.2 }} className="mt-0.5 flex-shrink-0">
-                  <Check className={`h-4 w-4 ${persona.color}`} />
-                </motion.div>
+              <li key={bulletIndex} className="flex items-start gap-3 text-sm text-muted-foreground">
+                <Check className={`mt-0.5 h-4 w-4 flex-shrink-0 ${persona.color}`} aria-hidden="true" />
                 <span>{t(key)}</span>
-              </motion.li>
+              </li>
             ))}
           </ul>
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0, height: isHovered ? 'auto' : 0 }}
-            transition={{ duration: 0.3 }}
-            className="overflow-hidden"
-          >
-            <div className={`p-3 rounded-xl ${persona.bgColor} flex items-center justify-between mt-2`}>
-              <div>
-                <div className={`text-2xl font-bold ${persona.color}`}>{t(persona.statKey)}</div>
-                <div className="text-xs text-muted-foreground">{t(persona.statLabelKey)}</div>
+          <div className="flex items-end justify-between border-t border-border/60 pt-4">
+            <div>
+              <div className={`font-mono text-3xl font-bold ${persona.color}`}>{t(persona.statKey)}</div>
+              <div className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">
+                {t(persona.statLabelKey)}
               </div>
-              <ArrowRight className={`h-5 w-5 ${persona.color}`} />
             </div>
-          </motion.div>
+            <ArrowRight
+              className={`h-5 w-5 transition-transform duration-300 ${persona.color} ${isHovered ? 'translate-x-1' : ''}`}
+              aria-hidden="true"
+            />
+          </div>
         </CardContent>
       </Card>
     </motion.div>
@@ -143,39 +124,31 @@ export function TwinUseCases() {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-muted/20 via-background to-background">
-      <div className="max-w-7xl mx-auto px-4 lg:px-8">
+    <section className="overflow-hidden bg-background py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <motion.div
-          className="text-center mb-14"
+          className="max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="inline-block mb-4"
-          >
-            <span className="px-4 py-1.5 rounded-full bg-muted text-foreground text-sm font-medium">
-              {t('landing.forEveryStakeholder')}
-            </span>
-          </motion.div>
-          <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <span className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            {t('landing.forEveryStakeholder')}
+          </span>
+          <h2 className="mt-6 font-display text-3xl font-bold uppercase leading-[1.05] tracking-tight text-foreground lg:text-5xl">
             {t('landing.dashboardViewsForEveryRole')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-5 text-base text-muted-foreground lg:text-lg">
             {t('landing.useCasesDescription')}
           </p>
         </motion.div>
         <motion.div
-          className="grid md:grid-cols-2 gap-6"
+          className="mt-16 grid gap-10 md:grid-cols-2 lg:gap-x-16"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, margin: '-50px' }}
         >
           {personaDefs.map((persona, index) => (
             <PersonaCard key={index} persona={persona} index={index} />
@@ -185,3 +158,4 @@ export function TwinUseCases() {
     </section>
   );
 }
+

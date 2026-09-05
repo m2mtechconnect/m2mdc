@@ -62,6 +62,7 @@ export function TwinFeatureSection({
   flip = false,
   accentColor = "primary",
   coverLegacyBrand = false,
+  index,
   cta,
 }: TwinFeatureSectionProps) {
   const colors = colorMap[accentColor];
@@ -73,7 +74,7 @@ export function TwinFeatureSection({
     : imageSrc;
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden bg-background">
+    <section className="py-20 lg:py-28 overflow-hidden bg-background border-t border-border/40">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className={cn(
           "grid lg:grid-cols-12 gap-12 lg:gap-20 items-center",
@@ -87,14 +88,12 @@ export function TwinFeatureSection({
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <div className="space-y-4">
-              {/* Section indicator line */}
-              <motion.div 
-                className={`w-12 h-1 rounded-full ${bgColor.replace('/10', '/60')}`}
-                initial={{ width: 0 }}
-                whileInView={{ width: 48 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-              />
+              {typeof index === 'number' && (
+                <span className={cn("font-mono text-xs", textColor)}>
+                  {String(index).padStart(2, '0')}
+                </span>
+              )}
+
               
               <motion.h2 
                 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight"

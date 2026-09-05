@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Shield, Globe, Lock, Server } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { SectionHeading } from "./SectionHeading";
 
 const regionKeys = [
   { labelKey: "landing.regionCanada", flag: "🇨🇦" },
@@ -22,29 +23,21 @@ const trustPointDefs = [
     icon: Globe,
     titleKey: "landing.dataResidencyMapping",
     descKey: "landing.dataResidencyMappingDesc",
-    color: "text-primary",
-    bgColor: "bg-primary/10",
   },
   {
     icon: Shield,
     titleKey: "landing.sovereigntyScore",
     descKey: "landing.sovereigntyScoreDesc",
-    color: "text-success",
-    bgColor: "bg-success/10",
   },
   {
     icon: Lock,
     titleKey: "landing.complianceIndicators",
     descKey: "landing.complianceIndicatorsDesc",
-    color: "text-warning",
-    bgColor: "bg-warning/10",
   },
   {
     icon: Server,
     titleKey: "landing.canadianCloudRegions",
     descKey: "landing.canadianCloudRegionsDesc",
-    color: "text-info",
-    bgColor: "bg-info/10",
   },
 ];
 
@@ -64,23 +57,11 @@ export function TwinTrustSection() {
   return (
     <section className="overflow-hidden bg-background py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <motion.div
-          className="max-w-3xl"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <span className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
-            {t('landing.enterpriseTrust')}
-          </span>
-          <h2 className="mt-6 font-display text-3xl font-bold uppercase leading-[1.05] tracking-tight text-foreground lg:text-5xl">
-            {t('landing.sovereigntyComplianceFeatures')}
-          </h2>
-          <p className="mt-5 text-base text-muted-foreground lg:text-lg">
-            {t('landing.trustDescription')}
-          </p>
-        </motion.div>
+        <SectionHeading
+          eyebrow={t('landing.enterpriseTrust')}
+          title={t('landing.sovereigntyComplianceFeatures')}
+          lede={t('landing.trustDescription')}
+        />
 
         <motion.div
           className="mt-10 flex flex-wrap gap-2"
@@ -113,11 +94,11 @@ export function TwinTrustSection() {
             <motion.div
               key={index}
               variants={itemVariants}
-              className="group cursor-default border-t border-border pt-6"
+              className="group cursor-default border-t border-border pt-6 transition-colors hover:border-success"
             >
               <div className="flex items-center justify-between">
-                <span className={`font-mono text-xs ${point.color}`}>{String(index + 1).padStart(2, '0')}</span>
-                <point.icon className={`h-5 w-5 ${point.color}`} aria-hidden="true" />
+                <span className="font-mono text-xs text-muted-foreground transition-colors group-hover:text-success">{String(index + 1).padStart(2, '0')}</span>
+                <point.icon className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-success" aria-hidden="true" />
               </div>
               <h3 className="mt-5 text-lg font-semibold text-foreground">{t(point.titleKey)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(point.descKey)}</p>

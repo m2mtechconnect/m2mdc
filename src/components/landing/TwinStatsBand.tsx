@@ -5,6 +5,7 @@
 
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { SectionHeading } from "./SectionHeading";
 
 interface StatCard {
   value: string;
@@ -26,23 +27,12 @@ export function TwinStatsBand() {
   return (
     <section className="bg-[#0A0A0A] py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-4 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="max-w-3xl"
-        >
-          <span className="text-xs font-semibold uppercase tracking-[0.28em] text-success">
-            {t('landing.platformCapabilities')}
-          </span>
-          <h2 className="mt-5 font-display text-3xl font-bold uppercase leading-tight tracking-tight text-[#F5F7FA] lg:text-5xl">
-            {t('landing.designedToBenchmarks')}
-          </h2>
-          <p className="mt-5 text-lg leading-relaxed text-[#C9CDD3]">
-            {t('landing.statsBandDescription')}
-          </p>
-        </motion.div>
+        <SectionHeading
+          surface="dark"
+          eyebrow={t('landing.platformCapabilities')}
+          title={t('landing.designedToBenchmarks')}
+          lede={t('landing.statsBandDescription')}
+        />
 
         <dl className="mt-14 grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat, index) => (

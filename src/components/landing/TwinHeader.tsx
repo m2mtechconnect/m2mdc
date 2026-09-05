@@ -11,6 +11,7 @@ export function TwinHeader() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const frameRef = useRef<number | null>(null);
 
@@ -28,6 +29,8 @@ export function TwinHeader() {
         const next = window.scrollY > 20;
         return current === next ? current : next;
       });
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(scrollable > 0 ? Math.min(1, window.scrollY / scrollable) : 0);
     };
     const handleScroll = () => {
       if (frameRef.current !== null) return;
@@ -58,6 +61,11 @@ export function TwinHeader() {
         isScrolled ? 'border-b border-white/10 shadow-lg shadow-black/40' : 'border-b border-white/5',
       )}
     >
+      <div
+        aria-hidden="true"
+        className="absolute bottom-0 left-0 h-px bg-success transition-[width] duration-150 ease-out"
+        style={{ width: `${scrollProgress * 100}%` }}
+      />
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <a href="/" className="flex items-center" aria-label="AURA home">

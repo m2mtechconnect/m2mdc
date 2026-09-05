@@ -17,3 +17,4 @@ export { TwinTrustSection } from './TwinTrustSection';
 export { TwinCTASection } from './TwinCTASection';
 export { ScrollReveal } from './ScrollReveal';
 export { TwinFooter } from './TwinFooter';
+export { SectionHeading } from './SectionHeading';

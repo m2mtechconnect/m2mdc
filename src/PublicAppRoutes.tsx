@@ -17,6 +17,7 @@ const MFA = lazy(() => loadAuthPages().then((module) => ({ default: module.MFA }
 const AuthCallback = lazy(() => loadAuthPages().then((module) => ({ default: module.AuthCallback })));
 const ManagedUserReturn = lazy(() => import('@/pages/oauth/ManagedUserReturn'));
 const RequestDemo = lazy(() => import('./pages/RequestDemo'));
+const ArchitecturePage = lazy(() => import('./pages/ArchitecturePage'));
 const InviteSignInRedirect = lazy(() =>
   import('@/routing/InviteSignInRedirect').then((module) => ({ default: module.InviteSignInRedirect })),
 );

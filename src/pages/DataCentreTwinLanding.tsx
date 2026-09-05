@@ -85,7 +85,7 @@ function DeferredMarketingBody() {
 /** Public, read-only marketing landing page for AURA DC. */
 export default function DataCentreTwinLanding() {
   return (
-    <div className="min-h-screen bg-background text-foreground scroll-smooth">
+    <div className="aura-marketing min-h-screen bg-background text-foreground scroll-smooth">
       <Helmet>
         <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
         <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />

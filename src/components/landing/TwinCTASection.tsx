@@ -42,7 +42,7 @@ export function TwinCTASection() {
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
                 <Button
                   size="lg"
-                  className="group h-14 rounded-none bg-accent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-m2m-black hover:bg-m2m-gold-dark"
+                  className="group h-14 rounded-none bg-accent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-accent-foreground hover:bg-accent/90"
                   onClick={() => navigate('/onboarding')}
                 >
                   {t('landing.startBuildingTwin')}

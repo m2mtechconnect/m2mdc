@@ -120,7 +120,7 @@ export function TwinHero() {
               <div className="mt-10 flex flex-wrap items-center gap-6">
                 <Button
                   size="lg"
-                  className="group h-14 rounded-none bg-accent px-8 text-sm font-bold uppercase tracking-[0.16em] text-m2m-black hover:bg-m2m-gold-dark"
+                  className="group h-14 rounded-none bg-accent px-8 text-sm font-bold uppercase tracking-[0.16em] text-accent-foreground hover:bg-accent/90"
                   onClick={() => navigate("/onboarding")}
                 >
                   {t('landing.getStartedFree')}

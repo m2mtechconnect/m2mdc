@@ -2023,3 +2023,51 @@ html:not(.dark) .aura-workspace-theme {
   color: hsl(var(--v2-graphite-fg));
   font-weight: 600;
 }
+
+/* ==================================================================
+   AURA MARKETING BRAND SYSTEM — NVIDIA-style technical identity
+   Scope: the public marketing landing page only (`.aura-marketing`).
+   The authenticated shell (`.aura-v2`) and all other routes are
+   unaffected. NVIDIA green (#76B900 family) replaces the legacy
+   M2M gold as the marketing accent; graphite remains the technical
+   surface. See docs/brand/aura-nvidia-style-guide.md.
+   ================================================================== */
+
+.aura-marketing {
+  /* Technical accent ramp (NVIDIA green family) */
+  --aura-green: 82 100% 36%;          /* #76B900 - core accent */
+  --aura-green-bright: 82 78% 58%;    /* readable green on graphite */
+  --aura-green-deep: 82 100% 21%;     /* AA-safe on white with white text */
+
+  /* Graphite technical surfaces */
+  --aura-graphite: 220 7% 12%;
+  --aura-graphite-deep: 220 9% 4%;
+  --aura-graphite-line: 220 7% 26%;
+
+  /* Shadcn token remap for the marketing surface */
+  --accent: var(--aura-green);
+  --accent-foreground: 0 0% 4%;
+  --primary: var(--aura-green-deep);
+  --primary-foreground: 0 0% 100%;
+  --success: var(--aura-green-deep);
+  --success-foreground: 0 0% 100%;
+  --ring: var(--aura-green-deep);
+
+  /* Legacy gold aliases retired on this surface */
+  --m2m-gold: var(--aura-green);
+  --m2m-gold-light: var(--aura-green-bright);
+  --m2m-gold-dark: 82 100% 28%;
+}
+
+/* Green reads AA on graphite: brighten state colours on dark bands. */
+.aura-marketing .bg-\[\#1E1E1E\] .text-success,
+.aura-marketing .bg-\[\#0A0A0A\] .text-success,
+.aura-marketing [class*="bg-graphite"] .text-success {
+  color: hsl(var(--aura-green-bright));
+}
+
+/* Neutralise the global gold text darkening inside the marketing page. */
+.aura-marketing .text-m2m-gold,
+.aura-marketing [class*="text-m2m-gold/"] {
+  color: hsl(var(--aura-green-deep)) !important;
+}

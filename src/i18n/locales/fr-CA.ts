@@ -111,7 +111,7 @@ const frCA = {
     features: 'Fonctionnalités',
     useCases: "Cas d'utilisation",
     integrations: 'Intégrations',
-    whyM2M: 'Pourquoi M2M',
+    whyM2M: 'Pourquoi AURA',
     omniverseLiveScene: 'Aperçu du jumeau AURA',
     solutions: 'Solutions',
     product: 'Produit',

@@ -279,6 +279,7 @@ const frCA = {
     archOperateI2: 'Alertes, flux de travail et piste d\'audit',
     archOperateI3: 'Indicateurs avec provenance identifiée',
     archTruthNote: 'Configuré ne signifie pas connecté. Connecté ne signifie pas vérifié. Simulé ne signifie pas mesuré.',
+    archPageLink: 'Explorer l\'architecture complète',
     faqQ6: 'Quelle est l\'architecture d\'AURA?',
     faqA6: 'Quatre domaines connectés : un plan directeur de l\'installation comme source de vérité unique, des moteurs d\'alimentation/refroidissement/thermique/carbone, un simulateur de scénarios et des vues d\'exploitation avec indicateurs à provenance identifiée. Consultez la section Architecture du système ci-dessus.',
     platformCapabilities: 'Capacités de la plateforme',

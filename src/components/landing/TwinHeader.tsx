@@ -135,7 +135,7 @@ export function TwinHeader() {
                 <Button variant="outline" className="w-full rounded-none border-white/20 bg-transparent text-[#F5F7FA] hover:bg-white/5" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}>
                   {t('auth.login')}
                 </Button>
-                <Button className="w-full rounded-none bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark" onClick={() => { navigate('/onboarding'); setIsMobileMenuOpen(false); }}>
+                <Button className="w-full rounded-none bg-accent text-accent-foreground font-semibold hover:bg-accent/90" onClick={() => { navigate('/onboarding'); setIsMobileMenuOpen(false); }}>
                   {t('auth.getStarted')}
                 </Button>
               </div>

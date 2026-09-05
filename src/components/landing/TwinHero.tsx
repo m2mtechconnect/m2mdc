@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
 import { useTranslation } from "react-i18next";
-import { AuraNodeMark } from "@/components/brand/AuraLogo";
+
 
 const LazyLoomDemoModal = lazy(() =>
   import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),

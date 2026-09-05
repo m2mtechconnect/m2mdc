@@ -386,89 +386,79 @@ export default function BlueprintEstimatorPage() {
                 ))}
               </div>
 
-              {/* PUE build-up */}
-              <h3 className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-success">
-                {t('blueprintTool.pueBreakdownTitle')}
-              </h3>
-              <table className="mt-4 w-full border-collapse text-sm">
-                <caption className="sr-only">{t('blueprintTool.pueBreakdownTitle')}</caption>
-                <tbody>
-                  {report.pueContributions.map((row) => (
-                    <tr key={row.label} className="border-b border-white/10">
-                      <th scope="row" className="py-2 text-left font-normal text-[#C9CDD3]">
-                        {t(`blueprintTool.pueRow.${row.label}`)}
-                      </th>
-                      <td className="py-2 text-right font-mono text-[#F5F7FA]">
-                        {row.value >= 0 && row.label !== 'cooling' ? '+' : ''}
-                        {row.value.toFixed(3)}
-                      </td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <th scope="row" className="py-3 text-left font-semibold text-[#F5F7FA]">
-                      {t('blueprintTool.pueRow.total')}
-                    </th>
-                    <td className="py-3 text-right font-mono font-bold text-success">
-                      {report.pue.toFixed(3)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <Accordion type="single" collapsible defaultValue="pue-detail" className="mt-10 border-t border-[#3A3A3A]">
+                <AccordionItem value="pue-detail" className="border-[#3A3A3A]">
+                  <AccordionTrigger className="min-h-14 text-left text-xs font-semibold uppercase tracking-[0.2em] text-success hover:no-underline">
+                    {t('blueprintTool.pueBreakdownTitle')}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-6">
+                    <table className="w-full table-fixed border-collapse text-sm">
+                      <caption className="sr-only">{t('blueprintTool.pueBreakdownTitle')}</caption>
+                      <tbody>
+                        {report.pueContributions.map((row) => (
+                          <tr key={row.label} className="border-b border-white/10">
+                            <th scope="row" className="py-2 pr-4 text-left font-normal text-[#C9CDD3]">
+                              {t(`blueprintTool.pueRow.${row.label}`)}
+                            </th>
+                            <td className="w-24 py-2 text-right font-mono text-[#F5F7FA]">
+                              {row.value >= 0 && row.label !== 'cooling' ? '+' : ''}{row.value.toFixed(3)}
+                            </td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <th scope="row" className="py-3 text-left font-semibold text-[#F5F7FA]">{t('blueprintTool.pueRow.total')}</th>
+                          <td className="py-3 text-right font-mono font-bold text-success">{report.pue.toFixed(3)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </AccordionContent>
+                </AccordionItem>
 
-              {/* Cost build-up */}
-              <h3 className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-success">
-                {t('blueprintTool.costBreakdownTitle')}
-              </h3>
-              <table className="mt-4 w-full border-collapse text-sm">
-                <caption className="sr-only">{t('blueprintTool.costBreakdownTitle')}</caption>
-                <tbody>
-                  {costRows.map((row) => (
-                    <tr key={row.label} className="border-b border-white/10">
-                      <th scope="row" className="py-2 text-left font-normal text-[#C9CDD3]">
-                        {row.label}
-                      </th>
-                      <td className="py-2 text-right font-mono text-[#F5F7FA]">
-                        {numberFormat(row.value)}
-                      </td>
-                    </tr>
-                  ))}
-                  <tr>
-                    <th scope="row" className="py-3 text-left font-semibold text-[#F5F7FA]">
-                      {t('blueprintTool.costTotal')}
-                    </th>
-                    <td className="py-3 text-right font-mono font-bold text-success">
-                      {numberFormat(report.annualTotalCost)}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                <AccordionItem value="cost-detail" className="border-[#3A3A3A]">
+                  <AccordionTrigger className="min-h-14 text-left text-xs font-semibold uppercase tracking-[0.2em] text-success hover:no-underline">
+                    {t('blueprintTool.costBreakdownTitle')}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-6">
+                    <table className="w-full table-fixed border-collapse text-sm">
+                      <caption className="sr-only">{t('blueprintTool.costBreakdownTitle')}</caption>
+                      <tbody>
+                        {costRows.map((row) => (
+                          <tr key={row.label} className="border-b border-white/10">
+                            <th scope="row" className="py-2 pr-4 text-left font-normal text-[#C9CDD3]">{row.label}</th>
+                            <td className="w-28 py-2 text-right font-mono text-[#F5F7FA]">{numberFormat(row.value)}</td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <th scope="row" className="py-3 text-left font-semibold text-[#F5F7FA]">{t('blueprintTool.costTotal')}</th>
+                          <td className="py-3 text-right font-mono font-bold text-success">{numberFormat(report.annualTotalCost)}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </AccordionContent>
+                </AccordionItem>
 
-              {/* Comparison */}
-              <div className="mt-10 border border-[#3A3A3A] bg-[#0F0F10] p-6">
-                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-success">
-                  {t('blueprintTool.compareTitle', { baseline: report.baselinePue.toFixed(2) })}
-                </h3>
-                <div className="mt-4 grid gap-6 sm:grid-cols-3">
-                  <div>
-                    <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
-                      {numberFormat(report.annualEnergySavedMwh)} MWh
-                    </p>
-                    <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareEnergy')}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
-                      {currency(report.annualCostSaved)}
-                    </p>
-                    <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareCost')}</p>
-                  </div>
-                  <div>
-                    <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
-                      {numberFormat(report.annualTonnesSaved, 1)} t
-                    </p>
-                    <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareCarbon')}</p>
-                  </div>
-                </div>
-              </div>
+                <AccordionItem value="comparison-detail" className="border-[#3A3A3A]">
+                  <AccordionTrigger className="min-h-14 text-left text-xs font-semibold uppercase tracking-[0.2em] text-success hover:no-underline">
+                    {t('blueprintTool.compareTitle', { baseline: report.baselinePue.toFixed(2) })}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-6">
+                    <div className="grid gap-6 sm:grid-cols-3">
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">{numberFormat(report.annualEnergySavedMwh)} MWh</p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareEnergy')}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">{currency(report.annualCostSaved)}</p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareCost')}</p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">{numberFormat(report.annualTonnesSaved, 1)} t</p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">{t('blueprintTool.compareCarbon')}</p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               {/* Scenario run through the AURA simulation engine */}
               <div className="mt-10 border border-[#3A3A3A] bg-[#0F0F10] p-6">
@@ -566,71 +556,62 @@ export default function BlueprintEstimatorPage() {
                       </div>
                     </div>
 
-                    <h4 className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-success">
-                      {t('blueprintTool.scenario.timelineTitle')}
-                    </h4>
-                    <table className="mt-4 w-full border-collapse text-sm">
-                      <caption className="sr-only">
-                        {t('blueprintTool.scenario.timelineTitle')}
-                      </caption>
-                      <thead>
-                        <tr className="border-b border-white/15 text-left text-xs uppercase tracking-[0.14em] text-[#AEB4BC]">
-                          <th scope="col" className="py-2 font-semibold">
-                            {t('blueprintTool.scenario.colTime')}
-                          </th>
-                          <th scope="col" className="py-2 font-semibold">
-                            {t('blueprintTool.scenario.colEvent')}
-                          </th>
-                          <th scope="col" className="py-2 text-right font-semibold">
-                            {t('blueprintTool.scenario.colPue')}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {runResult.events.map((event) => (
-                          <tr key={event.id} className="border-b border-white/10 align-top">
-                            <td className="py-2 pr-4 font-mono text-xs text-[#AEB4BC]">
-                              {`${String(Math.floor(event.at / 60)).padStart(2, '0')}:${String(
-                                event.at % 60,
-                              ).padStart(2, '0')}`}
-                            </td>
-                            <td className="py-2 pr-4">
-                              <span className="text-[#F5F7FA]">{event.title}</span>
-                              <span className="block text-xs text-[#AEB4BC]">
-                                {event.description}
-                              </span>
-                            </td>
-                            <td
-                              className={`py-2 text-right font-mono ${
-                                event.pue > runResult.designPue ? 'text-warning' : 'text-[#F5F7FA]'
-                              }`}
-                            >
-                              {event.pue.toFixed(3)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-
-                    <p className="mt-5 font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">
-                      {t('blueprintTool.scenario.provenance')}
-                    </p>
+                    <Accordion type="single" collapsible className="mt-7 border-t border-[#3A3A3A]">
+                      <AccordionItem value="scenario-timeline" className="border-[#3A3A3A]">
+                        <AccordionTrigger className="min-h-14 text-left text-xs font-semibold uppercase tracking-[0.2em] text-success hover:no-underline">
+                          {t('blueprintTool.scenario.timelineTitle')}
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-6">
+                          <div className="overflow-x-auto">
+                            <table className="w-full min-w-[34rem] border-collapse text-sm">
+                              <caption className="sr-only">{t('blueprintTool.scenario.timelineTitle')}</caption>
+                              <thead>
+                                <tr className="border-b border-white/15 text-left text-xs uppercase tracking-[0.14em] text-[#AEB4BC]">
+                                  <th scope="col" className="py-2 font-semibold">{t('blueprintTool.scenario.colTime')}</th>
+                                  <th scope="col" className="py-2 font-semibold">{t('blueprintTool.scenario.colEvent')}</th>
+                                  <th scope="col" className="py-2 text-right font-semibold">{t('blueprintTool.scenario.colPue')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {runResult.events.map((event) => (
+                                  <tr key={event.id} className="border-b border-white/10 align-top">
+                                    <td className="py-2 pr-4 font-mono text-xs text-[#AEB4BC]">
+                                      {`${String(Math.floor(event.at / 60)).padStart(2, '0')}:${String(event.at % 60).padStart(2, '0')}`}
+                                    </td>
+                                    <td className="py-2 pr-4">
+                                      <span className="text-[#F5F7FA]">{event.title}</span>
+                                      <span className="block text-xs text-[#AEB4BC]">{event.description}</span>
+                                    </td>
+                                    <td className={`py-2 text-right font-mono ${event.pue > runResult.designPue ? 'text-warning' : 'text-[#F5F7FA]'}`}>
+                                      {event.pue.toFixed(3)}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <p className="mt-5 font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">{t('blueprintTool.scenario.provenance')}</p>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
                   </div>
                 )}
               </div>
 
-              {/* Assumptions */}
-
-              <h3 className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-success">
-                {t('blueprintTool.assumptionsTitle')}
-              </h3>
-              <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[#C9CDD3]">
-                {['a1', 'a2', 'a3', 'a4', 'a5'].map((key) => (
-                  <li key={key} className="border-l border-[#3A3A3A] pl-4">
-                    {t(`blueprintTool.assumption.${key}`)}
-                  </li>
-                ))}
-              </ul>
+              <Accordion type="single" collapsible className="mt-8 border-t border-[#3A3A3A]">
+                <AccordionItem value="assumptions" className="border-[#3A3A3A]">
+                  <AccordionTrigger className="min-h-14 text-left text-xs font-semibold uppercase tracking-[0.2em] text-success hover:no-underline">
+                    {t('blueprintTool.assumptionsTitle')}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-6">
+                    <ul className="space-y-2 text-sm leading-relaxed text-[#C9CDD3]">
+                      {['a1', 'a2', 'a3', 'a4', 'a5'].map((key) => (
+                        <li key={key} className="border-l border-[#3A3A3A] pl-4">{t(`blueprintTool.assumption.${key}`)}</li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
 
               <BlueprintLeadForm spec={spec} report={report} run={runIsStale ? null : runResult} />
 

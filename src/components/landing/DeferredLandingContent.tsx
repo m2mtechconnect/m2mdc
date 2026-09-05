@@ -5,6 +5,8 @@ import {
   TwinCapabilityBadges,
   TwinFeatureSection,
   TwinStatsBand,
+  TwinProblemStatement,
+  TwinPillars,
   TwinIntegrationsGrid,
   TwinUseCases,
   TwinDifferentiators,
@@ -98,6 +100,8 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
 
   return (
     <TooltipProvider>
+      <ScrollReveal><TwinProblemStatement /></ScrollReveal>
+
       <div id="features">
         <ScrollReveal><TwinCapabilityBadges /></ScrollReveal>
         {featureDefs.map((feature, index) => (
@@ -118,6 +122,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
         ))}
       </div>
 
+      <TwinPillars />
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
       <ScrollReveal><div id="integrations"><TwinIntegrationsGrid /></div></ScrollReveal>
       <ScrollReveal><div id="use-cases"><TwinUseCases /></div></ScrollReveal>

@@ -78,7 +78,7 @@ export function ParallaxImage({
         onError={onError}
         style={prefersReducedMotion ? undefined : { y }}
         className={cn(
-          "marketing-image absolute inset-0 h-[calc(100%+var(--parallax-overscan,4rem))] w-full object-cover object-top",
+          "marketing-image absolute -top-8 left-0 h-[calc(100%+4rem)] w-full object-cover object-top",
           imgClassName,
         )}
       />

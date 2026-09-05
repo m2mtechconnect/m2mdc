@@ -60,9 +60,6 @@ export function TwinSecondaryCapabilities({ items }: { items: SecondaryCapabilit
           ))}
         </ul>
 
-        <p className="mt-12 border-t border-white/10 pt-6 font-mono text-xs uppercase tracking-[0.16em] text-[#AEB4BC]">
-          {t('landing.walkthroughNote')}
-        </p>
       </div>
     </section>
   );

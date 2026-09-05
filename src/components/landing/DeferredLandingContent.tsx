@@ -2,11 +2,9 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
-  TwinCapabilityBadges,
   TwinFeatureSection,
   TwinStatsBand,
   TwinProblemStatement,
-  TwinPillars,
   TwinArchitecture,
   TwinSimulationWalkthrough,
   TwinIntegrationsGrid,
@@ -105,7 +103,6 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       <ScrollReveal><TwinBenefits /></ScrollReveal>
 
       <div id="features">
-        <ScrollReveal><TwinCapabilityBadges /></ScrollReveal>
         {primaryFeatureDefs.map((feature, index) => (
           <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction={feature.flip ? 'right' : 'left'}>
             <TwinFeatureSection
@@ -139,7 +136,6 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       </ScrollReveal>
 
       <TwinSimulationWalkthrough />
-      <TwinPillars />
       <ScrollReveal><TwinArchitecture /></ScrollReveal>
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
       <ScrollReveal><div id="integrations"><TwinIntegrationsGrid /></div></ScrollReveal>

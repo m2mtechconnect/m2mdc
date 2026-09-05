@@ -1,13 +1,11 @@
 /**
- * TwinFAQ - straight answers plus explicit next steps.
+ * TwinFAQ - straight answers to the questions the rest of the page raises.
  * Presentation only. Answers restate the platform's truth semantics
  * (configured != connected, simulated != measured) and make no vendor
- * integration claim.
+ * integration claim. Conversion paths live in the closing CTA section.
  */
 
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowRight } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';
 
 export const FAQ_KEYS = [
@@ -19,23 +17,10 @@ export const FAQ_KEYS = [
   { q: 'landing.faqQ6', a: 'landing.faqA6' },
 ];
 
-const nextSteps = [
-  { titleKey: 'landing.nextStepStartTitle', bodyKey: 'landing.nextStepStartBody', href: '/sign-up' },
-  { titleKey: 'landing.nextStepDemoTitle', bodyKey: 'landing.nextStepDemoBody', href: '/request-demo' },
-  { titleKey: 'landing.nextStepTourTitle', bodyKey: 'landing.nextStepTourBody', href: '#simulation-walkthrough' },
-];
-
 export function TwinFAQ() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
-  const go = (href: string) => {
-    if (href.startsWith('#')) {
-      document.getElementById(href.slice(1))?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    navigate(href);
-  };
+
 
   return (
     <section id="faq" className="bg-background py-20 lg:py-28">
@@ -54,27 +39,6 @@ export function TwinFAQ() {
           ))}
         </dl>
 
-        <div className="mt-20">
-          <SectionHeading eyebrow={t('landing.nextStepsEyebrow')} title={t('landing.nextStepsTitle')} />
-          <ul className="mt-12 grid gap-px bg-border sm:grid-cols-3">
-            {nextSteps.map((step) => (
-              <li key={step.titleKey} className="bg-background">
-                <button
-                  type="button"
-                  onClick={() => go(step.href)}
-                  className="group flex h-full w-full flex-col items-start px-6 py-8 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <span className="text-base font-semibold text-foreground">{t(step.titleKey)}</span>
-                  <span className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(step.bodyKey)}</span>
-                  <ArrowRight
-                    className="mt-6 h-4 w-4 text-success transition-transform group-hover:translate-x-1"
-                    aria-hidden="true"
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </section>
   );

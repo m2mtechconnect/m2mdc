@@ -11,6 +11,7 @@ export { TwinArchitecture } from './TwinArchitecture';
 export { TwinSimulationWalkthrough } from './TwinSimulationWalkthrough';
 export { TwinIntegrationsGrid } from './TwinIntegrationsGrid';
 export { TwinUseCases } from './TwinUseCases';
+export { TwinBusinessCase } from './TwinBusinessCase';
 export { TwinDifferentiators } from './TwinDifferentiators';
 export { TwinTrustSection } from './TwinTrustSection';
 export { TwinCTASection } from './TwinCTASection';

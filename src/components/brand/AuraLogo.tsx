@@ -99,7 +99,7 @@ export function AuraLogo({
     <span
       className={cn(
         'flex min-w-0',
-        stacked ? 'flex-col items-center gap-1.5' : 'items-center gap-2.5',
+        stacked ? 'flex-col items-center gap-1' : 'items-center gap-2.5',
         className,
       )}
       role="img"
@@ -116,21 +116,21 @@ export function AuraLogo({
       <AuraNodeMark
         tone={surface === 'dark' ? 'light' : 'dark'}
         monochrome={monochrome}
-        className={cn(stacked ? 'h-10 w-10' : 'h-8 w-8')}
+        className={cn(stacked ? 'h-8 w-8' : 'h-8 w-8')}
       />
       {!compact && (
         <span className={cn('flex min-w-0 flex-col leading-none', stacked && 'gap-0.5')}>
           <span
             className={cn(
               'font-bold tracking-[0.18em]',
-              stacked ? 'text-xl' : 'text-lg',
+              'text-lg',
               wordTone,
             )}
           >
             AURA
           </span>
           {tagline ? (
-            <span className={cn('mt-1 text-xs tracking-wide', parentTone)}>{tagline}</span>
+            <span className={cn(stacked ? 'mt-0.5 text-xs tracking-wide' : 'mt-1 text-xs tracking-wide', parentTone)}>{tagline}</span>
           ) : null}
         </span>
       )}

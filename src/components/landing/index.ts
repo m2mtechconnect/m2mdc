@@ -9,6 +9,7 @@ export { TwinFeatureSection } from './TwinFeatureSection';
 export { TwinStatsBand } from './TwinStatsBand';
 export { TwinProblemStatement } from './TwinProblemStatement';
 export { TwinPillars } from './TwinPillars';
+export { TwinSimulationWalkthrough } from './TwinSimulationWalkthrough';
 export { TwinIntegrationsGrid } from './TwinIntegrationsGrid';
 export { TwinUseCases } from './TwinUseCases';
 export { TwinDifferentiators } from './TwinDifferentiators';

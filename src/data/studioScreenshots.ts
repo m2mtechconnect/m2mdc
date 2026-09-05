@@ -21,45 +21,45 @@ export interface StudioScreenshotsManifest {
 // Real Studio UI screenshots
 export const studioScreenshots: Record<string, ScreenshotVariants> = {
   dashboard: {
-    desktop: '/landing/screenshots/dashboard-desktop.png',
-    alt: 'Data Centre Command dashboard with live KPIs: PUE 1.38, GPU Saturation 23%, Thermal Stability 94%, Sovereign Compute 98%',
+    desktop: '/landing/screenshots/dashboard-desktop.webp',
+    alt: 'AURA Data Centre Command dashboard with modelled KPI cockpit, rack status overview and simulated event timeline',
     title: 'Data Centre Command',
   },
-  blueprint: {
-    desktop: '/landing/screenshots/blueprint-desktop.png',
-    alt: 'Blueprint Designer showing 9 agents, 23 data sources, 58 KPIs, 25 workflows with Agent Health panel',
-    title: 'Blueprint Designer',
+  power: {
+    desktop: '/landing/screenshots/power-desktop.webp',
+    alt: 'AURA power view showing the distribution chain from grid to racks with UPS bank status and redundancy level',
+    title: 'Power Chain & Resilience',
   },
   simulation: {
-    desktop: '/landing/screenshots/simulation-desktop.png',
-    alt: '3D Digital Twin with thermal rack visualization, simulation controls, and scenario selection panel',
+    desktop: '/landing/screenshots/simulation-desktop.webp',
+    alt: 'AURA scenario simulation running a GPU spike with 3D hall, simulation controls and scenario clock',
     title: '3D Digital Twin & Simulation',
   },
   telemetry: {
-    desktop: '/landing/screenshots/telemetry-desktop.png',
-    alt: 'Thermal telemetry showing rack temperatures 19-28°C, GPU temps 67°C, and inlet temp 21.9°C',
+    desktop: '/landing/screenshots/telemetry-desktop.webp',
+    alt: 'AURA thermal telemetry with rack thermal map, average inlet temperature and GPU temperatures',
     title: 'Thermal Telemetry',
   },
   cooling: {
-    desktop: '/landing/screenshots/cooling-desktop.png',
-    alt: 'Cooling zones dashboard with 8 zones, ambient temps, airflow CFM, and humidity monitoring',
+    desktop: '/landing/screenshots/cooling-desktop.webp',
+    alt: 'AURA cooling zones view with ambient temperature, target setpoint, humidity and airflow per zone',
     title: 'Cooling Management',
   },
   sovereignty: {
-    desktop: '/landing/screenshots/sovereignty-desktop.png',
-    alt: 'Sovereignty dashboard showing 100% score, data residency compliance, 5 certified frameworks, 95% audit readiness',
+    desktop: '/landing/screenshots/sovereignty-desktop.webp',
+    alt: 'AURA sovereignty view with data residency status, classification distribution and compliance frameworks',
     title: 'Sovereignty & Compliance',
   },
   carbon: {
-    desktop: '/landing/screenshots/carbon-desktop.png',
-    alt: 'Carbon tracking with 100% efficiency score, 99% renewable mix, regional grid comparison CA-QC vs CA-AB',
+    desktop: '/landing/screenshots/carbon-desktop.webp',
+    alt: 'AURA carbon view with efficiency score, renewable mix, carbon budget status and regional grid comparison',
     title: 'Carbon & Sustainability',
   },
 };
 
 // Manifest metadata
 export const screenshotManifest: StudioScreenshotsManifest = {
-  version: '5.0.0',
+  version: '6.0.0',
   generatedAt: new Date().toISOString(),
   screenshots: studioScreenshots,
 };

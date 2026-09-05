@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
 import { useTranslation } from "react-i18next";
-import { AuraNodeMark } from "@/components/brand/AuraLogo";
+
 
 const LazyLoomDemoModal = lazy(() =>
   import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
@@ -149,14 +149,14 @@ export function TwinHero() {
                     twin-studio.m2mtechconnect.com/dashboard
                   </span>
                 </div>
-                <div className="relative aspect-[16/9] overflow-hidden">
+                <div className="relative aspect-[16/10] overflow-hidden">
                   <img
-                    src={`/landing/screenshots/dashboard-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`}
-                    alt="AURA Data Centre Digital Twin dashboard showing 3D rack thermal visualization, PUE metrics, GPU utilization, and carbon emissions"
-                    width={1024}
-                    height={1024}
+                    src={`/landing/screenshots/simulation-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`}
+                    alt="AURA scenario simulation running a GPU spike scenario with the 3D data hall, PUE, utilisation and carbon intensity"
+                    width={1440}
+                    height={900}
                     decoding="async"
-                    className="w-full h-auto -translate-y-[22%]"
+                    className="h-full w-full object-cover object-top"
                     loading="eager"
                     // React 18 DOM does not recognize camelCase `fetchPriority`
                     // (React 19 API); it must reach the DOM as the lowercase
@@ -164,11 +164,6 @@ export function TwinHero() {
                     // fails the truth suite's console-cleanliness assertions.
                     {...{ fetchpriority: 'high' }}
                   />
-                  {/* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */}
-                  <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
-                    <AuraNodeMark tone="light" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                    <span className="text-[10px] font-semibold tracking-[0.16em] text-[#F5F7FA] sm:text-xs">AURA</span>
-                  </div>
                 </div>
               </div>
             </div>

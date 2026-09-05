@@ -24,6 +24,13 @@ import {
   type ClimateBand,
   type CoolingTopology,
 } from '@/lib/blueprint/publicBlueprintEstimator';
+import {
+  PUBLIC_SCENARIO_IDS,
+  runPublicScenario,
+  type PublicScenarioId,
+  type ScenarioRunResult,
+} from '@/lib/blueprint/publicScenarioRun';
+
 
 const COOLING_OPTIONS: CoolingTopology[] = ['air', 'rear-door', 'direct-liquid', 'immersion'];
 const CLIMATE_OPTIONS: ClimateBand[] = ['cold', 'temperate', 'hot'];

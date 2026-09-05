@@ -82,7 +82,7 @@ export default function RequestDemo() {
         <meta property="og:url" content="https://auradc.m2mtechconnect.com/request-demo" />
         <meta property="og:type" content="website" />
       </Helmet>
-      <div className="flex min-h-screen flex-col bg-[#0A0A0A]">
+      <div className="aura-marketing flex min-h-screen flex-col bg-[#0A0A0A]">
         <header className="border-b border-white/10">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
             <a href="/" className="flex items-center gap-2 text-sm text-[#AEB4BC] transition-colors hover:text-[#F5F7FA]">

@@ -18,3 +18,6 @@ export { TwinCTASection } from './TwinCTASection';
 export { ScrollReveal } from './ScrollReveal';
 export { TwinFooter } from './TwinFooter';
 export { SectionHeading } from './SectionHeading';
+export { TwinBenefits } from './TwinBenefits';
+export { TwinSecondaryCapabilities } from './TwinSecondaryCapabilities';
+export { TwinFAQ, FAQ_KEYS } from './TwinFAQ';

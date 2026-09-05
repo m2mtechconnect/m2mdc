@@ -83,6 +83,41 @@ function DeferredMarketingBody() {
   );
 }
 
+/**
+ * FAQ structured data. Mirrors the visible answers rendered by TwinFAQ and
+ * states the platform's truth semantics: no live telemetry, no vendor runtime.
+ */
+const FAQ_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      q: 'Is AURA showing live data from my facility?',
+      a: 'No. AURA has no live telemetry sources connected today. Every operational number you see is simulated or replayed, and it is labelled that way in the interface.',
+    },
+    {
+      q: 'What is the difference between configured, connected and verified?',
+      a: 'Configured means a system is described in the blueprint. Connected means a link exists. Verified means evidence was checked and recorded. AURA never collapses these into a single green state.',
+    },
+    {
+      q: 'Does AURA integrate with NVIDIA Omniverse or DSX?',
+      a: 'No. AURA is a DSX-aligned architecture rendered by its own web runtime. No NVIDIA runtime component is deployed, and none is claimed.',
+    },
+    {
+      q: 'Can I use it for a new AI factory build, not just an existing hall?',
+      a: 'Yes. Most teams start in the blueprint before racks exist, then run scenarios against the design.',
+    },
+    {
+      q: 'What can I do in a free account?',
+      a: 'Create a facility blueprint, run the scenario library against it, and read the KPI impact. No production connection is required.',
+    },
+  ].map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a },
+  })),
+};
+
 /** Public, read-only marketing landing page for AURA DC. */
 export default function DataCentreTwinLanding() {
   return (
@@ -90,7 +125,9 @@ export default function DataCentreTwinLanding() {
       <Helmet>
         <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
         <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />
+        <script type="application/ld+json">{JSON.stringify(FAQ_JSON_LD)}</script>
       </Helmet>
+
       <SkipToContent />
       <TwinHeader />
       <main id={MAIN_CONTENT_ID}>

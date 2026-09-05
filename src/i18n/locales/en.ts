@@ -263,6 +263,7 @@ const en = {
     archOperateI2: 'Alerts, workflow and audit trail',
     archOperateI3: 'Provenance-labelled KPIs',
     archTruthNote: 'Configured is not connected. Connected is not verified. Simulated is not measured.',
+    archPageLink: 'Explore the full architecture',
     faqQ6: 'How is AURA architected?',
     faqA6: 'Four connected areas: a facility blueprint as the single source of truth, power/cooling/thermal/carbon engines, a scenario simulator, and operational views with provenance-labelled KPIs. See the System Architecture section above.',
     // Stats Band

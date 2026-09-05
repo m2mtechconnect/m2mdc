@@ -9,6 +9,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';

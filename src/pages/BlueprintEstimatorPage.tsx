@@ -24,6 +24,13 @@ import {
   type ClimateBand,
   type CoolingTopology,
 } from '@/lib/blueprint/publicBlueprintEstimator';
+import {
+  PUBLIC_SCENARIO_IDS,
+  runPublicScenario,
+  type PublicScenarioId,
+  type ScenarioRunResult,
+} from '@/lib/blueprint/publicScenarioRun';
+
 
 const COOLING_OPTIONS: CoolingTopology[] = ['air', 'rear-door', 'direct-liquid', 'immersion'];
 const CLIMATE_OPTIONS: ClimateBand[] = ['cold', 'temperate', 'hot'];
@@ -52,11 +59,25 @@ export default function BlueprintEstimatorPage() {
   const [spec, setSpec] = useState<BlueprintEstimatorInput>(ESTIMATOR_DEFAULTS);
 
   const report = useMemo(() => runBlueprintEstimate(spec), [spec]);
+  const specKey = useMemo(() => JSON.stringify(spec), [spec]);
+
+  const [scenarioId, setScenarioId] = useState<PublicScenarioId>(PUBLIC_SCENARIO_IDS[0]);
+  const [runState, setRunState] = useState<{ result: ScenarioRunResult; specKey: string } | null>(
+    null,
+  );
+  const runResult = runState?.result ?? null;
+  const runIsStale = runState !== null && runState.specKey !== specKey;
+
+  const handleRunScenario = () => {
+    const result = runPublicScenario(scenarioId, spec, report);
+    if (result) setRunState({ result, specKey });
+  };
 
   const setNumber = (key: keyof BlueprintEstimatorInput) => (raw: string) => {
     const parsed = Number(raw);
     setSpec((current) => ({ ...current, [key]: Number.isFinite(parsed) ? parsed : 0 }));
   };
+
 
   const kpis = [
     {
@@ -442,7 +463,157 @@ export default function BlueprintEstimatorPage() {
                 </div>
               </div>
 
+              {/* Scenario run through the AURA simulation engine */}
+              <div className="mt-10 border border-[#3A3A3A] bg-[#0F0F10] p-6">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-success">
+                  {t('blueprintTool.scenario.title')}
+                </h3>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[#C9CDD3]">
+                  {t('blueprintTool.scenario.intro')}
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-2" role="group" aria-label={t('blueprintTool.scenario.pickLabel')}>
+                  {PUBLIC_SCENARIO_IDS.map((id) => {
+                    const active = id === scenarioId;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        aria-pressed={active}
+                        onClick={() => setScenarioId(id)}
+                        className={`rounded-none border px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] transition-colors ${
+                          active
+                            ? 'border-success bg-success/15 text-success'
+                            : 'border-white/20 text-[#C9CDD3] hover:border-white/40 hover:text-[#F5F7FA]'
+                        }`}
+                      >
+                        {t(`blueprintTool.scenario.names.${id}`)}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleRunScenario}
+                  className="mt-6 h-12 rounded-none bg-success px-8 text-sm font-bold uppercase tracking-[0.16em] text-[#0A0A0A] hover:bg-success/90"
+                >
+                  {t('blueprintTool.scenario.runCta')}
+                </Button>
+
+                {runResult === null ? (
+                  <p className="mt-6 text-sm text-[#AEB4BC]">{t('blueprintTool.scenario.idle')}</p>
+                ) : (
+                  <div className="mt-8">
+                    {runIsStale && (
+                      <p className="mb-6 border border-warning/40 bg-warning/10 p-3 text-xs uppercase tracking-[0.14em] text-warning">
+                        {t('blueprintTool.scenario.stale')}
+                      </p>
+                    )}
+                    <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">
+                      {t('blueprintTool.scenario.runMeta', {
+                        name: t(`blueprintTool.scenario.names.${runResult.scenarioId}`),
+                        minutes: Math.round(runResult.durationSeconds / 60),
+                        events: runResult.events.length,
+                      })}
+                    </p>
+
+                    <div className="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
+                          {runResult.peakPue.toFixed(2)}
+                        </p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">
+                          {t('blueprintTool.scenario.peakPue', {
+                            design: runResult.designPue.toFixed(2),
+                          })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
+                          {numberFormat(runResult.peakOverheadKw)} kW
+                        </p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">
+                          {t('blueprintTool.scenario.peakOverhead')}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
+                          {numberFormat(runResult.peakOverheadCostPerHour, 2)}
+                        </p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">
+                          {t('blueprintTool.scenario.peakCost', {
+                            carbon: numberFormat(runResult.peakOverheadKgCo2ePerHour, 2),
+                          })}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-mono text-2xl font-bold text-[#F5F7FA]">
+                          {runResult.lowestThermalStability.toFixed(0)}
+                        </p>
+                        <p className="mt-1 text-xs text-[#AEB4BC]">
+                          {t('blueprintTool.scenario.lowestThermal', {
+                            cooling: runResult.lowestCoolingEfficiency.toFixed(0),
+                          })}
+                        </p>
+                      </div>
+                    </div>
+
+                    <h4 className="mt-8 text-xs font-semibold uppercase tracking-[0.2em] text-success">
+                      {t('blueprintTool.scenario.timelineTitle')}
+                    </h4>
+                    <table className="mt-4 w-full border-collapse text-sm">
+                      <caption className="sr-only">
+                        {t('blueprintTool.scenario.timelineTitle')}
+                      </caption>
+                      <thead>
+                        <tr className="border-b border-white/15 text-left text-xs uppercase tracking-[0.14em] text-[#AEB4BC]">
+                          <th scope="col" className="py-2 font-semibold">
+                            {t('blueprintTool.scenario.colTime')}
+                          </th>
+                          <th scope="col" className="py-2 font-semibold">
+                            {t('blueprintTool.scenario.colEvent')}
+                          </th>
+                          <th scope="col" className="py-2 text-right font-semibold">
+                            {t('blueprintTool.scenario.colPue')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {runResult.events.map((event) => (
+                          <tr key={event.id} className="border-b border-white/10 align-top">
+                            <td className="py-2 pr-4 font-mono text-xs text-[#AEB4BC]">
+                              {`${String(Math.floor(event.at / 60)).padStart(2, '0')}:${String(
+                                event.at % 60,
+                              ).padStart(2, '0')}`}
+                            </td>
+                            <td className="py-2 pr-4">
+                              <span className="text-[#F5F7FA]">{event.title}</span>
+                              <span className="block text-xs text-[#AEB4BC]">
+                                {event.description}
+                              </span>
+                            </td>
+                            <td
+                              className={`py-2 text-right font-mono ${
+                                event.pue > runResult.designPue ? 'text-warning' : 'text-[#F5F7FA]'
+                              }`}
+                            >
+                              {event.pue.toFixed(3)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+
+                    <p className="mt-5 font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">
+                      {t('blueprintTool.scenario.provenance')}
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Assumptions */}
+
               <h3 className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-success">
                 {t('blueprintTool.assumptionsTitle')}
               </h3>

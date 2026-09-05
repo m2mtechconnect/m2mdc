@@ -1641,7 +1641,34 @@ const en = {
     },
     truthNote:
       'Configured is not connected. Connected is not verified. Simulated is not measured.',
+    scenario: {
+      title: 'Run this design through the AURA simulation engine',
+      intro:
+        'The estimate above is a steady-state design point. Pick an operating scenario and AURA runs the same preset event timeline the platform uses, starting from the design you entered, and reports what happens to PUE, cooling headroom and cost while the event plays out.',
+      pickLabel: 'Choose a scenario',
+      names: {
+        gpu_spike_training_job: 'GPU spike',
+        cooling_failure_hot_aisle: 'Cooling unit failure',
+        ups_failure_runtime_drop: 'UPS degradation',
+        grid_outage_ups_generator_failover: 'Grid outage',
+      },
+      runCta: 'Run scenario',
+      idle: 'No scenario has been run yet. Pick one above and run it to see the results.',
+      stale: 'Your design changed after this run. Run the scenario again to refresh the results.',
+      runMeta: '{{name}} - {{minutes}} min timeline - {{events}} events executed',
+      peakPue: 'Worst PUE reached (design point {{design}})',
+      peakOverhead: 'Extra facility load at the worst moment',
+      peakCost: 'Cost of that extra load per hour ({{carbon}} kg CO2e/h)',
+      lowestThermal: 'Lowest thermal stability score (cooling index {{cooling}})',
+      timelineTitle: 'Event timeline',
+      colTime: 'Time',
+      colEvent: 'Event',
+      colPue: 'PUE',
+      provenance:
+        'Simulated scenario output computed in your browser from your inputs. Not measured telemetry.',
+    },
     ctaPrimary: 'Build the full blueprint',
+
     ctaSecondary: 'Talk to an engineer',
   },
 

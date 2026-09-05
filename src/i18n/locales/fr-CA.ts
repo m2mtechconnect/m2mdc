@@ -1642,7 +1642,34 @@ const frCA = {
     },
     truthNote:
       "Configuré n'est pas connecté. Connecté n'est pas vérifié. Simulé n'est pas mesuré.",
+    scenario: {
+      title: "Exécuter cette conception dans le moteur de simulation AURA",
+      intro:
+        "L'estimation ci-dessus correspond à un point de conception en régime permanent. Choisissez un scénario d'exploitation : AURA exécute la même chronologie d'événements que la plateforme, à partir de la conception saisie, et indique l'effet sur le PUE, la marge de refroidissement et les coûts pendant l'événement.",
+      pickLabel: 'Choisir un scénario',
+      names: {
+        gpu_spike_training_job: 'Pointe de charge GPU',
+        cooling_failure_hot_aisle: 'Panne de refroidissement',
+        ups_failure_runtime_drop: "Dégradation de l'ASI",
+        grid_outage_ups_generator_failover: 'Panne du réseau électrique',
+      },
+      runCta: 'Exécuter le scénario',
+      idle: "Aucun scénario n'a encore été exécuté. Choisissez-en un ci-dessus et lancez-le pour voir les résultats.",
+      stale: 'Votre conception a changé après cette exécution. Relancez le scénario pour actualiser les résultats.',
+      runMeta: '{{name}} - chronologie de {{minutes}} min - {{events}} événements exécutés',
+      peakPue: 'PUE le plus défavorable atteint (point de conception {{design}})',
+      peakOverhead: 'Charge supplémentaire du bâtiment au pire moment',
+      peakCost: 'Coût horaire de cette charge supplémentaire ({{carbon}} kg éq. CO2/h)',
+      lowestThermal: 'Score de stabilité thermique le plus bas (indice de refroidissement {{cooling}})',
+      timelineTitle: 'Chronologie des événements',
+      colTime: 'Heure',
+      colEvent: 'Événement',
+      colPue: 'PUE',
+      provenance:
+        "Résultat de scénario simulé calculé dans votre navigateur à partir de vos données. Il ne s'agit pas de télémétrie mesurée.",
+    },
     ctaPrimary: 'Construire le plan directeur complet',
+
     ctaSecondary: 'Parler à un ingénieur',
   },
 

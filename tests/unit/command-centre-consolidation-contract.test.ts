@@ -7,6 +7,7 @@ const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file)
 describe('Command Center consolidation contract', () => {
   const commandCentre = read('src/workspace/CommandCentre.tsx');
   const highlights = read('src/workspace/dashboard/FacilityHighlights.tsx');
+  const actionCenter = read('src/workspace/dashboard/ActionCenter.tsx');
 
   it('renders one facility identity surface instead of stacked workspace and facility heroes', () => {
     expect(commandCentre).not.toContain('<WorkspaceHeader');
@@ -30,5 +31,12 @@ describe('Command Center consolidation contract', () => {
     expect(commandCentre).toContain("provenance: 'simulated'");
     expect(commandCentre).toContain('Not measured telemetry.');
     expect(highlights).toContain('{provenance}');
+  });
+
+  it('announces changing action counts and the empty state to assistive technology', () => {
+    expect(actionCenter).toContain('aria-live="polite"');
+    expect(actionCenter).toContain('aria-atomic="true"');
+    expect(actionCenter).toContain('data-testid="action-center-count"');
+    expect(actionCenter).toContain('role="status"');
   });
 });

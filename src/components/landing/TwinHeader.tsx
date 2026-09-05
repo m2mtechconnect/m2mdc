@@ -62,10 +62,10 @@ export function TwinHeader() {
     >
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          <a href="/" className="flex items-center" aria-label="M2M AURA home">
+          <a href="/" className="flex items-center" aria-label="AURA home">
             <AuraLogo surface="light" className="hidden sm:flex" />
             <AuraLogo surface="light" compact className="sm:hidden" />
-            <h1 className="sr-only">M2M AURA - Sovereign AI Data Centre Digital Twin Platform</h1>
+            <h1 className="sr-only">AURA - Sovereign AI Data Centre Digital Twin Platform</h1>
           </a>
 
           <nav className="hidden lg:flex items-center gap-1" aria-label="Public navigation">

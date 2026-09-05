@@ -47,4 +47,11 @@ describe('AURA brand asset regression guard', () => {
     expect(logo).toContain('AuraNodeMark');
     expect(logo).not.toContain('m2m-logo');
   });
+
+  it('keeps the product lockup AURA-only and vendor-neutral', () => {
+    const logo = readFileSync(path.join(SRC, 'components', 'brand', 'AuraLogo.tsx'), 'utf8');
+    expect(logo).not.toContain('M2M');
+    expect(logo).not.toContain('NVIDIA');
+    expect(logo).toContain('AURA_TECH_GREEN');
+  });
 });

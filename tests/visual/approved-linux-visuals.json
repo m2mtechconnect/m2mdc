@@ -2,10 +2,10 @@
   "schema": "aura.visual-fingerprint.v1",
   "contract": "global-light-supported-surfaces",
   "baselineSource": {
-    "sha": "f2af3cc3781e4fde61226776ab264d72c0842be0",
-    "workflowRunId": 33629286801,
-    "artifactId": 9846158523,
-    "artifactZipSha256": "8c96c9510d1d896be19c0b8743021a1765f83a1bf1c3552a39e02c90813dc71a"
+    "sha": "a0e776c32f1c7dbb2c280f0e533c47c970cc2f43",
+    "workflowRunId": 33935700180,
+    "artifactId": 9960110607,
+    "artifactZipSha256": "8cff3f953b58daf657544e631bf9df92a49c626ff55923560b8cb4039f39f6bb"
   },
   "notes": [
     "PR #127 exact-head review approved intentional changes on analytics desktop/mobile, Builder deployment readiness, and Connections desktop/mobile. The reviewed artifact showed one readiness heading, corrected Connections ownership, visible provenance labels without trend overlap, and no duplicate inspector close control.",
@@ -36,48 +36,49 @@
     "2026-08-29 exact-head review inspected desktop and 375px mobile Command Center captures from Visual Regression workflow 33272669880 at source 960a6f542ba711646a698123b47db6a043bab108. The owner approved the reviewed fingerprints while authorizing merge and publication. The change removes the duplicate generic workspace hero, keeps a single facility-led page title and simulated provenance, moves secondary facility actions into progressive disclosure, preserves the five-workspace navigation, and shows no blocking clipping, overlap or page-level horizontal overflow. The other 18 fingerprints remained exact.",
     "2026-08-30 exact-head qualification inspected all 20 current screenshots from Visual Regression workflow 33291409607 at source f5f1bb88235dc5ee67de9b0182192585b787394d. The owner explicitly approved the 17 changed SHA-256 fingerprints from artifact 9726093184 after visible review confirmed that the consolidated route truth, deterministic rendering and authenticated content/footer layout correction introduced no duplicate close controls, blank Simulation canvas, clipped primary controls, overlap or page-level horizontal overflow. Command Center desktop/mobile remained exact and Simulation desktop retained its responsive invariant; six full-page captures became exactly 49 pixels shorter under the corrected content-height contract.",
     "2026-09-02 exact-head qualification inspected all 20 screenshots from Visual Regression workflow 33625703952 at source 49919a2ddc6217cc702c3801bd2c1b6c51887d04. The first candidate artifact was rejected after review exposed a repeated organization suffix. The corrected artifact 9844751169 was then visibly reviewed: activation desktop/mobile remain fail-closed with explicit persisted-evidence blockers, Builder deployment readiness exposes the missing KPI and server-validated simulation requirements, and Command Center desktop/mobile show the persona priority journey without duplicated scope copy, clipped primary controls, overlap or page-level horizontal overflow. The other 15 fingerprints remained exact or retained their approved responsive invariant.",
-    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not."
+    "2026-09-02 release-validator correction reviewed all 20 screenshots from workflow 33629286801 at source f2af3cc3781e4fde61226776ab264d72c0842be0. Nineteen retained their approved fingerprints or responsive invariant. Teams was visually unchanged; decoded comparison found one of 921,600 pixels differed by one RGB level at the compositor boundary. Its full-image contract now uses a four-bit-per-channel pixel fingerprint so meaningful rendered changes still fail while imperceptible encoder antialiasing noise does not.",
+    "2026-09-04 exact-head review inspected all 20 screenshots from Visual Regression workflow 33935700180 at source a0e776c32f1c7dbb2c280f0e533c47c970cc2f43 and artifact 9960110607. The reviewed AURA-owned, vendor-neutral lockup intentionally removes the M2M wordmark and uses the AURA technical accent across the authenticated shell; all 17 changed shell fingerprints remain aligned with the existing light-theme contract with no clipping, overlap, contradictory scope copy or page-level horizontal overflow. The 17 changed fingerprints were approved; Simulation responsive invariants and the three remaining exact fingerprints were retained."
   ],
   "screenshots": [
     {
       "file": "activation-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "84034c17cb897c5884a7e34117bd52a1821f8c4fb8dc86d7e0d29787ba0a9405",
+      "sha256": "4c2afee8cfd388e47f05ca985b61e437b400be534d612f200553b2407772b830",
       "width": 1280,
       "height": 1745
     },
     {
       "file": "activation-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "8a8fb0578102f9c4257819f89998551227812a811b236cb24b8dac8e63d84fde",
+      "sha256": "a95741c7cd2bad4120a71fa5f3b9a4a75f42d4d214c07a40bdbcc9c40b4fe8b9",
       "width": 375,
       "height": 3242
     },
     {
       "file": "ai-runtime-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "f5bb9576158030ed62e482d3993e9de96b078808566ae0cd5a900644a3405a27",
+      "sha256": "31a458c9ed704c1193eb49497bc4569e5c18c9ff361f47be07a5e356cf35891f",
       "width": 1280,
       "height": 857
     },
     {
       "file": "analytics-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "e3722225474479585444fa0e31b113f92eaf3a811d2b4e814b1c1a09fa50fefc",
+      "sha256": "59547233617ca8480a820eebba42e0eabe52b6ba4f49d14197ebded2f88a1994",
       "width": 375,
       "height": 5553
     },
     {
       "file": "analytics-roi-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "343dc1d5bc19f869a3ea6a01d5fe81f561f7fb379443125939f6609f0710fe48",
+      "sha256": "96eb54c8c044d97239d697a711a4aca43b5c50f06bb9cdc1ed900b50f360aae8",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-first-run-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "166a853a2e3639d1d5c33a588850222ef1a4e4a0ae808a311f3ed982cda38e88",
+      "sha256": "df315b7cea779a7de5baca1c5425f1942c360ed6881bec968ee7a0e0c6b9f41b",
       "width": 1280,
       "height": 720
     },
@@ -91,70 +92,70 @@
     {
       "file": "builder-step1-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "d23a4fad778c60a640afc69b891d9530ef2730e626add228c7dec04c68f9032c",
+      "sha256": "61ac2cc7649bbe68e72a8e3845169c38d97b36443046227716e1fb949f520263",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step2-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "415bdc528446be21194970739a00aa8aed0b56a918697f863edb07f7082b10cd",
+      "sha256": "6d5290820a4adbd00969e61b60a799a0eeece0e210396190f58ab03d11143406",
       "width": 1280,
       "height": 720
     },
     {
       "file": "builder-step5-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "d548f723849eaec7d727c6fb9d0d0ae8a155cb552a055ca89f4958b0f668ce2f",
+      "sha256": "f5e4023a45e3613c0af26b4020181138594fcc24ef786adad53bceaa755bd043",
       "width": 1280,
       "height": 720
     },
     {
       "file": "compliance-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "60ae257bbff48d818afae27e7f524a15c58b8c58327857f28fc4d1b543deba24",
+      "sha256": "8211e522a2e1519cdf1e01b7aa57e1ca6ba890396d4bdc108a49960067f7da6a",
       "width": 1280,
       "height": 720
     },
     {
       "file": "connections-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "ec763bc8410fcee6e23967a29c597a88eaad26438fbb92a441178ec1c94baa5f",
+      "sha256": "281ecbc6be8903105498ee3e6fe3261f6dbaf3aaa3d33b4ef8f14ca6673d765f",
       "width": 375,
       "height": 2731
     },
     {
       "file": "dashboard-hero-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "96cbc1e14a044acba2ee5434e25ab56db27c287f93abf7176cc1314218e961e0",
+      "sha256": "34f4decae1301fbcbde96ec3b9c75bcd8a44b4878b47055667b9996ea50303cd",
       "width": 1280,
       "height": 720
     },
     {
       "file": "dashboard-mobile-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "39b22dc6543ffe5b8eb50b43c5638fd65d06a1d8ea056210e00328f5b18920ef",
+      "sha256": "0de7ed364014b2c3c284f58eb802e8690c673249d41e1b22c986714145d02379",
       "width": 375,
       "height": 2367
     },
     {
       "file": "deployments-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "eb2b018f2a4d66bb6499939f28ef90a93dab31132367fec4c37b84196ed55ee9",
+      "sha256": "a9fd8ec8749a393609667612c2fb8cc0955f26985b04a701203ef5462ae6c8b0",
       "width": 1280,
       "height": 720
     },
     {
       "file": "evidence-overview-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "c1473dd43a9ed5e1ca342f665d02f475d88ca2d8f3458871837f32151ac2c28e",
+      "sha256": "312fbd5fa2be9cd5ad923703f4c349cd51069704684781102efd695f33ebf43d",
       "width": 1280,
       "height": 720
     },
     {
       "file": "integrations-light-chromium-linux.png",
       "mode": "sha256",
-      "sha256": "4650d023a65f8cc2b5c8d6e35c5d14c11742082e6b3f82968acadc95f0d3489b",
+      "sha256": "48a46dd25cfc88e614001bf783c5fa8e50349ece748348d4e12c670639eacb99",
       "width": 1280,
       "height": 720
     },
@@ -174,7 +175,7 @@
     {
       "file": "teams-light-chromium-linux.png",
       "mode": "pixel-sha256-4bit",
-      "pixelSha256": "871ee986ce4c0dc8712aa20500082a00e3a15a136f391de58ece57bb5fc1e5c9",
+      "pixelSha256": "52968dee178e77e92faef27f9cfe430434b27bdc27a3cc7aba89f6ecebc979da",
       "width": 1280,
       "height": 720
     }

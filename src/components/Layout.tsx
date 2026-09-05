@@ -168,7 +168,7 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex min-w-0 flex-1 items-center gap-3 lg:gap-5">
             <Link
               to="/dashboard"
-              aria-label="AURA Command Center - M2M"
+              aria-label="AURA Command Center"
               className="flex items-center flex-shrink-0 group"
             >
               <AuraLogo surface="light" className="hidden md:flex transition-transform group-hover:scale-[1.02]" />

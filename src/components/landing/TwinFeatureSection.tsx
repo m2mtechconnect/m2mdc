@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { screenshotManifest } from "@/data/studioScreenshots";
+import { AuraNodeMark } from "@/components/brand/AuraLogo";
 
 interface TwinFeatureSectionProps {
   title: string;
@@ -20,6 +21,8 @@ interface TwinFeatureSectionProps {
   imageHeight: number;
   flip?: boolean;
   accentColor?: "primary" | "success" | "info" | "warning";
+  /** Crop the letterboxed white top margin and cover the legacy M2M mark (dashboard screenshot). */
+  coverLegacyBrand?: boolean;
   cta?: {
     label: string;
     href: string;
@@ -55,6 +58,7 @@ export function TwinFeatureSection({
   imageHeight,
   flip = false,
   accentColor = "primary",
+  coverLegacyBrand = false,
   cta,
 }: TwinFeatureSectionProps) {
   const colors = colorMap[accentColor];
@@ -181,7 +185,7 @@ export function TwinFeatureSection({
               {/* Accent border highlight */}
               <div className={`absolute top-0 left-0 right-0 h-1 ${bgColor.replace('/10', '/50')} rounded-t-2xl`} />
               
-              <div className="aspect-[16/10] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative">
+              <div className={cn("bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative", coverLegacyBrand ? "aspect-[16/9]" : "aspect-[16/10]")}>
                 <motion.img 
                   src={resolvedImageSrc} 
                   alt={imageAlt}
@@ -189,9 +193,11 @@ export function TwinFeatureSection({
                   height={imageHeight}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover"
-                  initial={{ scale: 1.05 }}
-                  whileInView={{ scale: 1 }}
+                  className={coverLegacyBrand ? "w-full h-auto" : "w-full h-full object-cover"}
+                  /* The -22% shift crops the letterboxed white top margin; it lives in the
+                     motion props because framer-motion's inline transform overrides CSS classes. */
+                  initial={coverLegacyBrand ? { y: '-22%', scale: 1.05 } : { scale: 1.05 }}
+                  whileInView={coverLegacyBrand ? { y: '-22%', scale: 1 } : { scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8 }}
                   onError={(e) => {
@@ -200,6 +206,13 @@ export function TwinFeatureSection({
                 />
                 {/* Gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+                {coverLegacyBrand && (
+                  /* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */
+                  <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
+                    <AuraNodeMark tone="light" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                    <span className="text-[10px] font-semibold tracking-[0.16em] text-[#F5F7FA] sm:text-xs">AURA</span>
+                  </div>
+                )}
               </div>
             </motion.div>
           </motion.div>

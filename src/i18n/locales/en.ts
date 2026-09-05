@@ -110,7 +110,7 @@ const en = {
     features: 'Features',
     useCases: 'Use Cases',
     integrations: 'Integrations',
-    whyM2M: 'Why M2M',
+    whyM2M: 'Why AURA',
     omniverseLiveScene: 'AURA Twin Preview',
     solutions: 'Solutions',
     product: 'Product',
@@ -185,7 +185,7 @@ const en = {
     carbonNeutralInfra: 'Carbon-Aware Infrastructure Modelling',
     canadianDataSovereignty: 'Canadian Data Sovereignty',
     // Differentiators
-    theM2MDifference: 'The M2M Difference',
+    theM2MDifference: 'The AURA Difference',
     keyDashboardFeatures: 'Key Dashboard Features',
     differentiatorDescription: 'Features visible in the dashboard interface, accessible immediately after login.',
     sovereigntyScoreDashboard: 'Sovereignty Score Dashboard',

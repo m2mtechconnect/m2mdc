@@ -111,7 +111,7 @@ const frCA = {
     features: 'Fonctionnalités',
     useCases: "Cas d'utilisation",
     integrations: 'Intégrations',
-    whyM2M: 'Pourquoi M2M',
+    whyM2M: 'Pourquoi AURA',
     omniverseLiveScene: 'Aperçu du jumeau AURA',
     solutions: 'Solutions',
     product: 'Produit',
@@ -186,7 +186,7 @@ const frCA = {
     carbonNeutralInfra: 'Modélisation d\'infrastructure sobre en carbone',
     canadianDataSovereignty: 'Souveraineté des données canadiennes',
     // Différenciateurs
-    theM2MDifference: 'La différence M2M',
+    theM2MDifference: 'La différence AURA',
     keyDashboardFeatures: 'Fonctionnalités clés du tableau de bord',
     differentiatorDescription: "Fonctionnalités visibles dans l'interface du tableau de bord, accessibles immédiatement après la connexion.",
     sovereigntyScoreDashboard: 'Tableau de bord du score de souveraineté',

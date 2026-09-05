@@ -21,9 +21,10 @@ const featureDefs = [
     bulletKeys: ['landing.featureDashboardB1', 'landing.featureDashboardB2', 'landing.featureDashboardB3'],
     imageSrc: '/landing/screenshots/dashboard-desktop.webp',
     imageAlt: 'Data Centre Command dashboard showing PUE, GPU saturation, thermal stability and sovereign compute metrics',
-    imageWidth: 1564,
-    imageHeight: 879,
+    imageWidth: 1024,
+    imageHeight: 1024,
     accentColor: 'primary' as const,
+    coverLegacyBrand: true,
   },
   {
     titleKey: 'landing.feature3dTitle',
@@ -111,6 +112,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
               imageHeight={feature.imageHeight}
               flip={feature.flip}
               accentColor={feature.accentColor}
+              coverLegacyBrand={'coverLegacyBrand' in feature ? feature.coverLegacyBrand : undefined}
             />
           </ScrollReveal>
         ))}

@@ -7,7 +7,7 @@
 import { Link } from "react-router-dom";
 import { Linkedin, Twitter, Mail, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import m2mLogo from "@/assets/m2m-logo.png";
+import { AuraLogo } from "@/components/brand/AuraLogo";
 
 const socialLinks = [
   { icon: Linkedin, href: "https://linkedin.com/company/m2mtechconnect", label: "LinkedIn" },
@@ -73,12 +73,8 @@ export function TwinFooter() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand column */}
           <div className="col-span-2 md:col-span-4 lg:col-span-1 mb-8 lg:mb-0">
-            <a href="https://m2mtechconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 mb-4 group">
-              <img src={m2mLogo} alt="M2M Tech Connect" width={326} height={326} loading="lazy" decoding="async" className="h-10 w-auto transition-transform group-hover:scale-105" />
-              <div>
-                <span className="font-display font-bold text-lg text-white">M2M</span>
-                <span className="font-display font-medium text-lg text-slate-200 ml-1">AURA</span>
-              </div>
+            <a href="https://m2mtechconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 mb-4 group" aria-label="AURA by M2M Tech Connect">
+              <AuraLogo surface="dark" className="transition-transform group-hover:scale-105" />
             </a>
             <p className="text-sm text-slate-300 mb-6 max-w-xs">{t('landing.footerDescription')}</p>
             <div className="flex items-center gap-3">

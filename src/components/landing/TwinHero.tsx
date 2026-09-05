@@ -12,13 +12,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-
-const LazyLoomDemoModal = lazy(() =>
-  import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
-);
 
 /** AURA hero footage (CDN asset). User-supplied, verified free of third-party logos. */
 const HERO_VIDEO_URL = "/__l5e/assets-v1/8f33396c-f1c0-426b-b231-3ea14276a02a/aura-hero-twin.mp4";
@@ -27,7 +22,6 @@ const HERO_VIDEO_URL = "/__l5e/assets-v1/8f33396c-f1c0-426b-b231-3ea14276a02a/au
 export function TwinHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [demoOpen, setDemoOpen] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
 
   // Never start the decorative video from an idle callback: performance audits
@@ -100,7 +94,7 @@ export function TwinHero() {
             <Button
               size="lg"
               className="group h-14 rounded-none bg-accent px-8 text-sm font-bold uppercase tracking-[0.16em] text-accent-foreground hover:bg-accent/90"
-              onClick={() => navigate("/onboarding")}
+              onClick={() => navigate("/sign-up")}
             >
               {t('landing.getStartedFree')}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -108,7 +102,7 @@ export function TwinHero() {
             <button
               type="button"
               className="group flex items-center gap-3 text-[#F5F7FA]"
-              onClick={() => setDemoOpen(true)}
+              onClick={() => navigate("/request-demo")}
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 transition-colors group-hover:border-success group-hover:bg-white/5">
                 <Play className="h-4 w-4" aria-hidden="true" />
@@ -118,12 +112,6 @@ export function TwinHero() {
           </div>
         </div>
       </section>
-
-      {demoOpen && (
-        <Suspense fallback={null}>
-          <LazyLoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
-        </Suspense>
-      )}
     </>
   );
 }

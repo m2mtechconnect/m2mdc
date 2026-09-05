@@ -8,6 +8,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { SectionHeading } from './SectionHeading';
+import { ParallaxImage } from "./Parallax";
 
 export interface SecondaryCapability {
   title: string;
@@ -40,17 +41,13 @@ export function TwinSecondaryCapabilities({ items }: { items: SecondaryCapabilit
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: index * 0.08 }}
             >
-              <div className="overflow-hidden border border-white/10">
-                <img
-                  src={item.imageSrc}
-                  alt={item.imageAlt}
-                  width={item.imageWidth}
-                  height={item.imageHeight}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-auto w-full"
-                />
-              </div>
+              <ParallaxImage
+                src={item.imageSrc}
+                alt={item.imageAlt}
+                width={item.imageWidth}
+                height={item.imageHeight}
+                containerClassName="aspect-[16/10] border border-white/10"
+              />
               <span className="mt-5 block font-mono text-xs text-success">
                 {String(index + 1).padStart(2, '0')}
               </span>

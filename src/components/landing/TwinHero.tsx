@@ -12,7 +12,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 /** AURA hero footage (CDN asset). User-supplied, verified free of third-party logos. */
@@ -23,6 +24,14 @@ export function TwinHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showVideo, setShowVideo] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const videoY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 90]), {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.4,
+  });
 
   // Never start the decorative video from an idle callback: performance audits
   // can observe idle work and pull the multi-MB asset into the initial network
@@ -52,10 +61,10 @@ export function TwinHero() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[#0A0A0A]">
+      <section ref={heroRef} className="relative overflow-hidden bg-[#0A0A0A]">
         <div className="absolute inset-0 z-0" aria-hidden="true">
           {showVideo && (
-            <video
+            <motion.video
               autoPlay
               loop
               muted
@@ -63,10 +72,11 @@ export function TwinHero() {
               preload="none"
               width={1280}
               height={680}
-              className="absolute inset-0 h-full w-full object-cover opacity-60"
+              className="absolute -top-[8%] left-0 h-[116%] w-full object-cover opacity-60"
+              style={prefersReducedMotion ? undefined : { y: videoY }}
             >
               <source src={HERO_VIDEO_URL} type="video/mp4" />
-            </video>
+            </motion.video>
           )}
           {/* Legibility scrims: darken left/bottom so copy always reads over footage */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/90 via-[#0A0A0A]/55 to-[#0A0A0A]/25" />

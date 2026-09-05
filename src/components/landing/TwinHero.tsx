@@ -94,7 +94,7 @@ export function TwinHero() {
             <Button
               size="lg"
               className="group h-14 rounded-none bg-accent px-8 text-sm font-bold uppercase tracking-[0.16em] text-accent-foreground hover:bg-accent/90"
-              onClick={() => navigate("/onboarding")}
+              onClick={() => navigate("/sign-up")}
             >
               {t('landing.getStartedFree')}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -102,7 +102,7 @@ export function TwinHero() {
             <button
               type="button"
               className="group flex items-center gap-3 text-[#F5F7FA]"
-              onClick={() => setDemoOpen(true)}
+              onClick={() => navigate("/request-demo")}
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 transition-colors group-hover:border-success group-hover:bg-white/5">
                 <Play className="h-4 w-4" aria-hidden="true" />
@@ -112,12 +112,6 @@ export function TwinHero() {
           </div>
         </div>
       </section>
-
-      {demoOpen && (
-        <Suspense fallback={null}>
-          <LazyLoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
-        </Suspense>
-      )}
     </>
   );
 }

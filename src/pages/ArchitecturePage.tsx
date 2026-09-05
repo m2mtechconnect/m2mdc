@@ -69,7 +69,7 @@ export default function ArchitecturePage() {
 
           {/* Same diagram and copy as the landing page section. */}
           <div className="mt-8">
-            <TwinArchitecture />
+            <TwinArchitecture showHeading={false} showPageLink={false} />
           </div>
 
           {/* Per-area detail */}

@@ -13,11 +13,14 @@ import {
   TwinDifferentiators,
   TwinTrustSection,
   TwinCTASection,
+  TwinBenefits,
+  TwinSecondaryCapabilities,
+  TwinFAQ,
   ScrollReveal,
   TwinFooter,
 } from '@/components/landing';
 
-const featureDefs = [
+const primaryFeatureDefs = [
   {
     titleKey: 'landing.featureDashboardTitle',
     subtitleKey: 'landing.featureDashboardSubtitle',
@@ -27,8 +30,7 @@ const featureDefs = [
     imageWidth: 1600,
     imageHeight: 1000,
     accentColor: 'primary' as const,
-  },
-  {
+  },  {
     titleKey: 'landing.feature3dTitle',
     subtitleKey: 'landing.feature3dSubtitle',
     bulletKeys: ['landing.feature3dB1', 'landing.feature3dB2', 'landing.feature3dB3'],
@@ -38,8 +40,7 @@ const featureDefs = [
     imageHeight: 900,
     flip: true,
     accentColor: 'info' as const,
-  },
-  {
+  },  {
     titleKey: 'landing.featurePowerTitle',
     subtitleKey: 'landing.featurePowerSubtitle',
     bulletKeys: ['landing.featurePowerB1', 'landing.featurePowerB2', 'landing.featurePowerB3'],
@@ -48,7 +49,19 @@ const featureDefs = [
     imageWidth: 1600,
     imageHeight: 1000,
     accentColor: 'success' as const,
-  },
+  },  {
+    titleKey: 'landing.featureSovereigntyTitle',
+    subtitleKey: 'landing.featureSovereigntySubtitle',
+    bulletKeys: ['landing.featureSovereigntyB1', 'landing.featureSovereigntyB2', 'landing.featureSovereigntyB3'],
+    imageSrc: '/landing/screenshots/sovereignty-desktop.webp',
+    imageAlt: 'AURA sovereignty view with data residency status, classification distribution and compliance frameworks',
+    imageWidth: 1600,
+    imageHeight: 1000,
+    flip: true,
+    accentColor: 'success' as const,
+  },];
+
+const secondaryFeatureDefs = [
   {
     titleKey: 'landing.featureThermalTitle',
     subtitleKey: 'landing.featureThermalSubtitle',
@@ -59,8 +72,7 @@ const featureDefs = [
     imageHeight: 1000,
     flip: true,
     accentColor: 'warning' as const,
-  },
-  {
+  },  {
     titleKey: 'landing.featureCoolingTitle',
     subtitleKey: 'landing.featureCoolingSubtitle',
     bulletKeys: ['landing.featureCoolingB1', 'landing.featureCoolingB2', 'landing.featureCoolingB3'],
@@ -69,19 +81,7 @@ const featureDefs = [
     imageWidth: 1600,
     imageHeight: 1000,
     accentColor: 'info' as const,
-  },
-  {
-    titleKey: 'landing.featureSovereigntyTitle',
-    subtitleKey: 'landing.featureSovereigntySubtitle',
-    bulletKeys: ['landing.featureSovereigntyB1', 'landing.featureSovereigntyB2', 'landing.featureSovereigntyB3'],
-    imageSrc: '/landing/screenshots/sovereignty-desktop.webp',
-    imageAlt: 'AURA sovereignty view with data residency status, classification distribution and compliance frameworks',
-    imageWidth: 1600,
-    imageHeight: 1000,
-    flip: true,
-    accentColor: 'success' as const,
-  },
-  {
+  },  {
     titleKey: 'landing.featureCarbonTitle',
     subtitleKey: 'landing.featureCarbonSubtitle',
     bulletKeys: ['landing.featureCarbonB1', 'landing.featureCarbonB2', 'landing.featureCarbonB3'],
@@ -101,10 +101,11 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
   return (
     <TooltipProvider>
       <ScrollReveal><TwinProblemStatement /></ScrollReveal>
+      <ScrollReveal><TwinBenefits /></ScrollReveal>
 
       <div id="features">
         <ScrollReveal><TwinCapabilityBadges /></ScrollReveal>
-        {featureDefs.map((feature, index) => (
+        {primaryFeatureDefs.map((feature, index) => (
           <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction={feature.flip ? 'right' : 'left'}>
             <TwinFeatureSection
               title={t(feature.titleKey)}
@@ -123,6 +124,19 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
         ))}
       </div>
 
+      <ScrollReveal>
+        <TwinSecondaryCapabilities
+          items={secondaryFeatureDefs.map((feature) => ({
+            title: t(feature.titleKey),
+            body: t(feature.subtitleKey),
+            imageSrc: feature.imageSrc,
+            imageAlt: feature.imageAlt,
+            imageWidth: feature.imageWidth,
+            imageHeight: feature.imageHeight,
+          }))}
+        />
+      </ScrollReveal>
+
       <TwinSimulationWalkthrough />
       <TwinPillars />
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
@@ -130,6 +144,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       <ScrollReveal><div id="use-cases"><TwinUseCases /></div></ScrollReveal>
       <ScrollReveal><div id="differentiators"><TwinDifferentiators /></div></ScrollReveal>
       <ScrollReveal><TwinTrustSection /></ScrollReveal>
+      <ScrollReveal><TwinFAQ /></ScrollReveal>
       <TwinCTASection />
       <TwinFooter />
     </TooltipProvider>

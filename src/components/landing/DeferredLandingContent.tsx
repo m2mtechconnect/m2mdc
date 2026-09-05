@@ -112,6 +112,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
               imageHeight={feature.imageHeight}
               flip={feature.flip}
               accentColor={feature.accentColor}
+              coverLegacyBrand={'coverLegacyBrand' in feature ? feature.coverLegacyBrand : undefined}
             />
           </ScrollReveal>
         ))}

@@ -95,7 +95,6 @@ export function TwinFooter() {
                 className="h-11 w-11 rounded-full object-cover"
                 width="44"
                 height="44"
-                loading="lazy"
               />
             </a>
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-[#AEB4BC]">

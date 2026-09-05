@@ -7,6 +7,8 @@ export { TwinHero } from './TwinHero';
 export { TwinCapabilityBadges } from './TwinCapabilityBadges';
 export { TwinFeatureSection } from './TwinFeatureSection';
 export { TwinStatsBand } from './TwinStatsBand';
+export { TwinProblemStatement } from './TwinProblemStatement';
+export { TwinPillars } from './TwinPillars';
 export { TwinIntegrationsGrid } from './TwinIntegrationsGrid';
 export { TwinUseCases } from './TwinUseCases';
 export { TwinDifferentiators } from './TwinDifferentiators';

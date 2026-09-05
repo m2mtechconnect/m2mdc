@@ -43,13 +43,18 @@ export function TwinHero() {
     if (!mql.matches || reduceMotion || saveData || slow) return;
 
     const revealVideo = () => setShowVideo(true);
+    // Reveal shortly after the page has settled so the hero is never a blank
+    // black frame, while keeping the asset off the critical render path.
+    const timer = window.setTimeout(revealVideo, 1200);
     window.addEventListener('pointerdown', revealVideo, { once: true, passive: true });
     window.addEventListener('keydown', revealVideo, { once: true });
     return () => {
+      window.clearTimeout(timer);
       window.removeEventListener('pointerdown', revealVideo);
       window.removeEventListener('keydown', revealVideo);
     };
   }, []);
+
 
   return (
     <>

@@ -5,6 +5,7 @@
  */
 
 import { Check, ArrowRight } from "lucide-react";
+import { ParallaxImage } from "./Parallax";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -169,24 +170,16 @@ export function TwinFeatureSection({
               {/* Accent hairline */}
               <div className={`absolute top-0 left-0 right-0 h-px ${bgColor.replace('/10', '/60')}`} />
 
-              <div className="relative aspect-[16/10] overflow-hidden bg-muted/40">
-                <motion.img
-                  src={resolvedImageSrc}
-                  alt={imageAlt}
-                  width={imageWidth}
-                  height={imageHeight}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover object-top"
-                  initial={{ scale: 1.04 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8 }}
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-              </div>
+              <ParallaxImage
+                src={resolvedImageSrc}
+                alt={imageAlt}
+                width={imageWidth}
+                height={imageHeight}
+                containerClassName="aspect-[16/10] bg-muted/40"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
             </div>
 
           </motion.div>

@@ -9,6 +9,7 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { screenshotManifest } from '@/data/studioScreenshots';
+import { ParallaxImage } from "./Parallax";
 
 const stepDefs = [
   {
@@ -70,14 +71,12 @@ export function TwinSimulationWalkthrough() {
 
               <div className={index % 2 === 1 ? 'lg:order-1 lg:col-span-8' : 'lg:col-span-8'}>
                 <figure className="border border-white/10 bg-[#1E1E1E] p-2">
-                  <img
+                  <ParallaxImage
                     src={`${step.src}?v=${version}`}
                     alt={t(step.altKey)}
                     width={1440}
                     height={900}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full"
+                    containerClassName="aspect-[16/10]"
                   />
                   <figcaption className="px-1 pt-3 font-mono text-[11px] uppercase tracking-[0.16em] text-[#AEB4BC]">
                     {t('landing.walkthroughNote')}

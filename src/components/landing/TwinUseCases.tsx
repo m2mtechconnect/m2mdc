@@ -58,9 +58,9 @@ const containerVariants = {
 };
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 24 } as const,
+  hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } },
-};
+} as const;
 
 function PersonaCard({ persona, index }: { persona: PersonaDef; index: number }) {
   const { t } = useTranslation();

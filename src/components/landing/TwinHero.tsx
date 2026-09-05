@@ -73,7 +73,7 @@ export function TwinHero() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/60 via-transparent to-[#0A0A0A]" />
         </div>
 
-        <div className="relative z-10 mx-auto flex min-h-[92vh] w-full max-w-7xl flex-col justify-end px-4 pb-20 pt-36 lg:px-8 lg:pb-28">
+        <div className="relative z-10 mx-auto flex min-h-[calc(92svh-4rem)] w-full max-w-7xl flex-col justify-end px-4 pb-16 pt-24 sm:pb-20 sm:pt-36 lg:min-h-[calc(92vh-5rem)] lg:px-8 lg:pb-28">
           <span className="inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.28em] text-success">
             <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
             {t('landing.enterpriseDigitalTwinPlatform')}

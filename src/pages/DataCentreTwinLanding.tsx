@@ -111,6 +111,10 @@ const FAQ_JSON_LD = {
       q: 'What can I do in a free account?',
       a: 'Create a facility blueprint, run the scenario library against it, and read the KPI impact. No production connection is required.',
     },
+    {
+      q: 'How is AURA architected?',
+      a: 'Four connected areas: a facility blueprint as the single source of truth, power, cooling, thermal and carbon engines, a scenario simulator, and operational views with provenance-labelled KPIs.',
+    },
   ].map(({ q, a }) => ({
     '@type': 'Question',
     name: q,

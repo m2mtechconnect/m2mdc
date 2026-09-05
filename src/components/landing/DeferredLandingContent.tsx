@@ -7,6 +7,7 @@ import {
   TwinStatsBand,
   TwinProblemStatement,
   TwinPillars,
+  TwinArchitecture,
   TwinSimulationWalkthrough,
   TwinIntegrationsGrid,
   TwinUseCases,
@@ -139,6 +140,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
 
       <TwinSimulationWalkthrough />
       <TwinPillars />
+      <ScrollReveal><TwinArchitecture /></ScrollReveal>
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
       <ScrollReveal><div id="integrations"><TwinIntegrationsGrid /></div></ScrollReveal>
       <ScrollReveal><div id="use-cases"><TwinUseCases /></div></ScrollReveal>

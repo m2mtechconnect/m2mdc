@@ -16,6 +16,7 @@ export const FAQ_KEYS = [
   { q: 'landing.faqQ3', a: 'landing.faqA3' },
   { q: 'landing.faqQ4', a: 'landing.faqA4' },
   { q: 'landing.faqQ5', a: 'landing.faqA5' },
+  { q: 'landing.faqQ6', a: 'landing.faqA6' },
 ];
 
 const nextSteps = [

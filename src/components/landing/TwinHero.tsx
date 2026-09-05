@@ -73,12 +73,13 @@ export function TwinHero() {
               preload="none"
               width={1920}
               height={1080}
-              className="absolute inset-0 h-full w-full object-cover opacity-20"
+              className="absolute inset-0 h-full w-full object-cover opacity-45"
             >
-              <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
+              <source src={HERO_VIDEO_URL} type="video/mp4" />
             </video>
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-[#0A0A0A]/90 to-[#0A0A0A]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/70 via-[#0A0A0A]/85 to-[#0A0A0A]" />
+
           <div
             className="absolute inset-0"
             style={{

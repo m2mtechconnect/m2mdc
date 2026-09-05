@@ -55,10 +55,11 @@ function DeferredMarketingBody() {
         setMounted(true);
         observer.disconnect();
       },
-      // The hero occupies almost the full first viewport. Do not request the
-      // motion-heavy marketing body until the visitor has actually started to
-      // scroll toward it.
-      { rootMargin: '0px 0px -25% 0px', threshold: 0 },
+      // Preload the marketing body well before the visitor reaches it. A
+      // negative bottom margin previously kept the trigger outside the
+      // intersection zone while the body was unmounted, so the page never
+      // grew taller than the hero and scrolling was impossible (stuck hero).
+      { rootMargin: '0px 0px 600px 0px', threshold: 0 },
     );
     observer.observe(triggerRef.current);
     return () => observer.disconnect();

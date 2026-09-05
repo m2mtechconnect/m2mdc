@@ -10,7 +10,7 @@
  * visitors never download the multi-MB asset on the critical path.
  */
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -90,6 +90,10 @@ export function TwinHero() {
             {t('landing.heroDescription')}
           </p>
 
+          <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#AEB4BC]">
+            {t('landing.idealBuyer')}
+          </p>
+
           <div className="mt-10 flex flex-wrap items-center gap-6">
             <Button
               size="lg"
@@ -105,7 +109,7 @@ export function TwinHero() {
               onClick={() => navigate("/request-demo")}
             >
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 transition-colors group-hover:border-success group-hover:bg-white/5">
-                <Play className="h-4 w-4" aria-hidden="true" />
+                <CalendarDays className="h-4 w-4" aria-hidden="true" />
               </span>
               <span className="text-xs font-medium uppercase tracking-[0.2em]">{t('landing.watchDemo')}</span>
             </button>

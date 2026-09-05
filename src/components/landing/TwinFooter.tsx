@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 import { Linkedin, Twitter, Mail, ExternalLink } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { AuraLogo } from "@/components/brand/AuraLogo";
-import m2mTechLogo from "@/assets/m2mtechconnect-logo.jpeg.asset.json";
 
 const socialLinks = [
   { icon: Linkedin, href: "https://linkedin.com/company/m2mtechconnect", label: "LinkedIn" },
@@ -90,7 +89,7 @@ export function TwinFooter() {
                 Powered by
               </span>
               <img
-                src={m2mTechLogo.url}
+                src="/m2mtech-logo.webp"
                 alt="M2M Tech"
                 className="h-11 w-11 rounded-full object-cover"
                 width="44"

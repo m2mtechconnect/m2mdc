@@ -69,7 +69,7 @@ export function TwinHeader() {
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <a href="/" className="flex items-center" aria-label="AURA home">
-            <AuraLogo surface="dark" showParentBrand={false} className="hidden sm:flex" />
+            <AuraLogo surface="dark" variant="horizontal" showParentBrand={false} className="hidden sm:flex" />
             <AuraLogo surface="dark" compact className="sm:hidden" />
             <h1 className="sr-only">AURA - Sovereign AI Data Centre Digital Twin Platform</h1>
           </a>

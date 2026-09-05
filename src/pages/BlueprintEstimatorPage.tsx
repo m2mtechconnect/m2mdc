@@ -133,7 +133,12 @@ export default function BlueprintEstimatorPage() {
               className="flex items-center gap-2 text-sm text-[#AEB4BC] transition-colors hover:text-[#F5F7FA]"
             >
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              <AuraLogo surface="dark" />
+              <AuraLogo
+                surface="dark"
+                variant="stacked"
+                showParentBrand={false}
+                tagline="Blueprint Estimator"
+              />
             </Link>
             <Link
               to="/architecture"

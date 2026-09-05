@@ -23,11 +23,14 @@ interface TwinFeatureSectionProps {
   accentColor?: "primary" | "success" | "info" | "warning";
   /** Crop the letterboxed white top margin and cover the legacy M2M mark (dashboard screenshot). */
   coverLegacyBrand?: boolean;
+  /** Editorial index rendered as a monospaced section number. */
+  index?: number;
   cta?: {
     label: string;
     href: string;
   };
 }
+
 
 const colorMap = {
   primary: "text-primary bg-primary/10",

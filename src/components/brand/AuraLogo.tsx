@@ -7,8 +7,6 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-const NVIDIA_GREEN = '#76B900';
-
 export interface AuraNodeMarkProps extends React.SVGProps<SVGSVGElement> {
   /** Stroke/structure tone. `light` for dark backgrounds, `dark` for light backgrounds. */
   tone?: 'light' | 'dark' | 'current';
@@ -17,7 +15,11 @@ export interface AuraNodeMarkProps extends React.SVGProps<SVGSVGElement> {
   title?: string;
 }
 
-/** Icon-only AURA node mark (square, scales from 16px to any size). */
+/**
+ * Icon-only AURA mark.
+ * A single architectural silhouette surrounds a carved data aperture. The
+ * lone green square is the intelligence point and remains legible at 16px.
+ */
 export function AuraNodeMark({
   tone = 'current',
   monochrome = false,
@@ -25,36 +27,36 @@ export function AuraNodeMark({
   className,
   ...props
 }: AuraNodeMarkProps) {
-  const structure = tone === 'light' ? '#F5F7FA' : tone === 'dark' ? '#1E1E1E' : 'currentColor';
+  const structureClass = tone === 'light'
+    ? 'text-[hsl(var(--logo-on-dark))]'
+    : tone === 'dark'
+      ? 'text-[hsl(var(--logo-on-light))]'
+      : undefined;
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 48 48"
       role={title ? 'img' : 'presentation'}
       aria-hidden={title ? undefined : true}
       focusable="false"
-      className={cn('shrink-0', className)}
+      className={cn('shrink-0', structureClass, className)}
       {...props}
     >
       {title ? <title>{title}</title> : null}
-      {/* A structure: a broad, unmistakable silhouette with four connection points. */}
-      <g
-        stroke={structure}
-        strokeWidth={3}
-        strokeLinecap="square"
-        strokeLinejoin="miter"
-        fill="none"
-      >
-        <path d="M5.5 27 L16 4.5 L26.5 27" />
-        <path d="M10.1 20.5 H21.9" />
-      </g>
-      {/* Three terminal nodes anchor the mark without competing with the silhouette. */}
-      <g fill={structure}>
-        <rect x="13.5" y="2" width="5" height="5" />
-        <rect x="3" y="24.5" width="5" height="5" />
-        <rect x="24" y="24.5" width="5" height="5" />
-      </g>
-      {/* Central intelligence node. */}
-      <rect x="13.25" y="17.75" width="5.5" height="5.5" fill={monochrome ? structure : NVIDIA_GREEN} />
+      {/* Solid architectural A with a precise, open data-channel aperture. */}
+      <path
+        fill="currentColor"
+        fillRule="evenodd"
+        d="M24 2 47 44H35.2l-4.1-8H16.9l-4.1 8H1L24 2Zm0 14.2-6.6 13h13.2l-6.6-13Z"
+        clipRule="evenodd"
+      />
+      {/* One intelligence point. No secondary nodes compete with the silhouette. */}
+      <rect
+        x="20.5"
+        y="25.5"
+        width="7"
+        height="7"
+        fill={monochrome ? 'currentColor' : 'hsl(var(--aura-node))'}
+      />
     </svg>
   );
 }
@@ -88,16 +90,16 @@ export function AuraLogo({
   tagline,
   className,
 }: AuraLogoProps) {
-  const wordTone = surface === 'dark' ? 'text-[#F5F7FA]' : 'text-[#1E1E1E]';
-  const parentTone = surface === 'dark' ? 'text-[#C9CDD3]' : 'text-[hsl(var(--text-muted))]';
-  const dividerTone = surface === 'dark' ? 'bg-[#3A3F45]' : 'bg-[hsl(var(--v2-line))]';
+  const wordTone = surface === 'dark' ? 'text-[hsl(var(--logo-on-dark))]' : 'text-[hsl(var(--logo-on-light))]';
+  const parentTone = surface === 'dark' ? 'text-[hsl(var(--logo-muted-on-dark))]' : 'text-[hsl(var(--text-muted))]';
+  const dividerTone = surface === 'dark' ? 'bg-[hsl(var(--logo-divider))]' : 'bg-[hsl(var(--v2-line))]';
   const stacked = variant === 'stacked' && !compact;
 
   return (
     <span
       className={cn(
         'flex min-w-0',
-        stacked ? 'flex-col items-start gap-2.5' : 'items-center gap-2.5',
+        stacked ? 'flex-col items-center gap-1' : 'items-center gap-2.5',
         className,
       )}
       role="img"
@@ -114,21 +116,21 @@ export function AuraLogo({
       <AuraNodeMark
         tone={surface === 'dark' ? 'light' : 'dark'}
         monochrome={monochrome}
-        className={cn(stacked ? 'h-12 w-12' : 'h-7 w-7')}
+        className={cn(stacked ? 'h-8 w-8' : 'h-8 w-8')}
       />
       {!compact && (
         <span className={cn('flex min-w-0 flex-col leading-none', stacked && 'gap-0.5')}>
           <span
             className={cn(
-              'font-semibold tracking-[0.16em]',
-              stacked ? 'text-[22px]' : 'text-[17px]',
+              'font-bold tracking-[0.18em]',
+              'text-lg',
               wordTone,
             )}
           >
             AURA
           </span>
           {tagline ? (
-            <span className={cn('mt-1 text-[11px] tracking-wide', parentTone)}>{tagline}</span>
+            <span className={cn(stacked ? 'mt-0.5 text-xs tracking-wide' : 'mt-1 text-xs tracking-wide', parentTone)}>{tagline}</span>
           ) : null}
         </span>
       )}

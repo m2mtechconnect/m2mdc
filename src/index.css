@@ -2078,3 +2078,43 @@ html:not(.dark) .aura-workspace-theme {
 .aura-marketing [class*="text-m2m-gold/"] {
   color: hsl(var(--aura-green-deep)) !important;
 }
+
+/* ============ Marketing image hover "pop" ============ */
+/* Pointer-fine devices only; fully disabled for reduced motion. */
+.marketing-image-frame {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.marketing-image {
+  transition: filter 0.6s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .marketing-image-frame:hover {
+    /* Scale lives on the frame: the parallax sets an inline transform on the img. */
+    transform: translateY(-6px) scale(1.035);
+    box-shadow:
+      0 24px 48px -16px hsl(var(--foreground) / 0.35),
+      0 0 0 1px hsl(var(--accent) / 0.45);
+  }
+
+  .marketing-image-frame:hover .marketing-image {
+    filter: saturate(1.12) contrast(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-image-frame,
+  .marketing-image {
+    transition: none;
+  }
+
+  .marketing-image-frame:hover,
+  .marketing-image-frame:hover .marketing-image {
+    transform: none;
+    filter: none;
+  }
+}

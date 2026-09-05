@@ -133,13 +133,20 @@ export function TwinArchitecture({ showHeading = true, showPageLink = true }: Tw
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-10"
+            className="mt-10 flex flex-wrap items-center gap-x-10 gap-y-4"
           >
             <Link
               to="/architecture"
               className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-success transition-colors hover:text-success/80"
             >
               {t('landing.archPageLink')}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+            <Link
+              to="/blueprint-estimator"
+              className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-success transition-colors hover:text-success/80"
+            >
+              {t('landing.estimatorLink')}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
             </Link>
           </motion.div>

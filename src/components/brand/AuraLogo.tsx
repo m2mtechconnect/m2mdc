@@ -58,6 +58,8 @@ export interface AuraLogoProps {
   surface?: 'dark' | 'light';
   /** Hide the wordmark and parent brand (compact widths). */
   compact?: boolean;
+  /** Show the M2M parent-brand prefix in contexts that require the full lockup. */
+  showParentBrand?: boolean;
   /** Optional supporting line under the wordmark. */
   tagline?: string;
   className?: string;
@@ -67,14 +69,20 @@ export interface AuraLogoProps {
  * Product lockup: `M2M | [AURA node] AURA`.
  * At compact widths only the AURA node renders, with an accessible label.
  */
-export function AuraLogo({ surface = 'dark', compact = false, tagline, className }: AuraLogoProps) {
+export function AuraLogo({
+  surface = 'dark',
+  compact = false,
+  showParentBrand = true,
+  tagline,
+  className,
+}: AuraLogoProps) {
   const wordTone = surface === 'dark' ? 'text-[#F5F7FA]' : 'text-[#1E1E1E]';
   const parentTone = surface === 'dark' ? 'text-[#C9CDD3]' : 'text-[hsl(var(--text-muted))]';
   const dividerTone = surface === 'dark' ? 'bg-[#3A3F45]' : 'bg-[hsl(var(--v2-line))]';
 
   return (
     <span className={cn('flex min-w-0 items-center gap-2.5', className)}>
-      {!compact && (
+      {!compact && showParentBrand && (
         <>
           <span className={cn('hidden text-[13px] font-semibold tracking-wide sm:inline', parentTone)}>
             M2M

@@ -106,7 +106,7 @@ export function TwinHeader() {
             </button>
             <Button
               className="h-10 rounded-none border border-white/20 bg-transparent px-5 text-xs font-semibold uppercase tracking-[0.2em] text-[#F5F7FA] hover:border-accent hover:bg-transparent hover:text-accent"
-              onClick={() => navigate('/onboarding')}
+              onClick={() => navigate('/sign-up')}
             >
               {t('auth.getStarted')}
             </Button>
@@ -143,7 +143,7 @@ export function TwinHeader() {
                 <Button variant="outline" className="w-full rounded-none border-white/20 bg-transparent text-[#F5F7FA] hover:bg-white/5" onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }}>
                   {t('auth.login')}
                 </Button>
-                <Button className="w-full rounded-none bg-accent text-accent-foreground font-semibold hover:bg-accent/90" onClick={() => { navigate('/onboarding'); setIsMobileMenuOpen(false); }}>
+                <Button className="w-full rounded-none bg-accent text-accent-foreground font-semibold hover:bg-accent/90" onClick={() => { navigate('/sign-up'); setIsMobileMenuOpen(false); }}>
                   {t('auth.getStarted')}
                 </Button>
               </div>

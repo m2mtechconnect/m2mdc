@@ -198,7 +198,11 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('link', { name: /^Start simulation$/i }).first().click();
-    await expectPath(page, '/simulation?twin=aura-reference-facility');
+    // Simulation owns its workflow step in the canonical URL. Starting from
+    // the dashboard therefore commits the inspected twin and its initial
+    // `inspect` step together, rather than exposing the transient bare twin
+    // route.
+    await expectPath(page, '/simulation?twin=aura-reference-facility&step=inspect');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^Open Blueprint$/i }).first().click();

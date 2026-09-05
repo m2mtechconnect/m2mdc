@@ -166,10 +166,10 @@ export default function BlueprintEstimatorPage() {
             </p>
           </div>
 
-          <div className="mx-auto mt-12 grid max-w-7xl gap-px border border-[#3A3A3A] bg-[#3A3A3A] px-0 lg:mt-16 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+          <div className="mx-auto mt-12 grid min-w-0 max-w-7xl gap-px border border-[#3A3A3A] bg-[#3A3A3A] px-0 lg:mt-16 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
             {/* Spec form */}
             <form
-              className="bg-[#111112] p-6 lg:p-8"
+              className="min-w-0 bg-[#111112] p-6 lg:p-8"
               onSubmit={(event) => event.preventDefault()}
               aria-label={t('blueprintTool.formLabel')}
             >
@@ -364,7 +364,7 @@ export default function BlueprintEstimatorPage() {
             </form>
 
             {/* Report */}
-            <section className="bg-[#161617] p-6 lg:p-10" aria-live="polite">
+            <section className="min-w-0 bg-[#161617] p-6 lg:p-10" aria-live="polite">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 className="font-display text-lg font-semibold uppercase tracking-wide text-[#F5F7FA]">
                   {t('blueprintTool.reportTitle')}

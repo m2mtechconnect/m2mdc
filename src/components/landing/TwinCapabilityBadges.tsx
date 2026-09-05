@@ -12,9 +12,10 @@ const containerVariants = {
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 12 } as const,
+  hidden: { opacity: 0, y: 12 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-};
+} as const;
+
 
 const capabilityKeys = [
   "landing.sovereigntyScoreTracking",

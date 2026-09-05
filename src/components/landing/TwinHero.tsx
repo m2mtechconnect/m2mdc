@@ -12,13 +12,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-
-
-const LazyLoomDemoModal = lazy(() =>
-  import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
-);
 
 /** AURA hero footage (CDN asset). User-supplied, verified free of third-party logos. */
 const HERO_VIDEO_URL = "/__l5e/assets-v1/8f33396c-f1c0-426b-b231-3ea14276a02a/aura-hero-twin.mp4";
@@ -27,7 +22,6 @@ const HERO_VIDEO_URL = "/__l5e/assets-v1/8f33396c-f1c0-426b-b231-3ea14276a02a/au
 export function TwinHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [demoOpen, setDemoOpen] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
 
   // Never start the decorative video from an idle callback: performance audits

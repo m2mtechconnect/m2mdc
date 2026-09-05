@@ -32,7 +32,7 @@ describe('buildBlueprintLeadSummary', () => {
   it('labels output as simulated and reports the modelled PUE', () => {
     const summary = buildBlueprintLeadSummary(ESTIMATOR_DEFAULTS, report, null);
     expect(summary).toContain('SIMULATED DESIGN-TIME OUTPUT');
-    expect(summary).toContain(`PUE: ${report.pue.toFixed(3).replace(/0+$/, '').replace(/\.$/, '')}`.slice(0, 8));
+    expect(summary).toContain(`PUE: ${report.pue.toFixed(3)}`);
     expect(summary).toContain('Scenario run: none executed');
   });
 

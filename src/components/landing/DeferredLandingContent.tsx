@@ -108,6 +108,8 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
           <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction={feature.flip ? 'right' : 'left'}>
             <TwinFeatureSection
               title={t(feature.titleKey)}
+              index={index + 1}
+
               subtitle={t(feature.subtitleKey)}
               bullets={feature.bulletKeys.map((key) => t(key))}
               imageSrc={feature.imageSrc}

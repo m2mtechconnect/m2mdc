@@ -1,7 +1,7 @@
 /**
  * AURA logo system.
  * Vector AURA Node mark: a geometric letter A built from connected
- * compute nodes with one central NVIDIA-green intelligence node.
+ * compute paths with one central green intelligence node.
  * Presentation only: no routing, auth or data behaviour.
  */
 import * as React from 'react';
@@ -12,11 +12,19 @@ const NVIDIA_GREEN = '#76B900';
 export interface AuraNodeMarkProps extends React.SVGProps<SVGSVGElement> {
   /** Stroke/structure tone. `light` for dark backgrounds, `dark` for light backgrounds. */
   tone?: 'light' | 'dark' | 'current';
+  /** Render the intelligence node in the structure colour for one-colour applications. */
+  monochrome?: boolean;
   title?: string;
 }
 
 /** Icon-only AURA node mark (square, scales from 16px to any size). */
-export function AuraNodeMark({ tone = 'current', title, className, ...props }: AuraNodeMarkProps) {
+export function AuraNodeMark({
+  tone = 'current',
+  monochrome = false,
+  title,
+  className,
+  ...props
+}: AuraNodeMarkProps) {
   const structure = tone === 'light' ? '#F5F7FA' : tone === 'dark' ? '#1E1E1E' : 'currentColor';
   return (
     <svg
@@ -28,27 +36,25 @@ export function AuraNodeMark({ tone = 'current', title, className, ...props }: A
       {...props}
     >
       {title ? <title>{title}</title> : null}
-      {/* A structure: two legs and a crossbar drawn between compute nodes. */}
+      {/* A structure: a broad, unmistakable silhouette with four connection points. */}
       <g
         stroke={structure}
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        strokeWidth={3}
+        strokeLinecap="square"
+        strokeLinejoin="miter"
         fill="none"
-        opacity={0.95}
       >
-        <path d="M16 5 L5.5 27" />
-        <path d="M16 5 L26.5 27" />
-        <path d="M10.2 20.5 L21.8 20.5" />
+        <path d="M5.5 27 L16 4.5 L26.5 27" />
+        <path d="M10.1 20.5 H21.9" />
       </g>
-      {/* Compute nodes at the structural vertices. */}
+      {/* Three terminal nodes anchor the mark without competing with the silhouette. */}
       <g fill={structure}>
-        <rect x="13.2" y="2.2" width="5.6" height="5.6" rx="1.4" />
-        <rect x="2.6" y="24.2" width="5.6" height="5.6" rx="1.4" />
-        <rect x="23.8" y="24.2" width="5.6" height="5.6" rx="1.4" />
+        <rect x="13.5" y="2" width="5" height="5" />
+        <rect x="3" y="24.5" width="5" height="5" />
+        <rect x="24" y="24.5" width="5" height="5" />
       </g>
       {/* Central intelligence node. */}
-      <rect x="13" y="17.6" width="6" height="6" rx="1.6" fill={NVIDIA_GREEN} />
+      <rect x="13.25" y="17.75" width="5.5" height="5.5" fill={monochrome ? structure : NVIDIA_GREEN} />
     </svg>
   );
 }
@@ -58,6 +64,10 @@ export interface AuraLogoProps {
   surface?: 'dark' | 'light';
   /** Hide the wordmark and parent brand (compact widths). */
   compact?: boolean;
+  /** Lockup arrangement. Compact mode always renders the mark only. */
+  variant?: 'horizontal' | 'stacked';
+  /** Render the complete lockup in one colour. */
+  monochrome?: boolean;
   /** Show the M2M parent-brand prefix in contexts that require the full lockup. */
   showParentBrand?: boolean;
   /** Optional supporting line under the wordmark. */
@@ -72,6 +82,8 @@ export interface AuraLogoProps {
 export function AuraLogo({
   surface = 'dark',
   compact = false,
+  variant = 'horizontal',
+  monochrome = false,
   showParentBrand = true,
   tagline,
   className,
@@ -79,9 +91,18 @@ export function AuraLogo({
   const wordTone = surface === 'dark' ? 'text-[#F5F7FA]' : 'text-[#1E1E1E]';
   const parentTone = surface === 'dark' ? 'text-[#C9CDD3]' : 'text-[hsl(var(--text-muted))]';
   const dividerTone = surface === 'dark' ? 'bg-[#3A3F45]' : 'bg-[hsl(var(--v2-line))]';
+  const stacked = variant === 'stacked' && !compact;
 
   return (
-    <span className={cn('flex min-w-0 items-center gap-2.5', className)}>
+    <span
+      className={cn(
+        'flex min-w-0',
+        stacked ? 'flex-col items-start gap-2.5' : 'items-center gap-2.5',
+        className,
+      )}
+      role="img"
+      aria-label="AURA"
+    >
       {!compact && showParentBrand && (
         <>
           <span className={cn('hidden text-[13px] font-semibold tracking-wide sm:inline', parentTone)}>
@@ -92,12 +113,20 @@ export function AuraLogo({
       )}
       <AuraNodeMark
         tone={surface === 'dark' ? 'light' : 'dark'}
-        className="h-7 w-7"
-        title={compact ? 'AURA by M2M' : undefined}
+        monochrome={monochrome}
+        className={cn(stacked ? 'h-12 w-12' : 'h-7 w-7')}
       />
       {!compact && (
-        <span className="flex min-w-0 flex-col leading-none">
-          <span className={cn('text-[17px] font-semibold tracking-[0.16em]', wordTone)}>AURA</span>
+        <span className={cn('flex min-w-0 flex-col leading-none', stacked && 'gap-0.5')}>
+          <span
+            className={cn(
+              'font-semibold tracking-[0.16em]',
+              stacked ? 'text-[22px]' : 'text-[17px]',
+              wordTone,
+            )}
+          >
+            AURA
+          </span>
           {tagline ? (
             <span className={cn('mt-1 text-[11px] tracking-wide', parentTone)}>{tagline}</span>
           ) : null}

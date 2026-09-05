@@ -242,6 +242,8 @@ const en = {
     problemStatement: 'Data centre decisions are made before the load arrives.',
     problemStatementDetail: 'AURA gives you a governed digital twin so you can model the facility, test scenarios, and keep the evidence behind every number.',
     rotatingPrefix: 'Model your',
+    problemMetaModel: 'Governed model',
+    problemMetaEvidence: 'Evidence kept',
     rotatingEnergy: 'energy',
     rotatingCarbon: 'carbon',
     rotatingCapacity: 'capacity',

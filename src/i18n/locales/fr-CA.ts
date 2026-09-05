@@ -244,6 +244,8 @@ const frCA = {
     problemStatement: 'Les décisions relatives aux centres de données se prennent avant l\'arrivée de la charge.',
     problemStatementDetail: 'AURA vous offre un jumeau numérique encadré pour modéliser l\'installation, tester des scénarios et conserver la preuve derrière chaque valeur.',
     rotatingPrefix: 'Modélisez votre',
+    problemMetaModel: 'Modèle encadré',
+    problemMetaEvidence: 'Preuve conservée',
     rotatingEnergy: 'énergie',
     rotatingCarbon: 'carbone',
     rotatingCapacity: 'capacité',

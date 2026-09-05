@@ -9,6 +9,7 @@
  */
 
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from 'lucide-react';
 import { SectionHeading } from './SectionHeading';
@@ -40,19 +41,29 @@ const areas = [
   },
 ];
 
-export function TwinArchitecture() {
+interface TwinArchitectureProps {
+  /** Hide the section heading when the embedding page supplies its own. */
+  showHeading?: boolean;
+  /** Hide the link to /architecture when already on that page. */
+  showPageLink?: boolean;
+}
+
+export function TwinArchitecture({ showHeading = true, showPageLink = true }: TwinArchitectureProps) {
   const { t } = useTranslation();
 
   return (
     <section id="architecture" className="relative overflow-hidden bg-[#161617] py-20 lg:py-28">
       <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.05]" aria-hidden="true" />
       <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
-        <SectionHeading
-          surface="dark"
-          eyebrow={t('landing.archEyebrow')}
-          title={t('landing.archTitle')}
-          lede={t('landing.archLede')}
-        />
+        {showHeading ? (
+          <SectionHeading
+            surface="dark"
+            eyebrow={t('landing.archEyebrow')}
+            title={t('landing.archTitle')}
+            lede={t('landing.archLede')}
+          />
+        ) : null}
+
 
         {/* Diagram: four areas, left to right, connected by data-flow arrows */}
         <div className="mt-14 grid gap-6 lg:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] lg:gap-4 lg:items-stretch">
@@ -114,6 +125,25 @@ export function TwinArchitecture() {
         >
           {t('landing.archTruthNote')}
         </motion.p>
+
+        {/* Link to the full architecture page */}
+        {showPageLink ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-10"
+          >
+            <Link
+              to="/architecture"
+              className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-success transition-colors hover:text-success/80"
+            >
+              {t('landing.archPageLink')}
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+            </Link>
+          </motion.div>
+        ) : null}
       </div>
     </section>
   );

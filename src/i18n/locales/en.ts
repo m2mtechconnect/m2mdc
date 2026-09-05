@@ -123,6 +123,20 @@ const en = {
     backHome: 'Back to home',
     intakePrefix: 'Demo request',
   },
+  archPage: {
+    metaTitle: 'System Architecture | AURA',
+    metaDescription: 'How AURA is built: one facility blueprint feeding power, cooling, carbon and financial engines, a scenario simulator, and provenance-labelled operational views.',
+    intro: 'AURA is organised as four connected areas around a single authoritative model of your facility. This page walks through each area: what it holds, what it computes, and what you can trust from its output.',
+    detailEyebrow: 'Area by area',
+    detailTitle: 'What each area does',
+    modelBody: 'The blueprint is the design-time record of the facility: rooms, racks, the power chain from utility to IT load, cooling zones and network topology. Every engine, scenario and operational view reads from this one model, so a change made at design time is the same change every other area sees. Industry profiles extend a universal schema rather than forking it.',
+    computeBody: 'Deterministic engines evaluate the blueprint: the power and cooling chain engine traces capacity and losses through the distribution path, thermal and energy models estimate heat rejection and consumption, and carbon and financial engines convert energy into emissions and cost. Engines compute from the model; they do not invent facility state.',
+    simulateBody: 'Scenarios are what-if changes run against a copy of the blueprint: add a row of racks, raise a setpoint, change a redundancy level. The simulator reports KPI deltas for PUE, energy, carbon and capacity. Every result is labelled simulated. Simulated output is never presented as measured telemetry.',
+    operateBody: 'Operational views, dashboards and alerts are generated from the same blueprint and engine outputs. Every KPI carries a provenance label: configured, connected, simulated or verified, with its source timestamp. Audit records and exports preserve that provenance for compliance review.',
+    demoLink: 'Request a demo',
+    ctaPrimary: 'Start building',
+    ctaSecondary: 'Request a demo',
+  },
   landing: {
     heroTitle: 'Sovereign AI Data Centre Digital Twin',
     heroSubtitle: 'Simulate energy, carbon, sovereignty, and GPU-capacity outcomes for sustainable, compliant infrastructure operations.',
@@ -263,6 +277,7 @@ const en = {
     archOperateI2: 'Alerts, workflow and audit trail',
     archOperateI3: 'Provenance-labelled KPIs',
     archTruthNote: 'Configured is not connected. Connected is not verified. Simulated is not measured.',
+    archPageLink: 'Explore the full architecture',
     faqQ6: 'How is AURA architected?',
     faqA6: 'Four connected areas: a facility blueprint as the single source of truth, power/cooling/thermal/carbon engines, a scenario simulator, and operational views with provenance-labelled KPIs. See the System Architecture section above.',
     // Stats Band

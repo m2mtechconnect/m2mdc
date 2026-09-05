@@ -59,11 +59,25 @@ export default function BlueprintEstimatorPage() {
   const [spec, setSpec] = useState<BlueprintEstimatorInput>(ESTIMATOR_DEFAULTS);
 
   const report = useMemo(() => runBlueprintEstimate(spec), [spec]);
+  const specKey = useMemo(() => JSON.stringify(spec), [spec]);
+
+  const [scenarioId, setScenarioId] = useState<PublicScenarioId>(PUBLIC_SCENARIO_IDS[0]);
+  const [runState, setRunState] = useState<{ result: ScenarioRunResult; specKey: string } | null>(
+    null,
+  );
+  const runResult = runState?.result ?? null;
+  const runIsStale = runState !== null && runState.specKey !== specKey;
+
+  const handleRunScenario = () => {
+    const result = runPublicScenario(scenarioId, spec, report);
+    if (result) setRunState({ result, specKey });
+  };
 
   const setNumber = (key: keyof BlueprintEstimatorInput) => (raw: string) => {
     const parsed = Number(raw);
     setSpec((current) => ({ ...current, [key]: Number.isFinite(parsed) ? parsed : 0 }));
   };
+
 
   const kpis = [
     {

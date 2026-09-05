@@ -161,8 +161,8 @@ export function TwinFeatureSection({
           {/* Image - 7 columns */}
           <motion.div 
             className={cn("lg:col-span-7 relative", flip && "lg:order-1")}
-            initial={{ opacity: 0, x: flip ? -40 : 40, scale: 0.98 }}
-            whileInView={{ opacity: 1, x: 0, scale: 1 }}
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >

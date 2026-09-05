@@ -55,7 +55,7 @@ export function TwinHero() {
       <section className="relative overflow-hidden bg-[#0A0A0A]">
         <div className="absolute inset-0 z-0" aria-hidden="true">
           {showVideo && (
-            <video
+            <motion.video
               autoPlay
               loop
               muted
@@ -63,10 +63,11 @@ export function TwinHero() {
               preload="none"
               width={1280}
               height={680}
-              className="absolute inset-0 h-full w-full object-cover opacity-60"
+              className="absolute -top-[8%] left-0 h-[116%] w-full object-cover opacity-60"
+              style={prefersReducedMotion ? undefined : { y: videoY }}
             >
               <source src={HERO_VIDEO_URL} type="video/mp4" />
-            </video>
+            </motion.video>
           )}
           {/* Legibility scrims: darken left/bottom so copy always reads over footage */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0A]/90 via-[#0A0A0A]/55 to-[#0A0A0A]/25" />

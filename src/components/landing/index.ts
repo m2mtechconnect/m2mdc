@@ -21,3 +21,4 @@ export { SectionHeading } from './SectionHeading';
 export { TwinBenefits } from './TwinBenefits';
 export { TwinSecondaryCapabilities } from './TwinSecondaryCapabilities';
 export { TwinFAQ, FAQ_KEYS } from './TwinFAQ';
+export { Parallax, ParallaxImage } from './Parallax';

@@ -103,6 +103,27 @@ const frCA = {
   },
 
   // Page d'accueil
+  demoRequest: {
+    metaTitle: 'Demander une démo | AURA',
+    metaDescription: 'Demandez une démonstration guidée de la plateforme de jumeau numérique souverain AURA pour centres de données IA.',
+    eyebrow: 'Visite guidée',
+    title: 'Demander une démo',
+    lede: 'Indiquez-nous comment vous joindre et l’équipe AURA planifiera une visite guidée de la plateforme de jumeau numérique pour votre centre de données.',
+    nameLabel: 'Nom complet',
+    namePlaceholder: 'Jane Tremblay',
+    emailLabel: 'Courriel professionnel',
+    emailPlaceholder: 'jane@entreprise.com',
+    companyLabel: 'Entreprise',
+    companyPlaceholder: "Nom de l'entreprise (facultatif)",
+    messageLabel: 'Sur quoi devrions-nous nous concentrer?',
+    messagePlaceholder: 'Capacité de refroidissement, coûts énergétiques, exigences de souveraineté...',
+    submit: 'Demander la démo',
+    submitting: 'Envoi en cours...',
+    successTitle: 'Demande reçue',
+    successBody: 'Merci. L’équipe AURA communiquera avec vous pour planifier votre démonstration guidée.',
+    backHome: "Retour à l'accueil",
+    intakePrefix: 'Demande de démo',
+  },
   landing: {
     heroTitle: 'Jumeau numérique souverain de centre de données IA',
     heroSubtitle: "Simulez les résultats d'énergie, de carbone, de souveraineté et de capacité GPU pour des opérations d'infrastructure durables et conformes.",

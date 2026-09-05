@@ -102,6 +102,27 @@ const en = {
   },
 
   // Landing Page
+  demoRequest: {
+    metaTitle: 'Request a Demo | AURA',
+    metaDescription: 'Request a guided demo of the AURA Sovereign AI Data Centre Digital Twin platform.',
+    eyebrow: 'Guided walkthrough',
+    title: 'Request a demo',
+    lede: 'Tell us where to reach you and the AURA team will schedule a guided walkthrough of the digital twin platform for your data centre.',
+    nameLabel: 'Full name',
+    namePlaceholder: 'Jane Tremblay',
+    emailLabel: 'Work email',
+    emailPlaceholder: 'jane@company.com',
+    companyLabel: 'Company',
+    companyPlaceholder: 'Company name (optional)',
+    messageLabel: 'What should we focus on?',
+    messagePlaceholder: 'Cooling capacity, energy costs, sovereignty requirements...',
+    submit: 'Request demo',
+    submitting: 'Sending...',
+    successTitle: 'Request received',
+    successBody: 'Thank you. The AURA team will contact you to schedule your guided demo.',
+    backHome: 'Back to home',
+    intakePrefix: 'Demo request',
+  },
   landing: {
     heroTitle: 'Sovereign AI Data Centre Digital Twin',
     heroSubtitle: 'Simulate energy, carbon, sovereignty, and GPU-capacity outcomes for sustainable, compliant infrastructure operations.',

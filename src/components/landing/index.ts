@@ -4,11 +4,9 @@
 
 export { TwinHeader } from './TwinHeader';
 export { TwinHero } from './TwinHero';
-export { TwinCapabilityBadges } from './TwinCapabilityBadges';
 export { TwinFeatureSection } from './TwinFeatureSection';
 export { TwinStatsBand } from './TwinStatsBand';
 export { TwinProblemStatement } from './TwinProblemStatement';
-export { TwinPillars } from './TwinPillars';
 export { TwinArchitecture } from './TwinArchitecture';
 export { TwinSimulationWalkthrough } from './TwinSimulationWalkthrough';
 export { TwinIntegrationsGrid } from './TwinIntegrationsGrid';

@@ -1668,6 +1668,27 @@ const frCA = {
       provenance:
         "Résultat de scénario simulé calculé dans votre navigateur à partir de vos données. Il ne s'agit pas de télémétrie mesurée.",
     },
+    lead: {
+      eyebrow: 'Envoyer ce rapport à AURA',
+      title: 'Transformez cette conception en véritable échange',
+      intro:
+        "Transmettez votre configuration et le rapport modélisé à l'équipe AURA par le même canal que l'inscription. Nous répondons avec les hypothèses que nous ajusterions et ce qu'un plan directeur complet ajouterait.",
+      introWithRun:
+        "Transmettez votre configuration, le rapport modélisé et votre scénario {{scenario}} à l'équipe AURA par le même canal que l'inscription. Nous répondons avec les hypothèses que nous ajusterions et ce qu'un plan directeur complet ajouterait.",
+      nameLabel: 'Nom complet',
+      emailLabel: 'Courriel professionnel',
+      roleLabel: 'Fonction',
+      companyLabel: 'Entreprise',
+      sizeLabel: "Taille de l'entreprise",
+      timelineLabel: 'Échéancier',
+      submit: 'Envoyer mon rapport',
+      submitting: 'Envoi en cours',
+      successTitle: 'Rapport envoyé',
+      successBody:
+        "Votre configuration, le rapport modélisé et tout scénario exécuté sont maintenant transmis à l'équipe AURA. Nous répondons au courriel professionnel saisi.",
+      provenance:
+        "Les valeurs transmises sont des résultats simulés de conception, et non de la télémétrie mesurée.",
+    },
     ctaPrimary: 'Construire le plan directeur complet',
 
     ctaSecondary: 'Parler à un ingénieur',

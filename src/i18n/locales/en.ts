@@ -1667,6 +1667,27 @@ const en = {
       provenance:
         'Simulated scenario output computed in your browser from your inputs. Not measured telemetry.',
     },
+    lead: {
+      eyebrow: 'Send this report to AURA',
+      title: 'Turn this design into a real conversation',
+      intro:
+        'Send your spec and the modelled report to the AURA team through the same intake used for sign-up. We reply with the assumptions we would change and what a full blueprint would add.',
+      introWithRun:
+        'Send your spec, the modelled report and your {{scenario}} scenario run to the AURA team through the same intake used for sign-up. We reply with the assumptions we would change and what a full blueprint would add.',
+      nameLabel: 'Full name',
+      emailLabel: 'Work email',
+      roleLabel: 'Role',
+      companyLabel: 'Company',
+      sizeLabel: 'Company size',
+      timelineLabel: 'Timeline',
+      submit: 'Send my report',
+      submitting: 'Sending',
+      successTitle: 'Report sent',
+      successBody:
+        'Your design spec, the modelled report and any scenario run are now with the AURA team. We reply to the work email you entered.',
+      provenance:
+        'Submitted values are simulated design-time output, not measured telemetry.',
+    },
     ctaPrimary: 'Build the full blueprint',
 
     ctaSecondary: 'Talk to an engineer',

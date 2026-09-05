@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TwinFooter } from '@/components/landing/TwinFooter';
+import { BlueprintLeadForm } from '@/components/blueprint/BlueprintLeadForm';
 import {
   ESTIMATOR_DEFAULTS,
   REGION_KEYS,
@@ -624,6 +625,8 @@ export default function BlueprintEstimatorPage() {
                   </li>
                 ))}
               </ul>
+
+              <BlueprintLeadForm spec={spec} report={report} run={runIsStale ? null : runResult} />
 
               <p className="mt-8 border-t border-[#3A3A3A] pt-6 font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">
                 {t('blueprintTool.truthNote')}

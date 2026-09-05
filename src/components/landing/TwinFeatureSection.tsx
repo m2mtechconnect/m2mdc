@@ -169,25 +169,12 @@ export function TwinFeatureSection({
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            {/* Decorative background glow */}
-            <motion.div 
-              className={`absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 rounded-full blur-3xl ${bgColor.replace('/10', '/5')}`}
-              animate={{ 
-                scale: [1, 1.1, 1],
-                opacity: [0.5, 0.8, 0.5]
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <div className="relative border border-border/60 bg-card p-2 shadow-sm overflow-hidden">
+              {/* Accent hairline */}
+              <div className={`absolute top-0 left-0 right-0 h-px ${bgColor.replace('/10', '/60')}`} />
 
-            <motion.div 
-              className="relative bg-gradient-to-br from-card/70 to-card/40 backdrop-blur-sm rounded-2xl border border-border/40 p-3 shadow-2xl shadow-black/5 overflow-hidden"
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.4 }}
-            >
-              {/* Accent border highlight */}
-              <div className={`absolute top-0 left-0 right-0 h-1 ${bgColor.replace('/10', '/50')} rounded-t-2xl`} />
-              
-              <div className={cn("bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative", coverLegacyBrand ? "aspect-[16/9]" : "aspect-[16/10]")}>
+              <div className={cn("bg-muted/40 overflow-hidden relative", coverLegacyBrand ? "aspect-[16/9]" : "aspect-[16/10]")}>
+
                 <motion.img 
                   src={resolvedImageSrc} 
                   alt={imageAlt}

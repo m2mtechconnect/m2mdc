@@ -193,9 +193,11 @@ export function TwinFeatureSection({
                   height={imageHeight}
                   loading="lazy"
                   decoding="async"
-                  className={coverLegacyBrand ? "w-full h-auto -translate-y-[22%]" : "w-full h-full object-cover"}
-                  initial={{ scale: 1.05 }}
-                  whileInView={{ scale: 1 }}
+                  className={coverLegacyBrand ? "w-full h-auto" : "w-full h-full object-cover"}
+                  /* The -22% shift crops the letterboxed white top margin; it lives in the
+                     motion props because framer-motion's inline transform overrides CSS classes. */
+                  initial={coverLegacyBrand ? { y: '-22%', scale: 1.05 } : { scale: 1.05 }}
+                  whileInView={coverLegacyBrand ? { y: '-22%', scale: 1 } : { scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8 }}
                   onError={(e) => {

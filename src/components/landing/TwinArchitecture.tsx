@@ -93,6 +93,17 @@ export function TwinArchitecture() {
           ))}
         </div>
 
+        {/* Mission statement */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mt-14 max-w-3xl border-t border-[#3A3A3A] pt-10 font-display text-xl leading-snug text-[#F5F7FA] lg:text-2xl"
+        >
+          {t('landing.missionStatement')}
+        </motion.p>
+
         {/* Truth footer */}
         <motion.p
           initial={{ opacity: 0 }}

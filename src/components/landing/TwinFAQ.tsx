@@ -54,27 +54,6 @@ export function TwinFAQ() {
           ))}
         </dl>
 
-        <div className="mt-20">
-          <SectionHeading eyebrow={t('landing.nextStepsEyebrow')} title={t('landing.nextStepsTitle')} />
-          <ul className="mt-12 grid gap-px bg-border sm:grid-cols-3">
-            {nextSteps.map((step) => (
-              <li key={step.titleKey} className="bg-background">
-                <button
-                  type="button"
-                  onClick={() => go(step.href)}
-                  className="group flex h-full w-full flex-col items-start px-6 py-8 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  <span className="text-base font-semibold text-foreground">{t(step.titleKey)}</span>
-                  <span className="mt-3 text-sm leading-relaxed text-muted-foreground">{t(step.bodyKey)}</span>
-                  <ArrowRight
-                    className="mt-6 h-4 w-4 text-success transition-transform group-hover:translate-x-1"
-                    aria-hidden="true"
-                  />
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
       </div>
     </section>
   );

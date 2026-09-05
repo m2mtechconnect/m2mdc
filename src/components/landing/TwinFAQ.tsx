@@ -21,7 +21,7 @@ export const FAQ_KEYS = [
 const nextSteps = [
   { titleKey: 'landing.nextStepStartTitle', bodyKey: 'landing.nextStepStartBody', href: '/sign-up' },
   { titleKey: 'landing.nextStepDemoTitle', bodyKey: 'landing.nextStepDemoBody', href: '/request-demo' },
-  { titleKey: 'landing.nextStepTourTitle', bodyKey: 'landing.nextStepTourBody', href: '#walkthrough' },
+  { titleKey: 'landing.nextStepTourTitle', bodyKey: 'landing.nextStepTourBody', href: '#simulation-walkthrough' },
 ];
 
 export function TwinFAQ() {

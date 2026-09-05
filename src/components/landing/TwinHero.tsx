@@ -12,7 +12,8 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 /** AURA hero footage (CDN asset). User-supplied, verified free of third-party logos. */
@@ -23,6 +24,14 @@ export function TwinHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showVideo, setShowVideo] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const videoY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 90]), {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.4,
+  });
 
   // Never start the decorative video from an idle callback: performance audits
   // can observe idle work and pull the multi-MB asset into the initial network
@@ -52,7 +61,7 @@ export function TwinHero() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[#0A0A0A]">
+      <section ref={heroRef} className="relative overflow-hidden bg-[#0A0A0A]">
         <div className="absolute inset-0 z-0" aria-hidden="true">
           {showVideo && (
             <motion.video

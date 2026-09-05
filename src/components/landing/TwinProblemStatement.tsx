@@ -37,11 +37,11 @@ export function TwinProblemStatement() {
           {t('landing.problemStatementDetail')}
         </p>
 
-        <div className="mt-10 flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1">
-          <span className="font-display text-xl sm:text-2xl lg:text-3xl font-semibold text-foreground">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+          <span className="font-display text-xl sm:text-2xl lg:text-3xl font-semibold leading-tight text-foreground">
             {t('landing.rotatingPrefix')}
           </span>
-          <span className="relative inline-flex h-[1.4em] min-w-[9ch] items-baseline justify-center overflow-hidden">
+          <span className="relative inline-flex min-h-[1.8em] min-w-[11ch] items-center justify-center overflow-hidden text-xl sm:text-2xl lg:text-3xl">
             <AnimatePresence mode="wait">
               <motion.span
                 key={ROTATING_KEYS[index]}
@@ -49,13 +49,14 @@ export function TwinProblemStatement() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: '-0.5em' }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="font-display text-xl sm:text-2xl lg:text-3xl font-semibold text-success whitespace-nowrap"
+                className="font-display font-semibold leading-tight text-success whitespace-nowrap"
               >
                 {t(ROTATING_KEYS[index])}
               </motion.span>
             </AnimatePresence>
           </span>
         </div>
+
       </div>
     </section>
   );

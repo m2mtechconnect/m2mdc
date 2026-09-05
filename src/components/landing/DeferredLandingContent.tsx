@@ -102,7 +102,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       <ScrollReveal><TwinProblemStatement /></ScrollReveal>
       <ScrollReveal><TwinBenefits /></ScrollReveal>
 
-      <div id="features">
+      <div id="features" className="scroll-mt-16 lg:scroll-mt-20">
         {primaryFeatureDefs.map((feature, index) => (
           <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction={feature.flip ? 'right' : 'left'}>
             <TwinFeatureSection
@@ -138,9 +138,10 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       <TwinSimulationWalkthrough />
       <ScrollReveal><TwinArchitecture /></ScrollReveal>
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
-      <ScrollReveal><div id="integrations"><TwinIntegrationsGrid /></div></ScrollReveal>
-      <ScrollReveal><div id="use-cases"><TwinUseCases /></div></ScrollReveal>
-      <ScrollReveal><div id="differentiators"><TwinDifferentiators /></div></ScrollReveal>
+      <ScrollReveal><div id="integrations" className="scroll-mt-16 lg:scroll-mt-20"><TwinIntegrationsGrid /></div></ScrollReveal>
+      <ScrollReveal><div id="use-cases" className="scroll-mt-16 lg:scroll-mt-20"><TwinUseCases /></div></ScrollReveal>
+      <ScrollReveal><div id="differentiators" className="scroll-mt-16 lg:scroll-mt-20"><TwinDifferentiators /></div></ScrollReveal>
+
       <ScrollReveal><TwinTrustSection /></ScrollReveal>
       <ScrollReveal><TwinFAQ /></ScrollReveal>
       <TwinCTASection />

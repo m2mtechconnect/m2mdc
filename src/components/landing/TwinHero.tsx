@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
 import { useTranslation } from "react-i18next";
+import { AuraNodeMark } from "@/components/brand/AuraLogo";
 
 const LazyLoomDemoModal = lazy(() =>
   import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
@@ -170,11 +171,11 @@ export function TwinHero() {
               <div className="aspect-[16/9] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-xl lg:rounded-b-2xl overflow-hidden relative">
                 <img
                   src={`/landing/screenshots/dashboard-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`}
-                  alt="M2M Digital Twin Dashboard showing 3D rack visualization, PUE metrics, GPU utilization, and carbon intensity KPIs"
-                  width={1564}
-                  height={879}
+                  alt="AURA Data Centre Digital Twin dashboard showing 3D rack thermal visualization, PUE metrics, GPU utilization, and carbon emissions"
+                  width={1024}
+                  height={1024}
                   decoding="async"
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-auto -translate-y-[22%]"
                   loading="eager"
                   // React 18 DOM does not recognize camelCase `fetchPriority`
                   // (React 19 API); it must reach the DOM as the lowercase
@@ -183,6 +184,11 @@ export function TwinHero() {
                   {...{ fetchpriority: 'high' }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
+                {/* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */}
+                <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
+                  <AuraNodeMark tone="light" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                  <span className="text-[10px] font-semibold tracking-[0.16em] text-[#F5F7FA] sm:text-xs">AURA</span>
+                </div>
               </div>
             </div>
 

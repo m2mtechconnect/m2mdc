@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
 import { AuraLogo } from '@/components/brand/AuraLogo';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { TwinFooter } from '@/components/landing/TwinFooter';

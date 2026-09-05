@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { AuraLogo } from '@/components/brand/AuraLogo';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TwinArchitecture } from '@/components/landing/TwinArchitecture';
 import { TwinFooter } from '@/components/landing/TwinFooter';
 
@@ -81,17 +82,23 @@ export default function ArchitecturePage() {
               <h2 className="mt-4 font-display text-2xl font-bold uppercase tracking-tight text-[#F5F7FA] lg:text-3xl">
                 {t('archPage.detailTitle')}
               </h2>
-              <div className="mt-12 grid gap-px border border-[#3A3A3A] bg-[#3A3A3A] md:grid-cols-2">
+              <Accordion type="single" collapsible defaultValue="area-01" className="mt-12 border-t border-[#3A3A3A]">
                 {detailAreas.map((area) => (
-                  <article key={area.number} className="bg-[#161617] p-8 lg:p-10">
-                    <span className="font-mono text-sm text-success">{area.number}</span>
-                    <h3 className="mt-3 font-display text-lg font-semibold uppercase tracking-wide text-[#F5F7FA]">
-                      {t(area.titleKey)}
-                    </h3>
-                    <p className="mt-4 text-sm leading-relaxed text-[#C9CDD3]">{t(area.bodyKey)}</p>
-                  </article>
+                  <AccordionItem key={area.number} value={`area-${area.number}`} className="border-[#3A3A3A]">
+                    <AccordionTrigger className="min-h-16 gap-4 py-5 text-left text-[#F5F7FA] hover:no-underline">
+                      <span className="flex min-w-0 items-center gap-4">
+                        <span className="font-mono text-sm text-success">{area.number}</span>
+                        <span className="font-display text-base font-semibold uppercase tracking-wide sm:text-lg">
+                          {t(area.titleKey)}
+                        </span>
+                      </span>
+                    </AccordionTrigger>
+                    <AccordionContent className="pb-7 pl-10 pr-8 text-sm leading-relaxed text-[#C9CDD3] sm:pl-12">
+                      {t(area.bodyKey)}
+                    </AccordionContent>
+                  </AccordionItem>
                 ))}
-              </div>
+              </Accordion>
 
               <p className="mt-12 border-t border-[#3A3A3A] pt-6 font-mono text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">
                 {t('landing.archTruthNote')}

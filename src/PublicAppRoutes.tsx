@@ -51,6 +51,7 @@ export default function PublicAppRoutes() {
       <Route path="/sign-up" element={withPublicRouteFallback(<SignUp />)} />
       <Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />
       <Route path="/request-demo" element={withPublicRouteFallback(<RequestDemo />)} />
+      <Route path="/architecture" element={withPublicRouteFallback(<ArchitecturePage />)} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
       <Route path="/reset-password" element={withPublicRouteFallback(<ResetPassword />)} />

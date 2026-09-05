@@ -114,6 +114,23 @@ export function TwinArchitecture() {
         >
           {t('landing.archTruthNote')}
         </motion.p>
+
+        {/* Link to the full architecture page */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-10"
+        >
+          <Link
+            to="/architecture"
+            className="group inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-success transition-colors hover:text-success/80"
+          >
+            {t('landing.archPageLink')}
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

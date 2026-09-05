@@ -42,6 +42,13 @@
     --dc-cyan: 186 100% 42%;
     --dc-teal: 186 100% 42%;
     --dc-teal-light: 186 100% 52%;
+
+    /* ============ AURA Identity ============ */
+    --aura-node: 82 100% 36%;
+    --logo-on-dark: 210 25% 97%;
+    --logo-muted-on-dark: 216 8% 81%;
+    --logo-on-light: 0 0% 12%;
+    --logo-divider: 213 9% 25%;
     
     /* ============ NOC Dark Theme Variables (for DC modules) ============ */
     --noc-bg-deep: 222 47% 5%;

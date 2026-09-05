@@ -21,6 +21,10 @@ const demoRequestSchema = z.object({
   name: z.string().trim().min(1, 'Full name is required').max(120),
   email: z.string().trim().email('Please enter a valid work email').max(255),
   company_name: z.string().trim().max(200).optional(),
+  job_title: z.string().trim().min(1, 'Role is required').max(160),
+  company_size: z.string().min(1),
+  project_stage: z.string().min(1),
+  timeline: z.string().min(1),
   message: z.string().trim().max(4000).optional(),
   // Honeypot - must stay empty.
   company_website: z.string().max(0).optional(),
@@ -33,17 +37,44 @@ export default function RequestDemo() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
+  // Same qualification set the blueprint estimator collects, so both intake
+  // paths produce comparable lead records.
+  const companySizes = ['1-50', '51-200', '201-1,000', '1,000+'];
+  const stageOptions = [
+    t('demoRequest.stageOptions.exploring'),
+    t('demoRequest.stageOptions.planning'),
+    t('demoRequest.stageOptions.design'),
+    t('demoRequest.stageOptions.operating'),
+  ];
+  const timelineOptions = [
+    t('onboarding.timelineOptions.exploring'),
+    t('onboarding.timelineOptions.oneToThree'),
+    t('onboarding.timelineOptions.threeToSix'),
+    t('onboarding.timelineOptions.sixToTwelve'),
+  ];
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<DemoRequestFormData>({ resolver: zodResolver(demoRequestSchema) });
+  } = useForm<DemoRequestFormData>({
+    resolver: zodResolver(demoRequestSchema),
+    defaultValues: {
+      company_size: companySizes[1],
+      project_stage: stageOptions[0],
+      timeline: timelineOptions[0],
+    },
+  });
 
   const onSubmit = async (data: DemoRequestFormData) => {
     setSubmitting(true);
     const summary = [
       t('demoRequest.intakePrefix'),
       data.company_name ? `${t('demoRequest.companyLabel')}: ${data.company_name}` : null,
+      `${t('demoRequest.roleLabel')}: ${data.job_title}`,
+      `${t('demoRequest.sizeLabel')}: ${data.company_size}`,
+      `${t('demoRequest.stageLabel')}: ${data.project_stage}`,
+      `${t('demoRequest.timelineLabel')}: ${data.timeline}`,
       data.message || null,
     ]
       .filter(Boolean)
@@ -173,6 +204,67 @@ export default function RequestDemo() {
                       placeholder={t('demoRequest.companyPlaceholder')}
                       {...register('company_name')}
                     />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-role" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#AEB4BC]">
+                      {t('demoRequest.roleLabel')}
+                    </Label>
+                    <Input
+                      id="demo-role"
+                      autoComplete="organization-title"
+                      className="h-12 rounded-none border-white/15 bg-white/[0.03] text-[#F5F7FA] placeholder:text-[#AEB4BC]/60"
+                      placeholder={t('demoRequest.rolePlaceholder')}
+                      {...register('job_title')}
+                    />
+                    {errors.job_title ? <p className="text-xs text-destructive">{errors.job_title.message}</p> : null}
+                  </div>
+
+                  <div className="grid gap-6 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="demo-size" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#AEB4BC]">
+                        {t('demoRequest.sizeLabel')}
+                      </Label>
+                      <select
+                        id="demo-size"
+                        className="h-12 w-full rounded-none border border-white/15 bg-white/[0.03] px-3 text-sm text-[#F5F7FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+                        {...register('company_size')}
+                      >
+                        {companySizes.map((size) => (
+                          <option key={size} value={size} className="bg-[#111112]">{size}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="demo-timeline" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#AEB4BC]">
+                        {t('demoRequest.timelineLabel')}
+                      </Label>
+                      <select
+                        id="demo-timeline"
+                        className="h-12 w-full rounded-none border border-white/15 bg-white/[0.03] px-3 text-sm text-[#F5F7FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+                        {...register('timeline')}
+                      >
+                        {timelineOptions.map((option) => (
+                          <option key={option} value={option} className="bg-[#111112]">{option}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="demo-stage" className="text-xs font-semibold uppercase tracking-[0.16em] text-[#AEB4BC]">
+                      {t('demoRequest.stageLabel')}
+                    </Label>
+                    <select
+                      id="demo-stage"
+                      className="h-12 w-full rounded-none border border-white/15 bg-white/[0.03] px-3 text-sm text-[#F5F7FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success"
+                      {...register('project_stage')}
+                    >
+                      {stageOptions.map((option) => (
+                        <option key={option} value={option} className="bg-[#111112]">{option}</option>
+                      ))}
+                    </select>
                   </div>
 
                   <div className="space-y-2">

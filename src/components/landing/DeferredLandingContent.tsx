@@ -9,6 +9,7 @@ import {
   TwinSimulationWalkthrough,
   TwinIntegrationsGrid,
   TwinUseCases,
+  TwinBusinessCase,
   TwinDifferentiators,
   TwinTrustSection,
   TwinCTASection,
@@ -104,7 +105,7 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
 
       <div id="features" className="scroll-mt-16 lg:scroll-mt-20">
         {primaryFeatureDefs.map((feature, index) => (
-          <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction={feature.flip ? 'right' : 'left'}>
+          <ScrollReveal key={feature.titleKey} delay={index * 0.1} direction="up">
             <TwinFeatureSection
               title={t(feature.titleKey)}
               index={index + 1}
@@ -140,6 +141,8 @@ export default function DeferredLandingContent({ onReady }: { onReady?: () => vo
       <ScrollReveal><TwinStatsBand /></ScrollReveal>
       <ScrollReveal><div id="integrations" className="scroll-mt-16 lg:scroll-mt-20"><TwinIntegrationsGrid /></div></ScrollReveal>
       <ScrollReveal><div id="use-cases" className="scroll-mt-16 lg:scroll-mt-20"><TwinUseCases /></div></ScrollReveal>
+
+      <ScrollReveal><div id="business-case" className="scroll-mt-16 lg:scroll-mt-20"><TwinBusinessCase /></div></ScrollReveal>
       <ScrollReveal><div id="differentiators" className="scroll-mt-16 lg:scroll-mt-20"><TwinDifferentiators /></div></ScrollReveal>
 
       <ScrollReveal><TwinTrustSection /></ScrollReveal>

@@ -1,19 +1,13 @@
 /** Bottom CTA section. Loaded only with the deferred marketing body. */
-import { lazy, Suspense, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Mail, Leaf, CheckCircle2, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
-const LazyLoomDemoModal = lazy(() =>
-  import('./LoomDemoModal').then((module) => ({ default: module.LoomDemoModal })),
-);
-
 export function TwinCTASection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [demoOpen, setDemoOpen] = useState(false);
   const benefits = [t('landing.viewLiveDashboard'), t('landing.configureOwnTwin'), t('landing.runSimulations')];
 
   return (
@@ -43,7 +37,7 @@ export function TwinCTASection() {
                 <Button
                   size="lg"
                   className="group h-14 rounded-none bg-accent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-accent-foreground hover:bg-accent/90"
-                  onClick={() => navigate('/onboarding')}
+                  onClick={() => navigate('/sign-up')}
                 >
                   {t('landing.startBuildingTwin')}
                   <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
@@ -52,7 +46,7 @@ export function TwinCTASection() {
                   size="lg"
                   variant="outline"
                   className="h-14 rounded-none border-white/20 bg-transparent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-[#F5F7FA] hover:border-accent hover:bg-transparent hover:text-accent"
-                  onClick={() => setDemoOpen(true)}
+                  onClick={() => navigate('/request-demo')}
                 >
                   <Play className="mr-3 h-4 w-4" aria-hidden="true" />
                   {t('landing.watchDemo')}
@@ -88,12 +82,6 @@ export function TwinCTASection() {
           </motion.div>
         </div>
       </section>
-
-      {demoOpen ? (
-        <Suspense fallback={null}>
-          <LazyLoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />
-        </Suspense>
-      ) : null}
     </>
   );
 }

@@ -18,6 +18,7 @@ const AuthCallback = lazy(() => loadAuthPages().then((module) => ({ default: mod
 const ManagedUserReturn = lazy(() => import('@/pages/oauth/ManagedUserReturn'));
 const RequestDemo = lazy(() => import('./pages/RequestDemo'));
 const ArchitecturePage = lazy(() => import('./pages/ArchitecturePage'));
+const BlueprintEstimatorPage = lazy(() => import('./pages/BlueprintEstimatorPage'));
 const InviteSignInRedirect = lazy(() =>
   import('@/routing/InviteSignInRedirect').then((module) => ({ default: module.InviteSignInRedirect })),
 );
@@ -52,6 +53,7 @@ export default function PublicAppRoutes() {
       <Route path="/onboarding" element={<Navigate to="/sign-up" replace />} />
       <Route path="/request-demo" element={withPublicRouteFallback(<RequestDemo />)} />
       <Route path="/architecture" element={withPublicRouteFallback(<ArchitecturePage />)} />
+      <Route path="/blueprint-estimator" element={withPublicRouteFallback(<BlueprintEstimatorPage />)} />
       <Route path="/sign-out" element={withPublicRouteFallback(<SignOut />)} />
       <Route path="/forgot-password" element={withPublicRouteFallback(<ForgotPassword />)} />
       <Route path="/reset-password" element={withPublicRouteFallback(<ResetPassword />)} />

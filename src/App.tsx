@@ -54,6 +54,7 @@ const PUBLIC_PATHS = new Set([
   '/onboarding',
   '/request-demo',
   '/architecture',
+  '/blueprint-estimator',
   '/oauth/managed-user/return',
   '/invite/accept',
   ...(import.meta.env.DEV ? ['/dev-overlays'] : []),

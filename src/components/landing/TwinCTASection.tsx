@@ -1,7 +1,7 @@
 /** Bottom CTA section. Loaded only with the deferred marketing body. */
 import { lazy, Suspense, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Mail, Sparkles, Leaf, CheckCircle2, Play } from 'lucide-react';
+import { ArrowRight, Mail, Leaf, CheckCircle2, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -18,54 +18,77 @@ export function TwinCTASection() {
 
   return (
     <>
-      <section className="relative py-24 lg:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-muted/50 via-muted/30 to-background" />
-        <motion.div className="absolute top-1/4 left-1/4 w-80 h-80 bg-primary/8 rounded-full blur-3xl" animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.12, 0.08] }} transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }} />
-        <motion.div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-success/6 rounded-full blur-3xl" animate={{ scale: [1, 1.3, 1], opacity: [0.06, 0.1, 0.06] }} transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 3 }} />
-        <div className="relative max-w-5xl mx-auto px-4 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="bg-card/60 backdrop-blur-sm rounded-3xl border border-border/50 p-8 lg:p-12 shadow-xl">
-            <div className="text-center max-w-3xl mx-auto">
-              <div className="w-16 h-1 bg-gradient-to-r from-primary to-success mx-auto mb-8 rounded-full" />
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 mb-6">
-                <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-                <span className="text-sm text-primary font-medium">{t('landing.startYourJourney')}</span>
+      <section className="relative overflow-hidden bg-[#0A0A0A] py-24 lg:py-32">
+        <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:40px_40px]" aria-hidden="true" />
+        <div className="relative mx-auto max-w-7xl px-4 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="grid gap-12 border-t border-white/10 pt-12 lg:grid-cols-12 lg:gap-16"
+          >
+            <div className="lg:col-span-7">
+              <span className="text-xs font-semibold uppercase tracking-[0.28em] text-success">
+                {t('landing.startYourJourney')}
               </span>
-              <h2 className="font-display text-3xl lg:text-5xl font-bold text-foreground mb-4 leading-tight">
+              <h2 className="mt-6 font-display text-[clamp(2rem,5vw,4rem)] font-bold uppercase leading-[0.95] tracking-tight text-[#F5F7FA]">
                 {t('landing.readyToBuild')}{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-m2m-gold-dark whitespace-nowrap">{t('landing.sovereignTwinQuestion')}</span>
+                <span className="text-[#AEB4BC]">{t('landing.sovereignTwinQuestion')}</span>
               </h2>
-              <p className="text-lg lg:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">{t('landing.ctaDescription')}</p>
-              <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                <Button size="lg" className="text-base px-10 h-14 group bg-accent text-m2m-black font-semibold hover:bg-m2m-gold-dark shadow-xl shadow-accent/20 hover:shadow-accent/30 transition-shadow" onClick={() => navigate('/onboarding')}>
-                  {t('landing.startBuildingTwin')}<ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-[#C9CDD3] lg:text-lg">
+                {t('landing.ctaDescription')}
+              </p>
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <Button
+                  size="lg"
+                  className="group h-14 rounded-none bg-accent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-m2m-black hover:bg-m2m-gold-dark"
+                  onClick={() => navigate('/onboarding')}
+                >
+                  {t('landing.startBuildingTwin')}
+                  <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                 </Button>
-                <Button size="lg" variant="outline" className="text-base px-10 h-14 border-border text-foreground hover:bg-muted" onClick={() => setDemoOpen(true)}>
-                  <Play className="mr-2 h-5 w-5" aria-hidden="true" />{t('landing.watchDemo')}
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="h-14 rounded-none border-white/20 bg-transparent px-10 text-xs font-semibold uppercase tracking-[0.2em] text-[#F5F7FA] hover:border-accent hover:bg-transparent hover:text-accent"
+                  onClick={() => setDemoOpen(true)}
+                >
+                  <Play className="mr-3 h-4 w-4" aria-hidden="true" />
+                  {t('landing.watchDemo')}
                 </Button>
               </div>
-              <div className="mb-8">
-                <a href="mailto:info@m2mtechconnect.com" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  <Mail className="h-4 w-4" aria-hidden="true" />{t('landing.orTalkToTeam')}
-                </a>
-              </div>
-              <div className="flex flex-wrap justify-center gap-6">
+              <a
+                href="mailto:info@m2mtechconnect.com"
+                className="mt-8 inline-flex items-center gap-2 text-sm text-[#AEB4BC] transition-colors hover:text-[#F5F7FA]"
+              >
+                <Mail className="h-4 w-4" aria-hidden="true" />
+                {t('landing.orTalkToTeam')}
+              </a>
+            </div>
+
+            <div className="lg:col-span-5">
+              <ul className="divide-y divide-white/10 border-y border-white/10">
                 {benefits.map((benefit) => (
-                  <div key={benefit} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle2 className="h-4 w-4 text-success" aria-hidden="true" /><span>{benefit}</span>
-                  </div>
+                  <li key={benefit} className="flex items-center gap-3 py-4 text-sm text-[#C9CDD3]">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                    <span>{benefit}</span>
+                  </li>
                 ))}
-              </div>
+                <li className="flex items-center gap-3 py-4 text-sm text-[#C9CDD3]">
+                  <Leaf className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+                  <span>{t('landing.carbonNeutralInfra')}</span>
+                </li>
+                <li className="flex items-center gap-3 py-4 text-sm text-[#C9CDD3]">
+                  <span aria-hidden="true">🇨🇦</span>
+                  <span>{t('landing.canadianDataSovereignty')}</span>
+                </li>
+              </ul>
             </div>
           </motion.div>
-          <div className="mt-12 pt-8 border-t border-border/30">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-8 text-sm text-muted-foreground">
-              <div className="flex items-center gap-2"><Leaf className="h-4 w-4 text-success" aria-hidden="true" /><span>{t('landing.carbonNeutralInfra')}</span></div>
-              <div className="hidden sm:block w-px h-4 bg-border" aria-hidden="true" />
-              <div className="flex items-center gap-2"><span aria-hidden="true">🇨🇦</span><span>{t('landing.canadianDataSovereignty')}</span></div>
-            </div>
-          </div>
         </div>
       </section>
+
       {demoOpen ? (
         <Suspense fallback={null}>
           <LazyLoomDemoModal open={demoOpen} onOpenChange={setDemoOpen} />

@@ -62,86 +62,65 @@ export function TwinTrustSection() {
   const { t } = useTranslation();
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden bg-gradient-to-b from-background via-muted/10 to-background">
-      <div className="max-w-6xl mx-auto px-4 lg:px-8">
+    <section className="overflow-hidden bg-background py-20 lg:py-28">
+      <div className="mx-auto max-w-7xl px-4 lg:px-8">
         <motion.div
-          className="text-center mb-14"
+          className="max-w-3xl"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="inline-block mb-4"
-          >
-            <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              {t('landing.enterpriseTrust')}
-            </span>
-          </motion.div>
-          <h2 className="font-display text-3xl lg:text-4xl font-bold text-foreground mb-4">
+          <span className="text-xs font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+            {t('landing.enterpriseTrust')}
+          </span>
+          <h2 className="mt-6 font-display text-3xl font-bold uppercase leading-[1.05] tracking-tight text-foreground lg:text-5xl">
             {t('landing.sovereigntyComplianceFeatures')}
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
+          <p className="mt-5 text-base text-muted-foreground lg:text-lg">
             {t('landing.trustDescription')}
           </p>
-
-          <motion.div
-            className="flex flex-wrap justify-center gap-3"
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            {regionKeys.map((region, index) => (
-              <motion.div key={index} variants={itemVariants} whileHover={{ scale: 1.05, y: -2 }} transition={{ duration: 0.2 }}>
-                <Badge
-                  variant="outline"
-                  className="px-4 py-2.5 text-sm border-border bg-card/60 text-foreground cursor-default hover:border-primary/40 hover:bg-card transition-all"
-                >
-                  <span className="mr-2">{region.flag}</span>
-                  {t(region.labelKey)}
-                </Badge>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
 
         <motion.div
-          className="grid md:grid-cols-2 gap-5 mb-14"
+          className="mt-10 flex flex-wrap gap-2"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true }}
+        >
+          {regionKeys.map((region, index) => (
+            <motion.div key={index} variants={itemVariants}>
+              <Badge
+                variant="outline"
+                className="cursor-default rounded-none border-border bg-transparent px-4 py-2 text-xs uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:border-success hover:text-foreground"
+              >
+                <span className="mr-2" aria-hidden="true">{region.flag}</span>
+                {t(region.labelKey)}
+              </Badge>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="mt-16 grid gap-x-16 gap-y-10 md:grid-cols-2"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
         >
           {trustPointDefs.map((point, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
-              whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-              className="relative flex gap-4 p-6 bg-card/40 rounded-2xl border border-border/40 hover:border-border hover:bg-card/60 transition-all cursor-default group overflow-hidden"
+              className="group cursor-default border-t border-border pt-6"
             >
-              <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity ${point.bgColor.replace('/10', '/5')}`} />
-              <div className="relative flex-shrink-0">
-                <motion.div
-                  className={`w-12 h-12 rounded-xl ${point.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}
-                  whileHover={{ rotate: [0, -5, 5, 0] }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <point.icon className={`h-6 w-6 ${point.color}`} />
-                </motion.div>
+              <div className="flex items-center justify-between">
+                <span className={`font-mono text-xs ${point.color}`}>{String(index + 1).padStart(2, '0')}</span>
+                <point.icon className={`h-5 w-5 ${point.color}`} aria-hidden="true" />
               </div>
-              <div className="relative">
-                <h3 className={`font-semibold text-lg mb-1.5 group-hover:${point.color} transition-colors text-foreground`}>
-                  {t(point.titleKey)}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {t(point.descKey)}
-                </p>
-              </div>
+              <h3 className="mt-5 text-lg font-semibold text-foreground">{t(point.titleKey)}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t(point.descKey)}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -149,3 +128,4 @@ export function TwinTrustSection() {
     </section>
   );
 }
+

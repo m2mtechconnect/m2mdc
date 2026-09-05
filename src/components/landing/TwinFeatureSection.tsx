@@ -23,11 +23,14 @@ interface TwinFeatureSectionProps {
   accentColor?: "primary" | "success" | "info" | "warning";
   /** Crop the letterboxed white top margin and cover the legacy M2M mark (dashboard screenshot). */
   coverLegacyBrand?: boolean;
+  /** Editorial index rendered as a monospaced section number. */
+  index?: number;
   cta?: {
     label: string;
     href: string;
   };
 }
+
 
 const colorMap = {
   primary: "text-primary bg-primary/10",
@@ -59,6 +62,7 @@ export function TwinFeatureSection({
   flip = false,
   accentColor = "primary",
   coverLegacyBrand = false,
+  index,
   cta,
 }: TwinFeatureSectionProps) {
   const colors = colorMap[accentColor];
@@ -70,7 +74,7 @@ export function TwinFeatureSection({
     : imageSrc;
 
   return (
-    <section className="py-20 lg:py-28 overflow-hidden bg-background">
+    <section className="py-20 lg:py-28 overflow-hidden bg-background border-t border-border/40">
       <div className="max-w-7xl mx-auto px-4 lg:px-8">
         <div className={cn(
           "grid lg:grid-cols-12 gap-12 lg:gap-20 items-center",
@@ -84,14 +88,12 @@ export function TwinFeatureSection({
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
             <div className="space-y-4">
-              {/* Section indicator line */}
-              <motion.div 
-                className={`w-12 h-1 rounded-full ${bgColor.replace('/10', '/60')}`}
-                initial={{ width: 0 }}
-                whileInView={{ width: 48 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-              />
+              {typeof index === 'number' && (
+                <span className={cn("font-mono text-xs", textColor)}>
+                  {String(index).padStart(2, '0')}
+                </span>
+              )}
+
               
               <motion.h2 
                 className="font-display text-3xl lg:text-4xl font-bold text-foreground leading-tight"
@@ -167,25 +169,12 @@ export function TwinFeatureSection({
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.7, ease: "easeOut" }}
           >
-            {/* Decorative background glow */}
-            <motion.div 
-              className={`absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-4/5 rounded-full blur-3xl ${bgColor.replace('/10', '/5')}`}
-              animate={{ 
-                scale: [1, 1.1, 1],
-                opacity: [0.5, 0.8, 0.5]
-              }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            />
+            <div className="relative border border-border/60 bg-card p-2 shadow-sm overflow-hidden">
+              {/* Accent hairline */}
+              <div className={`absolute top-0 left-0 right-0 h-px ${bgColor.replace('/10', '/60')}`} />
 
-            <motion.div 
-              className="relative bg-gradient-to-br from-card/70 to-card/40 backdrop-blur-sm rounded-2xl border border-border/40 p-3 shadow-2xl shadow-black/5 overflow-hidden"
-              whileHover={{ scale: 1.01 }}
-              transition={{ duration: 0.4 }}
-            >
-              {/* Accent border highlight */}
-              <div className={`absolute top-0 left-0 right-0 h-1 ${bgColor.replace('/10', '/50')} rounded-t-2xl`} />
-              
-              <div className={cn("bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-xl overflow-hidden relative", coverLegacyBrand ? "aspect-[16/9]" : "aspect-[16/10]")}>
+              <div className={cn("bg-muted/40 overflow-hidden relative", coverLegacyBrand ? "aspect-[16/9]" : "aspect-[16/10]")}>
+
                 <motion.img 
                   src={resolvedImageSrc} 
                   alt={imageAlt}
@@ -204,8 +193,6 @@ export function TwinFeatureSection({
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
                 {coverLegacyBrand && (
                   /* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */
                   <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
@@ -214,7 +201,8 @@ export function TwinFeatureSection({
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
+
           </motion.div>
         </div>
       </div>

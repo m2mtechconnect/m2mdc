@@ -52,6 +52,7 @@ const PUBLIC_PATHS = new Set([
   '/twin-preview',
   '/omniverse-scene',
   '/onboarding',
+  '/request-demo',
   '/oauth/managed-user/return',
   '/invite/accept',
   ...(import.meta.env.DEV ? ['/dev-overlays'] : []),

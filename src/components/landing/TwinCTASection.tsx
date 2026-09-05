@@ -1,7 +1,7 @@
 /** Bottom CTA section. Loaded only with the deferred marketing body. */
 import { lazy, Suspense, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Mail, Sparkles, Leaf, CheckCircle2, Play } from 'lucide-react';
+import { ArrowRight, Mail, Leaf, CheckCircle2, Play } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';

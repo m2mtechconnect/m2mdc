@@ -20,6 +20,10 @@ const LazyLoomDemoModal = lazy(() =>
   import("./LoomDemoModal").then((module) => ({ default: module.LoomDemoModal })),
 );
 
+/** Original AURA-owned hero footage (CDN asset). No third-party material. */
+const HERO_VIDEO_URL = "/__l5e/assets-v1/02283e37-d405-41be-b0e4-7ff4ff65e88d/aura-hero-hall.mp4";
+
+
 export function TwinHero() {
   const { t } = useTranslation();
   const navigate = useNavigate();

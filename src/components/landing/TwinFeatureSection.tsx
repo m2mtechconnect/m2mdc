@@ -193,8 +193,6 @@ export function TwinFeatureSection({
                     e.currentTarget.style.display = 'none';
                   }}
                 />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
                 {coverLegacyBrand && (
                   /* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */
                   <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
@@ -203,7 +201,8 @@ export function TwinFeatureSection({
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
+
           </motion.div>
         </div>
       </div>

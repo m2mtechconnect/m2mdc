@@ -1,13 +1,15 @@
 /**
- * TwinHero - public AURA DC landing hero.
+ * TwinHero - public AURA DC landing hero (technical editorial direction).
+ *
+ * Full-bleed graphite surface, oversized left-aligned editorial headline,
+ * hairline instrument strip and an edge-bleeding product frame.
  *
  * The first paint is intentionally static and compositor-friendly. Decorative
  * video is a post-interaction enhancement so performance audits and anonymous
  * visitors never download the 30+ MB asset on the critical path.
  */
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Play, CheckCircle2, Sparkles, TrendingUp, Zap, Leaf, Building2 } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { screenshotManifest } from "@/data/studioScreenshots";
@@ -24,11 +26,11 @@ export function TwinHero() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
 
-  const powerStats = [
-    { value: "1.28", label: t('landing.avgPueAchieved'), icon: TrendingUp, color: "text-success" },
-    { value: "89%", label: t('landing.gpuUtilization'), icon: Zap, color: "text-warning" },
-    { value: "28", label: t('landing.gco2KwhAvg'), icon: Leaf, color: "text-success" },
-    { value: "50+", label: t('landing.enterprises'), icon: Building2, color: "text-primary" },
+  const instruments = [
+    { value: "1.28", label: t('landing.avgPueAchieved') },
+    { value: "89%", label: t('landing.gpuUtilization') },
+    { value: "28", label: t('landing.gco2KwhAvg') },
+    { value: "50+", label: t('landing.enterprises') },
   ];
 
   const quickBenefits = [
@@ -60,9 +62,8 @@ export function TwinHero() {
 
   return (
     <>
-      <section className="relative min-h-[95vh] flex items-center overflow-hidden bg-background">
-        {/* No raster poster on first paint. The 33 MB video is user-initiated only. */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-primary/10 via-background to-success/5">
+      <section className="relative overflow-hidden bg-[#0A0A0A] pt-28 lg:pt-32">
+        <div className="absolute inset-0 z-0" aria-hidden="true">
           {showVideo && (
             <video
               autoPlay
@@ -72,143 +73,115 @@ export function TwinHero() {
               preload="none"
               width={1920}
               height={1080}
-              className="absolute inset-0 h-full w-full object-cover opacity-30"
+              className="absolute inset-0 h-full w-full object-cover opacity-20"
             >
               <source src="/landing/hero-datacenter.mp4" type="video/mp4" />
             </video>
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/65 to-background" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/70 via-transparent to-background/70" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A]/80 via-[#0A0A0A]/90 to-[#0A0A0A]" />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundSize: '40px 40px',
+              backgroundImage:
+                'linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)',
+            }}
+          />
         </div>
 
-        {/* Fixed paint-only texture. Percentage-sized blurred blobs were the full CLS culprit in Lighthouse. */}
-        <div className="absolute inset-0 z-[1] pointer-events-none" aria-hidden="true">
-          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.02]" />
-        </div>
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-4 pb-16 lg:px-8 lg:pb-24">
+          <span className="inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.28em] text-success">
+            <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+            {t('landing.enterpriseDigitalTwinPlatform')}
+          </span>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 py-16 lg:py-24 w-full">
-          <div className="flex flex-wrap justify-center gap-6 lg:gap-10 mb-12">
-            {powerStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="flex items-center gap-3 rounded-full border border-border/30 bg-card/40 px-4 py-2 backdrop-blur-sm transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                <span className={`text-lg font-bold ${stat.color}`}>{stat.value}</span>
-                <span className="text-xs text-muted-foreground">{stat.label}</span>
-              </div>
-            ))}
-          </div>
+          <h1 className="mt-6 font-display text-[clamp(2.5rem,7vw,6.5rem)] font-bold uppercase leading-[0.9] tracking-tight text-[#F5F7FA]">
+            {t('landing.heroHeadline1')}{' '}
+            <span className="inline-block border-b-4 border-accent pb-1 text-[#AEB4BC]">
+              {t('landing.heroHeadline2')}
+            </span>
+          </h1>
 
-          <div className="text-center max-w-4xl mx-auto mb-16">
-            <div className="mb-6">
-              <Badge variant="outline" className="border-primary/40 text-primary bg-primary/5 px-4 py-1.5 text-sm font-medium">
-                <Sparkles className="h-3.5 w-3.5 mr-2" />
-                {t('landing.enterpriseDigitalTwinPlatform')}
-              </Badge>
-            </div>
+          <div className="mt-12 grid gap-12 md:grid-cols-12 md:items-end">
+            <div className="md:col-span-5">
+              <p className="max-w-md text-lg leading-relaxed text-[#C9CDD3] lg:text-xl">
+                {t('landing.heroDescription')}
+              </p>
 
-            <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-foreground leading-[1.1] tracking-tight mb-6">
-              {t('landing.heroHeadline1')}{" "}
-              <span className="relative inline-block">
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-m2m-gold-dark to-accent">
-                  {t('landing.heroHeadline2')}
-                </span>
-                <span className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-accent to-m2m-gold-dark rounded-full" />
-              </span>
-            </h1>
+              <ul className="mt-8 space-y-2.5">
+                {quickBenefits.map((benefit) => (
+                  <li key={benefit} className="flex items-center gap-3 text-sm text-[#AEB4BC]">
+                    <span className="h-px w-5 bg-success" aria-hidden="true" />
+                    {benefit}
+                  </li>
+                ))}
+              </ul>
 
-            <p className="text-lg lg:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto mb-8">
-              {t('landing.heroDescription')}
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
-              {quickBenefits.map((benefit) => (
-                <div key={benefit} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-success" />
-                  <span>{benefit}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
-              <Button
-                size="lg"
-                className="text-base px-10 h-14 group relative overflow-hidden transition-all duration-300 bg-accent text-m2m-black hover:bg-m2m-gold-dark hover:shadow-2xl hover:shadow-accent/30"
-                onClick={() => navigate("/onboarding")}
-              >
-                <span className="relative z-10 flex items-center font-semibold">
+              <div className="mt-10 flex flex-wrap items-center gap-6">
+                <Button
+                  size="lg"
+                  className="group h-14 rounded-none bg-accent px-8 text-sm font-bold uppercase tracking-[0.16em] text-m2m-black hover:bg-m2m-gold-dark"
+                  onClick={() => navigate("/onboarding")}
+                >
                   {t('landing.getStartedFree')}
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </span>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="text-base px-10 h-14 border-border text-foreground hover:bg-muted/80 transition-all duration-300"
-                onClick={() => setDemoOpen(true)}
-              >
-                <Play className="mr-2 h-5 w-5" />
-                {t('landing.watchDemo')}
-              </Button>
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </Button>
+                <button
+                  type="button"
+                  className="group flex items-center gap-3 text-[#F5F7FA]"
+                  onClick={() => setDemoOpen(true)}
+                >
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-white/25 transition-colors group-hover:border-success group-hover:bg-white/5">
+                    <Play className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="text-xs font-medium uppercase tracking-[0.2em]">{t('landing.watchDemo')}</span>
+                </button>
+              </div>
             </div>
-          </div>
 
-          <div className="relative max-w-5xl mx-auto">
-            <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm rounded-2xl lg:rounded-3xl border border-border/40 p-2 shadow-2xl shadow-black/20 transition-transform duration-300 hover:scale-[1.005]">
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-border/30 bg-muted/30 rounded-t-xl lg:rounded-t-2xl">
-                <div className="flex gap-1.5" aria-hidden="true">
-                  <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                  <div className="w-3 h-3 rounded-full bg-warning/60" />
-                  <div className="w-3 h-3 rounded-full bg-success/60" />
-                </div>
-                <div className="flex-1 mx-4">
-                  <div className="bg-background/60 rounded-lg px-4 py-1.5 text-xs text-muted-foreground text-center max-w-sm mx-auto border border-border/30">
+            <div className="md:col-span-7">
+              <div className="relative overflow-hidden border border-white/10 bg-[#1E1E1E] shadow-2xl">
+                <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
+                  <span className="h-2 w-2 rounded-full bg-success/50" aria-hidden="true" />
+                  <span className="h-2 w-2 rounded-full bg-white/10" aria-hidden="true" />
+                  <span className="h-2 w-2 rounded-full bg-white/10" aria-hidden="true" />
+                  <span className="ml-3 font-mono text-[11px] text-[#AEB4BC]">
                     twin-studio.m2mtechconnect.com/dashboard
+                  </span>
+                </div>
+                <div className="relative aspect-[16/9] overflow-hidden">
+                  <img
+                    src={`/landing/screenshots/dashboard-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`}
+                    alt="AURA Data Centre Digital Twin dashboard showing 3D rack thermal visualization, PUE metrics, GPU utilization, and carbon emissions"
+                    width={1024}
+                    height={1024}
+                    decoding="async"
+                    className="w-full h-auto -translate-y-[22%]"
+                    loading="eager"
+                    // React 18 DOM does not recognize camelCase `fetchPriority`
+                    // (React 19 API); it must reach the DOM as the lowercase
+                    // attribute or React emits a console.error per mount, which
+                    // fails the truth suite's console-cleanliness assertions.
+                    {...{ fetchpriority: 'high' }}
+                  />
+                  {/* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */}
+                  <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
+                    <AuraNodeMark tone="light" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
+                    <span className="text-[10px] font-semibold tracking-[0.16em] text-[#F5F7FA] sm:text-xs">AURA</span>
                   </div>
                 </div>
               </div>
-              <div className="aspect-[16/9] bg-gradient-to-br from-muted/80 via-muted/50 to-background rounded-b-xl lg:rounded-b-2xl overflow-hidden relative">
-                <img
-                  src={`/landing/screenshots/dashboard-desktop.webp?v=${encodeURIComponent(screenshotManifest.version)}`}
-                  alt="AURA Data Centre Digital Twin dashboard showing 3D rack thermal visualization, PUE metrics, GPU utilization, and carbon emissions"
-                  width={1024}
-                  height={1024}
-                  decoding="async"
-                  className="w-full h-auto -translate-y-[22%]"
-                  loading="eager"
-                  // React 18 DOM does not recognize camelCase `fetchPriority`
-                  // (React 19 API); it must reach the DOM as the lowercase
-                  // attribute or React emits a console.error per mount, which
-                  // fails the truth suite's console-cleanliness assertions.
-                  {...{ fetchpriority: 'high' }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
-                {/* Covers only the embedded legacy M2M mark in the screenshot's dark dashboard header (#1D1C21). */}
-                <div className="absolute left-0 top-0 flex h-[8%] w-[18%] items-center gap-1.5 bg-[#1D1C21] pl-2 sm:pl-3" aria-hidden="true">
-                  <AuraNodeMark tone="light" className="h-3.5 w-3.5 sm:h-5 sm:w-5" />
-                  <span className="text-[10px] font-semibold tracking-[0.16em] text-[#F5F7FA] sm:text-xs">AURA</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="absolute -bottom-6 -left-6 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-xl hidden sm:block">
-              <div className="text-3xl font-bold text-success">6,970</div>
-              <div className="text-xs text-muted-foreground">{t('landing.hoursSavedMonthly')}</div>
-            </div>
-
-            <div className="absolute -top-6 -right-6 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-4 shadow-xl hidden sm:block">
-              <div className="text-3xl font-bold text-primary">+32%</div>
-              <div className="text-xs text-muted-foreground">{t('landing.efficiencyGains')}</div>
-            </div>
-
-            <div className="absolute top-1/2 -right-8 -translate-y-1/2 bg-card/95 backdrop-blur-sm rounded-xl border border-border/50 p-3 shadow-lg hidden xl:block">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-success" />
-                <span className="text-xs font-medium text-foreground">{t('landing.liveMonitoring')}</span>
-              </div>
             </div>
           </div>
+
+          <dl className="mt-16 grid grid-cols-2 gap-px border-t border-white/10 bg-white/10 md:grid-cols-4">
+            {instruments.map((item) => (
+              <div key={item.label} className="bg-[#0A0A0A] px-5 py-6">
+                <dt className="text-xs uppercase tracking-[0.18em] text-[#AEB4BC]">{item.label}</dt>
+                <dd className="mt-2 font-mono text-3xl text-[#F5F7FA]">{item.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 

@@ -23,6 +23,9 @@ interface UseSovereigntyOptions {
 }
 
 interface UseSovereigntyReturn {
+  /** No tenant-backed audit source is wired yet; consumers must fail closed. */
+  isAssessmentAvailable: boolean;
+  provenance: 'unavailable' | 'demo';
   // Engine results
   result: SovereigntyEngineResult;
   
@@ -131,6 +134,8 @@ export function useSovereignty(options: UseSovereigntyOptions = {}): UseSovereig
   }, []);
   
   return {
+    isAssessmentAvailable: false,
+    provenance: 'unavailable',
     result,
     assets: mockDataAssets,
     flows: mockDataFlows,

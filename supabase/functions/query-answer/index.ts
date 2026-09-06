@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
+import { callerRejectedResponse, requireCaller } from "../_shared/callerIdentity.ts";
 import { AIProviderRequestError, makeAICompletion } from "../_shared/ai-client.ts";
 
 serve(async (req) => {
@@ -10,7 +11,8 @@ serve(async (req) => {
   }
 
   try {
-    const { query, userId } = await req.json();
+    const caller = await requireCaller(req);
+    const { query } = await req.json();
 
     if (!query || typeof query !== "string") {
       return new Response(
@@ -33,6 +35,9 @@ serve(async (req) => {
         type: "websearch",
         config: "english",
       })
+      // Knowledge is either explicitly owned by the caller or global
+      // (`user_id IS NULL`). Never search another user's indexed content.
+      .or(`user_id.eq.${caller.userId},user_id.is.null`)
       .limit(6);
 
     if (searchError) {
@@ -102,9 +107,9 @@ Format your response as JSON:
 
     const latency = Date.now() - startTime;
 
-    if (userId) {
+    {
       await supabase.from("search_history").insert({
-        user_id: userId,
+        user_id: caller.userId,
         query,
         intent: "QUERY",
         result_count: sources.length,
@@ -137,6 +142,9 @@ Format your response as JSON:
     );
   } catch (error) {
     console.error("Error in query-answer:", error);
+
+    const rejected = callerRejectedResponse(error, req);
+    if (rejected) return rejected;
 
     if (error instanceof AIProviderRequestError && error.status === 429) {
       return new Response(

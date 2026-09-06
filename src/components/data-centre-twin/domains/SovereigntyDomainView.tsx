@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { 
   Globe, 
@@ -48,6 +49,8 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
     certifiedFrameworks,
     auditReadinessScore,
     riskLevel,
+    isAssessmentAvailable,
+    provenance,
   } = useSovereignty({ primaryJurisdiction: 'CA-QC' });
   
   const filteredFrameworks = frameworks.filter(f => {
@@ -61,6 +64,41 @@ export function SovereigntyDomainView({ facility }: SovereigntyDomainViewProps) 
     in_progress: frameworks.filter(f => f.status === 'in_progress').length,
     not_applicable: frameworks.filter(f => f.status === 'not_applicable').length,
   };
+
+  if (!isAssessmentAvailable) {
+    return (
+      <div className="space-y-6" data-provenance={provenance} data-testid="sovereignty-domain-view">
+        <DomainProvenanceHeader provenance="unavailable" sourceName="not-assessed" ariaContext="Sovereignty domain data provenance" />
+        <MetricProvenanceManifest domain="sovereignty" metrics={SOVEREIGNTY_METRICS} />
+        <Card data-provenance="unavailable">
+          <CardHeader>
+            <CardTitle className="text-base">Sovereignty assessment not available</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              A tenant-backed audit source is not connected for this facility.
+              Scores, compliance status, cross-border flow counts, and framework
+              certifications are withheld until evidence is available.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-md border border-border/60 p-3">
+                <div className="text-xs text-muted-foreground">Configured jurisdiction</div>
+                <div className="font-medium">{getJurisdictionDisplayName('CA-QC')}</div>
+              </div>
+              <div className="rounded-md border border-border/60 p-3">
+                <div className="text-xs text-muted-foreground">Facility</div>
+                <div className="font-medium">{facility.name}</div>
+              </div>
+              <div className="rounded-md border border-border/60 p-3">
+                <div className="text-xs text-muted-foreground">Assessment status</div>
+                <div className="font-medium">Not assessed</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-6" data-provenance="unavailable" data-testid="sovereignty-domain-view">

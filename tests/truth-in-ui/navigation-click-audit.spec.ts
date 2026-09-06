@@ -198,7 +198,9 @@ test.describe('AURA DC authenticated navigation real-click matrix', () => {
     await installSessionAndOpen(context, page);
 
     await page.getByRole('link', { name: /^Start simulation$/i }).first().click();
-    await expectPath(page, '/simulation?twin=aura-reference-facility');
+    // The simulation workflow owns its active step in the URL. A dashboard
+    // link without an explicit step is canonicalized to the inspect state.
+    await expectPath(page, '/simulation?twin=aura-reference-facility&step=inspect');
 
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await page.getByRole('link', { name: /^Open Blueprint$/i }).first().click();

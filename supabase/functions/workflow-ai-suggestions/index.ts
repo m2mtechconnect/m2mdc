@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -10,7 +11,7 @@ serve(async (req) => {
 
   try {
     const { nodes, edges } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
@@ -37,19 +38,11 @@ Provide:
 2. 1-2 optimization tips for current structure
 3. Overall workflow health score (1-10)`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+    const response = await makeAIResponse(
+      { messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt }
-        ],
-        tools: [
+        ], tools: [
           {
             type: "function",
             function: {
@@ -91,10 +84,9 @@ Provide:
               }
             }
           }
-        ],
-        tool_choice: { type: "function", function: { name: "provide_workflow_suggestions" } }
-      }),
-    });
+        ], toolChoice: { type: "function", function: { name: "provide_workflow_suggestions" } } },
+      { model: 'fast', operation: 'workflow-ai-suggestions' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

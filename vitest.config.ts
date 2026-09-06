@@ -12,6 +12,16 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./tests/setup.ts'],
+    // The Windows workspace reuses pnpm junctions from the prepared dependency
+    // runtime. Externalizing Zod through that junction drops its named `z`
+    // export under Vitest even though Node and Bun resolve it correctly.
+    // Transform it through Vite so test collection sees the same ESM contract
+    // as the application build.
+    server: {
+      deps: {
+        inline: ['zod'],
+      },
+    },
     // Vitest must not collect Playwright specs. Playwright owns
     // tests/e2e, tests/truth-in-ui, tests/visual, tests/builder and
     // tests/settings; collecting them here produced ~122 false failures.

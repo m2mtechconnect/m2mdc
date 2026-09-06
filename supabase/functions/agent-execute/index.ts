@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/agent-execute
  * 
@@ -114,7 +115,7 @@ serve(createHandler({
     ];
 
     // Get Lovable API key
-    const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
+    const lovableApiKey = isManagedAIConfigured();
     if (!lovableApiKey) {
       throw {
         code: 'CONFIGURATION_ERROR',
@@ -123,26 +124,15 @@ serve(createHandler({
       };
     }
 
-    const model = agent.config?.model || 'google/gemini-2.5-flash';
     const temperature = agent.config?.temperature || 0.7;
 
-    log("Calling Lovable AI", { model });
+    log("Calling managed AI", { profile: 'fast' });
 
-    // Call Lovable AI
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: fullMessages,
-        temperature,
-        max_tokens: 2000,
-        stream: false,
-      }),
-    });
+    // Call the managed AI boundary.
+    const aiResponse = await makeAIResponse(
+      { messages: fullMessages, temperature: temperature, maxTokens: 2000 },
+      { model: 'fast', operation: 'agent-execute' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
@@ -155,6 +145,7 @@ serve(createHandler({
     }
 
     const aiData = await aiResponse.json();
+    const aiEvidence = getAIResponseEvidence(aiResponse);
     const assistantMessage = aiData.choices?.[0]?.message?.content;
 
     if (!assistantMessage) {
@@ -170,7 +161,8 @@ serve(createHandler({
         role: 'assistant',
         content: assistantMessage,
         metadata: {
-          model,
+          model: aiEvidence?.model ?? null,
+          ai: aiEvidence,
           tokens: aiData.usage,
         },
       });

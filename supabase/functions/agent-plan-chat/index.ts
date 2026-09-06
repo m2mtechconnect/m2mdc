@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/agent-plan-chat
  * 
@@ -12,7 +13,6 @@
  * - desiredOutcome: string (optional)
  * - successMetric: string (optional)
  * - workflow: string (optional)
- * - model: string (optional)
  * 
  * RESPONSE:
  * - response: AI response text
@@ -32,7 +32,6 @@ const InputSchema = z.object({
   desiredOutcome: z.string().optional().default(""),
   successMetric: z.string().optional().default(""),
   workflow: z.string().optional().default(""),
-  model: z.string().optional().default("google/gemini-3-pro-preview"),
 });
 
 serve(createHandler({
@@ -47,15 +46,14 @@ serve(createHandler({
       department, 
       desiredOutcome, 
       successMetric, 
-      workflow, 
-      model 
+      workflow,
     } = input;
     const { log } = context;
 
     log("Agent plan chat", { agentName });
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: 'CONFIGURATION_ERROR',
@@ -74,7 +72,7 @@ Agent Details:
 - Desired Outcome: ${desiredOutcome}
 - Success Metric: ${successMetric}
 - Workflow Type: ${workflow}
-- Recommended Model: ${model}
+- Response Profile: reasoning
 
 Your role is to:
 1. Explain how this agent would work in production
@@ -84,21 +82,13 @@ Your role is to:
 
 Be helpful, concise, and specific about this agent's capabilities. Use the agent configuration details to provide accurate, contextual responses.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
-        messages: [
+    const response = await makeAIResponse(
+      { messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: message }
-        ],
-        stream: false,
-      }),
-    });
+        ] },
+      { model: 'reasoning', operation: 'agent-plan-chat' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

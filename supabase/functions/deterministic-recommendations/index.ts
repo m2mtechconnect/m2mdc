@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -99,7 +100,7 @@ serve(async (req) => {
     }
 
     // Get LOVABLE_API_KEY from environment
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
@@ -203,25 +204,16 @@ Each recommendation must:
 
 Output ONLY a JSON array of ${topN} objects, no other text.`;
 
-    console.log('[deterministic-recommendations] Calling Lovable AI...');
+    console.log('[deterministic-recommendations] Calling managed AI...');
 
-    // Call Lovable AI
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+    // Call the managed AI boundary.
+    const response = await makeAIResponse(
+      { messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.3, // Low temperature for deterministic output
-        response_format: { type: 'json_object' },
-      }),
-    });
+        ], temperature: 0.3, responseFormat: { type: 'json_object' } },
+      { model: 'fast', operation: 'deterministic-recommendations' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

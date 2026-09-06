@@ -27,3 +27,5 @@ jobs:
         with: { node-version: '20' }
       - name: Enforce PR-0.1 production perimeter
         run: node scripts/verify-production-perimeter.mjs
+      - name: Enforce frontend/backend contract drift
+        run: node scripts/verify-frontend-backend-contract.mjs

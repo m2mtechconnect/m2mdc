@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -402,7 +403,7 @@ async function progressiveCapture(url: string): Promise<{
   }
 
   // Strategy 4: AI content recovery (for JS-heavy sites)
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const LOVABLE_API_KEY = isManagedAIConfigured();
   if (LOVABLE_API_KEY) {
     try {
       console.log('[Progressive-Capture] Strategy 4: AI content recovery');
@@ -423,15 +424,8 @@ async function progressiveCapture(url: string): Promise<{
         };
       }
 
-      const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'google/gemini-3-pro-preview',
-          messages: [
+      const aiResponse = await makeAIResponse(
+      { messages: [
             {
               role: 'system',
               content: 'Extract all meaningful business content from this HTML. Focus on what the business does, their services, products, mission, and key information. Ignore navigation, menus, footers, scripts, and UI elements. If the page is mostly JavaScript placeholders or has no real content, respond with just "INSUFFICIENT_CONTENT".'
@@ -440,11 +434,9 @@ async function progressiveCapture(url: string): Promise<{
               role: 'user',
               content: `URL: ${url}\n\nHTML:\n${html.substring(0, 50000)}`
             }
-          ],
-          temperature: 0.1,
-          max_tokens: 2048,
-        }),
-      });
+          ], temperature: 0.1, maxTokens: 2048 },
+      { model: 'reasoning', operation: 'url-turbo-capture' },
+    );
 
       if (aiResponse.ok) {
         const data = await aiResponse.json();
@@ -587,20 +579,13 @@ async function progressiveCapture(url: string): Promise<{
   };
 }
 
-// Summarize with Gemini 2.5 Flash
+// Summarize with the fast server-owned response profile.
 async function summarizeChunk(chunk: string): Promise<string> {
-  const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+  const LOVABLE_API_KEY = isManagedAIConfigured();
   if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured');
 
-  const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-3-pro-preview',
-      messages: [
+  const response = await makeAIResponse(
+      { messages: [
         {
           role: 'system',
           content: 'You are a precise extractive summarizer. Use only the provided text. Return concise bullets and tagged entities relevant to Operations, Sales & Marketing, and Finance & Administration. If content is thin, return "insufficient_evidence": true.'
@@ -609,11 +594,9 @@ async function summarizeChunk(chunk: string): Promise<string> {
           role: 'user',
           content: chunk
         }
-      ],
-      temperature: 0.1,
-      max_tokens: 512,
-    }),
-  });
+      ], temperature: 0.1, maxTokens: 512 },
+      { model: 'reasoning', operation: 'url-turbo-capture' },
+    );
 
   if (!response.ok) {
     throw new Error(`Gemini error: ${response.status}`);

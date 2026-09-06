@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -152,7 +153,7 @@ Rules:
 - Base everything ONLY on the provided text. If uncertain, lower confidence or omit.
 - Prefer quick wins that can be piloted in AURA. Map to Canadian funding when appropriate.`;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
     }
@@ -200,17 +201,8 @@ Rules:
       required: ["company", "domain", "departmentsCovered", "items"],
     };
 
-    const aiResponse = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-pro-preview",
-          messages: [
+    const aiResponse = await makeAIResponse(
+      { messages: [
             { role: "system", content: systemPrompt },
             {
               role: "user",
@@ -218,8 +210,7 @@ Rules:
                 domain || "manual-input"
               }\nCompany: ${companyName || "Unknown"}\n\nContent:\n${context}`,
             },
-          ],
-          tools: [
+          ], tools: [
             {
               type: "function",
               function: {
@@ -229,13 +220,11 @@ Rules:
                 parameters: recommendationSchema,
               },
             },
-          ],
-          tool_choice: {
+          ], toolChoice: {
             type: "function",
             function: { name: "generate_recommendations" },
-          },
-        }),
-      }
+          } },
+      { model: 'reasoning', operation: 'manual-recommendations' },
     );
 
     if (!aiResponse.ok) {

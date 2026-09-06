@@ -1,7 +1,8 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/analyze-document-with-gemini
  * 
- * PURPOSE: Advanced Gemini 3.0 / 2.5 Flash document analysis
+ * PURPOSE: Advanced managed-AI document analysis
  * Generates complete Twin/Agent creation plan from documents
  * 
  * AUTH: public (no auth required)
@@ -38,7 +39,7 @@ serve(createHandler({
     const startTime = Date.now();
     log("Starting Gemini analysis", { fileName, fileType });
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: ErrorCodes.INTERNAL_ERROR,
@@ -47,16 +48,9 @@ serve(createHandler({
       };
     }
 
-    // Use Gemini 3.0 Pro for deep document understanding
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-preview",
-        messages: [
+    // Use the reasoning server-owned profile for deep document understanding.
+    const response = await makeAIResponse(
+      { messages: [
           {
             role: "system",
             content: `You are an AI architect that analyzes documents to design Digital Twins and AI Agents.
@@ -113,9 +107,9 @@ Be specific. Don't use placeholders. Make real recommendations.`,
             role: "user",
             content: `File: ${fileName}\nType: ${fileType || 'unknown'}\n\nContent:\n${fileContent.substring(0, 12000)}`,
           },
-        ],
-      }),
-    });
+        ] },
+      { model: 'reasoning', operation: 'analyze-document-with-gemini' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -145,6 +139,7 @@ Be specific. Don't use placeholders. Make real recommendations.`,
     }
 
     const data = await response.json();
+    const aiEvidence = getAIResponseEvidence(response);
     const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
@@ -224,7 +219,8 @@ Be specific. Don't use placeholders. Make real recommendations.`,
       file_type: fileType || 'unknown',
       indexed_id: indexedId,
       latency_ms: latency,
-      powered_by: "Gemini 3.0 Pro",
+      powered_by: aiEvidence?.profile ?? 'reasoning',
+      ai: aiEvidence,
     };
   }
 }));

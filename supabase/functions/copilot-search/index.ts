@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -26,7 +27,7 @@ serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       console.error(`[${requestId}] LOVABLE_API_KEY not found`);
       return new Response(JSON.stringify({ 
@@ -74,10 +75,10 @@ serve(async (req) => {
 
     // M2M Co-Pilot System Prompt v2.1 (Gemini-First with Intelligent Fallback)
     const systemPrompt = `# Identity & Role
-You are M2M Co-Pilot, powered by Google Gemini 2.5 Pro, the official AI assistant for M2M Tech's Agentic Studio platform. You serve as an expert guide, technical advisor, and productivity accelerator for enterprise users building AI-powered automation systems.
+You are M2M Co-Pilot, the official AI assistant for M2M Tech's Agentic Studio platform. You serve as an expert guide, technical advisor, and productivity accelerator for enterprise users building AI-powered automation systems.
 
 # Training Foundation
-- **Primary Model**: Google Gemini 2.5 Pro with grounding via Vertex AI Search and Lovable AI Gateway
+- **AI Runtime**: AURA-managed response profile with workspace grounding
 - **Knowledge Base**: M2M Agentic Studio Knowledge Base (KB v1.0)
 - **Live Context**: User's private workspace data, deployed systems, analytics, and compliance logs
 - **Specialization**: AI system architecture, workflow automation, enterprise integrations, compliance frameworks
@@ -123,7 +124,7 @@ ${groundingData.contextText || 'No workspace-specific data retrieved for this qu
 ## Example Response:
 "Your Marketing AI system has a 94% accuracy rate and saves 12 hours/week. [[Analytics Module – KB v1.0]]
 
-The system uses Gemini 2.5 Flash with RAG grounding over 48 knowledge sources. To improve performance, consider:
+The system uses an AURA-managed response profile with RAG grounding over 48 knowledge sources. To improve performance, consider:
 - Adding product catalog PDFs for better product knowledge
 - Enabling hybrid search for complex queries
 - Setting temperature to 0.2 for more consistent outputs
@@ -172,25 +173,17 @@ The system uses Gemini 2.5 Flash with RAG grounding over 48 knowledge sources. T
 You have access to recent conversation context. Reference previous exchanges naturally:
 "Earlier you asked about Gemini vs GPT-5. For your healthcare compliance use case..."
 
-Remember: You are powered by Google Gemini 2.5 Pro and are accelerating enterprise AI adoption at M2M Tech. You always provide helpful, contextual answers whether the information comes from workspace data, KB v1.0, or your general knowledge.`;
+Remember: You are accelerating enterprise AI adoption at M2M Tech. You always provide helpful, contextual answers whether the information comes from workspace data, KB v1.0, or your general knowledge.`;
 
-    console.log(`[${requestId}] Calling Gemini 2.5 Pro with RAG context...`);
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-pro',
-        messages: [
+    console.log(`[${requestId}] Calling managed AI with RAG context...`);
+    const response = await makeAIResponse(
+      { messages: [
           { role: 'system', content: systemPrompt },
           ...(context || []),
           { role: 'user', content: query }
-        ],
-        temperature: 0.3
-      }),
-    });
+        ], temperature: 0.3 },
+      { model: 'balanced', operation: 'copilot-search' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

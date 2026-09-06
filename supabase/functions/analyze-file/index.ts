@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/analyze-file
  * 
@@ -47,7 +48,7 @@ serve(createHandler({
 
     log("Analyzing file", { fileName, fileType });
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: ErrorCodes.INTERNAL_ERROR,
@@ -56,16 +57,9 @@ serve(createHandler({
       };
     }
 
-    // Use Gemini Flash for document analysis
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+    // Use the fast server-owned profile for document analysis.
+    const response = await makeAIResponse(
+      { messages: [
           {
             role: "system",
             content: `You are a document analysis AI. Analyze documents and provide:
@@ -105,9 +99,9 @@ Return JSON:
             role: "user",
             content: `File: ${fileName}\nType: ${fileType || 'unknown'}\n\nContent:\n${fileContent.substring(0, 8000)}`,
           },
-        ],
-      }),
-    });
+        ] },
+      { model: 'fast', operation: 'analyze-file' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

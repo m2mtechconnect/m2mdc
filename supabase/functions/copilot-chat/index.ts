@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/copilot-chat
  * 
@@ -8,7 +9,7 @@
  * - messages: array (required, chat messages)
  * - role: string (optional: Executive, Manager, Engineer)
  * - useGrounding: boolean (optional, enable knowledge base)
- * - settings: object (optional: model, temperature, maxTokens, systemPrompt)
+ * - settings: object (optional: temperature, maxTokens, systemPrompt)
  * 
  * RESPONSE:
  * - text: AI response text
@@ -38,7 +39,6 @@ const InputSchema = z.object({
   role: z.enum(['Executive', 'Manager', 'Engineer']).optional(),
   useGrounding: z.boolean().default(false),
   settings: z.object({
-    model: z.string().optional(),
     temperature: z.number().min(0).max(2).optional(),
     maxTokens: z.number().int().positive().optional(),
     systemPrompt: z.string().optional(),
@@ -56,17 +56,14 @@ serve(createHandler({
     log("Co-Pilot request", { messageCount: messages.length, role, useGrounding });
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: 'CONFIGURATION_ERROR',
-        message: 'Lovable AI not configured. Contact support.',
+        message: 'Managed AI is not configured. Contact support.',
         status: 500,
       };
     }
-
-    // Model selection - ENFORCE GEMINI 3.X
-    const lovableModel = 'google/gemini-3-pro-preview';
 
     // Build system prompt
     const rolePrompt = role ? ROLE_PROMPTS[role] : '';
@@ -124,22 +121,13 @@ serve(createHandler({
 
     const startTime = Date.now();
 
-    log("Calling Lovable AI", { model: lovableModel });
+    log("Calling managed AI", { profile: 'reasoning' });
 
-    // Call Lovable AI Gateway
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: lovableModel,
-        messages: aiMessages,
-        temperature: settings?.temperature || 0.3,
-        max_tokens: settings?.maxTokens || 1024,
-      })
-    });
+    // Call the managed AI boundary.
+    const aiResponse = await makeAIResponse(
+      { messages: aiMessages, temperature: settings?.temperature || 0.3, maxTokens: settings?.maxTokens || 1024 },
+      { model: 'reasoning', operation: 'copilot-chat' },
+    );
 
     const latency = Date.now() - startTime;
 
@@ -170,6 +158,7 @@ serve(createHandler({
     }
 
     const aiData = await aiResponse.json();
+    const aiEvidence = getAIResponseEvidence(aiResponse);
     const text = aiData.choices?.[0]?.message?.content || "No response generated";
 
     log("Co-Pilot success", { latency, citationCount: citations.length });
@@ -179,7 +168,8 @@ serve(createHandler({
       citations,
       metrics: {
         latency_ms: latency,
-        model: lovableModel,
+        model: aiEvidence?.model ?? null,
+        ai: aiEvidence,
         grounded: useGrounding && citations.length > 0
       }
     };

@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/builder-generate-summary
  * 
@@ -67,7 +68,7 @@ serve(createHandler({
     });
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: 'CONFIGURATION_ERROR',
@@ -159,22 +160,13 @@ CRITICAL REQUIREMENTS:
 - Keep tone professional, concise, and positive
 - Use clear business language, not technical jargon`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+    const response = await makeAIResponse(
+      { messages: [
           { role: "system", content: "You are a business analyst creating clear, compelling system summaries. Write in a professional, accessible tone." },
           { role: "user", content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 800,
-      }),
-    });
+        ], temperature: 0.7, maxTokens: 800 },
+      { model: 'fast', operation: 'builder-generate-summary' },
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -190,7 +182,7 @@ CRITICAL REQUIREMENTS:
       if (response.status === 402) {
         throw {
           code: ErrorCodes.EXTERNAL_API_ERROR,
-          message: "Payment required, please add funds to your Lovable AI workspace.",
+          message: "AI service capacity is unavailable. Please contact support.",
           status: 402,
         };
       }

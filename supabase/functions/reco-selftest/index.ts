@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -94,9 +95,9 @@ serve(async (req) => {
       report.ok = false;
     }
 
-    // 4. Lovable AI Gateway Check (Canary Test)
+    // 4. Managed AI boundary check (canary test)
     try {
-      const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+      const LOVABLE_API_KEY = isManagedAIConfigured();
       
       if (!LOVABLE_API_KEY) {
         report.checks.ai = { 
@@ -106,24 +107,18 @@ serve(async (req) => {
         report.ok = false;
       } else {
         const startTime = Date.now();
-        const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'google/gemini-3-pro-preview',
-            messages: [
+        const aiResponse = await makeAIResponse(
+      { messages: [
               { 
                 role: 'user', 
                 content: 'Return strict JSON only: {"probe":"ok","timestamp":"' + new Date().toISOString() + '"}. No markdown, no prose.' 
               }
-            ],
-          }),
-        });
+            ] },
+      { model: 'reasoning', operation: 'reco-selftest' },
+    );
 
         const latency = Date.now() - startTime;
+        const aiEvidence = getAIResponseEvidence(aiResponse);
 
         if (!aiResponse.ok) {
           const errorText = await aiResponse.text();
@@ -132,6 +127,7 @@ serve(async (req) => {
             status: aiResponse.status,
             error: `AI gateway returned ${aiResponse.status}`,
             details: errorText.substring(0, 500),
+            ai: aiEvidence,
             latency,
           };
           report.ok = false;
@@ -154,7 +150,8 @@ serve(async (req) => {
 
           report.checks.ai = {
             ok: !!parsed?.probe,
-            model: 'google/gemini-3-pro-preview',
+            model: aiEvidence?.model ?? null,
+            ai: aiEvidence,
             latency,
             parsed,
             rawResponseLength: content.length,

@@ -146,6 +146,8 @@ export interface SupabaseMockHandle {
   requests(): SanitizedRequest[];
   /** How many times a `/rest/v1/profiles*` request was fulfilled. */
   profileHits(): number;
+  /** Unexpected Supabase requests rejected by fail-closed strict mode. */
+  unexpectedHits(): number;
   /** Storage entry for pre-navigation localStorage priming. */
   storage(): { key: string; value: string };
 }
@@ -162,11 +164,16 @@ export async function installSupabaseMock(
     /** Tenant-scoped durable fixtures for cross-persona journey tests. */
     simulationRuns?: unknown[];
     decisionRecords?: unknown[];
+    /** Reject unconfigured REST, RPC, and Edge Function requests instead of returning empty success. */
+    strictUnexpectedBackend?: boolean;
   } = {},
 ): Promise<SupabaseMockHandle> {
   const session = opts.session ?? buildFakeSession();
   const log: SanitizedRequest[] = [];
   let profileHits = 0;
+  let unexpectedHits = 0;
+  const strictUnexpectedBackend = opts.strictUnexpectedBackend ??
+    process.env.AURA_STRICT_UNEXPECTED_BACKEND === '1';
   const organizationId = '00000000-0000-4000-8000-000000000010';
   const globalRole = opts.platformRole !== undefined
     ? opts.platformRole
@@ -209,6 +216,19 @@ export async function installSupabaseMock(
         headers: { ...CORS_HEADERS, 'content-type': contentType, ...extraHeaders },
         body,
       });
+    const rejectUnexpected = () => {
+      unexpectedHits += 1;
+      return route.fulfill({
+        status: 501,
+        headers: { ...CORS_HEADERS, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          error: {
+            code: 'UNHANDLED_SUPABASE_TEST_REQUEST',
+            message: `No explicit truth-suite fixture for ${method} ${pathname}`,
+          },
+        }),
+      });
+    };
 
     // ---- OPTIONS preflight -------------------------------------
     if (method === 'OPTIONS') {
@@ -325,11 +345,15 @@ export async function installSupabaseMock(
 
     // ---- RPC / other REST --------------------------------------
     if (pathname.startsWith('/rest/v1/') || pathname.startsWith('/rpc/')) {
+      if (strictUnexpectedBackend) return rejectUnexpected();
       if (method === 'HEAD') return route.fulfill({ status: 200, headers: CORS_HEADERS, body: '' });
       return fulfillJson(method === 'GET' ? '[]' : '{}');
     }
 
-    // Any other supabase.co path — reply empty so nothing hangs.
+    // Strict qualification must never turn an unknown backend request into a
+    // false success. Permissive mode remains available for legacy visual and
+    // exploratory tests while their fixtures are reconciled.
+    if (strictUnexpectedBackend) return rejectUnexpected();
     return fulfillJson('{}');
   }
 
@@ -363,6 +387,7 @@ export async function installSupabaseMock(
     session,
     requests: () => log.slice(),
     profileHits: () => profileHits,
+    unexpectedHits: () => unexpectedHits,
     storage: () => ({ key: STORAGE_KEY, value: session.storagePayload }),
   };
 }

@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -12,7 +13,7 @@ serve(async (req) => {
   try {
     const { messages, templateConfig } = await req.json();
     
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
@@ -35,24 +36,15 @@ Important Context:
 
 Keep responses concise, professional, and helpful.`;
 
-    console.log("Calling Lovable AI Gateway with Gemini 3 Pro Preview...");
+    console.log("Calling managed AI with the reasoning response profile...");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-preview", // Latest Gemini model
-        messages: [
+    const response = await makeAIResponse(
+      { messages: [
           { role: "system", content: systemPrompt },
           ...messages,
-        ],
-        stream: true,
-        temperature: 0.7,
-      }),
-    });
+        ], temperature: 0.7 },
+      { model: 'reasoning', operation: 'template-preview-chat', stream: true },
+    );
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -67,7 +59,7 @@ Keep responses concise, professional, and helpful.`;
       if (response.status === 402) {
         return new Response(
           JSON.stringify({ 
-            error: "Payment required, please add funds to your Lovable AI workspace." 
+            error: "AI service capacity is unavailable. Please contact support."
           }),
           {
             status: 402,

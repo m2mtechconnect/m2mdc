@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 /**
  * /v1/builder-infer-goal
  * 
@@ -42,7 +43,7 @@ serve(createHandler({
     log("Inferring goal", { systemName, department });
 
     // Get Lovable API key
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw {
         code: 'CONFIGURATION_ERROR',
@@ -70,22 +71,13 @@ ${description ? `Description: ${description}` : ''}
 
 Infer the best department, outcome, and successMetric for this AI system.`;
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+    const aiResponse = await makeAIResponse(
+      { messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.3,
-        response_format: { type: 'json_object' },
-      }),
-    });
+        ], temperature: 0.3, responseFormat: { type: 'json_object' } },
+      { model: 'fast', operation: 'builder-infer-goal' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();

@@ -1,3 +1,4 @@
+import { getAIResponseEvidence, isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -427,7 +428,7 @@ serve(async (req) => {
               usedUrls.push(page.url);
             }
             
-            // Call Lovable AI with structured output
+            // Call managed AI with structured output.
             const systemPrompt = `You are M2M's Agentic Advisor. Given raw website text from a single company,
 produce the TOP ${topN} AI initiatives PER department that can deliver measurable impact in 90–180 days.
 
@@ -440,7 +441,7 @@ Rules:
 - Base everything ONLY on the provided site pages. If uncertain, lower confidence or omit.
 - Prefer quick wins that can be piloted in AURA. Map to Canadian funding when appropriate.`;
 
-            const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+            const LOVABLE_API_KEY = isManagedAIConfigured();
             if (!LOVABLE_API_KEY) {
               throw new Error('LOVABLE_API_KEY not configured');
             }
@@ -479,29 +480,20 @@ Rules:
               required: ["company", "domain", "departmentsCovered", "items"]
             };
 
-            const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',
-                messages: [
+            const aiResponse = await makeAIResponse(
+      { messages: [
                   { role: 'system', content: systemPrompt },
                   { role: 'user', content: `Analyze this company:\n\nDomain: ${normalizedDomain}\n\nPages:\n${context}` },
-                ],
-                tools: [{
+                ], tools: [{
                   type: "function",
                   function: {
                     name: "generate_recommendations",
                     description: "Generate AI initiative recommendations for a company",
                     parameters: recommendationSchema
                   }
-                }],
-                tool_choice: { type: "function", function: { name: "generate_recommendations" } }
-              }),
-            });
+                }], toolChoice: { type: "function", function: { name: "generate_recommendations" } } },
+      { model: 'fast', operation: 'url-recommendations' },
+    );
 
             if (!aiResponse.ok) {
               const errorText = await aiResponse.text();
@@ -784,7 +776,7 @@ Rules:
     
     console.log(`[Classification] Pre-classified Industry: ${industryClassification}`);
 
-    // Call Lovable AI with Gemini - Digital Twin Blueprint Generator
+    // Call managed AI for Digital Twin blueprint generation.
     const systemPrompt = `You are an ELITE Digital Twin Blueprint Generator for M2M Agentic Studio.
 
 🎯 YOUR MISSION
@@ -899,7 +891,7 @@ Before returning, verify EACH recommendation:
 
 If a recommendation fails any check → REMOVE IT`;
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
@@ -939,29 +931,20 @@ If a recommendation fails any check → REMOVE IT`;
       required: ["company", "domain", "departmentsCovered", "items"]
     };
 
-    const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
-        messages: [
+    const aiResponse = await makeAIResponse(
+      { messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Analyze this company:\n\nDomain: ${normalizedDomain}\n\nPages:\n${context}` },
-        ],
-        tools: [{
+        ], tools: [{
           type: "function",
           function: {
             name: "generate_recommendations",
             description: "Generate AI initiative recommendations for a company",
             parameters: recommendationSchema
           }
-        }],
-        tool_choice: { type: "function", function: { name: "generate_recommendations" } }
-      }),
-    });
+        }], toolChoice: { type: "function", function: { name: "generate_recommendations" } } },
+      { model: 'fast', operation: 'url-recommendations' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
@@ -991,6 +974,7 @@ If a recommendation fails any check → REMOVE IT`;
     }
 
     const aiData = await aiResponse.json();
+    const aiEvidence = getAIResponseEvidence(aiResponse);
     let result;
     let geminiOk = false;
     let geminiError: string | undefined;
@@ -1603,9 +1587,9 @@ If a recommendation fails any check → REMOVE IT`;
       .insert({
         site_id: site.id,
         departments_covered: result.departmentsCovered,
-        payload: { ...result, status: 'ok' },
+        payload: { ...result, status: 'ok', ai: aiEvidence },
         topn: topN,
-        model: 'google/gemini-2.5-flash',
+        model: aiEvidence?.model ?? null,
       });
 
     const response = normalizeResponse({ 

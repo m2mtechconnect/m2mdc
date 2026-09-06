@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { getCorsHeaders } from "../_shared/cors.ts";
 
@@ -59,22 +60,15 @@ serve(async (req) => {
       throw new Error(`No test scenario found for template: ${templateId}`);
     }
 
-    // Simulate AI call (in production would call Lovable AI Gateway)
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    // Simulate the managed AI call.
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    // Call Lovable AI Gateway
-    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: config?.llm?.model || "google/gemini-2.5-flash",
-        messages: [
+    // Call the managed AI boundary.
+    const aiResponse = await makeAIResponse(
+      { messages: [
           {
             role: "system",
             content: config?.system_prompt || "You are a helpful AI assistant.",
@@ -83,10 +77,9 @@ serve(async (req) => {
             role: "user",
             content: scenario.query,
           },
-        ],
-        temperature: config?.llm?.temperature || 0.7,
-      }),
-    });
+        ], temperature: config?.llm?.temperature || 0.7 },
+      { model: 'fast', operation: 'template-test-run' },
+    );
 
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();

@@ -1,3 +1,4 @@
+import { isManagedAIConfigured, makeAIResponse } from "../_shared/ai-client.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCorsHeaders } from "../_shared/cors.ts";
@@ -124,7 +125,7 @@ serve(async (req) => {
       .join('\n\n---\n\n');
 
     // Parallel per-department generation for ultra-fast results
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const LOVABLE_API_KEY = isManagedAIConfigured();
     if (!LOVABLE_API_KEY) {
       return new Response(
         JSON.stringify({ error: 'LOVABLE_API_KEY not configured' }),
@@ -144,22 +145,13 @@ ${retrievedContent}
 Output valid JSON array with max 2 recommendations. Format:
 [{"department":"${dept}","recommendation":"...","why_it_matters":"...","steps":["...","...","..."],"confidence":80}]`;
 
-          const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              model: 'google/gemini-3-pro-preview',
-              messages: [
+          const aiResponse = await makeAIResponse(
+      { messages: [
                 { role: 'system', content: SYSTEM_PROMPT },
                 { role: 'user', content: userPrompt },
-              ],
-              temperature: 0.2,
-              max_tokens: 800,
-            }),
-          });
+              ], temperature: 0.2, maxTokens: 800 },
+      { model: 'reasoning', operation: 'recommendations-generate-stream' },
+    );
 
           if (!aiResponse.ok) {
             console.error(`AI error for ${dept}:`, aiResponse.status);

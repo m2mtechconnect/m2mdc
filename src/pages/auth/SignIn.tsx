@@ -14,7 +14,8 @@ import { toast } from "sonner";
 import { Loader2, Lock, Mail, Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { AuthLayout, SecurityBadge, SSOButtons } from "@/components/auth";
+import { SecurityBadge, SSOButtons } from "@/components/auth";
+import { SignInLayout } from "@/components/auth/SignInLayout";
 import { Helmet } from "react-helmet-async";
 import { signInWithGoogle } from "@/auth/ssoProviders";
 
@@ -117,9 +118,9 @@ export default function SignIn() {
       <meta property="og:url" content="https://auradc.m2mtechconnect.com/login" />
       <meta property="og:type" content="website" />
     </Helmet>
-    <AuthLayout
-      title="Sign in to your account"
-      subtitle="Enter your credentials to access the studio"
+    <SignInLayout
+      title="Sign in to AURA"
+      subtitle="Continue to your AI factory workspace."
     >
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Error Message */}
@@ -201,7 +202,7 @@ export default function SignIn() {
         {/* Submit Button */}
         <Button 
           type="submit" 
-          className="w-full h-12 text-base font-medium bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary transition-all duration-300" 
+          className="w-full h-12 text-base font-medium bg-primary text-primary-foreground hover:bg-primary/90"
           disabled={loading}
         >
           {loading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
@@ -243,7 +244,7 @@ export default function SignIn() {
           Back to home
         </Link>
       </div>
-    </AuthLayout>
+    </SignInLayout>
     </>
   );
 }

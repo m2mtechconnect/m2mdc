@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0a1628" />
+    <!-- Prioritize only the public homepage hero. Portal routes load no marketing media. -->
+    <script>
+      if (window.location.pathname === '/') {
+        var auraMarketingPoster = document.createElement('link');
+        auraMarketingPoster.rel = 'preload';
+        auraMarketingPoster.as = 'image';
+        auraMarketingPoster.href = '/landing/aura-hero-poster.webp';
+        auraMarketingPoster.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(auraMarketingPoster);
+      }
+    </script>
     <title>AURA | Sovereign AI Data Centre Digital Twin Platform</title>
     <meta name="description" content="AURA by M2M Tech Connect is an AI-powered Digital Twin platform for sovereign data centres. Model and simulate PUE, GPU utilization, thermals, carbon emissions, and compliance.">
     <meta name="author" content="M2M Tech Connect" />

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import './DataCentreTwinLanding.css';
-import m2mLogo from '@/assets/m2m-logo.png';
+import { MarketingParentBrand } from '@/components/landing/MarketingParentBrand';
 function Logo(){return <span className="dc-logo" role="img" aria-label="AURA"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="currentColor" fillRule="evenodd" d="M24 2 47 44H35.2l-4.1-8H16.9l-4.1 8H1L24 2Zm0 14.2-6.6 13h13.2l-6.6-13Z"/><rect x="20.5" y="25.5" width="7" height="7" fill="#80b900"/></svg>AURA</span>}
 const features=[['Align the design','Bring configuration, reference geometry and assumptions into the same review.'],['Explore a scenario','Inspect supplied thermal and electrical reference displays in context.'],['Review the evidence','Reopen saved results with their inputs, method and units.']];
 const journey=[['Command Center','Understand the current design and what needs attention.'],['Design & Build','Configure the facility and prepare a design revision.'],['Simulate','Explore the scene, submit an analysis and review saved results.'],['Operate','Inspect connected worker telemetry and source availability.'],['Evidence','Trace a result back to its inputs and recorded outcome.']];
@@ -49,7 +49,7 @@ export default function DataCentreTwinLanding(){const[open,setOpen]=useState(fal
 <div className="dc-footer-main">
   <div className="dc-footer-brand">
     <Link className="dc-footer-aura" to="/" aria-label="AURA home"><Logo/></Link>
-    <a className="dc-footer-powered" href="https://m2mtechconnect.com/" aria-label="Powered by M2M Tech — corporate website"><img className="dc-m2m-logo" src={m2mLogo} width="40" height="40" alt="" loading="lazy"/><span>Powered by <strong>M2M Tech</strong></span></a>
+    <MarketingParentBrand/>
     <p>AI data centre intelligence.<br/>From design to informed decisions.</p>
     <a className="dc-footer-corporate" href="https://m2mtechconnect.com/">Visit M2M corporate <span aria-hidden="true">↗</span></a>
   </div>

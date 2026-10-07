@@ -45,7 +45,8 @@
     "2026-08-26 release reconciliation: /reset-password is the shipped recovery-completion route and /readiness/supervisor is the authenticated supervisor-readiness route. Both are explicitly classified without changing their existing guards or the default-deny policy.",
     "2026-08-26 post-release smoke correction: /infrastructure remains non-canonical and its illustrative mock page remains excluded from production; the legacy URL is classified redirect-only and resolves to the tenant-bound /evidence/assets workspace.",
     "2026-08-27 perimeter exclusion: /blueprint/preview and /simulation/preview are reclassified from production_routes to production_blocked_routes. They remain authenticated, permission-guarded recommendation previews in the shipped router, but they are excluded from the production perimeter and are not part of the qualified production surface. No Edge Function classification changes; the production_functions allowlist is unchanged.",
-    "2026-09-01 perimeter drift correction: ai-config was already explicitly promoted by edge-function-promotions.json after independent caller authentication, scoped CORS, gateway JWT verification, read-only behavior, and server-owned provider-neutral output were reviewed. It is now present in production_functions so the effective allowlist matches the governed promotion ledger."
+    "2026-09-01 perimeter drift correction: ai-config was already explicitly promoted by edge-function-promotions.json after independent caller authentication, scoped CORS, gateway JWT verification, read-only behavior, and server-owned provider-neutral output were reviewed. It is now present in production_functions so the effective allowlist matches the governed promotion ledger.",
+    "2026-10-07 marketing-only scope: the three unchanged legacy public marketing routes /request-demo, /architecture and /blueprint-estimator were absent from this inventory in the published source. They are now explicitly classified production_blocked_routes, not promoted or qualified by the homepage publication. The replacement homepage uses mailto for demo contact and does not invoke public-intake. No router, Auth, backend, function promotion or access rule is changed."
   ],
   "production_functions": [
     "agent-execute",
@@ -126,6 +127,9 @@
   "production_blocked_routes": [
     "*",
     "/*",
+    "/architecture",
+    "/blueprint-estimator",
+    "/request-demo",
     "/admin/asset-pipeline",
     "/admin/asset-preview",
     "/admin/asset-validation/:assetId",

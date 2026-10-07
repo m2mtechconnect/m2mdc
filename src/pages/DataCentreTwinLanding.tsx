@@ -6,7 +6,31 @@ import m2mLogo from '@/assets/m2m-logo.png';
 function Logo(){return <span className="dc-logo" role="img" aria-label="AURA"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="currentColor" fillRule="evenodd" d="M24 2 47 44H35.2l-4.1-8H16.9l-4.1 8H1L24 2Zm0 14.2-6.6 13h13.2l-6.6-13Z"/><rect x="20.5" y="25.5" width="7" height="7" fill="#80b900"/></svg>AURA</span>}
 const features=[['Align the design','Bring configuration, reference geometry and assumptions into the same review.'],['Explore a scenario','Inspect supplied thermal and electrical reference displays in context.'],['Review the evidence','Reopen saved results with their inputs, method and units.']];
 const journey=[['Command Center','Understand the current design and what needs attention.'],['Design & Build','Configure the facility and prepare a design revision.'],['Simulate','Explore the scene, submit an analysis and review saved results.'],['Operate','Inspect connected worker telemetry and source availability.'],['Evidence','Trace a result back to its inputs and recorded outcome.']];
-function Scene(){const video=useRef<HTMLVideoElement>(null);const[playing,setPlaying]=useState(false);useEffect(()=>{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)void video.current?.play().catch(()=>{});},[]);return <><div className="dc-background"><div className="dc-scene"><video ref={video} src="/landing/aura-hero-twin-web.mp4" poster="/landing/aura-hero-poster.webp" width="1280" height="680" muted loop playsInline preload="metadata" onPlay={()=>setPlaying(true)} onPause={()=>setPlaying(false)} aria-label="AURA rack and thermal visualization"/></div></div><button className="dc-motion" onClick={()=>{const v=video.current;if(!v)return;if(v.paused){void v.play().catch(()=>{});}else{v.pause();}setPlaying(!v.paused);}}>{playing?'Pause animation':'Play animation'}</button></>}
+function Scene(){
+  const video=useRef<HTMLVideoElement>(null);
+  const[playing,setPlaying]=useState(false);
+  useEffect(()=>{
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    let disposed=false;
+    let firstFrame=0;
+    let secondFrame=0;
+    // Paint the already-preloaded poster before play() replaces it with a
+    // pending video frame. Playback follows real rendering, not a timed delay.
+    const poster=new Image();
+    poster.src='/landing/aura-hero-poster.webp';
+    const beginPlayback=()=>{
+      if(disposed)return;
+      firstFrame=requestAnimationFrame(()=>{
+        secondFrame=requestAnimationFrame(()=>{
+          if(!disposed)void video.current?.play().catch(()=>{});
+        });
+      });
+    };
+    void poster.decode().then(beginPlayback,beginPlayback);
+    return()=>{disposed=true;cancelAnimationFrame(firstFrame);cancelAnimationFrame(secondFrame);};
+  },[]);
+  return <><div className="dc-background"><div className="dc-scene"><video ref={video} src="/landing/aura-hero-twin-web.mp4" poster="/landing/aura-hero-poster.webp" width="1280" height="680" muted loop playsInline preload="none" onPlay={()=>setPlaying(true)} onPause={()=>setPlaying(false)} aria-label="AURA rack and thermal visualization"/></div></div><button className="dc-motion" onClick={()=>{const v=video.current;if(!v)return;if(v.paused){void v.play().catch(()=>{});}else{v.pause();}setPlaying(!v.paused);}}>{playing?'Pause animation':'Play animation'}</button></>
+}
 export default function DataCentreTwinLanding(){const[open,setOpen]=useState(false);return <div className="dc-marketing">
 <Helmet><title>AURA | AI Factory Design &amp; Review</title><meta name="description" content="Bring your AI factory design, systems and evidence into one clear view. Explore NVIDIA DSX reference interiors with AURA."/><link rel="canonical" href="https://auradc.m2mtechconnect.com/"/><meta property="og:url" content="https://auradc.m2mtechconnect.com/"/><link rel="preload" as="image" href="/landing/aura-hero-poster.webp" fetchPriority="high"/></Helmet>
 <a className="dc-skip" href="#main-content">Skip to main content</a>

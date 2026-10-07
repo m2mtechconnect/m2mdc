@@ -1,145 +1,60 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { SkipToContent, MAIN_CONTENT_ID } from '@/components/a11y/SkipToContent';
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { TwinHeader } from '@/components/landing/TwinHeader';
-import { TwinHero } from '@/components/landing/TwinHero';
+import './DataCentreTwinLanding.css';
+import m2mLogo from '@/assets/m2m-logo.png';
+function Logo(){return <span className="dc-logo" role="img" aria-label="AURA"><svg viewBox="0 0 48 48" aria-hidden="true" focusable="false"><path fill="currentColor" fillRule="evenodd" d="M24 2 47 44H35.2l-4.1-8H16.9l-4.1 8H1L24 2Zm0 14.2-6.6 13h13.2l-6.6-13Z"/><rect x="20.5" y="25.5" width="7" height="7" fill="#80b900"/></svg>AURA</span>}
+const features=[['Align the design','Bring configuration, reference geometry and assumptions into the same review.'],['Explore a scenario','Inspect supplied thermal and electrical reference displays in context.'],['Review the evidence','Reopen saved results with their inputs, method and units.']];
+const journey=[['Command Center','Understand the current design and what needs attention.'],['Design & Build','Configure the facility and prepare a design revision.'],['Simulate','Explore the scene, submit an analysis and review saved results.'],['Operate','Inspect connected worker telemetry and source availability.'],['Evidence','Trace a result back to its inputs and recorded outcome.']];
+function Scene(){const video=useRef<HTMLVideoElement>(null);const[playing,setPlaying]=useState(false);useEffect(()=>{if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)void video.current?.play().catch(()=>{});},[]);return <><div className="dc-background"><div className="dc-scene"><video ref={video} src="/landing/aura-hero-twin.mp4" muted loop playsInline preload="metadata" onPlay={()=>setPlaying(true)} onPause={()=>setPlaying(false)} aria-label="AURA rack and thermal visualization"/></div></div><button className="dc-motion" onClick={()=>{const v=video.current;if(!v)return;if(v.paused){void v.play().catch(()=>{});}else{v.pause();}setPlaying(!v.paused);}}>{playing?'Pause animation':'Play animation'}</button></>}
+export default function DataCentreTwinLanding(){const[open,setOpen]=useState(false);return <div className="dc-marketing">
+<Helmet><title>AURA | AI Factory Design &amp; Review</title><meta name="description" content="Bring your AI factory design, systems and evidence into one clear view. Explore NVIDIA DSX reference interiors with AURA."/><link rel="canonical" href="https://auradc.m2mtechconnect.com/"/><meta property="og:url" content="https://auradc.m2mtechconnect.com/"/></Helmet>
+<a className="dc-skip" href="#main-content">Skip to main content</a>
+<header><div className="dc-container dc-header"><Link to="/" aria-label="AURA home"><Logo/></Link><button className="dc-menu" aria-expanded={open} aria-controls="dc-nav" onClick={()=>setOpen(!open)}>{open?'Close menu':'Menu'}</button><nav id="dc-nav" className={open?'is-open':''} aria-label="Public navigation">{[['Features','features'],['Use cases','use-cases'],['Integrations','integrations'],['Why AURA','differentiators']].map(([label,id])=><a key={id} href={'#'+id} onClick={()=>setOpen(false)}>{label}</a>)}<Link to="/login">Login</Link><Link className="dc-button dc-outline" to="/onboarding">Get started</Link></nav></div></header>
+<main id="main-content"><section className="dc-hero"><Scene/><div className="dc-container dc-hero-content"><p className="dc-eyebrow">● AI factory design & review</p><h1><span className="dc-title-line">Model and test</span><span className="dc-title-line dc-title-accent">your data center</span></h1><p className="dc-lead">Bring your AI factory design, systems and evidence into one clear view.</p><p className="dc-intro">For infrastructure leaders, engineering teams and the partners bringing AI factories to life.</p><div className="dc-actions"><a className="dc-button dc-primary" href="mailto:info@m2mtechconnect.com?subject=AURA%20guided%20demo">Book a guided demo ↗</a><a className="dc-button" href="#features">Explore AURA ↓</a></div><p className="dc-caption">AURA illustrative visualization · Explore actual DSX reference interiors below</p></div></section>
+<section className="dc-container dc-section dc-market" aria-labelledby="market-heading"><p className="dc-eyebrow">Why now</p><h2 id="market-heading">More AI capacity.<br/>More pressure on infrastructure.</h2><p>Power, cooling and compute decisions need to be reviewed together.</p><div className="dc-grid"><article><small>2025 · GLOBAL DATA CENTRES</small><h3>485 TWh</h3><p>Electricity demand.</p></article><article><small>2030 · IEA CENTRAL PROJECTION</small><h3>950 TWh</h3><p>Electricity demand projected to nearly double.</p></article><article><small>THE DESIGN CHALLENGE</small><h3>One connected view</h3><p>NVIDIA DSX brings facility design, simulation and operations into a shared framework.</p></article></div><p className="dc-source-links">Market context: <a href="https://www.iea.org/reports/key-questions-on-energy-and-ai/executive-summary">IEA, 2026 ↗</a> · Technology context: <a href="https://www.nvidia.com/en-us/data-center/products/dsx/">NVIDIA DSX ↗</a>. Industry figures, not AURA performance results.</p></section>
+<section className="dc-container dc-section" id="features"><p className="dc-eyebrow">From question to decision</p><h2>Can every team see<br/>the same design?</h2><p>Give the conversation a shared starting point.</p><div className="dc-grid">{features.map(([title,body],i)=><article key={title}><small>0{i+1}</small><h3>{title}</h3><p>{body}</p></article>)}</div></section>
+<section className="dc-container dc-section"><p className="dc-eyebrow">Explore the design</p><h2>See how the systems fit together.</h2><p>Explore the spaces behind an AI factory design. Select a view to see what it brings to the review.</p><InteriorGallery/></section>
+<section className="dc-container dc-section"><p className="dc-eyebrow">Inside AURA</p><h2>See the number.<br/>Understand its source.</h2><p>AURA screens captured 24 September 2026. Design scenarios and recorded worker measurements stay distinct.</p><div className="dc-kpi-wide"><KpiImage file="dashboard" title="Compare the design trade-offs" detail="PUE, CUE, WUE and energy. AURA generated demo: a 24-hour illustrative scenario, not measured facility data."/><KpiImage file="trends" title="See how the scenario changes over time" detail="IT load and inlet temperature from the same generated design scenario."/></div><h3 className="dc-kpi-heading">Recorded AURA worker measurements</h3><p>Historical snapshots of the cloud GPU running AURA. These values describe that worker, not the reference facility and not a live feed on this page.</p><div className="dc-kpi-grid">{[['gpu-utilization','Is the GPU being used?'],['gpu-memory','How much GPU memory is in use?'],['gpu-temperature','How warm is the GPU running?'],['gpu-power','How much power is the GPU drawing?']].map(([file,title])=><KpiImage key={file} file={file} title={title} detail="Recorded worker telemetry · Telegraf / InfluxDB · timestamp retained in the screen"/>)}</div></section>
+<section className="dc-container dc-section" id="use-cases"><p className="dc-eyebrow">Built for the review team</p><h2>Different roles.<br/>A shared design question.</h2><div className="dc-grid"><article><h3>Infrastructure leaders</h3><p>Understand a proposed design and the assumptions behind it before deciding the next step.</p></article><article><h3>Engineering teams</h3><p>Explore the reference systems and review supported scenarios with their context intact.</p></article><article><h3>Integration partners</h3><p>Bring clients into a visual design review and identify the data and integrations a pilot needs.</p></article></div></section>
+<section className="dc-container dc-section" id="journey"><p className="dc-eyebrow">One platform, five connected workspaces</p><h2>From design to a defensible decision</h2><div className="dc-journey">{journey.map(([title,body],i)=><article key={title}><small>0{i+1}</small><h3>{title}</h3><p>{body}</p></article>)}</div></section>
+<section className="dc-container dc-section" id="integrations"><p className="dc-eyebrow">Ecosystem</p><h2>Built around the model</h2><div className="dc-grid"><article><h3>NVIDIA DSX / OpenUSD</h3><p>The reference assembly supplies the data-hall and system geometry. Scene controls and scientific analysis have separate readiness and result states.</p></article><article><h3>Cloud rendering</h3><p>The configured Brev worker hosts the renderer. The lightweight local interface presents saved results without continuously rendering a scene.</p></article><article><h3>Telemetry & evidence</h3><p>Worker metrics describe the worker. Facility conclusions require appropriate facility inputs and reviewed analysis methods.</p></article></div></section>
+<section className="dc-container dc-section" id="differentiators"><p className="dc-eyebrow">The AURA difference</p><h2>The context behind the view.</h2><div className="dc-grid"><article><h3>Shared design context</h3><p>Carry the design conversation from configuration into exploration and review.</p></article><article><h3>Visual understanding</h3><p>Explore NVIDIA DSX reference interiors through AURA in your browser.</p></article><article><h3>Traceable results</h3><p>Keep inputs, methods and units attached to saved results. Facility CFD requires a reviewed engineering case.</p></article></div></section>
+<section className="dc-container dc-section"><p className="dc-eyebrow">Start your journey</p><h2>Bring one question.<br/>Find your next step.</h2><div className="dc-actions"><Link className="dc-button dc-primary" to="/dashboard">Open AURA ↗</Link><a className="dc-button dc-outline" href="mailto:info@m2mtechconnect.com?subject=AURA%20demo">Book a guided demo</a></div></section></main>
+<footer className="dc-footer"><div className="dc-container">
+<div className="dc-footer-main">
+  <div className="dc-footer-brand">
+    <Link className="dc-footer-aura" to="/" aria-label="AURA home"><Logo/></Link>
+    <a className="dc-footer-powered" href="https://m2mtechconnect.com/" aria-label="Powered by M2M Tech — corporate website"><img className="dc-m2m-logo" src={m2mLogo} width="40" height="40" alt="" loading="lazy"/><span>Powered by <strong>M2M Tech</strong></span></a>
+    <p>AI data centre intelligence.<br/>From design to informed decisions.</p>
+    <a className="dc-footer-corporate" href="https://m2mtechconnect.com/">Visit M2M corporate <span aria-hidden="true">↗</span></a>
+  </div>
+  <nav className="dc-footer-links" aria-label="Footer navigation">
+    <div className="dc-footer-group"><h2>Explore AURA</h2><ul>
+      <li><a href="#features">Platform features</a></li><li><a href="#use-cases">Who it’s for</a></li><li><a href="#journey">The five workspaces</a></li><li><a href="#integrations">Technology & integrations</a></li><li><a href="#differentiators">Why AURA</a></li>
+    </ul></div>
+    <div className="dc-footer-group"><h2>Get started</h2><ul>
+      <li><a href="mailto:info@m2mtechconnect.com?subject=AURA%20guided%20demo">Book a guided demo</a></li><li><Link to="/login">Sign in to AURA</Link></li><li><Link to="/onboarding">Create an account</Link></li>
+    </ul></div>
+    <div className="dc-footer-group"><h2>Connect with M2M</h2><ul>
+      <li><a href="https://m2mtechconnect.com/">Corporate website <span aria-hidden="true">↗</span></a></li><li><a href="mailto:info@m2mtechconnect.com">Contact our team</a></li>
+    </ul><p className="dc-footer-note">Have an AI factory project in mind? Let’s start a conversation.</p></div>
+  </nav>
+</div>
+<div className="dc-footer-legal"><p>© {new Date().getFullYear()} M2M Tech Connect Inc.</p><nav aria-label="Legal"><a href="https://m2mtechconnect.com/privacy">Privacy policy</a><a href="https://m2mtechconnect.com/terms">Terms of use</a></nav><a href="#main-content">Back to top <span aria-hidden="true">↑</span></a></div>
+</div></footer></div>}
 
-const DeferredLandingContent = lazy(() => import('@/components/landing/DeferredLandingContent'));
+const interiorViews=[['data-hall','Data hall row'],['racks','Racks close-up'],['cooling','Hot aisle · cooling'],['power','Hot aisle · power'],['thermal','Thermal viewpoint'],['coolant','Coolant distribution'],['network','Networking'],['panels','Power panels']];
+const interiorValue=[
+ ['Understand the layout','See how racks and aisles fit together.','Give the team a shared starting point for a design review.'],
+ ['Bring compute into focus','Inspect the reference rack assembly up close.','Discuss the equipment in its spatial context.'],
+ ['Make cooling visible','See the cooling-side layout in relation to the racks.','Identify what needs further thermal analysis and facility inputs.'],
+ ['Follow the power-side layout','Explore the reference aisle and its equipment.','Frame the electrical questions for the next engineering review.'],
+ ['Put thermal questions in context','Locate the area used for thermal exploration.','Temperature conclusions require an applied field and its source.'],
+ ['Understand cooling distribution','Inspect the reference coolant distribution assembly.','Connect a component discussion to the overall design.'],
+ ['Explore the network fabric','Inspect the reference networking arrangement.','Review connectivity alongside compute, cooling and power.'],
+ ['Review electrical infrastructure','See the reference power-panel arrangement.','Discuss distribution and the supported scenarios to explore next.']
+];
+function InteriorGallery(){const[selected,setSelected]=useState(0);const[file,title]=interiorViews[selected];const[value,description,decision]=interiorValue[selected];return <div className="dc-interior-gallery"><div className="dc-scene-story"><figure><img className="dc-gallery-main" src={'/landing/dsx/interior-'+file+'.png'} alt={'NVIDIA DSX reference interior: '+title} width="1300" height="625" loading="lazy"/><figcaption>{title} · NVIDIA DSX reference geometry</figcaption></figure><div className="dc-scene-value" aria-live="polite"><p className="dc-eyebrow">{String(selected+1).padStart(2,'0')} / 08 · {title}</p><h3>{value}</h3><p>{description}</p><div className="dc-value-outcome"><small>BRING TO YOUR REVIEW</small><p>{decision}</p></div><Link to="/login?returnTo=%2Fsimulate">Explore in AURA ↗</Link></div></div><div className="dc-gallery-choices" role="group" aria-label="Choose a DSX interior view">{interiorViews.map(([file,label],i)=><button key={file} aria-pressed={selected===i} onClick={()=>setSelected(i)}><img src={'/landing/dsx/interior-'+file+'.png'} alt="" width="260" height="125" loading="lazy"/><span>{label}</span></button>)}</div><p className="dc-gallery-source">Saved NVIDIA DSX reference views · captured 24 September 2026 · not a live customer facility</p></div>}
 
-function DeferredMarketingBody() {
-  const triggerRef = useRef<HTMLDivElement>(null);
-  const pendingAnchorRef = useRef<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-
-  const scrollToPendingAnchor = useCallback(() => {
-    const id = pendingAnchorRef.current;
-    if (!id) return;
-    const target = document.getElementById(id);
-    if (!target) return;
-    pendingAnchorRef.current = null;
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, []);
-
-  const requestAnchor = useCallback((id: string) => {
-    const existing = document.getElementById(id);
-    if (existing) {
-      existing.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    pendingAnchorRef.current = id;
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const hash = window.location.hash.replace(/^#/, '');
-    if (hash) requestAnchor(hash);
-
-    const onRequest = (event: Event) => {
-      const custom = event as CustomEvent<string>;
-      if (custom.detail) requestAnchor(custom.detail);
-    };
-    window.addEventListener('aura:landing-body-request', onRequest as EventListener);
-    return () => window.removeEventListener('aura:landing-body-request', onRequest as EventListener);
-  }, [requestAnchor]);
-
-  useEffect(() => {
-    if (mounted || !triggerRef.current) return;
-    if (!('IntersectionObserver' in window)) {
-      setMounted(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        setMounted(true);
-        observer.disconnect();
-      },
-      // Preload the marketing body well before the visitor reaches it. A
-      // negative bottom margin previously kept the trigger outside the
-      // intersection zone while the body was unmounted, so the page never
-      // grew taller than the hero and scrolling was impossible (stuck hero).
-      { rootMargin: '0px 0px 600px 0px', threshold: 0 },
-    );
-    observer.observe(triggerRef.current);
-    return () => observer.disconnect();
-  }, [mounted]);
-
-  return (
-    <>
-      <div ref={triggerRef} aria-hidden="true" className="h-px w-full" />
-      {mounted ? (
-        <Suspense
-          fallback={(
-            <div className="flex min-h-32 items-center justify-center" role="status" aria-live="polite">
-              <span className="text-sm text-muted-foreground">Loading platform capabilities…</span>
-            </div>
-          )}
-        >
-          <DeferredLandingContent onReady={scrollToPendingAnchor} />
-        </Suspense>
-      ) : null}
-    </>
-  );
-}
-
-/**
- * FAQ structured data. Mirrors the visible answers rendered by TwinFAQ and
- * states the platform's truth semantics: no live telemetry, no vendor runtime.
- */
-const FAQ_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      q: 'Is AURA showing live data from my facility?',
-      a: 'No. AURA has no live telemetry sources connected today. Every operational number you see is simulated or replayed, and it is labelled that way in the interface.',
-    },
-    {
-      q: 'What is the difference between configured, connected and verified?',
-      a: 'Configured means a system is described in the blueprint. Connected means a link exists. Verified means evidence was checked and recorded. AURA never collapses these into a single green state.',
-    },
-    {
-      q: 'Does AURA integrate with NVIDIA Omniverse or DSX?',
-      a: 'No. AURA is a DSX-aligned architecture rendered by its own web runtime. No NVIDIA runtime component is deployed, and none is claimed.',
-    },
-    {
-      q: 'Can I use it for a new AI factory build, not just an existing hall?',
-      a: 'Yes. Most teams start in the blueprint before racks exist, then run scenarios against the design.',
-    },
-    {
-      q: 'What can I do in a free account?',
-      a: 'Create a facility blueprint, run the scenario library against it, and read the KPI impact. No production connection is required.',
-    },
-    {
-      q: 'How is AURA architected?',
-      a: 'Four connected areas: a facility blueprint as the single source of truth, power, cooling, thermal and carbon engines, a scenario simulator, and operational views with provenance-labelled KPIs.',
-    },
-  ].map(({ q, a }) => ({
-    '@type': 'Question',
-    name: q,
-    acceptedAnswer: { '@type': 'Answer', text: a },
-  })),
-};
-
-/** Public, read-only marketing landing page for AURA DC. */
-export default function DataCentreTwinLanding() {
-  return (
-    <div className="aura-marketing min-h-screen bg-background text-foreground scroll-smooth">
-      <Helmet>
-        <link rel="canonical" href="https://auradc.m2mtechconnect.com/" />
-        <meta property="og:url" content="https://auradc.m2mtechconnect.com/" />
-        <script type="application/ld+json">{JSON.stringify(FAQ_JSON_LD)}</script>
-      </Helmet>
-
-      <SkipToContent />
-      <TwinHeader />
-      <main id={MAIN_CONTENT_ID}>
-        <div className="pt-16 lg:pt-20">
-          <TwinHero />
-        </div>
-        <DeferredMarketingBody />
-      </main>
-    </div>
-  );
-}
+function KpiImage({file,title,detail}:{file:string;title:string;detail:string}){return <figure className="dc-kpi-figure"><h3>{title}</h3><img src={'/landing/dsx/kpi-'+file+'.png'} alt={title+' — actual AURA screen capture'} loading="lazy"/><figcaption>{detail}</figcaption></figure>}

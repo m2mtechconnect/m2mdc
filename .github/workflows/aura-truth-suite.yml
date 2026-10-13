@@ -28,7 +28,7 @@ env:
 jobs:
   truth-in-ui:
     name: Truth-in-UI (shard ${{ matrix.shard }}/4)
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -71,7 +71,7 @@ jobs:
 
   route-stress:
     name: Route stress sweep
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

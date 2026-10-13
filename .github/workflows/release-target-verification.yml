@@ -38,7 +38,7 @@ concurrency:
 jobs:
   source-build:
     name: Verify exact source SHA and build fingerprint
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 30
     outputs:
       checked_sha: ${{ steps.source.outputs.checked_sha }}
@@ -116,7 +116,7 @@ jobs:
   live-target:
     name: Verify published target fingerprint
     needs: source-build
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 20
     environment: ${{ inputs.environment }}
     env:

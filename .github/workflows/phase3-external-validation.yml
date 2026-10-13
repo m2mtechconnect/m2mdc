@@ -33,7 +33,7 @@ env:
 jobs:
   validate:
     name: Ephemeral Supabase stack
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 45
     env:
       # Explicitly neutralise any ambient production configuration.

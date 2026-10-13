@@ -23,7 +23,7 @@ env:
 jobs:
   qualification:
     name: Exact-SHA release decision
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4

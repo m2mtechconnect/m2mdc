@@ -38,7 +38,7 @@ env:
 jobs:
   software:
     name: Twin canvas (software)
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 25
     concurrency:
       group: twin-canvas-software-${{ github.event.pull_request.number || github.ref }}
@@ -86,7 +86,7 @@ jobs:
   gpu:
     name: Twin canvas (hardware GPU, advisory)
     if: github.event_name == 'workflow_dispatch' && inputs.run_gpu_lane == true
-    runs-on: ubuntu-latest-gpu
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}-gpu
     continue-on-error: true
     timeout-minutes: 25
     concurrency:
@@ -135,7 +135,7 @@ jobs:
 
   summary:
     name: Twin canvas matrix summary
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: twin-canvas-summary-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}

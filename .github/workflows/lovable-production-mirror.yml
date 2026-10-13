@@ -21,7 +21,7 @@ concurrency:
 jobs:
   mirror:
     name: Reconcile production compatibility ref
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4

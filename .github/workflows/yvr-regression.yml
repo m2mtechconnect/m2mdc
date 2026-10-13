@@ -35,7 +35,7 @@ env:
 jobs:
   yvr-unit-tests:
     name: Data Centre Template Scope
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +60,7 @@ jobs:
 
   yvr-integration-tests:
     name: Builder Template Wiring
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     needs: yvr-unit-tests
 
     steps:
@@ -86,7 +86,7 @@ jobs:
 
   yvr-e2e-tests:
     name: Navigation Performance Contract
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     needs: [yvr-unit-tests, yvr-integration-tests]
 
     steps:
@@ -112,7 +112,7 @@ jobs:
 
   yvr-regression-summary:
     name: Template Scope Summary
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     needs: [yvr-unit-tests, yvr-integration-tests, yvr-e2e-tests]
     if: always()
 
@@ -132,7 +132,7 @@ jobs:
 
   block-on-failure:
     name: Block Merge on Template Scope Failure
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     needs: yvr-regression-summary
     if: failure()
 

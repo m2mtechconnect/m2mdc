@@ -17,7 +17,7 @@ env:
 jobs:
   static-gate:
     name: Typecheck and Lint
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: p1-static-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}

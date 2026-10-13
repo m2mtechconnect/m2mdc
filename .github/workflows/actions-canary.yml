@@ -13,7 +13,7 @@ permissions:
 jobs:
   canary:
     name: Actions scheduler canary
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 5
     steps:
       - name: Report scheduler health

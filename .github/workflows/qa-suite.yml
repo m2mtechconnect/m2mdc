@@ -30,7 +30,7 @@ env:
 jobs:
   unit-tests:
     name: Unit Tests
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: qa-unit-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -68,7 +68,7 @@ jobs:
 
   e2e-tests:
     name: E2E Tests (${{ matrix.browser }})
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     timeout-minutes: 45
     env:
       QA_AUTH_BOOTSTRAP: '1'
@@ -259,7 +259,7 @@ jobs:
 
   accessibility-audit:
     name: Accessibility Audit
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: qa-a11y-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -296,7 +296,7 @@ jobs:
 
   security-scan:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: qa-security-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -327,7 +327,7 @@ jobs:
 
   qa-summary:
     name: QA Summary
-    runs-on: ubuntu-latest
+    runs-on: codebuild-m2mtechconnect-org-github-runner-${{ github.run_id }}-${{ github.run_attempt }}
     concurrency:
       group: qa-summary-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}

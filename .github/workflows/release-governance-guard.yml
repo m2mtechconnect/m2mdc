@@ -1,0 +1,127 @@
+name: Release Governance Guard
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  REPOSITORY: ${{ github.repository }}
+
+jobs:
+  governance:
+    name: Release Governance Guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PUBLIC_REPO_INTENTIONAL: ${{ vars.AURA_PUBLIC_REPOSITORY_INTENTIONAL }}
+    steps:
+      - name: Verify repository visibility decision
+        id: visibility
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo_json="$(gh api "repos/${REPOSITORY}")"
+          visibility="$(jq -r '.visibility' <<<"$repo_json")"
+          echo "Repository visibility: $visibility"
+
+          if [ "$visibility" = "public" ] && [ "${PUBLIC_REPO_INTENTIONAL:-}" != "true" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: repository is public but AURA_PUBLIC_REPOSITORY_INTENTIONAL is not explicitly set to true."
+            echo "Either make the repository private or set the repository variable only after an explicit public-source decision."
+            exit 1
+          fi
+
+      - name: Verify main is protected and required checks are enforced
+        id: main_protection
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          branch_json="$(gh api "repos/${REPOSITORY}/branches/main")"
+          protected="$(jq -r '.protected' <<<"$branch_json")"
+          enforcement="$(jq -r '.protection.required_status_checks.enforcement_level // "off"' <<<"$branch_json")"
+
+          echo "main.protected=$protected"
+          echo "required-status enforcement=$enforcement"
+
+          failed=0
+          if [ "$protected" != "true" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: main is not protected."
+            failed=1
+          fi
+
+          if [ "$enforcement" = "off" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: required-status enforcement is off."
+            failed=1
+          fi
+
+          required_contexts="$(jq -r '.protection.required_status_checks.contexts[]? // empty' <<<"$branch_json")"
+          if ! grep -Fxq "QA Summary" <<<"$required_contexts"; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: QA Summary is not an enforced required status context on main."
+            failed=1
+          fi
+
+          exit "$failed"
+
+      - name: Verify production environment approval protection
+        id: production_environment
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! env_json="$(gh api "repos/${REPOSITORY}/environments/production" 2>/dev/null)"; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: GitHub production environment is not readable/configured."
+            exit 1
+          fi
+
+          reviewer_count="$(jq '[.protection_rules[]? | select(.type == "required_reviewers") | .reviewers[]?] | length' <<<"$env_json")"
+          protected_branches="$(jq -r '.deployment_branch_policy.protected_branches // false' <<<"$env_json")"
+          custom_branch_policies="$(jq -r '.deployment_branch_policy.custom_branch_policies // false' <<<"$env_json")"
+
+          echo "production required reviewers=$reviewer_count"
+          echo "deployment branch policy: protected_branches=$protected_branches custom_branch_policies=$custom_branch_policies"
+
+          failed=0
+          if [ "$reviewer_count" -lt 1 ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: production environment has no required reviewers."
+            failed=1
+          fi
+
+          if [ "$protected_branches" != "true" ] && [ "$custom_branch_policies" != "true" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: production deployments are not restricted by a deployment branch policy."
+            failed=1
+          fi
+
+          exit "$failed"
+
+      - name: Summarize and enforce governance gate
+        if: always()
+        shell: bash
+        env:
+          VISIBILITY_OUTCOME: ${{ steps.visibility.outcome }}
+          MAIN_PROTECTION_OUTCOME: ${{ steps.main_protection.outcome }}
+          PRODUCTION_ENV_OUTCOME: ${{ steps.production_environment.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            echo "### AURA release governance"
+            echo "- Repository visibility decision: $VISIBILITY_OUTCOME"
+            echo "- main protection + QA Summary requirement: $MAIN_PROTECTION_OUTCOME"
+            echo "- production environment reviewers/branch policy: $PRODUCTION_ENV_OUTCOME"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$VISIBILITY_OUTCOME" != "success" ] || \
+             [ "$MAIN_PROTECTION_OUTCOME" != "success" ] || \
+             [ "$PRODUCTION_ENV_OUTCOME" != "success" ]; then
+            echo "RELEASE_GOVERNANCE_BLOCKED: one or more native governance controls are not satisfied."
+            exit 1
+          fi
+
+          echo "AURA release governance prerequisites are satisfied."
